@@ -5,7 +5,7 @@ export function FilterSidebar() {
   return (
     <>
       <nav
-        className={`${styles["sidebar"]} ${styles["sidebar--left"]} ${styles["sidebar--floating"]}`}
+        className={`${styles["sidebar"]} ${styles["sidebar--left"]} ${styles["sidebar--floating"]} ${styles["filter--desktop"]}`}
         aria-label="카테고리 및 난이도 필터"
       >
         <div className={styles["filter"]}>
@@ -198,7 +198,9 @@ export function FilterSidebar() {
         </div>
       </nav>
 
-      <details className={`${styles["sidebar"]} ${styles["sidebar--collapsible"]}`}>
+      <details
+        className={`${styles["sidebar"]} ${styles["sidebar--collapsible"]} ${styles["filter--mobile"]}`}
+      >
         <summary className={styles["sidebar__summary"]} aria-label="필터 열기">
           필터
         </summary>

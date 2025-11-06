@@ -3,6 +3,14 @@
   display: block;
 }
 
+.filter--desktop {
+  display: none;
+}
+
+.filter--mobile {
+  display: block;
+}
+
 .sidebar {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -226,9 +234,6 @@
     display: grid;
   }
 
-  .sidebar--collapsible {
-    display: none;
-  }
 }
 
 @media (min-width: 1200px) {
@@ -251,5 +256,13 @@
   .sidebar--floating::-webkit-scrollbar-thumb {
     background: var(--color-border);
     border-radius: var(--radius-sm);
+  }
+
+  .filter--desktop {
+    display: block;
+  }
+
+  .filter--mobile {
+    display: none;
   }
 }
