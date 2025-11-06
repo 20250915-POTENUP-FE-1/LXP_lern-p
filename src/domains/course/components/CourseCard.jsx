@@ -30,9 +30,6 @@ export function CourseCard() {
         <p className={styles["course-card__meta"]}>강사: 홍길동 • 입문</p>
         <div className={styles["course-card__foot"]}>
           <span className={styles["course-card__price"]}>₩49,000</span>
-          <a className={styles["course-card__cta"]} href="/courses/placeholder">
-            자세히 보기
-          </a>
         </div>
       </div>
     </article>

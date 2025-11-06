@@ -43,18 +43,16 @@ export function LoginModal() {
         </div>
 
         <footer className="modal__actions">
-          <a href="#" className="modal__button modal__button--ghost">
-            취소
-          </a>
-          <a
-            href="/signup"
-            className="modal__button modal__button--ghost"
-          >
-            회원가입
-          </a>
+          
           <a href="#" className="modal__button">
             로그인
           </a>
+          <div className="modal__actions--bottom">
+            아직 계정이 없으신가요?
+            <a className="modal__actions--link" href="/signup">
+              회원가입
+            </a>
+          </div>
         </footer>
       </div>
     </div>

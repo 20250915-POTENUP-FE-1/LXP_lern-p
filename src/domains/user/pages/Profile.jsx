@@ -7,12 +7,22 @@ export default function Profile() {
       className={styles["profile-section"]}
       aria-labelledby="mypage-profile-title"
     >
-      <h1
-        id="mypage-profile-title"
-        className={styles["profile-section__title"]}
-      >
-        내 정보
-      </h1>
+      <div className={styles["profile-section__header"]}>
+        <h1
+          id="mypage-profile-title"
+          className={styles["profile-section__title"]}
+        >
+          내 정보
+        </h1>
+        <div className={styles["profile__actions"]}>
+          <a
+            href="/mypage/edit"
+            className={`${styles["profile__btn"]} ${styles["profile__btn--edit"]}`}
+          >
+            정보 수정
+          </a>
+        </div>
+      </div>
 
       {/* 프로필 헤더 카드 */}
       <section
@@ -27,14 +37,7 @@ export default function Profile() {
         </div>
       </section>
 
-      <div className={styles["profile__actions"]}>
-        <a
-          href="/mypage/edit"
-          className={`${styles["profile__btn"]} ${styles["profile__btn--edit"]}`}
-        >
-          정보 수정
-        </a>
-      </div>
+      
 
       {/* 상세 정보 카드 */}
       <div className={styles["profile-section__card"]}>

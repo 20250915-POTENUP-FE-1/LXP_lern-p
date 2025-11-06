@@ -3,6 +3,11 @@
   gap: var(--space-5);
 }
 
+.profile-section__header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .profile-section__title {
   margin: 0;
   font-size: var(--text-2xl);

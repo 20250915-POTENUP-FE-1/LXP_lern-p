@@ -35,7 +35,7 @@
 
 @media (min-width: 1200px) {
   .app-shell__main {
-    padding-inline: var(--space-6);
+    padding-inline: var(--space-4);
   }
 }
 

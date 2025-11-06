@@ -156,7 +156,7 @@ a:focus-visible {
 
 @media (min-width: 768px) {
   .container {
-    padding-inline: var(--space-5);
+    padding-inline: 0;
   }
 
   :global(main),
@@ -167,7 +167,7 @@ a:focus-visible {
 
 @media (min-width: 1200px) {
   .container {
-    padding-inline: var(--space-6);
+    padding-inline: 0;
   }
 
   :global(main),
@@ -247,9 +247,24 @@ a:focus-visible {
 
 .modal__actions {
   display: flex;
+  flex-direction: column;
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-5);
+}
+
+.modal__actions .modal__actions--bottom {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-3);
+}
+
+.modal__actions .modal__actions--link {
+  color: var(--color-brand);
+  text-decoration: none;
 }
 
 .modal__form {

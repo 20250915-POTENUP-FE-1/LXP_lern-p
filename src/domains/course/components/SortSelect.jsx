@@ -8,9 +8,6 @@ export function SortSelect() {
       role="group"
       aria-label="정렬"
     >
-      <label htmlFor="course-sort" className={styles["sort__label"]}>
-        정렬
-      </label>
       <select
         id="course-sort"
         className={styles["sort__select"]}

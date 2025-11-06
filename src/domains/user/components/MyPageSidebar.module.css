@@ -135,7 +135,7 @@
 @media (min-width: 1200px) {
   .sidebar--floating {
     position: sticky;
-    top: var(--space-10);
+    top: 0;
     max-height: calc(100dvh - var(--space-10) - var(--space-6));
     overflow-y: auto;
   }
