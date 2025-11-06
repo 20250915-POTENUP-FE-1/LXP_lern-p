@@ -4,7 +4,7 @@ import styles from "./CourseDetailPage.module.css";
 export default function CourseDetailPage() {
   return (
     <main
-      className={styles["course-detail"]}
+      className={`${styles["course-detail"]} container`}
       aria-labelledby="course-detail-title"
     >
       <div className={styles["course-detail__layout"]}>
@@ -46,33 +46,24 @@ export default function CourseDetailPage() {
             </p>
           </header>
 
-          <nav
-            className={styles["course-detail-tabs"]}
-            aria-label="강좌 상세 탭"
-          >
-            <ul className={styles["course-detail-tabs__list"]}>
-              <li className={styles["course-detail-tabs__item"]}>
+          <nav className={styles["course-tabs"]} aria-label="강좌 상세 탭">
+            <ul className={styles["course-tabs__list"]}>
+              <li>
                 <a
                   href="#intro"
-                  className={styles["course-detail-tabs__link"]}
+                  className={styles["course-tabs__link"]}
                   aria-current="page"
                 >
                   강좌 소개
                 </a>
               </li>
-              <li className={styles["course-detail-tabs__item"]}>
-                <a
-                  href="#curriculum"
-                  className={styles["course-detail-tabs__link"]}
-                >
+              <li>
+                <a href="#curriculum" className={styles["course-tabs__link"]}>
                   커리큘럼
                 </a>
               </li>
-              <li className={styles["course-detail-tabs__item"]}>
-                <a
-                  href="#instructor"
-                  className={styles["course-detail-tabs__link"]}
-                >
+              <li>
+                <a href="#instructor" className={styles["course-tabs__link"]}>
                   강사 정보
                 </a>
               </li>
@@ -133,51 +124,53 @@ export default function CourseDetailPage() {
           className={styles["course-detail__aside"]}
           aria-label="신청 영역"
         >
-          <div className={styles["floating-cta"]}>
+          <div
+            className={`${styles["sidebar"]} ${styles["sidebar--right"]} ${styles["sidebar--floating"]}`}
+          >
             <a
               href="#course-apply-modal"
-              className={styles["floating-cta__button"]}
+              className={styles["course-detail__cta-button"]}
             >
               신청하기
             </a>
-            <ul className={styles["floating-cta__meta-list"]}>
-              <li className={styles["floating-cta__meta-row"]}>
-                <span className={styles["floating-cta__meta-label"]}>강사</span>
-                <span className={styles["floating-cta__meta-value"]}>
+            <ul className={styles["course-detail__cta-meta"]}>
+              <li className={styles["course-detail__cta-row"]}>
+                <span className={styles["course-detail__cta-label"]}>강사</span>
+                <span className={styles["course-detail__cta-value"]}>
                   김코딩
                 </span>
               </li>
               <li
-                className={styles["floating-cta__divider"]}
+                className={styles["course-detail__cta-divider"]}
                 aria-hidden="true"
               />
-              <li className={styles["floating-cta__meta-row"]}>
-                <span className={styles["floating-cta__meta-label"]}>
+              <li className={styles["course-detail__cta-row"]}>
+                <span className={styles["course-detail__cta-label"]}>
                   총 강의
                 </span>
-                <span className={styles["floating-cta__meta-value"]}>12강</span>
+                <span className={styles["course-detail__cta-value"]}>12강</span>
               </li>
               <li
-                className={styles["floating-cta__divider"]}
+                className={styles["course-detail__cta-divider"]}
                 aria-hidden="true"
               />
-              <li className={styles["floating-cta__meta-row"]}>
-                <span className={styles["floating-cta__meta-label"]}>
+              <li className={styles["course-detail__cta-row"]}>
+                <span className={styles["course-detail__cta-label"]}>
                   총 시간
                 </span>
-                <span className={styles["floating-cta__meta-value"]}>
+                <span className={styles["course-detail__cta-value"]}>
                   5시간 20분
                 </span>
               </li>
               <li
-                className={styles["floating-cta__divider"]}
+                className={styles["course-detail__cta-divider"]}
                 aria-hidden="true"
               />
-              <li className={styles["floating-cta__meta-row"]}>
-                <span className={styles["floating-cta__meta-label"]}>
+              <li className={styles["course-detail__cta-row"]}>
+                <span className={styles["course-detail__cta-label"]}>
                   난이도
                 </span>
-                <span className={styles["floating-cta__meta-value"]}>초급</span>
+                <span className={styles["course-detail__cta-value"]}>초급</span>
               </li>
             </ul>
           </div>

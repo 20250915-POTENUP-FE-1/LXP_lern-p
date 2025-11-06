@@ -3,7 +3,11 @@ import styles from "./SortSelect.module.css";
 
 export function SortSelect() {
   return (
-    <div className={styles["sort"]} role="group" aria-label="정렬">
+    <div
+      className={`${styles["sort"]} ${styles["sort--compact"]}`}
+      role="group"
+      aria-label="정렬"
+    >
       <label htmlFor="course-sort" className={styles["sort__label"]}>
         정렬
       </label>

@@ -4,7 +4,7 @@ import styles from "./Header.module.css";
 export function Header() {
   return (
     <>
-      <a href="#main-content" className={styles["skip-link"]}>
+      <a href="#main-content" className={styles["header__skip-link"]}>
         본문으로 건너뛰기
       </a>
 
@@ -31,23 +31,45 @@ export function Header() {
 
           {/* 우측: 액션 + 프로필 */}
           <div className={styles["header__right"]}>
-            {/* 게스트: 로그인 */}
-            <a className={styles["header__action-link"]} href="#login-modal">
-              로그인
-            </a>
-
-            {/* 로그인(O) & 강사권한(X): 권한 요청 */}
-            <a
-              className={styles["header__action-ghost"]}
-              href="#role-request-modal"
+            <nav
+              className={styles["header__actions"]}
+              aria-label="사용자 작업"
             >
-              강사 권한 요청
-            </a>
+              {/* 게스트: 로그인 */}
+              <a
+                className={`${styles["header__action"]} ${styles["header__action--link"]}`}
+                href="#login-modal"
+                aria-controls="login-modal"
+              >
+                로그인
+              </a>
 
-            {/* 로그인(O) & 강사권한(O): 강좌 등록 */}
-            <a className={styles["header__action-cta"]} href="/courses/create">
-              강좌 등록하기
-            </a>
+              {/* 회원가입 */}
+              <a
+                className={`${styles["header__action"]} ${styles["header__action--ghost"]}`}
+                href="/signup"
+              >
+                회원가입
+              </a>
+
+              {/* 로그인(O) & 강사권한(X): 권한 요청 */}
+              <a
+                className={`${styles["header__action"]} ${styles["header__action--ghost"]}`}
+                href="#instructor-request-modal"
+              >
+                강사 권한 요청
+              </a>
+
+              {/* 로그인(O) & 강사권한(O): 강좌 등록 */}
+              <a
+                className={`${styles["header__action"]} ${styles["header__action--cta"]}`}
+                href="/courses/create"
+                data-modal-target="#instructor-request-modal"
+                data-requires-role="instructor"
+              >
+                강좌 등록하기
+              </a>
+            </nav>
 
             {/* 로그인(O): 프로필(마이페이지) */}
             <a

@@ -20,10 +20,14 @@ export default function AuthLayout() {
         role="main"
         tabIndex={-1}
       >
-        <Outlet />
+        <div className={styles["auth"]}>
+          <div className={styles["auth__card"]}>
+            <Outlet />
+          </div>
+        </div>
       </main>
       <footer className={styles["auth-shell__footer"]} role="contentinfo">
-        <p className={styles["footer__text"]}>
+        <p className={styles["auth-shell__footer-text"]}>
           도움이 필요하신가요? support@lernp.example
         </p>
       </footer>

@@ -3,16 +3,15 @@ import React from "react";
 export function RoleRequestModal() {
   return (
     <div
-      id="role-request-modal"
+      id="instructor-request-modal"
       data-modal-root
-      data-size="lg"
-      className="modal"
+      className="modal modal--instructor-request modal--wide"
       role="dialog"
       aria-modal="true"
       aria-labelledby="role-request-title"
     >
       <a href="#" className="modal__overlay" aria-label="닫기" />
-      <div className="modal__content" role="document">
+      <div className="modal__content modal__content--role-request" role="document">
         <header className="modal__header">
           <h2 id="role-request-title" className="modal__title">
             강사 권한 요청
@@ -48,11 +47,11 @@ export function RoleRequestModal() {
             </div>
           </form>
         </div>
-        <footer className="modal__footer">
-          <a href="#" className="modal__btn">
+        <footer className="modal__actions">
+          <a href="#" className="modal__button">
             요청 보내기
           </a>
-          <a href="#" className="modal__btn modal__btn--ghost">
+          <a href="#" className="modal__button modal__button--ghost">
             취소
           </a>
         </footer>

@@ -17,8 +17,15 @@ export default function Enrolled() {
       <div className={styles["enrolled-section__list"]}>
         {/* 아이템(정적 마크업) */}
         <div className={styles["enrolled-card"]}>
-          <h3 className={styles["enrolled-card__title"]}>React 완전정복</h3>
-          <p className={styles["enrolled-card__meta"]}>카테고리: 프론트엔드</p>
+          <a
+            href="/courses/placeholder"
+            className={styles["enrolled__link"]}
+          >
+            <h3 className={styles["enrolled__title"]}>React 완전정복</h3>
+            <p className={styles["enrolled__category"]}>
+              프론트엔드 / React / 입문
+            </p>
+          </a>
           <div className={styles["progress"]} aria-label="진행률 60%">
             <div className={styles["progress__bar"]} style={{ width: "60%" }} />
           </div>
@@ -26,8 +33,15 @@ export default function Enrolled() {
         </div>
 
         <div className={styles["enrolled-card"]}>
-          <h3 className={styles["enrolled-card__title"]}>TypeScript 기초</h3>
-          <p className={styles["enrolled-card__meta"]}>카테고리: 프론트엔드</p>
+          <a
+            href="/courses/placeholder"
+            className={styles["enrolled__link"]}
+          >
+            <h3 className={styles["enrolled__title"]}>TypeScript 기초</h3>
+            <p className={styles["enrolled__category"]}>
+              프론트엔드 / TypeScript / 중급
+            </p>
+          </a>
           <div className={styles["progress"]} aria-label="진행률 30%">
             <div className={styles["progress__bar"]} style={{ width: "30%" }} />
           </div>

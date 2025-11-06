@@ -13,7 +13,7 @@ export default function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles["app-shell__footer"]} role="contentinfo">
-        <p className={styles["footer__text"]}>
+        <p className={styles["app-shell__footer-text"]}>
           © {new Date().getFullYear()} lernP
         </p>
       </footer>

@@ -7,7 +7,7 @@ import { SearchBar } from "../components/SearchBar";
 
 export default function CourseListPage() {
   return (
-    <main className={styles["catalog"]} aria-label="강좌 목록">
+    <main className={`${styles["catalog"]} container`} aria-label="강좌 목록">
       {/* 툴바 */}
       <div className={styles["catalog__toolbar"]}>
         <SearchBar />
@@ -26,7 +26,9 @@ export default function CourseListPage() {
           className={styles["catalog__content"]}
           aria-label="강좌 카드 목록"
         >
-          <div className={styles["catalog__cards"]}>
+          <div
+            className={`${styles["catalog__cards"]} ${styles["course-grid"]}`}
+          >
             {/* 데모 카드 8개 */}
             {Array.from({ length: 8 }).map((_, i) => (
               <CourseCard key={i} />

@@ -27,6 +27,15 @@ export default function Profile() {
         </div>
       </section>
 
+      <div className={styles["profile__actions"]}>
+        <a
+          href="/mypage/edit"
+          className={`${styles["profile__btn"]} ${styles["profile__btn--edit"]}`}
+        >
+          정보 수정
+        </a>
+      </div>
+
       {/* 상세 정보 카드 */}
       <div className={styles["profile-section__card"]}>
         <div className={styles["profile-section__row"]}>

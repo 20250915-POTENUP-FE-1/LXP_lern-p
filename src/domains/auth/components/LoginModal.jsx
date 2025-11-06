@@ -5,14 +5,13 @@ export function LoginModal() {
     <div
       id="login-modal"
       data-modal-root
-      data-size="md"
-      className="modal"
+      className="modal modal--login modal--narrow"
       role="dialog"
       aria-modal="true"
       aria-labelledby="login-modal-title"
     >
       <a href="#" className="modal__overlay" aria-label="닫기" />
-      <div className="modal__content" role="document">
+      <div className="modal__content modal__content--login" role="document">
         <header className="modal__header">
           <h2 id="login-modal-title" className="modal__title">
             로그인
@@ -43,11 +42,17 @@ export function LoginModal() {
           </form>
         </div>
 
-        <footer className="modal__footer">
-          <a href="#" className="modal__btn modal__btn--ghost">
+        <footer className="modal__actions">
+          <a href="#" className="modal__button modal__button--ghost">
             취소
           </a>
-          <a href="#" className="modal__btn">
+          <a
+            href="/signup"
+            className="modal__button modal__button--ghost"
+          >
+            회원가입
+          </a>
+          <a href="#" className="modal__button">
             로그인
           </a>
         </footer>

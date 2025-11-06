@@ -1,53 +1,115 @@
 import React from "react";
 import styles from "@/domains/user/components/MyPageSidebar.module.css";
 
-/** Block: mypage-tabs (named export) */
 export function MyPageSidebar() {
   return (
-    <nav className={styles["mypage-tabs"]} aria-label="마이페이지 탭">
-      {/* 기본 탭 */}
-      <ul className={styles["mypage-tabs__list"]}>
-        <li className={styles["mypage-tabs__item"]}>
-          <a
-            href="/mypage"
-            className={styles["mypage-tabs__link"]}
-            aria-current="page"
-          >
-            내 정보
-          </a>
-        </li>
-        <li className={styles["mypage-tabs__item"]}>
-          <a href="/mypage/enrolled" className={styles["mypage-tabs__link"]}>
-            수강 중인 강좌
-          </a>
-        </li>
-      </ul>
-
-      {/* 강사 전용 섹션 */}
-      <div
-        className={`${styles["mypage-tabs__section"]} ${styles["mypage-tabs__section--instructor"]}`}
-        aria-label="강사 전용"
+    <>
+      <nav
+        className={`${styles["sidebar"]} ${styles["sidebar--left"]} ${styles["sidebar--floating"]}`}
+        aria-label="마이페이지 탐색"
       >
-        <h4 className={styles["mypage-tabs__section-title"]}>강사</h4>
-        <ul className={styles["mypage-tabs__list"]}>
-          <li className={styles["mypage-tabs__item"]}>
-            <a
-              href="/mypage/instructor/courses"
-              className={styles["mypage-tabs__link"]}
+        <div className={styles["mypage-nav__section"]}>
+          <h4 className={styles["mypage-nav__section-title"]}>내 계정</h4>
+          <ul className={styles["mypage-nav"]}>
+            <li className={styles["mypage-nav__item"]}>
+              <a
+                href="/mypage"
+                className={styles["mypage-nav__link"]}
+                aria-current="page"
+              >
+                내 정보
+              </a>
+            </li>
+            <li className={styles["mypage-nav__item"]}>
+              <a
+                href="/mypage/enrolled"
+                className={styles["mypage-nav__link"]}
+              >
+                수강 중인 강좌
+              </a>
+            </li>
+            <li className={styles["mypage-nav__item"]}>
+              <a href="/mypage/cart" className={styles["mypage-nav__link"]}>
+                장바구니
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div
+          className={`${styles["mypage-nav__section"]} ${styles["mypage-nav__section--instructor"]}`}
+          aria-label="강사 전용"
+        >
+          <h4 className={styles["mypage-nav__section-title"]}>강사</h4>
+          <ul className={styles["mypage-nav"]}>
+            <li className={styles["mypage-nav__item"]}>
+              <a
+                href="/mypage/instructor/courses"
+                className={styles["mypage-nav__link"]}
+              >
+                내가 등록한 강의
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <details
+        className={`${styles["sidebar"]} ${styles["sidebar--collapsible"]}`}
+      >
+        <summary className={styles["sidebar__summary"]}>마이페이지 메뉴</summary>
+        <div className={styles["sidebar__panel"]}>
+          <nav aria-label="마이페이지 탐색 (모바일)">
+            <div className={styles["mypage-nav__section"]}>
+              <h4 className={styles["mypage-nav__section-title"]}>내 계정</h4>
+              <ul className={styles["mypage-nav"]}>
+                <li className={styles["mypage-nav__item"]}>
+                  <a
+                    href="/mypage"
+                    className={styles["mypage-nav__link"]}
+                    aria-current="page"
+                  >
+                    내 정보
+                  </a>
+                </li>
+                <li className={styles["mypage-nav__item"]}>
+                  <a
+                    href="/mypage/enrolled"
+                    className={styles["mypage-nav__link"]}
+                  >
+                    수강 중인 강좌
+                  </a>
+                </li>
+                <li className={styles["mypage-nav__item"]}>
+                  <a href="/mypage/cart" className={styles["mypage-nav__link"]}>
+                    장바구니
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div
+              className={`${styles["mypage-nav__section"]} ${styles["mypage-nav__section--instructor"]}`}
+              aria-label="강사 전용"
             >
-              내 강좌
-            </a>
-          </li>
-          <li className={styles["mypage-tabs__item"]}>
-            <a
-              href="/mypage/instructor/create"
-              className={styles["mypage-tabs__link"]}
-            >
-              강좌 만들기
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+              <h4 className={styles["mypage-nav__section-title"]}>강사</h4>
+              <ul className={styles["mypage-nav"]}>
+                <li className={styles["mypage-nav__item"]}>
+                  <a
+                    href="/mypage/instructor/courses"
+                    className={styles["mypage-nav__link"]}
+                  >
+                    내가 등록한 강의
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+          <a href="#main-content" className={styles["sidebar__close"]}>
+            닫기
+          </a>
+        </div>
+      </details>
+    </>
   );
 }

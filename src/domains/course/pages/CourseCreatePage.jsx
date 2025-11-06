@@ -5,7 +5,7 @@ import { CourseForm } from "@/domains/course/components/CourseForm";
 export default function CourseCreatePage() {
   return (
     <section
-      className={styles["course-create"]}
+      className={`${styles["course-create"]} container`}
       aria-labelledby="course-create-title"
     >
       <header className={styles["course-create__header"]}>
