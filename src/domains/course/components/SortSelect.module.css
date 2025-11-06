@@ -1,0 +1,15 @@
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sort__label {
+  color: var(--color-ink-subtle);
+  font-size: 0.9rem;
+}
+.sort__select {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}

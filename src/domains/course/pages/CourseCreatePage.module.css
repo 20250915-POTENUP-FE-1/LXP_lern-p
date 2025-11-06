@@ -1,0 +1,11 @@
+.course-create {
+  max-width: 960px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: grid;
+  gap: 16px;
+}
+.course-create__title {
+  margin: 0;
+  font-size: 1.25rem;
+}

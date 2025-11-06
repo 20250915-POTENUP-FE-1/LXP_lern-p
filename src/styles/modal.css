@@ -1,0 +1,161 @@
+/* ===== Global Modal System =====
+ * 해시(:target) 기반 오픈 + JS 클래스(.is-open) 기반 오픈 모두 지원
+ * - 기본 숨김: [data-modal-root]
+ * - 표시: :target[data-modal-root]  또는 .is-open[data-modal-root]
+ */
+
+[data-modal-root] {
+  position: fixed;
+  inset: 0;
+  display: none; /* 기본 숨김 (필수) */
+  place-items: center;
+  z-index: 1000; /* 겹침 이슈 방지 */
+}
+
+/* 해시(#id) 대상이면 표시 */
+:target[data-modal-root] {
+  display: grid;
+}
+
+/* JS로 열고 싶을 때 쓰는 대안 (.is-open 붙이면 표시) */
+.is-open[data-modal-root] {
+  display: grid;
+}
+
+/* 배경 스크롤 잠금(최신 브라우저) */
+html:has(:target[data-modal-root]),
+html:has(.is-open[data-modal-root]) {
+  overflow: hidden;
+}
+
+/* Overlay + Panel */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: contents; /* 컨테이너만, 실제 박스는 overlay/content가 담당 */
+}
+
+.modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+/* Size: data-size 로 제어 (sm | md | lg) */
+.modal__content {
+  position: relative;
+  width: 560px; /* md 기본 */
+  max-width: calc(100% - 32px);
+  background: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* data-size 변형 */
+[data-size="sm"] .modal__content {
+  width: 420px;
+}
+[data-size="md"] .modal__content {
+  width: 560px;
+}
+[data-size="lg"] .modal__content {
+  width: 720px;
+}
+
+/* Header/Body/Footer */
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+.modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+.modal__close {
+  border: 0;
+  background: transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modal__body {
+  padding: 16px 20px;
+}
+.modal__footer {
+  padding: 12px 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--color-border);
+}
+
+/* 내부 Form 유틸 (모달 안에서만 쓸 경량 유틸) */
+.modal__form {
+  display: grid;
+  gap: 12px;
+}
+.modal__field {
+  display: grid;
+  gap: 6px;
+}
+.modal__label {
+  font-size: 0.9rem;
+  color: var(--color-ink-muted);
+}
+.modal__input,
+.modal__textarea {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+/* 모달 전용 버튼(이름 충돌 방지: modal__btn) */
+.modal__btn {
+  background: var(--color-ink);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal__btn--ghost {
+  background: #fff;
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+}
+
+/* 목록 유틸 */
+.modal__list {
+  margin: 0;
+  padding-left: 1rem;
+}
+.modal__list-item {
+  margin: 4px 0;
+}
+
+/* RWD */
+@media (max-width: 1024px) {
+  [data-size="lg"] .modal__content {
+    width: 640px;
+  }
+}
+@media (max-width: 768px) {
+  .modal__content {
+    width: 100%;
+    max-width: calc(100% - 16px);
+    border-radius: 12px;
+  }
+}

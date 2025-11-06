@@ -1,8 +1,9 @@
-import "./index.css";
-import { providers } from "./providers";
+// /src/app/App.jsx
+import React from "react";
+import { RouterProvider } from "react-router";
+import router from "@/router";
+import "@/styles/global.css";
 
-function App() {
-  return <></>;
+export default function App() {
+  return <RouterProvider router={router} />;
 }
-
-export default App;

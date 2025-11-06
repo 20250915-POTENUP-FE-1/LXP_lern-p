@@ -1,0 +1,59 @@
+.floating-cta {
+  position: sticky;
+  top: 96px;
+}
+.floating-cta__panel {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  background: #fff;
+}
+.floating-cta__price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.floating-cta__price-value {
+  font-size: 1.25rem;
+}
+.floating-cta__price-note {
+  color: var(--color-ink-subtle);
+  font-size: 0.9rem;
+}
+.floating-cta__button {
+  background: var(--color-ink);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.floating-cta__secondary {
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+@media (max-width: 768px) {
+  .floating-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    padding: 8px;
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0)
+    );
+  }
+  .floating-cta__panel {
+    border: 1px solid var(--color-border);
+  }
+}

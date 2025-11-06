@@ -1,0 +1,41 @@
+.mypage {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+.mypage__layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+}
+.mypage__sidebar {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+.mypage__content {
+  min-height: 400px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+@media (max-width: 1024px) {
+  .mypage__layout {
+    grid-template-columns: 240px 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .mypage__layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .mypage__sidebar {
+    position: sticky;
+    top: 72px;
+    z-index: 10;
+  }
+  .mypage__content {
+    padding: 12px;
+  }
+}

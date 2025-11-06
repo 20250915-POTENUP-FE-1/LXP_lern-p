@@ -1,0 +1,33 @@
+.auth-page {
+  max-width: 440px;
+  margin: 48px auto;
+  padding: 0 16px;
+  display: grid;
+  gap: 16px;
+}
+.auth-page__title {
+  margin: 0;
+  font-size: 1.4rem;
+  text-align: center;
+}
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+.auth-form__field {
+  display: grid;
+  gap: 6px;
+}
+.auth-form__input {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.auth-form__submit {
+  background: var(--color-ink);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+}

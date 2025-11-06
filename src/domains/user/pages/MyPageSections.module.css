@@ -1,0 +1,122 @@
+.profile-section {
+  display: grid;
+  gap: 16px;
+}
+.profile-section__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.profile-section__header-card {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+.profile-section__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  background: #e5e7eb;
+}
+.profile-section__identity {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+.profile-section__name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-ink);
+}
+.profile-section__email {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 0.95rem;
+}
+.profile-section__since {
+  margin: 0;
+  color: var(--color-ink-subtle);
+  font-size: 0.85rem;
+}
+.profile-section__card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  display: grid;
+  gap: 8px;
+}
+.profile-section__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+.profile-section__divider {
+  height: 1px;
+  background: #f3f4f6;
+}
+.profile-section__label {
+  color: var(--color-ink-subtle);
+}
+.profile-section__value {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.enrolled-section {
+  display: grid;
+  gap: 12px;
+}
+.enrolled-section__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.enrolled-section__list {
+  display: grid;
+  gap: 12px;
+}
+.enrolled-card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  display: grid;
+  gap: 8px;
+}
+.enrolled-card__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.enrolled-card__meta {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-ink-muted);
+}
+.progress {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.progress__bar {
+  height: 100%;
+  background: var(--color-primary);
+}
+.enrolled-card__percent {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+@media (max-width: 768px) {
+  .profile-section__header-card {
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+  }
+  .profile-section__avatar {
+    width: 72px;
+    height: 72px;
+  }
+}

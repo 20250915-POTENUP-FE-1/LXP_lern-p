@@ -1,0 +1,42 @@
+.app-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.app-shell__main {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+.app-shell__footer {
+  border-top: 1px solid #eee;
+  padding: 16px;
+}
+.footer__text {
+  margin: 0;
+  color: #6b7280;
+  text-align: center;
+}
+
+.auth-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.auth-shell__header {
+  border-bottom: 1px solid #eee;
+  padding: 12px 16px;
+}
+.auth-shell__brand {
+  text-decoration: none;
+  font-weight: 700;
+  color: #18181b;
+}
+.auth-shell__main {
+  display: grid;
+  align-content: start;
+}
+.auth-shell__footer {
+  border-top: 1px solid #eee;
+  padding: 16px;
+}
