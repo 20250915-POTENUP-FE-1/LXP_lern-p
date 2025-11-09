@@ -1,5 +1,5 @@
-import React from "react";
 import styles from "@/domains/user/components/MyPageSidebar.module.css";
+import { NavLink } from "react-router";
 
 export function MyPageSidebar() {
   return (
@@ -12,26 +12,22 @@ export function MyPageSidebar() {
           <h4 className={styles["mypage-nav__section-title"]}>내 계정</h4>
           <ul className={styles["mypage-nav"]}>
             <li className={styles["mypage-nav__item"]}>
-              <a
-                href="/mypage"
+              <NavLink 
+                index
                 className={styles["mypage-nav__link"]}
-                aria-current="page"
-              >
-                내 정보
-              </a>
+              >내 정보</NavLink>
             </li>
             <li className={styles["mypage-nav__item"]}>
-              <a
-                href="/mypage/enrolled"
+              <NavLink
+                to="/mypage/enrolled"
                 className={styles["mypage-nav__link"]}
-              >
-                수강 중인 강좌
-              </a>
+              >수강 중인 강좌</NavLink>
             </li>
             <li className={styles["mypage-nav__item"]}>
-              <a href="/mypage/cart" className={styles["mypage-nav__link"]}>
-                장바구니
-              </a>
+              <NavLink
+                to="/mypage/cart"
+                className={styles["mypage-nav__link"]}
+              >장바구니</NavLink>
             </li>
           </ul>
         </div>
@@ -43,12 +39,12 @@ export function MyPageSidebar() {
           <h4 className={styles["mypage-nav__section-title"]}>강사</h4>
           <ul className={styles["mypage-nav"]}>
             <li className={styles["mypage-nav__item"]}>
-              <a
-                href="/mypage/instructor/courses"
+              <NavLink
+                to="/mypage/instructor/courses"
                 className={styles["mypage-nav__link"]}
               >
                 내가 등록한 강의
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -64,26 +60,22 @@ export function MyPageSidebar() {
               <h4 className={styles["mypage-nav__section-title"]}>내 계정</h4>
               <ul className={styles["mypage-nav"]}>
                 <li className={styles["mypage-nav__item"]}>
-                  <a
-                    href="/mypage"
+                  <NavLink 
+                    index
                     className={styles["mypage-nav__link"]}
-                    aria-current="page"
-                  >
-                    내 정보
-                  </a>
+                  >내 정보</NavLink>
                 </li>
                 <li className={styles["mypage-nav__item"]}>
-                  <a
-                    href="/mypage/enrolled"
+                  <NavLink
+                    to="/mypage/enrolled"
                     className={styles["mypage-nav__link"]}
-                  >
-                    수강 중인 강좌
-                  </a>
+                  >수강 중인 강좌</NavLink>
                 </li>
                 <li className={styles["mypage-nav__item"]}>
-                  <a href="/mypage/cart" className={styles["mypage-nav__link"]}>
-                    장바구니
-                  </a>
+                  <NavLink
+                    to="/mypage/cart"
+                    className={styles["mypage-nav__link"]}
+                  >장바구니</NavLink>
                 </li>
               </ul>
             </div>
@@ -95,12 +87,12 @@ export function MyPageSidebar() {
               <h4 className={styles["mypage-nav__section-title"]}>강사</h4>
               <ul className={styles["mypage-nav"]}>
                 <li className={styles["mypage-nav__item"]}>
-                  <a
-                    href="/mypage/instructor/courses"
+                  <NavLink
+                    to="/mypage/instructor/courses"
                     className={styles["mypage-nav__link"]}
                   >
                     내가 등록한 강의
-                  </a>
+                  </NavLink>
                 </li>
               </ul>
             </div>
