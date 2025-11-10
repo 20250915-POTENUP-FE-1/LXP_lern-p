@@ -155,7 +155,7 @@ a:focus-visible {
   padding-inline: var(--space-4);
 }
 
-@media (min-width: var(--bp-tablet)) {
+@media (min-width: 768px) {
   .container {
     padding-inline: 0;
   }
@@ -166,7 +166,7 @@ a:focus-visible {
   }
 }
 
-@media (min-width: var(--bp-desktop)) {
+@media (min-width: 1200px) {
   .container {
     padding-inline: 0;
   }
@@ -356,7 +356,7 @@ a:focus-visible {
   color: var(--color-text);
 }
 
-@media (min-width: var(--bp-tablet)) {
+@media (min-width: 768px) {
   .modal {
     padding: var(--space-6);
   }
@@ -366,9 +366,9 @@ a:focus-visible {
   }
 }
 
-@media (max-width: var(--bp-mobile)) {
+@media (max-width: 480px) {
   .modal {
-    align-items: flex-start;
+    align-items: center;
     padding: var(--space-2);
   }
 
