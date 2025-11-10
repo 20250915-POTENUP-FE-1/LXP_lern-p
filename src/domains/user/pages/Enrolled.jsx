@@ -1,18 +1,20 @@
 import styles from "@/domains/user/pages/MyPageSections.module.css";
-import { auth, db } from "@/shared/lib/firebase/config";
+import { auth } from "@/shared/lib/firebase/config";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { fetchEnrolledCourses } from "../services/enrolledService";
 
 export default function Enrolled() {
 
   const [user, setUser] = useState(null);
   const [enrolledList, setEnrolledList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // TODO: 로그인 페이지 완성 후 제거할 것
   //signOut(auth);
   useEffect(() => {
-    signInWithEmailAndPassword(auth, "dev@example.com", "12341234")
+    signInWithEmailAndPassword(auth, "user@example.com", "password123123")
       .then(() => console.log("✅ 로그인 성공"))
       .catch(console.error);
   }, []);
@@ -26,61 +28,25 @@ export default function Enrolled() {
     return () => unsubscribe();
   }, [])
 
-   // 2) user.uid 가 생기면 → 해당 유저 수강 목록(enrolled) 가져오기
+  // 2) user.uid 가 생기면 → 해당 유저 수강 목록(enrolled) 가져오기
   useEffect(() => {
     if (!user) return;
-    const fetchEnrolled = async (uid) => {
-      // 1) enrolled 가져오기
-      const enrolledRef = collection(db, "enrolled"); // 1. 컬렉션 선택 collection(db, "컬렉션명")
-      const condition = where("userId", "==", uid); // 2. 조건 달기 where("필드", "연산자", 값)
-      const q = query(enrolledRef, condition); // 3. 서버에서 데이터 가져오기 query(컬렉션, 조건들)
-      const snapshot = await getDocs(q); // getDocs(쿼리)
+    setLoading(true);
 
-      const enrolled  = snapshot.docs.map(doc => ({
-        id: doc.id,      // 문서 고유 ID 포함시키기
-        ...doc.data(),   // 문서에 저장된 실제 필드들 펼치기
-      }));
+    fetchEnrolledCourses(user.uid)
+      .then((data) => setEnrolledList(data))
+      .finally(() => setLoading(false));
+  }, [user]);
 
-      // 🔥 수강 내역이 없으면 바로 종료
-      if (enrolled.length === 0) {
-        setEnrolledList([]);
-        return;
-      }
+  // 로딩 UI
+  if (loading) {
+    return <div style={{ padding: "40px" }}>⏳ 내 수강 강좌 불러오는 중...</div>;
+  }
 
-      //console.log(enrolled)
-
-      // 2) courseId만 모으기
-      const courseIds = enrolled.map(item => item.courseId);
-      
-      // 3) course 정보 가져오기
-      const courseRef = collection(db, "courses");
-      const q2 = query(courseRef, where("__name__", "in", courseIds)); // __name__ 문서 id를 의미하는 Firestore의 예약 키워드.
-      const courseSnap = await getDocs(q2);
-
-      //console.log(courseSnap)
-
-      const courseMap = {};
-      courseSnap.forEach(doc => {
-        courseMap[doc.id] = doc.data();
-      });
-
-      // 4) Join
-      const finalList = enrolled.map(item => ({
-        ...item,
-        course: courseMap[item.courseId] || null
-      }));
-
-      //setEnrolledList(enrolled);
-      setEnrolledList(finalList);
-    }
-
-    fetchEnrolled(user.uid);
-    
-  }, [user])
-
-  // TODO: 로그인 페이지 완성 후 제거할 것
-  console.log("🔥 user.uid:", user?.uid);
-  console.log("📚 enrolledList:", enrolledList);
+  // 수강 목록 없을 때
+  if (enrolledList.length === 0) {
+    return <div style={{ padding: "40px" }}>🫠 수강 중인 강의가 없어요.</div>;
+  }
 
   return (
     <article
@@ -95,38 +61,26 @@ export default function Enrolled() {
       </h1>
 
       <div className={styles["enrolled-section__list"]}>
-        {/* 아이템(정적 마크업) */}
-        <div className={styles["enrolled-card"]}>
-          <a
-            href="/courses/placeholder"
+        {enrolledList.map((item)=>(
+          <div key={item.id} className={styles["enrolled-card"]}>
+          <Link
+            to={`/courses/${item.courseId}`}
             className={styles["enrolled__link"]}
           >
-            <h3 className={styles["enrolled__title"]}>React 완전정복</h3>
+            <h3 className={styles["enrolled__title"]}>{item.course?.title ?? "제목 없음"}</h3>
             <p className={styles["enrolled__category"]}>
-              프론트엔드 / React / 입문
+              {Array.isArray(item.course?.category)
+                ? item.course.category.join(" / ")
+                : item.course?.category ?? "카테고리 없음"}
             </p>
-          </a>
-          <div className={styles["progress"]} aria-label="진행률 60%">
-            <div className={styles["progress__bar"]} style={{ width: "60%" }} />
+          </Link>
+          <div className={styles["progress"]} aria-label={`${item.progress ?? 0}%`}>
+            <div className={styles["progress__bar"]} style={{ width: `${item.progress ?? 0}%` }} />
           </div>
-          <span className={styles["enrolled-card__percent"]}>60%</span>
+          <span className={styles["enrolled-card__percent"]}>{`${item.progress ?? 0}%`}</span>
         </div>
-
-        <div className={styles["enrolled-card"]}>
-          <a
-            href="/courses/placeholder"
-            className={styles["enrolled__link"]}
-          >
-            <h3 className={styles["enrolled__title"]}>TypeScript 기초</h3>
-            <p className={styles["enrolled__category"]}>
-              프론트엔드 / TypeScript / 중급
-            </p>
-          </a>
-          <div className={styles["progress"]} aria-label="진행률 30%">
-            <div className={styles["progress__bar"]} style={{ width: "30%" }} />
-          </div>
-          <span className={styles["enrolled-card__percent"]}>30%</span>
-        </div>
+        ))}
+        
       </div>
     </article>
   );
