@@ -1,108 +1,122 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../../shared/lib/firebase/config';
+import CourseApply from '../components/CourseApply';
 import styles from './CourseDetailPage.module.css';
-
-// 로그인 확인 변수 선언
-const auth = getAuth();
-const navigate = useNavigate();
-
-// 로그인 상태 변수
-const [currentUser, setCurrentUser] = useState(null);
-
-// 오픈 모달 상태
-const [showLoginModal, setShowLoginModal] = useState(false);
-const [showEnrollModal, setShowEnrollModal] = useState(false);
-
-//컴포넌트 마운트 시 로그인 상태 구독
-useEffect(() => {
-  const unsub = onAuthStateChanged(auth, (user) => setCurrentUser(user));
-  return () => unsub();
-});
-
-const handleEnrollClick = () => {
-  if (!currentUser) {
-    setShowLoginModal(true);
-  } else {
-    setShowEnrollModal(true);
-  }
-};
 
 export default function CourseDetailPage() {
   const { courseId } = useParams(); //URL 에서 id : c_101 추출
+  const navigate = useNavigate();
+
+  const auth = getAuth();
+  // 로그인 상태 변수
+  const [currentUser, setCurrentUser] = useState(null);
+  // 오픈 모달 상태
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
 
   const [course, setCourse] = useState(null); //강좌1개 : { title: "React 입문", ... }
   const [section, setSections] = useState([]); //섹션 여러개(배열) : [{ id: "sec_01", title: "..." }, ...]
   const [lectures, setLectures] = useState({}); // 섹션별 강의 (객체) : { sec_01: [강의1, 강의2], sec_02: [...] }
   const [loading, setLoading] = useState(true); //로딩상태(boolean) :uefalse
   const [activeTab, setActiveTab] = useState('intro');
+  const [enrolling, setEnrolling] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+
+  // 로그인 상태
+  useEffect(() => {
+    signInWithEmailAndPassword(auth, 'user@example.com', 'password123123')
+      .then(() => console.log(':white_check_mark: 로그인 성공'))
+      .catch(console.error);
+  }, []);
+
+  //컴포넌트 마운트 시 로그인 상태 구독
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+
+    return () => unsub();
+  }, [auth]);
+
+  // 강의 수강여부 확인 로직
+  useEffect(() => {
+    const checkEnrollmentStatus = async () => {
+      if (currentUser && courseId) {
+        try {
+          const userDocSnap = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const enrolled = userData.enrolledCourses?.some((item) => item.courseId === courseId);
+            setIsEnrolled(enrolled || false);
+          } else {
+            setIsEnrolled(false);
+          }
+        } catch (error) {
+          console.error('수강 상태 확인 실패 : ', error);
+          setIsEnrolled(false);
+        }
+      } else {
+        setIsEnrolled(false);
+      }
+    };
+    checkEnrollmentStatus();
+  }, [currentUser, courseId]);
+
+  // 강의 클릭 안정성
   const handleTabClick = (e, tabId) => {
     e.preventDefault(); // <a> 태그의 기본 동작(페이지 이동/스크롤) 방지
     setActiveTab(tabId); // 현재 활성 탭 상태 업데이트
   };
 
+  //강의 상세보기
+  //course 내용 불러오기
   useEffect(() => {
-    console.log('🔍 useEffect 실행됨');
-    console.log('🔍 courseId:', courseId);
-
     const fetchCourseData = async () => {
-      console.log('🔍 데이터 조회 시작');
       if (!courseId) {
-        console.log('❌ courseId 없음');
         return;
       }
       try {
         // course 조회
-        console.log('🔍 Firebase 조회 중...', courseId);
+
         const courseSnap = await getDoc(doc(db, 'courses', courseId));
-        console.log('🔍 조회 완료:', courseSnap.exists());
 
         if (!courseSnap.exists()) {
-          console.error('강좌를 찾을 수 없습니다');
           setLoading(false);
           return;
         }
 
         const courseData = courseSnap.data();
         setCourse(courseData);
-        console.log('Course:', courseData);
 
-        // section 조회 (course.section:Ids 가 있다고 확인 시)
-        if (courseData.sectionIds && courseData.sectionIds.length > 0) {
-          const sectionsData = [];
-          for (const sectionId of courseData.sectionIds) {
-            const sectionSnap = await getDoc(doc(db, 'sections', sectionId));
-            if (sectionSnap.exists()) {
-              sectionsData.push({ id: sectionSnap.id, ...sectionSnap.data() });
-            }
-          }
+        // section 컬렉션에서 courseId 로 필터
+        const sectionSnap = await getDocs(collection(db, 'sections'));
+        const allSections = sectionSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-          //sequence 순서대로 정렬
-          sectionsData.sort((a, b) => a.sequence - b.sequence);
-          setSections(sectionsData);
-          console.log('Sections:', sectionsData);
+        // 해당 코스의 섹션만 필터링 + sequence 순서 정렬
+        const courseSections = allSections
+          .filter((sec) => sec.courseId === courseId)
+          .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
 
-          // lectures 조회 (section.lectureIds 가 있다고 확인 시)
-          const allLectures = {};
-          for (const section of sectionsData) {
-            if (section.lectureIds && section.lectureIds.length > 0) {
-              const sectionLectures = [];
-              for (const lectureId of section.lectureIds) {
-                const lectureSnap = await getDoc(doc(db, 'lectures', lectureId));
-                if (lectureSnap.exists()) {
-                  sectionLectures.push({ id: lectureSnap.id, ...lectureSnap.data() });
-                }
-              }
+        setSections(courseSections);
 
-              sectionLectures.sort((a, b) => a.sequence - b.sequence);
-              allLectures[section.id] = sectionLectures;
-            }
-          }
-          setLectures(allLectures);
-          console.log('Lectures: ', allLectures);
+        // lectures 컬렉션 전체 조회 → 섹션별로 묶기
+        // lectures 조회 (section.lectureIds 가 있다고 확인 시)
+        const lectureSnap = await getDocs(collection(db, 'lectures'));
+        const allLectures = lectureSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const lectureMap = {};
+
+        for (const sec of courseSections) {
+          lectureMap[sec.id] = allLectures
+            .filter((lec) => lec.sectionId === sec.id)
+
+            .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
         }
+        setLectures(lectureMap);
+        console.log('section:', courseSections);
+        console.log('lecture:', lectureMap);
       } catch (error) {
         console.error('데이터 조회 실패', error);
       } finally {
@@ -112,16 +126,56 @@ export default function CourseDetailPage() {
     fetchCourseData();
   }, [courseId]);
 
-  /*
-            const snap = await getDoc(
-        doc(db, 'courses', 'mnr24rUtaNwWWHbfhfVv'), // ✅ 여기!
-      );
-      setCourse(snap.data());
-      console.log('불러온 데이터:', snap.data());
-    };
-    fetchCourse();
-  }, []);
-      */
+  // 강의 신청하기
+  const handleEnrolledCourse = async () => {
+    console.log('강의신청');
+    // 로그인 확인
+    if (!currentUser) {
+      alert('로그인 필요합니다');
+      setShowEnrollModal(false);
+      navigate('/#login-modal');
+      return;
+    }
+    setEnrolling(true);
+    console.log('firebase 업데이트 시작');
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+
+      await updateDoc(userRef, {
+        enrolledCourses: arrayUnion({
+          courseId: courseId,
+          progress: 0,
+          enrolledAt: new Date().toISOString(),
+        }),
+        updatedAt: new Date().toISOString(),
+      });
+      console.log('강의 산청 완료');
+      setIsEnrolled(true);
+      setShowEnrollModal(false);
+    } catch (error) {
+      alert('강의 신청에 실패하셨습니다');
+    } finally {
+      setEnrolling(false);
+    }
+  };
+
+  const handleEnrollClick = () => {
+    if (!course) {
+      console.log('❌ course 없음');
+      return;
+    }
+
+    if (course.isFree) {
+      console.log('✅ 무료 강좌 → 로그인 모달');
+      setShowLoginModal(true);
+      return;
+    }
+
+    // 유료 강좌
+    console.log('✅ 유료 강좌 → 신청 모달');
+    setShowEnrollModal(true);
+    console.log('🔴 setShowEnrollModal(true) 호출 완료');
+  };
 
   // ========== 로딩/에러 처리 ==========
   if (loading) {
@@ -133,14 +187,13 @@ export default function CourseDetailPage() {
   }
 
   // ========== 총 강의 수 계산 ==========
-  const totalLectures = section.reduce((sum, sec) => sum + (lectures[sec.id]?.length || 0), 0);
-  const handleEnrollClick = () => {
-    if (course.isFree) {
-      alert('무료 강좌 등록 완료!');
-    } else {
-      // 추후 장바구니/결제 페이지 이동 로직 연결 가능
-    }
-  };
+  const totalLectures = section.reduce((sum, sec) => sum + (lectures[sec.id]?.length || 0), 0); // 총강의 수
+  // 총 시간(분)
+  const totalMinutes = section.reduce((acc, sec) => {
+    const list = lectures[sec.id] || [];
+    const mins = list.reduce((s, lec) => s + (Number(lec.duration) || 0), 0);
+    return acc + mins;
+  }, 0);
 
   // ========== 렌더링 ==========
   return (
@@ -234,6 +287,7 @@ export default function CourseDetailPage() {
               <h2 id="curriculum-title" className={styles['course-detail__section-title']}>
                 커리큘럼
               </h2>
+
               {section.length === 0 ? (
                 <p>커리큘럼이 없습니다</p>
               ) : (
@@ -281,12 +335,20 @@ export default function CourseDetailPage() {
           <div
             className={`${styles['sidebar']} ${styles['sidebar--right']} ${styles['sidebar--floating']}`}
           >
+            <h4>금액 ₩ {course.price.toLocaleString()}</h4>
+            {/*수강 여부에 따라 버튼 달라짐*/}
             <button
               id="course-apply-module-Btn"
-              className={styles['course-detail__cta-button']}
-              onClick={handleEnrollClick}
+              className={`${styles['course-detail__cta-button']} ${
+                isEnrolled ? styles['course-detail__cta-button--enrolled'] : ''
+              }
+              `}
+              onClick={handleEnrollClick} // ✅ 이렇게 간단하게
+              // ✅ isEnrolled가 true이면 비활성화
             >
-              {course.isFree ? '무료 수강하기' : `₩${course.price.toLocaleString()} 수강하기`}
+              {/* ✅ 버튼 텍스트를 isEnrolled 상태에 따라 완전히 분기 */}
+
+              {isEnrolled ? '수강중인 강좌' : course.isFree ? '무료 수강하기' : ` 수강하기`}
             </button>
 
             <ul className={styles['course-detail__cta-meta']}>
@@ -313,6 +375,17 @@ export default function CourseDetailPage() {
           </div>
         </aside>
       </div>
+
+      <CourseApply
+        open={showEnrollModal}
+        course={course}
+        totalLectures={totalLectures}
+        totalMinutes={totalMinutes || course.duration || 0}
+        enrolling={enrolling}
+        onCancel={() => setShowEnrollModal(false)}
+        onConfirm={handleEnrolledCourse}
+        isEnrolled={isEnrolled}
+      />
     </main>
   );
 }
