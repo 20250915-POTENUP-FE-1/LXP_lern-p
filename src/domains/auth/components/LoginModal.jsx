@@ -1,5 +1,5 @@
 import { Modal } from '@/shared/ui/Modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { login } from '../services/authService';
 
@@ -10,6 +10,14 @@ export function LoginModal({ isOpen, onClose }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({ email: '', password: '' });
+      setError('');
+      setLoading(false);
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
