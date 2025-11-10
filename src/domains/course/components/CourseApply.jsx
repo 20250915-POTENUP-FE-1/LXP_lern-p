@@ -57,9 +57,9 @@ function CourseApply({
           <button type="button" className={styles.btnSecondary} onClick={onCancel}>
             취소
           </button>
-          {!isEnrolled && (
+          {isEnrolled && (
             <button type="button" className={styles.btnPrimary} onClick={onConfirm}>
-              신청{course?.isFree ? '' : ` / ₩${course.price?.toLocaleString()}`}
+              신청
             </button>
           )}
         </div>

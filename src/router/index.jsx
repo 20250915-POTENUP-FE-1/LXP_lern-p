@@ -10,8 +10,7 @@ import MyPage from '@/domains/user/pages/MyPage';
 import Profile from '@/domains/user/pages/Profile';
 import AppLayout from '@/layouts/AppLayout';
 import AuthLayout from '@/layouts/AuthLayout';
-import { createBrowserRouter } from 'react-router-dom';
-import SeedDataPage from '../domains/course/pages/admin/SeedDataPage';
+import { createBrowserRouter } from 'react-router';
 
 const router = createBrowserRouter([
   {
@@ -21,10 +20,6 @@ const router = createBrowserRouter([
       { index: true, element: <CourseListPage /> },
       { path: 'courses/:courseId', element: <CourseDetailPage /> },
       { path: 'courses/create', element: <CourseCreatePage /> },
-      {
-        path: '/admin/seed',
-        element: <SeedDataPage />,
-      }, // ✅ 초기 데이터 생성 페이지
       {
         path: 'mypage',
         element: <MyPage />,

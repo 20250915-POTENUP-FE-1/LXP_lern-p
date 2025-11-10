@@ -1,7 +1,7 @@
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { db } from '../../../shared/lib/firebase/config';
 import CourseApply from '../components/CourseApply';
 import styles from './CourseDetailPage.module.css';
@@ -24,13 +24,6 @@ export default function CourseDetailPage() {
   const [activeTab, setActiveTab] = useState('intro');
   const [enrolling, setEnrolling] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
-
-  // 로그인 상태
-  useEffect(() => {
-    signInWithEmailAndPassword(auth, 'user@example.com', 'password123123')
-      .then(() => console.log(':white_check_mark: 로그인 성공'))
-      .catch(console.error);
-  }, []);
 
   //컴포넌트 마운트 시 로그인 상태 구독
   useEffect(() => {
@@ -115,8 +108,6 @@ export default function CourseDetailPage() {
             .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
         }
         setLectures(lectureMap);
-        console.log('section:', courseSections);
-        console.log('lecture:', lectureMap);
       } catch (error) {
         console.error('데이터 조회 실패', error);
       } finally {
@@ -128,7 +119,6 @@ export default function CourseDetailPage() {
 
   // 강의 신청하기
   const handleEnrolledCourse = async () => {
-    console.log('강의신청');
     // 로그인 확인
     if (!currentUser) {
       alert('로그인 필요합니다');
@@ -137,7 +127,6 @@ export default function CourseDetailPage() {
       return;
     }
     setEnrolling(true);
-    console.log('firebase 업데이트 시작');
     try {
       const userRef = doc(db, 'users', currentUser.uid);
 
@@ -149,7 +138,6 @@ export default function CourseDetailPage() {
         }),
         updatedAt: new Date().toISOString(),
       });
-      console.log('강의 산청 완료');
       setIsEnrolled(true);
       setShowEnrollModal(false);
     } catch (error) {
@@ -205,7 +193,7 @@ export default function CourseDetailPage() {
         {/* 2) 좌측 본문 */}
         <article className={styles['course-detail__main']}>
           <header className={styles['course-detail__header']}>
-            {/* ✅ Firebase 데이터 렌더링 */}
+            {/*Firebase 데이터 렌더링 */}
             <h1 id="course-detail-title" className={styles['course-detail__title']}>
               {course.title}
             </h1>
@@ -221,7 +209,7 @@ export default function CourseDetailPage() {
               <li className={styles['course-detail__meta-item']}>
                 👥 {course.studentCount}명 수강중
               </li>
-              <li className={styles['course-detail__meta-item']}>⭐ {course.level}</li>
+              <li className={styles['course-detail__meta-item']}>{course.level}</li>
             </ul>
             <p className={styles['course-detail__summary']}>“{course.summary}”</p>
           </header>
@@ -235,7 +223,7 @@ export default function CourseDetailPage() {
                   href="#intro"
                   className={`${styles['course-tabs__link']} ${activeTab === 'intro' ? styles['active'] : ''}`} // 💡 CSS 클래스 조건부 적용
                   aria-current={activeTab === 'intro' ? 'page' : undefined}
-                  onClick={(e) => handleTabClick(e, 'intro')} // 💡 클릭 핸들러
+                  onClick={(e) => handleTabClick(e, 'intro')} // 클릭 핸들러
                 >
                   강좌 소개
                 </a>
@@ -245,7 +233,7 @@ export default function CourseDetailPage() {
                   href="#curriculum"
                   className={`${styles['course-tabs__link']} ${activeTab === 'curriculum' ? styles['active'] : ''}`} // 💡 CSS 클래스 조건부 적용
                   aria-current={activeTab === 'curriculum' ? 'page' : undefined}
-                  onClick={(e) => handleTabClick(e, 'curriculum')} // 💡 클릭 핸들러
+                  onClick={(e) => handleTabClick(e, 'curriculum')} // 클릭 핸들러
                 >
                   커리큘럼
                 </a>
@@ -255,7 +243,7 @@ export default function CourseDetailPage() {
                   href="#instructor"
                   className={`${styles['course-tabs__link']} ${activeTab === 'instructor' ? styles['active'] : ''}`} // 💡 CSS 클래스 조건부 적용
                   aria-current={activeTab === 'instructor' ? 'page' : undefined}
-                  onClick={(e) => handleTabClick(e, 'instructor')} // 💡 클릭 핸들러
+                  onClick={(e) => handleTabClick(e, 'instructor')} // 클릭 핸들러
                 >
                   강사 정보
                 </a>
@@ -263,7 +251,7 @@ export default function CourseDetailPage() {
             </ul>
           </nav>
 
-          {activeTab === 'intro' && ( // 💡 activeTab이 'intro'일 때만 렌더링
+          {activeTab === 'intro' && ( // activeTab이 'intro'일 때만 렌더링
             <section
               id="intro"
               className={styles['course-detail__section']}
@@ -341,14 +329,11 @@ export default function CourseDetailPage() {
               id="course-apply-module-Btn"
               className={`${styles['course-detail__cta-button']} ${
                 isEnrolled ? styles['course-detail__cta-button--enrolled'] : ''
-              }
-              `}
-              onClick={handleEnrollClick} // ✅ 이렇게 간단하게
-              // ✅ isEnrolled가 true이면 비활성화
+              }`}
+              onClick={handleEnrollClick}
+              disabled={isEnrolled === 0} // ✅ 0일 때 비활성화
             >
-              {/* ✅ 버튼 텍스트를 isEnrolled 상태에 따라 완전히 분기 */}
-
-              {isEnrolled ? '수강중인 강좌' : course.isFree ? '무료 수강하기' : ` 수강하기`}
+              {isEnrolled === 0 ? '수강 불가' : '수강 신청'}
             </button>
 
             <ul className={styles['course-detail__cta-meta']}>

@@ -1,5 +1,5 @@
 import { Header } from '@/shared/ui/Header';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { LoginModal } from '../domains/auth/components/LoginModal';
 import styles from './Layouts.module.css';
 

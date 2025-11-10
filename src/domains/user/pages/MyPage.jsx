@@ -1,5 +1,5 @@
 import layout from '@/domains/user/pages/MyPage.module.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { MyPageSidebar } from '../components/MyPageSidebar';
 
 export default function MyPage() {
