@@ -29,8 +29,9 @@
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
 
   /* typography */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-    Noto Sans, Apple SD Gothic Neo, AppleGothic, "맑은 고딕", sans-serif;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Apple SD Gothic Neo,
+    AppleGothic, '맑은 고딕', sans-serif;
   --text-xs: 12px;
   --text-sm: 14px;
   --text-md: 16px;
@@ -154,7 +155,7 @@ a:focus-visible {
   padding-inline: var(--space-4);
 }
 
-@media (min-width: 768px) {
+@media (min-width: var(--bp-tablet)) {
   .container {
     padding-inline: 0;
   }
@@ -165,7 +166,7 @@ a:focus-visible {
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: var(--bp-desktop)) {
   .container {
     padding-inline: 0;
   }
@@ -180,27 +181,12 @@ a:focus-visible {
 .modal {
   position: fixed;
   inset: 0;
-  display: none;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: var(--space-4);
   z-index: var(--z-modal);
   isolation: isolate;
-}
-
-.modal--open,
-.modal.is-open,
-.modal[data-open="true"],
-.modal[data-state="open"],
-.modal:target,
-#login-modal:target,
-#instructor-request-modal:target,
-[data-modal-root]#login-modal:target,
-[data-modal-root]#instructor-request-modal:target,
-[data-modal-root].is-open,
-[data-modal-root][data-open="true"],
-[data-modal-root][data-state="open"],
-[data-modal-root]:target {
-  display: grid;
 }
 
 .modal__overlay {
@@ -209,6 +195,7 @@ a:focus-visible {
   background: rgba(7, 10, 16, 0.65);
   backdrop-filter: blur(2px);
   z-index: var(--z-overlay);
+  cursor: pointer;
 }
 
 .modal__content {
@@ -290,7 +277,9 @@ a:focus-visible {
   background: var(--color-surface);
   color: var(--color-text);
   padding: var(--space-3) var(--space-4);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
     background-color 0.2s ease;
 }
 
@@ -317,7 +306,10 @@ a:focus-visible {
   text-decoration: none;
   background: var(--color-brand);
   color: var(--color-text);
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .modal__button:hover,
@@ -353,7 +345,9 @@ a:focus-visible {
   place-items: center;
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .modal__close:hover,
@@ -362,27 +356,25 @@ a:focus-visible {
   color: var(--color-text);
 }
 
-html:has(.modal--open),
-html:has(.modal.is-open),
-html:has(.modal[data-open="true"]),
-html:has(.modal[data-state="open"]),
-html:has(.modal:target),
-html:has(#login-modal:target),
-html:has(#instructor-request-modal:target),
-html:has([data-modal-root].is-open),
-html:has([data-modal-root][data-open="true"]),
-html:has([data-modal-root][data-state="open"]),
-html:has([data-modal-root]:target) {
-  overflow: clip;
-}
-
-@media (min-width: 768px) {
+@media (min-width: var(--bp-tablet)) {
   .modal {
     padding: var(--space-6);
   }
 
   .modal__content {
     padding: 28px;
+  }
+}
+
+@media (max-width: var(--bp-mobile)) {
+  .modal {
+    align-items: flex-start;
+    padding: var(--space-2);
+  }
+
+  .modal__content {
+    width: 100%;
+    margin-top: var(--space-8);
   }
 }
 
@@ -397,7 +389,7 @@ html:has([data-modal-root]:target) {
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   color-scheme: dark;
   --color-bg: #0b0d12;
   --color-surface: #11131a;
