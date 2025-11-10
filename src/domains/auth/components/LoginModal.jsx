@@ -1,4 +1,5 @@
 import { Modal } from '@/shared/ui/Modal';
+import { validateForm } from '@/shared/util/validateForm';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { login } from '../services/authService';
@@ -10,6 +11,8 @@ export function LoginModal({ isOpen, onClose }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isInvalid = validateForm(formData);
+  const showError = (isInvalid && (formData.email || formData.password)) || !!error;
 
   useEffect(() => {
     if (isOpen) {
@@ -26,10 +29,18 @@ export function LoginModal({ isOpen, onClose }) {
       ...prev,
       [id]: value,
     }));
+
+    if (error) setError('');
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (isInvalid) {
+      setError('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
@@ -63,7 +74,7 @@ export function LoginModal({ isOpen, onClose }) {
 
       <form className="modal__form" aria-label="로그인 폼" onSubmit={handleLogin}>
         <div className="modal__body">
-          <div className="modal__field">
+          <div className={`modal__field ${showError ? 'modal__field--error' : ''}`}>
             <label htmlFor="email" className="modal__label">
               이메일
             </label>
@@ -75,7 +86,7 @@ export function LoginModal({ isOpen, onClose }) {
               onChange={handleChange}
             />
           </div>
-          <div className="modal__field">
+          <div className={`modal__field ${showError ? 'modal__field--error' : ''}`}>
             <label htmlFor="password" className="modal__label">
               비밀번호
             </label>
@@ -87,10 +98,13 @@ export function LoginModal({ isOpen, onClose }) {
               onChange={handleChange}
             />
           </div>
+
+          {/* 에러 메시지 */}
+          {error && <p className="modal__error-text">{error}</p>}
         </div>
 
         <footer className="modal__actions">
-          <button type="submit" className="modal__button" disabled={loading}>
+          <button type="submit" className="modal__button" disabled={loading || isInvalid}>
             {loading ? '로그인 중...' : '로그인'}
           </button>
           <div className="modal__actions--bottom">

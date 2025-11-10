@@ -264,6 +264,16 @@ a:focus-visible {
   gap: var(--space-2);
 }
 
+.modal__field--error .modal__input {
+  border-color: var(--color-danger);
+}
+
+.modal__error-text {
+  margin-top: 8px;
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+}
+
 .modal__label {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
@@ -328,6 +338,12 @@ a:focus-visible {
 .modal__button--ghost:focus-visible {
   color: var(--color-text);
   border-color: var(--color-brand);
+}
+
+.modal__button:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
 }
 
 .modal--wide .modal__content {

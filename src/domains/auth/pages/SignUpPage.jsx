@@ -1,3 +1,4 @@
+import { validateForm } from '@/shared/util/validateForm';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { createUserProfile } from '../../user/services/UserService';
@@ -16,10 +17,16 @@ export default function SignUpPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isEmpty = validateForm(formData); // true 또는 false
+  const isPwMismatch = formData.password !== formData.passwordConfirm;
+
+  const isInvalid = isEmpty || isPwMismatch;
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+
+    if (error) setError('');
   };
 
   const handleSignUp = async (e) => {
@@ -112,7 +119,7 @@ export default function SignUpPage() {
           />
           <p className={styles['form__help']}>안전한 비밀번호를 사용해주세요.</p>
         </div>
-        <div className={styles['form__group']} data-error="false">
+        <div className={styles['form__group']} data-error={isPwMismatch}>
           <label htmlFor="passwordConfirm" className={styles['form__label']}>
             비밀번호 확인
           </label>
@@ -125,17 +132,20 @@ export default function SignUpPage() {
             autoComplete="new-password"
             placeholder="비밀번호를 다시 입력하세요."
           />
-          <p className={styles['form__error']} role="alert">
-            비밀번호가 일치하지 않습니다.
-          </p>
         </div>
-        <button type="submit" className={styles['form__submit']} disabled={loading}>
+        {/* 에러 메시지 */}
+        {error && (
+          <p className={styles['form__error']} role="alert">
+            {error}
+          </p>
+        )}
+        <button type="submit" className={styles['form__submit']} disabled={loading || isInvalid}>
           {loading ? '가입 중...' : '회원가입'}
         </button>
       </form>
       <div className={styles['auth-page__actions']}>
         이미 계정이 있으신가요?
-        <Link className={styles['auth-page__link']} href="/signin">
+        <Link className={styles['auth-page__link']} to="/signin">
           로그인하기
         </Link>
       </div>
