@@ -23,6 +23,8 @@ export default function Profile() {
     return () => unsubscribe(); // 언마운트 시 감시 종료 (CleanUp)
   }, [])
 
+  console.log(profile)
+
   useEffect(() => {
     // 테스트용(삭제)
     signInWithEmailAndPassword(auth, "dev@example.com", "12341234")
@@ -34,6 +36,15 @@ export default function Profile() {
   if (!user || !profile) {
     return <div style={{ padding: "40px" }}>⏳ 내 정보 불러오는 중...</div>;
   }
+
+  // createdAt 문자열, timeStamp 
+  const createdAt = profile.createdAt;
+  // Firestore Timestamp 형태: createdAt.toDate() 존재
+  // 문자열 형태: new Date(createdAt) 변환
+  const createdDate =
+    createdAt instanceof Object && typeof createdAt.toDate === "function"
+      ? createdAt.toDate()
+      : new Date(createdAt);
 
   return (
     <article
@@ -66,7 +77,7 @@ export default function Profile() {
         <div className={styles["profile-section__identity"]}>
           <h2 className={styles["profile-section__name"]}>{profile.name}님</h2>
           <p className={styles["profile-section__email"]}>{profile.email}</p>
-          <p className={styles["profile-section__since"]}>가입일: {profile.createdAt?.toDate().toLocaleDateString("ko-KR", {
+          <p className={styles["profile-section__since"]}>가입일: {createdDate.toLocaleDateString("ko-KR", {
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -98,7 +109,7 @@ export default function Profile() {
         <div className={styles["profile-section__row"]}>
           <span className={styles["profile-section__label"]}>가입일</span>
           <span className={styles["profile-section__value"]}>
-            {profile.createdAt?.toDate().toLocaleDateString("ko-KR", {
+            {createdDate.toLocaleDateString("ko-KR", {
               year: "numeric",
               month: "long",
               day: "numeric",

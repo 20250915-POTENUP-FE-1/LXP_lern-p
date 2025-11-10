@@ -13,7 +13,8 @@ export function MyPageSidebar() {
           <ul className={styles["mypage-nav"]}>
             <li className={styles["mypage-nav__item"]}>
               <NavLink 
-                index
+                to="/mypage"
+                end
                 className={styles["mypage-nav__link"]}
               >내 정보</NavLink>
             </li>

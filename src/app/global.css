@@ -107,7 +107,7 @@ a {
 
 a:hover,
 a:focus-visible {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 ::selection {
