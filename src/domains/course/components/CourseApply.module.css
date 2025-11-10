@@ -1,7 +1,11 @@
-/* CourseApply.module.css */
+/* CourseApply.module.css (BEM Refactoring) */
 
-/* === Overlay & Container === */
-.backdrop {
+/* ==================================== */
+/* 📦 Block: course-apply              */
+/* ==================================== */
+
+/* === course-apply__backdrop (Overlay & Container) === */
+.course-apply__backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--z-modal);
@@ -11,7 +15,7 @@
   isolation: isolate;
 }
 
-.backdrop::before {
+.course-apply__backdrop::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -20,7 +24,8 @@
   z-index: var(--z-overlay);
 }
 
-.modal {
+/* === course-apply__modal (Element: Modal container) === */
+.course-apply__modal {
   position: relative;
   z-index: calc(var(--z-overlay) + 1);
   width: min(560px, calc(100vw - var(--space-4) * 2));
@@ -28,7 +33,6 @@
   color: var(--color-text);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  /* box-shadow: var(--shadow-md); */
   padding: var(--space-6);
   max-height: calc(100dvh - var(--space-6) * 2);
   overflow: hidden;
@@ -37,15 +41,15 @@
   gap: var(--space-4);
 }
 
-/* === Title === */
-.title {
+/* === course-apply__title (Element: Title) === */
+.course-apply__title {
   margin: 0;
   font-size: var(--text-2xl);
   font-weight: 600;
 }
 
-/* === Content List === */
-.list {
+/* === course-apply__list (Element: Content List container) === */
+.course-apply__list {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -56,7 +60,8 @@
   gap: var(--space-3);
 }
 
-.listItem {
+/* === course-apply__item (Element: List Item) === */
+.course-apply__item {
   display: grid;
   grid-template-columns: 110px 1fr;
   align-items: start;
@@ -65,23 +70,25 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.listItem:last-child {
+.course-apply__item:last-child {
   border-bottom: none;
 }
 
-.label {
+/* === course-apply__label (Element: Label) === */
+.course-apply__label {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.value {
+/* === course-apply__value (Element: Value) === */
+.course-apply__value {
   color: var(--color-text);
   line-height: 1.6;
   word-break: keep-all;
 }
 
-/* === Actions === */
-.actions {
+/* === course-apply__actions (Element: Actions/Buttons container) === */
+.course-apply__actions {
   display: flex;
   gap: var(--space-3);
   justify-content: flex-end;
@@ -89,9 +96,8 @@
   flex-wrap: wrap;
 }
 
-/* 버튼 공통 */
-.btnPrimary,
-.btnSecondary {
+/* === course-apply__button (Base Button Element) === */
+.course-apply__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -107,49 +113,50 @@
     border-color 0.2s ease;
 }
 
-/* 기본(강조) */
-.btnPrimary {
+/* --- course-apply__button--primary (Modifier: Primary button) --- */
+.course-apply__button--primary {
   background: var(--color-brand);
   color: var(--color-text);
   border: 1px solid transparent;
 }
-.btnPrimary:hover,
-.btnPrimary:focus-visible {
+.course-apply__button--primary:hover,
+.course-apply__button--primary:focus-visible {
   background: var(--color-brand-700);
   color: var(--color-text);
 }
-.btnPrimary:active {
+.course-apply__button--primary:active {
   transform: translateY(1px);
 }
 
-/* 보조(고스트) */
-.btnSecondary {
+/* --- course-apply__button--secondary (Modifier: Secondary button) --- */
+.course-apply__button--secondary {
   background: transparent;
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
 }
-.btnSecondary:hover,
-.btnSecondary:focus-visible {
+.course-apply__button--secondary:hover,
+.course-apply__button--secondary:focus-visible {
   color: var(--color-text);
   border-color: var(--color-brand);
 }
 
 /* === Focus & A11y === */
-:where(.btnPrimary, .btnSecondary):focus-visible {
+.course-apply__button:focus-visible {
+  /* Base button element에 적용 */
   outline: 3px solid var(--color-brand);
   outline-offset: 2px;
 }
 
 /* === Responsive === */
 @media (max-width: 480px) {
-  .modal {
+  .course-apply__modal {
     padding: var(--space-5);
     width: min(420px, calc(100vw - var(--space-4) * 2));
   }
-  .listItem {
+  .course-apply__item {
     grid-template-columns: 1fr;
   }
-  .actions {
+  .course-apply__actions {
     flex-direction: column-reverse;
     align-items: stretch;
   }
@@ -157,8 +164,8 @@
 
 /* === Reduced Motion === */
 @media (prefers-reduced-motion: reduce) {
-  .btnPrimary,
-  .btnSecondary {
+  .course-apply__button {
+    /* Base button element에 적용 */
     transition-duration: 0.01ms !important;
   }
 }
