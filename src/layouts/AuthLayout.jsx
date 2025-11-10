@@ -1,15 +1,16 @@
-import { Outlet } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import styles from './Layouts.module.css';
 
 export default function AuthLayout() {
   return (
     <div className={styles['auth-shell']}>
       <header className={styles['auth-shell__header']} role="banner" aria-label="인증 헤더">
-        <a href="/" className={styles['auth-shell__brand']}>
+        <Link to="/" className={styles['auth-shell__brand']}>
           lernP
-        </a>
+        </Link>
       </header>
-      <main id="main-content" className={styles['auth-shell__main']} role="main" tabIndex={-1}>
+
+      <main className={styles['auth-shell__main']} role="main">
         <div className={styles['auth']}>
           <div className={styles['auth__card']}>
             <Outlet />

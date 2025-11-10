@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { db } from '../../../shared/lib/firebase/config';
+import { db } from '../../../shared/lib/firebase/firestore';
 import CourseApply from '../components/CourseApply';
 import styles from './CourseDetailPage.module.css';
 
