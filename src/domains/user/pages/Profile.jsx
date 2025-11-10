@@ -1,5 +1,5 @@
 import styles from "@/domains/user/pages/MyPageSections.module.css";
-import { auth } from "@/shared/lib/firebase/config";
+import { auth } from "@/shared/lib/firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { getUserProfile } from "../services/userService";
