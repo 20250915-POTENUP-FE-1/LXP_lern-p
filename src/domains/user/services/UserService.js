@@ -1,5 +1,5 @@
 import { db } from '@/shared/lib/firebase/firestore';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 export const createUserProfile = async ({ id, email, name, avatarUrl = '' }) => {
   const userProfile = {
@@ -18,4 +18,10 @@ export const createUserProfile = async ({ id, email, name, avatarUrl = '' }) => 
   await setDoc(doc(db, 'users', id), userProfile);
 
   return userProfile;
+};
+
+// 수정 예정
+export const getUserProfile = async (uid) => {
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? snap.data() : null;
 };
