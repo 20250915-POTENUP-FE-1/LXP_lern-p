@@ -1,4 +1,5 @@
 import styles from '@/domains/user/pages/MyPageSections.module.css';
+import { formatUserDate } from "@/domains/user/utils/formatUserDate";
 import { useAuthState } from '../../auth/hooks/useAuthState';
 
 export default function Profile() {
@@ -28,7 +29,7 @@ export default function Profile() {
         <div className={styles['profile-section__identity']}>
           <h2 className={styles['profile-section__name']}>{user.name}님</h2>
           <p className={styles['profile-section__email']}>{user.email}</p>
-          <p className={styles['profile-section__since']}>가입일: {user.createdAt}</p>
+          <p className={styles['profile-section__since']}>가입일: {formatUserDate(user.createdAt)}</p>
         </div>
       </section>
 
@@ -46,7 +47,7 @@ export default function Profile() {
         <div className={styles['profile-section__divider']} aria-hidden="true" />
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>가입일</span>
-          <span className={styles['profile-section__value']}>{user.createdAt}</span>
+          <span className={styles['profile-section__value']}>{formatUserDate(user.createdAt)}</span>
         </div>
       </div>
     </article>
