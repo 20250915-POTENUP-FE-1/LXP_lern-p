@@ -161,20 +161,20 @@ export default function CourseDetailPage() {
 
   const handleEnrollClick = () => {
     if (!course) {
-      console.log('❌ course 없음');
+      console.log(' course 없음');
       return;
     }
 
     if (course.isFree) {
-      console.log('✅ 무료 강좌 → 로그인 모달');
+      console.log('무료 강좌 → 로그인 모달');
       setShowLoginModal(true);
       return;
     }
 
     // 유료 강좌
-    console.log('✅ 유료 강좌 → 신청 모달');
+    console.log('유료 강좌 → 신청 모달');
     setShowEnrollModal(true);
-    console.log('🔴 setShowEnrollModal(true) 호출 완료');
+    console.log('setShowEnrollModal(true) 호출 완료');
   };
 
   // ========== 로딩/에러 처리 ==========
