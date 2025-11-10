@@ -4,55 +4,53 @@ import { logout } from '@/domains/auth/services/authService';
 import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import styles from './Header.module.css';
 
 export function Header() {
   const { user, loading } = useAuthState();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const dropdownRef = useRef(null);
-  // 외부 클릭 감지
-  useEffect(() => {
-    function handleOutsideClick(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
-  const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const loginModal = useModal(false);
   const roleModal = useModal(false);
 
+  const dropdownRef = useRef(null);
+  useEffect(() => {
+    const onDown = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, []);
+
+  // Guard가 넘긴 location.state로 모달 오픈
+  useEffect(() => {
+    const s = location.state;
+    if (!s) return;
+
+    if (s.modal === 'login') loginModal.open();
+    if (s.modal === 'roleRequest' && user) roleModal.open(); // 권한 요청은 로그인 상태에서만
+
+    // 한 번 열고 나면 state 제거하여 루프/잔여상태 방지
+    if (s.modal) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, user, navigate, location.pathname, loginModal, roleModal]);
+
+  const closeLogin = () => loginModal.close();
+  const closeRoleRequest = () => roleModal.close();
+
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
 
-  const openFromURL = params.get('login') === '1';
-  const roleFromURL = params.get('roleRequest') === '1';
-
-  // URL 변화에 따라 모달 자동 오픈
-  useEffect(() => {
-    if (openFromURL) loginModal.open();
-    if (roleFromURL) roleModal.open();
-  }, [openFromURL, roleFromURL]);
-
-  const closeLogin = () => {
-    loginModal.close();
-    navigate('/', { replace: true }); // URL 정리
-  };
-
-  const closeRoleRequest = () => {
-    roleModal.close();
-    navigate('/', { replace: true });
-  };
-
   const handleLogout = async () => {
-    await logout();
     setMenuOpen(false);
+    // 먼저 홈으로 네비게이트(쿼리/스테이트 초기화) → 그 다음 실제 로그아웃
+    navigate('/', { replace: true, state: null });
+    await logout();
   };
 
   if (loading) return null;

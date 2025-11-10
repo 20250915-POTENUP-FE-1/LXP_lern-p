@@ -9,15 +9,30 @@ export function RequireInstructor({ children }) {
 
   // 로그인 필요
   if (!user) {
-    return <Navigate to={`/?login=1&redirect=${encodeURIComponent(location.pathname)}`} replace />;
-  }
-
-  // 강사 권한 필요
-  if (!user.roles?.includes('INSTRUCTOR')) {
     return (
-      <Navigate to={`/?roleRequest=1&redirect=${encodeURIComponent(location.pathname)}`} replace />
+      <Navigate
+        to={location.pathname}
+        replace
+        state={{ modal: 'login', redirect: location.pathname }}
+      />
     );
   }
 
-  return children;
+  const isInstructor = user.roles?.includes('INSTRUCTOR');
+
+  if (isInstructor) return children;
+
+  // 보호된 instructor 섹션이면 → /mypage 로 이동시키고, 그곳에서 모달 열기
+  if (location.pathname.startsWith('/mypage/instructor')) {
+    return (
+      <Navigate
+        to="/mypage"
+        replace
+        state={{ modal: 'roleRequest', redirect: location.pathname }}
+      />
+    );
+  }
+
+  // 그 외는 홈에서 모달
+  return <Navigate to="/" replace state={{ modal: 'roleRequest', redirect: location.pathname }} />;
 }
