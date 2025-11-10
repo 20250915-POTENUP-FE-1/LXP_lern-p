@@ -1,6 +1,6 @@
 import styles from "@/domains/user/pages/MyPageSections.module.css";
 import { auth } from "@/shared/lib/firebase/config";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { getUserProfile } from "../services/userService";
 
@@ -22,15 +22,6 @@ export default function Profile() {
 
     return () => unsubscribe(); // 언마운트 시 감시 종료 (CleanUp)
   }, [])
-
-  console.log(profile)
-
-  useEffect(() => {
-    // 테스트용(삭제)
-    signInWithEmailAndPassword(auth, "dev@example.com", "12341234")
-      .then(() => console.log("✅ 로그인 성공"))
-      .catch(console.error);
-  }, []);
 
   // 로딩 추가
   if (!user || !profile) {
