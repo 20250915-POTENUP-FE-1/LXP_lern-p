@@ -52,7 +52,9 @@
   padding: var(--space-3) var(--space-4);
   background: var(--color-surface);
   color: var(--color-text);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form__control:focus-visible {
@@ -68,14 +70,21 @@
 }
 
 .form__error {
-  display: none;
   margin: 0;
   font-size: var(--text-xs);
   color: var(--color-danger);
 }
 
-.form__group[data-error="true"] .form__error {
+.form__group[data-error='true'] .form__error {
   display: block;
+}
+
+.form__error--global {
+  display: block;
+  margin: 0;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-danger);
 }
 
 .form__submit {
@@ -86,7 +95,9 @@
   color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .form__submit:hover,
@@ -149,7 +160,9 @@
   color: var(--color-text);
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .upload__trigger:hover,
@@ -171,6 +184,6 @@
   color: var(--color-danger);
 }
 
-.upload[data-error="true"] .upload__error {
+.upload[data-error='true'] .upload__error {
   display: block;
 }
