@@ -5,11 +5,11 @@ import CourseListPage from '@/domains/course/pages/CourseListPage';
 import Cart from '@/domains/user/pages/Cart';
 import Enrolled from '@/domains/user/pages/Enrolled';
 import InstructorCourses from '@/domains/user/pages/instructor/InstructorCourses';
-import MyPage from '@/domains/user/pages/MyPage';
 import Profile from '@/domains/user/pages/Profile';
 import AppLayout from '@/layouts/AppLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import { createBrowserRouter } from 'react-router';
+import MyPage from '../domains/user/pages/Mypage';
 import { RequireAuth } from './guards/RequireAuth';
 import { RequireInstructor } from './guards/RequireInstructor';
 
