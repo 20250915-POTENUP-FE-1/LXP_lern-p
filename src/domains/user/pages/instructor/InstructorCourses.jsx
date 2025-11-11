@@ -10,14 +10,16 @@ export default function InstructorCourses() {
   const [coursesLoading, setCoursesLoading] = useState(false);
 
   // user.id 준비된 뒤 → 데이터 가져오기
-  useEffect(() => {
+    useEffect(() => {
     if (userLoading || !user?.id) return;
     setCoursesLoading(true);
-
     getInstructorCourses(user.id)
-      .then((data) => setCourses(data))
+      .then(setCourses)
+      .catch((err) => {
+        console.error(err);
+      })
       .finally(() => setCoursesLoading(false));
-  }, [user, userLoading]);
+  }, [user?.id, userLoading]);
 
   // 로딩 UI
   if (userLoading || coursesLoading) {
@@ -52,14 +54,16 @@ export default function InstructorCourses() {
       <div className={styles["authored"]}>
         {courses.map((course) => (
           <div key={course.id} className={styles["authored__item"]}>
-            <div className={styles["authored__meta"]}>
-              <h3 className={styles["authored__title"]}>{course.title}</h3>
-              <p className={styles["authored__category"]}>
-                {Array.isArray(course.category)
-                  ? course.category.join(" / ")
-                  : course.category ?? "카테고리 없음"}
-              </p>
-            </div>
+            <NavLink to={`/courses/${course.id}`}>
+              <div className={styles["authored__meta"]}>
+                <h3 className={styles["authored__title"]}>{course.title}</h3>
+                <p className={styles["authored__category"]}>
+                  {Array.isArray(course.category)
+                    ? course.category.join(" / ")
+                    : course.category ?? "카테고리 없음"}
+                </p>
+              </div>
+            </NavLink>
             <div className={styles["authored__actions"]}>
               <NavLink to={`/courses/${course.id}/edit`} className={styles["authored__btn"]}>수정</NavLink>
               <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
