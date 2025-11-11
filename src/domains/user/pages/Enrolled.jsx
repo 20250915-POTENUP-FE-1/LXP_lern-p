@@ -1,6 +1,6 @@
 import styles from "@/domains/user/pages/MyPageSections.module.css";
 import { auth } from "@/shared/lib/firebase/config";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { fetchEnrolledCourses } from "../services/enrolledService";
@@ -10,14 +10,6 @@ export default function Enrolled() {
   const [user, setUser] = useState(null);
   const [enrolledList, setEnrolledList] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // TODO: 로그인 페이지 완성 후 제거할 것
-  //signOut(auth);
-  useEffect(() => {
-    signInWithEmailAndPassword(auth, "user@example.com", "password123123")
-      .then(() => console.log("✅ 로그인 성공"))
-      .catch(console.error);
-  }, []);
 
   // 1) 로그인 상태 감지 (로그인하면 user 업데이트)
   useEffect(() => {
