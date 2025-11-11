@@ -26,10 +26,6 @@ export default function CourseDetailPage() {
   // 🔍 로그인 상태 구독
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      console.log(' Firebase Auth 상태 변경:', user);
-      console.log('  - user 객체:', user);
-      console.log('  - uid:', user?.uid);
-      console.log('  - email:', user?.email);
       setCurrentUser(user);
     });
 
