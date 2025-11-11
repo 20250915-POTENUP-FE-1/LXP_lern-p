@@ -90,7 +90,6 @@
 .profile__btn:hover,
 .profile__btn:focus-visible {
   border-color: var(--color-brand);
-  color: var(--color-brand-700);
 }
 
 .profile__btn--edit {
