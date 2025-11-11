@@ -11,10 +11,10 @@ export default function Enrolled() {
 
   // 2) user.uid 가 생기면 → 해당 유저 수강 목록(enrolled) 가져오기
   useEffect(() => {
-    if (userLoading || !user) return;
+    if (userLoading || !user?.id) return;
     setEnrolledLoading(true);
 
-    fetchEnrolledCourses(user.uid)
+    fetchEnrolledCourses(user.id)
       .then((data) => setEnrolledList(data))
       .finally(() => setEnrolledLoading(false));
   }, [user, userLoading]);
