@@ -2,11 +2,6 @@ import { Link } from 'react-router';
 import styles from './CourseCard.module.css';
 
 export function CourseCard({ course }) {
-  // 카테고리 문자열로 변환 (배열 → " > " 구분자)
-  const categoryPath = Array.isArray(course.category)
-    ? course.category.join(' > ')
-    : course.category;
-
   return (
     <Link
       to={`/courses/${course.id}`}
@@ -23,13 +18,13 @@ export function CourseCard({ course }) {
       </div>
 
       <div className={styles['course-card__body']}>
-        <h3 className={styles['course-card__title']}>{course.title}</h3>
+        <div>
+          <h3 className={styles['course-card__title']}>{course.title}</h3>
+        </div>
 
-        {/* 강사명 + 카테고리 경로 */}
-        <p className={styles['course-card__meta']}>
-          <span className={styles['course-card__instructor']}>{course.instructorName}</span>
-          {categoryPath && <span className={styles['course-card__category']}>{categoryPath}</span>}
-        </p>
+        <div className={`${styles['course-card__meta']} ${styles['course-card__instructor']}`}>
+          {course.instructorName}
+        </div>
 
         {course.summary && <p className={styles['course-card__summary']}>{course.summary}</p>}
 
@@ -50,11 +45,9 @@ export function CourseCard({ course }) {
           <span className={styles['course-card__price']}>
             {course.isFree ? '무료' : `₩${course.price.toLocaleString()}`}
           </span>
-          {
-            <span className={styles['course-card__students']}>
-              👥 {course.studentCount.toLocaleString()}
-            </span>
-          }
+          {/* <span className={styles['course-card__students']}>
+             {course.studentCount.toLocaleString()}
+          </span> */}
         </div>
       </div>
     </Link>
