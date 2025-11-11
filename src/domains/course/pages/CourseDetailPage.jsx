@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import { LoginModal } from '../../auth/components/LoginModal';
 import { useAuthState } from '../../auth/hooks/useAuthState';
 import { CourseApplyModal } from '../components/CourseApplyModal';
+import { FloatingCTA } from '../components/FloatingCTA';
 import { useCourseApply } from '../hooks/useCourseApply';
 import { useCourseDetail } from '../hooks/useCourseDetail';
 import styles from './CourseDetailPage.module.css';
@@ -138,22 +139,21 @@ export default function CourseDetailPage() {
           )}
         </article>
 
-        {/* 사이드 */}
-        <aside className={styles['course-detail__aside']}>
-          <div className={styles.sidebar}>
-            <h4>금액 ₩ {course.price?.toLocaleString() ?? 0}</h4>
-            <button
-              className={`${styles['course-detail__cta-button']} ${
-                isEnrolled ? styles['course-detail__cta-button--enrolled'] : ''
-              }`}
-              onClick={handleApplyClick}
-              disabled={isEnrolled}
-            >
-              {isEnrolled ? '수강 중입니다' : course.isFree ? '무료 수강하기' : '수강 신청'}
-            </button>
-          </div>
-        </aside>
+        {/* 데스크탑용 사이드 CTA */}
+        <FloatingCTA
+          price={course.price}
+          isFree={course.isFree}
+          isEnrolled={isEnrolled}
+          onApply={handleApplyClick}
+          instructorName={course.instructorName}
+          totalLectures={courseInfo.totalLectures}
+          totalTime={course.totalTime}
+          level={course.level}
+          // onAddToCart={() => console.log('장바구니 담기 클릭')}
+        />
       </div>
+
+      {/* 모바일용 하단 고정 CTA */}
 
       {/* 모달 */}
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />

@@ -1,15 +1,9 @@
 .floating-cta {
-  position: fixed;
-  inset-inline: 0;
   bottom: 0;
-  top: auto;
+  z-index: 999;
   padding: var(--space-3);
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.95),
-    rgba(255, 255, 255, 0)
-  );
-  z-index: 998;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 .floating-cta__panel {
@@ -19,7 +13,7 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   background: var(--color-elevated);
-  /* box-shadow: var(--shadow-md); */
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .floating-cta__price {
@@ -39,6 +33,14 @@
   font-size: var(--text-sm);
 }
 
+/* -------------------- */
+/* 버튼 그룹 */
+/* -------------------- */
+.floating-cta__actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .floating-cta__button {
   border: none;
   border-radius: var(--radius-sm);
@@ -47,7 +49,9 @@
   color: var(--color-text);
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .floating-cta__button:hover,
@@ -56,48 +60,90 @@
   outline: none;
 }
 
+.floating-cta__button:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
 .floating-cta__button:active {
   transform: translateY(1px);
 }
 
+/* 장바구니 버튼 */
 .floating-cta__secondary {
   text-align: center;
   display: block;
   text-decoration: none;
-  color: var(--color-text);
+  color: var(--color-brand-700);
+  background: transparent;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-:global([data-theme="dark"]) .floating-cta {
-  background: linear-gradient(
-    to top,
-    rgba(11, 13, 18, 0.9),
-    rgba(11, 13, 18, 0)
-  );
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
 .floating-cta__secondary:hover,
 .floating-cta__secondary:focus-visible {
   border-color: var(--color-brand);
-  color: var(--color-brand-700);
+  color: var(--color-brand);
+  background: rgba(79, 70, 229, 0.05);
+}
+
+.floating-cta__meta-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.floating-cta__meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.floating-cta__meta-label {
+  color: var(--color-text-muted);
+}
+
+.floating-cta__meta-value {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.floating-cta__divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+:global([data-theme='dark']) .floating-cta__panel {
+  background: rgba(11, 13, 18, 0.9);
+  border-color: var(--color-border);
 }
 
 @media (min-width: 768px) {
   .floating-cta {
-    position: sticky;
+    position: sticky; /* 사이드바에 붙음 */
     top: var(--space-11);
+    bottom: auto;
+    margin-top: 0; /* 스크롤 트릭 제거 */
+    align-self: start;
+    justify-self: end;
+    width: 100%;
     padding: 0;
     background: none;
+    box-shadow: none;
   }
 
   .floating-cta__panel {
     padding: var(--space-5);
-  }
-
-  :global([data-theme="dark"]) .floating-cta {
-    background: none;
   }
 }
