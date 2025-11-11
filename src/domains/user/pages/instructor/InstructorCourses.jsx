@@ -53,24 +53,24 @@ export default function InstructorCourses() {
 
       <div className={styles["authored"]}>
         {courses.map((course) => (
-          <div key={course.id} className={styles["authored__item"]}>
-            <NavLink to={`/courses/${course.id}`}>
-              <div className={styles["authored__meta"]}>
-                <h3 className={styles["authored__title"]}>{course.title}</h3>
-                <p className={styles["authored__category"]}>
-                  {Array.isArray(course.category)
-                    ? course.category.join(" / ")
-                    : course.category ?? "카테고리 없음"}
-                </p>
-              </div>
-            </NavLink>
-            <div className={styles["authored__actions"]}>
-              <NavLink to={`/courses/${course.id}/edit`} className={styles["authored__btn"]}>수정</NavLink>
-              <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
-                삭제
-              </button>
+          <NavLink to={`/courses/${course.id}`}>
+            <div key={course.id} className={styles["authored__item"]}>
+                <div className={styles["authored__meta"]}>
+                  <h3 className={styles["authored__title"]}>{course.title}</h3>
+                  <p className={styles["authored__category"]}>
+                    {Array.isArray(course.category)
+                      ? course.category.join(" / ")
+                      : course.category ?? "카테고리 없음"}
+                  </p>
+                </div>
+                <div className={styles["authored__actions"]}>
+                  <button className={styles["authored__btn"]}>수정</button>
+                  <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
+                    삭제
+                  </button>
+                </div>
             </div>
-          </div>
+          </NavLink>
         ))}
       </div>
     </article>

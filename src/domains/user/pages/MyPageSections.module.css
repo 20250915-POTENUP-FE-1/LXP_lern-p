@@ -232,6 +232,10 @@
   gap: var(--space-4);
 }
 
+.authored-section * {
+  text-decoration: none;
+}
+
 .authored {
   display: grid;
   gap: var(--space-3);
@@ -245,10 +249,6 @@
   padding: var(--space-4);
   background: var(--color-elevated);
   /* box-shadow: var(--shadow-sm); */
-}
-
-.authored__item * {
-  text-decoration: none;
 }
 
 .authored__meta {
