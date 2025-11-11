@@ -1,7 +1,34 @@
-import React from "react";
 import styles from "@/domains/user/pages/MyPageSections.module.css";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { useAuthState } from '../../auth/hooks/useAuthState';
+import { getEnrolledCourses } from "../services/enrolledService";
 
 export default function Enrolled() {
+  const { user, loading: userLoading } = useAuthState();
+  const [enrolledLoading, setEnrolledLoading] = useState(false);
+  const [enrolledList, setEnrolledList] = useState([]);
+
+  // 2) user.uid 가 생기면 → 해당 유저 수강 목록(enrolled) 가져오기
+  useEffect(() => {
+    if (userLoading || !user?.id) return;
+    setEnrolledLoading(true);
+
+    getEnrolledCourses(user.id)
+      .then((data) => setEnrolledList(data))
+      .finally(() => setEnrolledLoading(false));
+  }, [user, userLoading]);
+
+  // 로딩 UI
+  if (userLoading || enrolledLoading) {
+    return <div style={{ padding: "40px" }}>⏳ 내 수강 강좌 불러오는 중...</div>;
+  }
+
+  // 수강 목록 없을 때
+  if (enrolledList.length === 0) {
+    return <div style={{ padding: "40px" }}>🫠 수강 중인 강의가 없어요.</div>;
+  }
+
   return (
     <article
       className={styles["enrolled-section"]}
@@ -15,38 +42,26 @@ export default function Enrolled() {
       </h1>
 
       <div className={styles["enrolled-section__list"]}>
-        {/* 아이템(정적 마크업) */}
-        <div className={styles["enrolled-card"]}>
-          <a
-            href="/courses/placeholder"
+        {enrolledList.map((item)=>(
+          <div key={item.id} className={styles["enrolled-card"]}>
+          <Link
+            to={`/courses/${item.courseId}`}
             className={styles["enrolled__link"]}
           >
-            <h3 className={styles["enrolled__title"]}>React 완전정복</h3>
+            <h3 className={styles["enrolled__title"]}>{item.course?.title ?? "제목 없음"}</h3>
             <p className={styles["enrolled__category"]}>
-              프론트엔드 / React / 입문
+              {Array.isArray(item.course?.category)
+                ? item.course.category.join(" / ")
+                : item.course?.category ?? "카테고리 없음"}
             </p>
-          </a>
-          <div className={styles["progress"]} aria-label="진행률 60%">
-            <div className={styles["progress__bar"]} style={{ width: "60%" }} />
+          </Link>
+          <div className={styles["progress"]} aria-label={`${item.progress ?? 0}%`}>
+            <div className={styles["progress__bar"]} style={{ width: `${item.progress ?? 0}%` }} />
           </div>
-          <span className={styles["enrolled-card__percent"]}>60%</span>
+          <span className={styles["enrolled-card__percent"]}>{`${item.progress ?? 0}%`}</span>
         </div>
-
-        <div className={styles["enrolled-card"]}>
-          <a
-            href="/courses/placeholder"
-            className={styles["enrolled__link"]}
-          >
-            <h3 className={styles["enrolled__title"]}>TypeScript 기초</h3>
-            <p className={styles["enrolled__category"]}>
-              프론트엔드 / TypeScript / 중급
-            </p>
-          </a>
-          <div className={styles["progress"]} aria-label="진행률 30%">
-            <div className={styles["progress__bar"]} style={{ width: "30%" }} />
-          </div>
-          <span className={styles["enrolled-card__percent"]}>30%</span>
-        </div>
+        ))}
+        
       </div>
     </article>
   );
