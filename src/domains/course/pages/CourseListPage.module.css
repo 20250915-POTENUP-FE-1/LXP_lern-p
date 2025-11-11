@@ -1,62 +1,71 @@
-.catalog {
+.course-list {
   display: grid;
   gap: var(--space-5);
   padding-block: var(--space-6);
 }
 
-.catalog__toolbar {
+.course-list__toolbar {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   align-items: center;
 }
 
-.catalog__grid {
+.course-list__grid {
   display: grid;
   gap: var(--space-4);
 }
 
-.catalog__sidebar {
+/* 사이드바: 기본 비활성 상태지만 구조만 유지 */
+.course-list__sidebar {
   display: block;
 }
 
-.catalog__content {
+/* 콘텐츠 */
+.course-list__content {
   min-width: 0;
 }
 
 .course-grid {
   display: grid;
-  flex-wrap: wrap;
   gap: var(--space-4);
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr; /* 기본: 1열 */
 }
 
 @media (min-width: 768px) {
-  .catalog__toolbar {
+  .course-list__toolbar {
     grid-template-columns: minmax(0, 1fr) max-content;
   }
 
-  .catalog__grid {
+  .course-list__grid {
     grid-template-columns: 280px 1fr;
     align-items: start;
   }
 
   .course-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 태블릿: 2열 */
   }
 }
 
 @media (min-width: 1200px) {
-  .catalog__grid {
+  .course-list__grid {
     grid-template-columns: 250px 1fr;
   }
 
-  .catalog__sidebar {
+  .course-list__sidebar {
     position: sticky;
     top: var(--space-10);
   }
 
   .course-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr); /* 데스크탑: 4열 */
   }
+}
+
+.course-list__loading,
+.course-list__empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  padding-block: var(--space-8);
 }

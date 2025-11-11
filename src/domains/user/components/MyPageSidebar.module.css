@@ -91,6 +91,7 @@
 .mypage-nav__link:focus-visible {
   border-color: var(--color-brand);
   color: var(--color-text);
+  text-decoration: none;
 }
 
 .mypage-nav__item:has(.mypage-nav__link[aria-current="page"]) .mypage-nav__link {
