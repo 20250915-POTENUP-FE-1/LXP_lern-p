@@ -17,7 +17,6 @@ export default function AuthLayout() {
           </div>
         </div>
       </main>
-
       <footer className={styles['auth-shell__footer']} role="contentinfo">
         <p className={styles['auth-shell__footer-text']}>
           도움이 필요하신가요? support@lernp.example

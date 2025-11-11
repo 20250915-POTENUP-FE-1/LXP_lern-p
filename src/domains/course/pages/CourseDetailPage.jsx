@@ -1,181 +1,171 @@
-import React from "react";
-import styles from "./CourseDetailPage.module.css";
+import { useModal } from '@/shared/hooks/useModal';
+import { useState } from 'react';
+import { useParams } from 'react-router';
+import { LoginModal } from '../../auth/components/LoginModal';
+import { useAuthState } from '../../auth/hooks/useAuthState';
+import { CourseApplyModal } from '../components/CourseApplyModal';
+import { FloatingCTA } from '../components/FloatingCTA';
+import { useCourseApply } from '../hooks/useCourseApply';
+import { useCourseDetail } from '../hooks/useCourseDetail';
+import styles from './CourseDetailPage.module.css';
 
 export default function CourseDetailPage() {
-  return (
-    <main
-      className={`${styles["course-detail"]} container`}
-      aria-labelledby="course-detail-title"
-    >
-      <div className={styles["course-detail__layout"]}>
-        {/* 1) 히어로: 레이아웃의 첫 자식 + 전체 폭 */}
-        <div className={styles["course-detail__hero"]} aria-hidden="true" />
+  const { id } = useParams();
+  const { user } = useAuthState();
 
-        {/* 2) 좌측 본문 */}
-        <article className={styles["course-detail__main"]}>
-          <header className={styles["course-detail__header"]}>
-            <h1
-              id="course-detail-title"
-              className={styles["course-detail__title"]}
-            >
-              React 완전정복
-            </h1>
-            <p className={styles["course-detail__instructor"]}>김코딩 강사</p>
-            <ul
-              className={styles["course-detail__tags"]}
-              aria-label="강좌 태그"
-            >
-              <li className={styles["course-detail__tag"]}>#프론트엔드</li>
-              <li className={styles["course-detail__tag"]}>#React</li>
-              <li className={styles["course-detail__tag"]}>#JavaScript</li>
+  // 탭 상태
+  const [activeTab, setActiveTab] = useState('intro');
+
+  // 모달 제어
+  const loginModal = useModal(false);
+  const applyModal = useModal(false);
+
+  // 데이터 훅
+  const { course, sections, lectures, loading } = useCourseDetail(id);
+  const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
+
+  const handleTabClick = (e, tabId) => {
+    e.preventDefault();
+    setActiveTab(tabId);
+  };
+
+  const handleApplyClick = () => {
+    if (!course) return;
+    if (!user) {
+      loginModal.open();
+      return;
+    }
+    applyModal.open();
+  };
+
+  if (loading) return <div className={styles.loading}>로딩 중...</div>;
+  if (!course) return <div className={styles.error}>강좌를 찾을 수 없습니다</div>;
+
+  const totalLectures = sections.reduce((sum, sec) => sum + (lectures[sec.id]?.length || 0), 0);
+  const courseInfo = { ...course, totalLectures };
+
+  return (
+    <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
+      <div className={styles['course-detail__layout']}>
+        <img
+          className={styles['course-detail__hero']}
+          src={course.thumbnail}
+          alt={`${course.title} 썸네일`}
+          loading="lazy"
+        />
+        <article className={styles['course-detail__main']}>
+          <header className={styles['course-detail__header']}>
+            <h1 className={styles['course-detail__title']}>{course.title}</h1>
+            <p className={styles['course-detail__instructor']}>{course.instructorName} 강사</p>
+
+            {course.tags?.length > 0 && (
+              <ul className={styles['course-detail__tags']}>
+                {course.tags.map((tag, idx) => (
+                  <li key={idx} className={styles['course-detail__tag']}>
+                    #{tag}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <ul className={styles['course-detail__meta']}>
+              <li>👥 {course.studentCount ?? 0}명 수강중</li>
+              <li>{course.level}</li>
             </ul>
-            <ul
-              className={styles["course-detail__meta"]}
-              aria-label="강좌 정보"
-            >
-              <li className={styles["course-detail__meta-item"]}>
-                👥 120명 수강중
-              </li>
-              <li className={styles["course-detail__meta-item"]}>⭐ 초급</li>
-              <li className={styles["course-detail__meta-item"]}>
-                📅 8주 과정
-              </li>
-            </ul>
-            <p className={styles["course-detail__summary"]}>
-              “React의 기초부터 실전 프로젝트까지 단계별로 학습합니다”
-            </p>
+
+            {course.summary && (
+              <p className={styles['course-detail__summary']}>"{course.summary}"</p>
+            )}
           </header>
 
-          <nav className={styles["course-tabs"]} aria-label="강좌 상세 탭">
-            <ul className={styles["course-tabs__list"]}>
-              <li>
-                <a
-                  href="#intro"
-                  className={styles["course-tabs__link"]}
-                  aria-current="page"
-                >
-                  강좌 소개
-                </a>
-              </li>
-              <li>
-                <a href="#curriculum" className={styles["course-tabs__link"]}>
-                  커리큘럼
-                </a>
-              </li>
-              <li>
-                <a href="#instructor" className={styles["course-tabs__link"]}>
-                  강사 정보
-                </a>
-              </li>
+          {/* 탭 */}
+          <nav className={styles['course-tabs']}>
+            <ul className={styles['course-tabs__list']}>
+              {[
+                { key: 'intro', label: '강좌 소개' },
+                { key: 'curriculum', label: '커리큘럼' },
+                { key: 'instructor', label: '강사 정보' },
+              ].map(({ key, label }) => (
+                <li key={key}>
+                  <a
+                    href={`#${key}`}
+                    className={`${styles['course-tabs__link']} ${
+                      activeTab === key ? styles.active : ''
+                    }`}
+                    onClick={(e) => handleTabClick(e, key)}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
 
-          <section
-            id="intro"
-            className={styles["course-detail__section"]}
-            aria-labelledby="intro-title"
-          >
-            <h2
-              id="intro-title"
-              className={styles["course-detail__section-title"]}
-            >
-              강좌 개요
-            </h2>
-            <p className={styles["course-detail__paragraph"]}>
-              이 강좌는 React의 기본 개념부터 실전 프로젝트까지 다룹니다…
-            </p>
-          </section>
+          {/* 탭 콘텐츠 */}
+          {activeTab === 'intro' && (
+            <section className={styles['course-detail__section']}>
+              <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
+              <p>{course.description || '강좌 개요는 추후 업데이트 예정입니다.'}</p>
+            </section>
+          )}
 
-          <section
-            id="curriculum"
-            className={styles["course-detail__section"]}
-            aria-labelledby="curriculum-title"
-          >
-            <h2
-              id="curriculum-title"
-              className={styles["course-detail__section-title"]}
-            >
-              커리큘럼
-            </h2>
-            <p className={styles["course-detail__paragraph"]}>
-              커리큘럼 상세는 추후 업데이트 예정
-            </p>
-          </section>
+          {activeTab === 'curriculum' && (
+            <section className={styles['course-detail__section']}>
+              <h2 className={styles['course-detail__section-title']}>커리큘럼</h2>
+              {sections.length === 0 ? (
+                <p>커리큘럼이 없습니다</p>
+              ) : (
+                sections.map((sec) => (
+                  <details key={sec.id}>
+                    <summary>{sec.title}</summary>
+                    <ul>
+                      {lectures[sec.id]?.map((lec) => (
+                        <li key={lec.id}>
+                          {lec.title} ({lec.duration}분)
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ))
+              )}
+            </section>
+          )}
 
-          <section
-            id="instructor"
-            className={styles["course-detail__section"]}
-            aria-labelledby="instructor-title"
-          >
-            <h2
-              id="instructor-title"
-              className={styles["course-detail__section-title"]}
-            >
-              강사 정보
-            </h2>
-            <p className={styles["course-detail__paragraph"]}>
-              강사 소개는 추후 업데이트 예정
-            </p>
-          </section>
+          {activeTab === 'instructor' && (
+            <section className={styles['course-detail__section']}>
+              <h2 className={styles['course-detail__section-title']}>강사 정보</h2>
+              <p>강사 소개는 추후 업데이트 예정입니다.</p>
+            </section>
+          )}
         </article>
 
-        {/* 3) 우측 사이드바: 히어로 아래에서 시작 */}
-        <aside
-          className={styles["course-detail__aside"]}
-          aria-label="신청 영역"
-        >
-          <div
-            className={`${styles["sidebar"]} ${styles["sidebar--right"]} ${styles["sidebar--floating"]}`}
-          >
-            <a
-              href="#course-apply-modal"
-              className={styles["course-detail__cta-button"]}
-            >
-              신청하기
-            </a>
-            <ul className={styles["course-detail__cta-meta"]}>
-              <li className={styles["course-detail__cta-row"]}>
-                <span className={styles["course-detail__cta-label"]}>강사</span>
-                <span className={styles["course-detail__cta-value"]}>
-                  김코딩
-                </span>
-              </li>
-              <li
-                className={styles["course-detail__cta-divider"]}
-                aria-hidden="true"
-              />
-              <li className={styles["course-detail__cta-row"]}>
-                <span className={styles["course-detail__cta-label"]}>
-                  총 강의
-                </span>
-                <span className={styles["course-detail__cta-value"]}>12강</span>
-              </li>
-              <li
-                className={styles["course-detail__cta-divider"]}
-                aria-hidden="true"
-              />
-              <li className={styles["course-detail__cta-row"]}>
-                <span className={styles["course-detail__cta-label"]}>
-                  총 시간
-                </span>
-                <span className={styles["course-detail__cta-value"]}>
-                  5시간 20분
-                </span>
-              </li>
-              <li
-                className={styles["course-detail__cta-divider"]}
-                aria-hidden="true"
-              />
-              <li className={styles["course-detail__cta-row"]}>
-                <span className={styles["course-detail__cta-label"]}>
-                  난이도
-                </span>
-                <span className={styles["course-detail__cta-value"]}>초급</span>
-              </li>
-            </ul>
-          </div>
-        </aside>
+        {/* 데스크탑용 사이드 CTA */}
+        <FloatingCTA
+          price={course.price}
+          isFree={course.isFree}
+          isEnrolled={isEnrolled}
+          onApply={handleApplyClick}
+          instructorName={course.instructorName}
+          totalLectures={courseInfo.totalLectures}
+          totalTime={course.totalTime}
+          level={course.level}
+          // onAddToCart={() => console.log('장바구니 담기 클릭')}
+        />
       </div>
+
+      {/* 모바일용 하단 고정 CTA */}
+
+      {/* 모달 */}
+      <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
+      <CourseApplyModal
+        isOpen={applyModal.isOpen}
+        onClose={applyModal.close}
+        course={courseInfo}
+        user={user}
+        isEnrolled={isEnrolled}
+        applying={applying}
+        onApply={handleApply}
+      />
     </main>
   );
 }
