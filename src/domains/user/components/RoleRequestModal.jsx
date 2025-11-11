@@ -1,46 +1,45 @@
-import { Modal } from '../../../shared/ui/Modal';
+import { updateUserToInstructor } from '@/domains/user/services/userService';
+import { Modal } from '@/shared/ui/Modal';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
-export function RoleRequestModal({ isOpen, onClose }) {
+export function RoleRequestModal({ isOpen, onClose, user }) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      // Firestore roles 업데이트 (예: ["USER", "INSTRUCTOR"])
+      await updateUserToInstructor(user.id);
+
+      onClose();
+      navigate('/mypage');
+    } catch (err) {
+      console.error('강사 권한 부여 실패:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <header className="modal__header">
         <h2 id="role-request-title" className="modal__title">
-          강사 권한 요청
+          강사가 되시겠습니까?
         </h2>
         <button type="button" className="modal__close" aria-label="닫기" onClick={onClose}>
           ×
         </button>
       </header>
-      <div className="modal__body">
-        <form className="modal__form" aria-label="강사 권한 요청 폼">
-          <div className="modal__field">
-            <label htmlFor="rr-name" className="modal__label">
-              이름
-            </label>
-            <input id="rr-name" type="text" className="modal__input" />
-          </div>
-          <div className="modal__field">
-            <label htmlFor="rr-portfolio" className="modal__label">
-              포트폴리오 URL
-            </label>
-            <input
-              id="rr-portfolio"
-              type="url"
-              className="modal__input"
-              placeholder="https://..."
-            />
-          </div>
-          <div className="modal__field">
-            <label htmlFor="rr-message" className="modal__label">
-              요청 사유
-            </label>
-            <textarea id="rr-message" rows="4" className="modal__textarea" />
-          </div>
-        </form>
+
+      <div className="modal__body" style={{ paddingTop: '8px' }}>
+        <p className="modal__text">강의를 등록하려면 강사 권한이 필요합니다.</p>
       </div>
+
       <footer className="modal__actions">
-        <button type="submit" className="modal__button">
-          요청 보내기
+        <button type="button" className="modal__button" onClick={handleConfirm} disabled={loading}>
+          {loading ? '처리 중...' : '확인'}
         </button>
       </footer>
     </Modal>
