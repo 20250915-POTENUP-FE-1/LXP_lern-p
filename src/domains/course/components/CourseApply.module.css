@@ -1,10 +1,3 @@
-/* CourseApply.module.css (BEM Refactoring) */
-
-/* ==================================== */
-/* 📦 Block: course-apply              */
-/* ==================================== */
-
-/* === course-apply__backdrop (Overlay & Container) === */
 .course-apply__backdrop {
   position: fixed;
   inset: 0;

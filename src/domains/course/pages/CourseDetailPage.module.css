@@ -185,6 +185,7 @@
   text-decoration: none;
   background: var(--color-brand);
   color: var(--color-text);
+
   font-weight: 700;
   transition:
     background 0.2s ease,
@@ -193,11 +194,16 @@
 
 .course-detail__cta-button:hover,
 .course-detail__cta-button:focus-visible {
-  background: var(--color-brand-700);
+  background: var(--color-brand);
 }
 
 .course-detail__cta-button:active {
   transform: translateY(1px);
+}
+
+.course-detail__cta-button:disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .course-detail__cta-meta {

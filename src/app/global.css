@@ -371,6 +371,136 @@ a:focus-visible {
   background: rgba(79, 70, 229, 0.12);
   color: var(--color-text);
 }
+.course-apply__list {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.course-apply__item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
+}
+
+.course-apply__label {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.course-apply__value {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.modal__button--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.modal__button--ghost:hover {
+  border-color: var(--color-brand);
+  color: var(--color-text);
+}
+/* 리스트 컨테이너: 박스 처리 + 간격 최적화 */
+.course-apply__list {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* 각 행: 그리드 2컬럼(라벨:값), 세로 정렬, 호버 하이라이트 */
+.course-apply__item {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 2fr;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.16s ease;
+}
+.course-apply__item:last-child {
+  border-bottom: 0;
+}
+.course-apply__item:hover {
+  background: var(--color-brand-50);
+}
+
+/* 라벨: 톤 다운 + 소문자 간격 */
+.course-apply__label {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* 값: 굵기/정렬/말줄임 처리 */
+.course-apply__value {
+  justify-self: end;
+  text-align: right;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 액션 영역: 상단 경계 + 여백 */
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* 고스트 버튼: 대비 강화 + 호버 피드백 */
+.modal__button--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-5);
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+.modal__button--ghost:hover,
+.modal__button--ghost:focus-visible {
+  border-color: var(--color-brand);
+  background: var(--color-brand-50);
+  color: var(--color-text);
+}
+
+/* 모바일(<=480px): 라벨/값 세로 스택, 줄바꿈 허용 */
+@media (max-width: 480px) {
+  .course-apply__item {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+  .course-apply__value {
+    justify-self: start;
+    text-align: left;
+    white-space: normal;
+  }
+}
 
 @media (min-width: 768px) {
   .modal {
