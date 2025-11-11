@@ -1,7 +1,7 @@
-import { db } from "@/shared/lib/firebase/config";
+import { db } from '@/shared/lib/firebase/firestore';
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-export async function fetchEnrolledCourses(userId) {
+export async function getEnrolledCourses(userId) {
   // 1) 해당 유저의 수강 내역 가져오기
   const enrolledSnap = await getDocs(
     query(collection(db, "enrollments"), where("userId", "==", userId))

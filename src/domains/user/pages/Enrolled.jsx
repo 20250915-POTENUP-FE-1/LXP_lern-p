@@ -2,7 +2,7 @@ import styles from "@/domains/user/pages/MyPageSections.module.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useAuthState } from '../../auth/hooks/useAuthState';
-import { fetchEnrolledCourses } from "../services/enrolledService";
+import { getEnrolledCourses } from "../services/enrolledService";
 
 export default function Enrolled() {
   const { user, loading: userLoading } = useAuthState();
@@ -14,7 +14,7 @@ export default function Enrolled() {
     if (userLoading || !user?.id) return;
     setEnrolledLoading(true);
 
-    fetchEnrolledCourses(user.id)
+    getEnrolledCourses(user.id)
       .then((data) => setEnrolledList(data))
       .finally(() => setEnrolledLoading(false));
   }, [user, userLoading]);
