@@ -1,7 +1,36 @@
-import React from "react";
+import { useAuthState } from "@/domains/auth/hooks/useAuthState";
 import styles from "@/domains/user/pages/MyPageSections.module.css";
+import { getInstructorCourses } from "@/domains/user/services/instructorService";
+import { useEffect, useState } from "react";
+import { NavLink } from "react-router";
 
 export default function InstructorCourses() {
+  const { user, loading: userLoading } = useAuthState();
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+
+  // user.id 준비된 뒤 → 데이터 가져오기
+    useEffect(() => {
+    if (userLoading || !user?.id) return;
+    setCoursesLoading(true);
+    getInstructorCourses(user.id)
+      .then(setCourses)
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => setCoursesLoading(false));
+  }, [user?.id, userLoading]);
+
+  // 로딩 UI
+  if (userLoading || coursesLoading) {
+    return <div style={{ padding: "40px" }}>⏳ 강좌 불러오는 중...</div>;
+  }
+
+  // 강좌 없을 때 UI
+  if (courses.length === 0) {
+    return <div style={{ padding: "40px" }}>🫠 개설한 강의가 아직 없어요.</div>;
+  }
+
   return (
     <article
       className={styles["authored-section"]}
@@ -23,39 +52,26 @@ export default function InstructorCourses() {
       </div>
 
       <div className={styles["authored"]}>
-        <div className={styles["authored__item"]}>
-          <div className={styles["authored__meta"]}>
-            <h3 className={styles["authored__title"]}>React 실전 프로젝트</h3>
-            <p className={styles["authored__category"]}>
-              프론트엔드 / React / 실전
-            </p>
-          </div>
-          <div className={styles["authored__actions"]}>
-            <a href="/courses/placeholder/edit" className={styles["authored__btn"]}>
-              수정
-            </a>
-            <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
-              삭제
-            </button>
-          </div>
-        </div>
-
-        <div className={styles["authored__item"]}>
-          <div className={styles["authored__meta"]}>
-            <h3 className={styles["authored__title"]}>Node.js 백엔드 구조</h3>
-            <p className={styles["authored__category"]}>
-              백엔드 / Node.js / 중급
-            </p>
-          </div>
-          <div className={styles["authored__actions"]}>
-            <a href="/courses/placeholder/edit" className={styles["authored__btn"]}>
-              수정
-            </a>
-            <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
-              삭제
-            </button>
-          </div>
-        </div>
+        {courses.map((course) => (
+          <NavLink to={`/courses/${course.id}`}>
+            <div key={course.id} className={styles["authored__item"]}>
+                <div className={styles["authored__meta"]}>
+                  <h3 className={styles["authored__title"]}>{course.title}</h3>
+                  <p className={styles["authored__category"]}>
+                    {Array.isArray(course.category)
+                      ? course.category.join(" / ")
+                      : course.category ?? "카테고리 없음"}
+                  </p>
+                </div>
+                <div className={styles["authored__actions"]}>
+                  <button className={styles["authored__btn"]}>수정</button>
+                  <button type="button" className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}>
+                    삭제
+                  </button>
+                </div>
+            </div>
+          </NavLink>
+        ))}
       </div>
     </article>
   );

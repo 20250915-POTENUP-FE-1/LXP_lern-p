@@ -232,6 +232,10 @@
   gap: var(--space-4);
 }
 
+.authored-section * {
+  text-decoration: none;
+}
+
 .authored {
   display: grid;
   gap: var(--space-3);
