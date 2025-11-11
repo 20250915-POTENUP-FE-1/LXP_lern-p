@@ -1,7 +1,10 @@
+import { useAuthState } from "@/domains/auth/hooks/useAuthState";
 import styles from '@/domains/user/components/MyPageSidebar.module.css';
+
 import { NavLink } from 'react-router';
 
 export function MyPageSidebar() {
+  const { user } = useAuthState();
   return (
     <>
       <nav
@@ -29,6 +32,7 @@ export function MyPageSidebar() {
           </ul>
         </div>
 
+        {user?.roles?.includes("INSTRUCTOR") && (
         <div
           className={`${styles['mypage-nav__section']} ${styles['mypage-nav__section--instructor']}`}
           aria-label="강사 전용"
@@ -42,6 +46,7 @@ export function MyPageSidebar() {
             </li>
           </ul>
         </div>
+        )}
       </nav>
 
       <details className={`${styles['sidebar']} ${styles['sidebar--collapsible']}`}>
