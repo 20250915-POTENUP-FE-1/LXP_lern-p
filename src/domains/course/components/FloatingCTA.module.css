@@ -57,9 +57,9 @@
 .floating-cta__button:hover,
 .floating-cta__button:focus-visible {
   background: var(--color-brand-700);
-  background-color: var(--color-brand);
+  background-color: var(--color-brand-700);
   outline: none;
-color: var(--color-text);
+color: var(--color-text-light);
 }
 
 .floating-cta__button:disabled {

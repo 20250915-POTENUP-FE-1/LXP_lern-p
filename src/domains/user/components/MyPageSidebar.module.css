@@ -97,7 +97,7 @@
 .mypage-nav__item:has(.mypage-nav__link[aria-current="page"]) .mypage-nav__link {
   background: linear-gradient(90deg, var(--color-brand), var(--color-brand-700));
   border-color: transparent;
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
 }
 
 .mypage-nav__section {

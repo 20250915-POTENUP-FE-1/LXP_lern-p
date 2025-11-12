@@ -242,7 +242,7 @@
 .btn--primary {
   border: none;
   background: var(--color-brand);
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
 }
 
 .btn--primary:hover,

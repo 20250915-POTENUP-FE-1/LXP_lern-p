@@ -2,6 +2,7 @@
   display: grid;
   gap: var(--space-5);
   padding-block: var(--space-6);
+  padding-top: 0;
 }
 
 .course-list__toolbar {

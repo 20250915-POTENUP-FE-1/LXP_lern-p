@@ -316,7 +316,7 @@ a:focus-visible {
   font-weight: 600;
   text-decoration: none;
   background: var(--color-brand);
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -326,7 +326,7 @@ a:focus-visible {
 .modal__button:hover,
 .modal__button:focus-visible {
   background: var(--color-brand-700);
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
 }
 
 .modal__button--ghost {

@@ -90,7 +90,7 @@
 .profile__btn--edit {
   background: var(--color-brand);
   border-color: var(--color-brand);
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
 }
 
 .profile__btn--edit:hover,
@@ -307,7 +307,7 @@
 .authored__btn--primary {
   background: var(--color-brand);
   border-color: var(--color-brand);
-  color: var(--color-brand-50);
+  color: var(--color-text-light);
 }
 
 .authored__btn--primary:hover,
