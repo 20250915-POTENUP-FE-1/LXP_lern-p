@@ -8,7 +8,7 @@ export function FloatingCTA({
   totalLectures,
   totalTime,
   level,
-  onApply, // ✅ 이거 추가
+  onApply,
   onAddToCart,
 }) {
   return (
@@ -19,7 +19,6 @@ export function FloatingCTA({
           <strong className={styles['floating-cta__price-value']}>
             {isFree ? '무료' : `₩${price?.toLocaleString() ?? 0}`}
           </strong>
-          {!isFree && <span className={styles['floating-cta__price-note']}>일시 결제</span>}
         </div>
 
         {/* 버튼 그룹 */}

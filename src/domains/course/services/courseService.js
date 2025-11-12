@@ -11,6 +11,7 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -84,7 +85,7 @@ export const applyCourse = async (userId, courseId) => {
       // 2. users 업데이트
       const userRef = doc(db, 'users', userId);
       tx.update(userRef, {
-        enrolledCourseIds: arrayUnion(enrollmentRef.id),
+        enrolledCourses: arrayUnion(enrollmentRef.id),
         updatedAt: serverTimestamp(),
       });
 
@@ -118,5 +119,91 @@ export const getEnrollmentStatus = async (userId, courseId) => {
   } catch (err) {
     console.error('getEnrollmentStatus 실패:', err);
     return false;
+  }
+};
+
+/** 강좌 등록 (courses + sections + lectures + user 업데이트) */
+export const createCourse = async (user, courseData, sectionList) => {
+  if (!user?.id) throw new Error('로그인이 필요합니다.');
+
+  try {
+    // 1. courses 컬렉션에 문서 추가 (자동 ID 생성)
+    const courseRef = await addDoc(collection(db, 'courses'), {
+      title: courseData.title,
+      summary: courseData.summary,
+      description: courseData.description,
+      thumbnailUrl: courseData.thumbnailUrl,
+      instructorId: user.id,
+      instructorName: user.name,
+      category: courseData.category,
+      level: courseData.level,
+      tags: [courseData.level || '', courseData.category?.[2] || ''],
+      price: Number(courseData.price),
+      isFree: Number(courseData.price) === 0,
+      studentCount: 0,
+      duration:
+        sectionList.reduce(
+          (total, sec) => total + sec.lectures.reduce((sum, lec) => sum + (lec.duration || 0), 0),
+          0,
+        ) || 0,
+      status: 'published',
+      sections: [],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    const courseId = courseRef.id;
+    const sectionIds = [];
+
+    // 2. sections 컬렉션 추가
+    for (let i = 0; i < sectionList.length; i++) {
+      const sectionData = sectionList[i];
+      const sectionRef = await addDoc(collection(db, 'sections'), {
+        courseId,
+        title: sectionData.title,
+        sequence: i + 1,
+        lectures: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      const sectionId = sectionRef.id;
+      sectionIds.push(sectionId);
+      const lectureIds = [];
+
+      // 3. lectures 컬렉션 추가
+      for (let j = 0; j < sectionData.lectures.length; j++) {
+        const lecData = sectionData.lectures[j];
+        const lectureRef = await addDoc(collection(db, 'lectures'), {
+          courseId,
+          sectionId,
+          title: lecData.title,
+          videoUrl: lecData.videoUrl || '',
+          duration: lecData.duration,
+          sequence: j + 1,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        lectureIds.push(lectureRef.id);
+      }
+
+      // 4. 섹션 문서에 lectures 필드 업데이트
+      await updateDoc(sectionRef, { lectures: lectureIds });
+    }
+
+    // 5. 강좌 문서에 sections 필드 업데이트
+    await updateDoc(courseRef, { sections: sectionIds });
+
+    // 6. 사용자 문서에 createdCourses 추가
+    const userRef = doc(db, 'users', user.id);
+    await updateDoc(userRef, {
+      createdCourses: arrayUnion(courseId),
+      updatedAt: serverTimestamp(),
+    });
+
+    return courseId;
+  } catch (err) {
+    console.error('createCourse 실패:', err);
+    throw new Error('강좌 등록 중 오류가 발생했습니다.');
   }
 };

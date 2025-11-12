@@ -1,10 +1,10 @@
 import { db } from '@/shared/lib/firebase/firestore';
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 export async function getEnrolledCourses(userId) {
   // 1) 해당 유저의 수강 내역 가져오기
   const enrolledSnap = await getDocs(
-    query(collection(db, "enrollments"), where("userId", "==", userId))
+    query(collection(db, 'enrollments'), where('userId', '==', userId)),
   );
 
   const enrolled = enrolledSnap.docs.map((doc) => ({
@@ -16,11 +16,11 @@ export async function getEnrolledCourses(userId) {
   if (enrolled.length === 0) return [];
 
   // 2) courseId 목록 추출
-  const courseIds = enrolled.map((item) => item.courseId);
+  const courses = enrolled.map((item) => item.courseId);
 
   // 3) 해당 강의 목록 가져오기
   const courseSnap = await getDocs(
-    query(collection(db, "courses"), where("__name__", "in", courseIds))
+    query(collection(db, 'courses'), where('__name__', 'in', courses)),
   );
 
   const courseMap = {};

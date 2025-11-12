@@ -10,6 +10,7 @@
 }
 
 .course-detail__hero {
+  width: 100%;
   grid-column: 1 / -1;
   min-height: 240px;
   border-radius: var(--radius-lg);
@@ -235,7 +236,7 @@
 
 @media (min-width: 768px) {
   .course-detail__layout {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
     align-items: start;
   }
 

@@ -7,6 +7,7 @@ import { CourseApplyModal } from '../components/CourseApplyModal';
 import { FloatingCTA } from '../components/FloatingCTA';
 import { useCourseApply } from '../hooks/useCourseApply';
 import { useCourseDetail } from '../hooks/useCourseDetail';
+import { formatDuration } from '../utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
 
 export default function CourseDetailPage() {
@@ -49,7 +50,7 @@ export default function CourseDetailPage() {
       <div className={styles['course-detail__layout']}>
         <img
           className={styles['course-detail__hero']}
-          src={course.thumbnail}
+          src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
@@ -116,7 +117,7 @@ export default function CourseDetailPage() {
                 <p>커리큘럼이 없습니다</p>
               ) : (
                 sections.map((sec) => (
-                  <details key={sec.id}>
+                  <details key={sec.id} open>
                     <summary>{sec.title}</summary>
                     <ul>
                       {lectures[sec.id]?.map((lec) => (
@@ -147,7 +148,7 @@ export default function CourseDetailPage() {
           onApply={handleApplyClick}
           instructorName={course.instructorName}
           totalLectures={courseInfo.totalLectures}
-          totalTime={course.totalTime}
+          totalTime={formatDuration(course.duration)}
           level={course.level}
           // onAddToCart={() => console.log('장바구니 담기 클릭')}
         />
