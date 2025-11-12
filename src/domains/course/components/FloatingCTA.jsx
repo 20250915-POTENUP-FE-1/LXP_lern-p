@@ -8,7 +8,7 @@ export function FloatingCTA({
   totalLectures,
   totalTime,
   level,
-  onApply, // ✅ 이거 추가
+  onApply, // 이거 추가
   onAddToCart,
 }) {
   return (
