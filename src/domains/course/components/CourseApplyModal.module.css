@@ -34,34 +34,6 @@
   color: var(--color-text);
 }
 
-/* 제목(강좌명)만 살짝 굵게 */
-.course-apply__list .modal__field:nth-child(2) .modal__value {
-  font-weight: 600;
-}
-
-/* 요약: 줄간격과 가독성 */
-.course-apply__list .modal__field:nth-child(3) .modal__value {
-  line-height: 1.6;
-}
-
-/* 난이도: 뱃지 스타일 */
-.course-apply__list .modal__field:nth-child(6) .modal__value {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgb(255 98 0 / 0.1); /* brand 투명 배경 */
-  color: var(--color-brand);
-  font-weight: 600;
-  line-height: 1;
-}
-
-/* 결제(가격): 강렬한 포인트 */
-.course-apply__list .modal__field:last-child .modal__value {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
 /* 모달 내부 여백·스크롤 최적화 */
 .modal__body {
   overflow-y: auto;
@@ -98,3 +70,4 @@
 .modal__button:focus-visible {
   color: #fff;
 }
+
