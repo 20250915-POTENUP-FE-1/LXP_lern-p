@@ -94,7 +94,7 @@ color: var(--color-text);
 .floating-cta__secondary:focus-visible {
   border-color: var(--color-brand);
   color: var(--color-brand);
-  background: rgb(248, 248, 248);
+  background: rgba(248, 248, 248);
 }
 
 .floating-cta__meta-list {
