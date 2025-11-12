@@ -8,9 +8,18 @@ export function FloatingCTA({
   totalLectures,
   totalTime,
   level,
-  onApply, // ✅ 이거 추가
+  onApply, //
   onAddToCart,
+  incart = false,
+  cartPending = false,
+  disableCart = false,
 }) {
+  // 장바구니 버튼 라벨/ 상태
+  const cartLabel = disableCart
+    ? '수강 중 (장바구니 불가)'
+    : incart
+      ? '장바구니 담김'
+      : '장바구니 추가';
   return (
     <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
       <div className={styles['floating-cta__panel']}>
@@ -26,9 +35,7 @@ export function FloatingCTA({
         <div className={styles['floating-cta__actions']}>
           <button
             type="button"
-            className={`${styles['floating-cta__button']} ${
-              isEnrolled ? styles['floating-cta__button--disabled'] : ''
-            }`}
+            className={`${styles['floating-cta__button']}  ${isEnrolled ? styles['floating-cta__button--disabled'] : ''}`}
             onClick={onApply}
             disabled={isEnrolled}
           >
@@ -36,9 +43,24 @@ export function FloatingCTA({
           </button>
 
           {/* 장바구니 버튼 */}
-          <button type="button" className={styles['floating-cta__secondary']} onClick={onAddToCart}>
-            장바구니 담기
-          </button>
+          {!isEnrolled && (
+            <button
+              type="button"
+              className={`${styles['floating-cta__secondary']} ${incart ? styles['is-in-cart'] : ''}`}
+              onClick={onAddToCart}
+              disabled={incart}
+              aria-pressed={incart}
+              title={
+                disableCart
+                  ? '이미 수강중인 강좌'
+                  : incart
+                    ? '이미 장바구니에 담긴 강좌'
+                    : undefined
+              }
+            >
+              {(cartPending = cartLabel)}
+            </button>
+          )}
         </div>
 
         {/* 하단 메타 정보 */}

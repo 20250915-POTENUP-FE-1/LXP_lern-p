@@ -74,7 +74,7 @@ export default function CourseListPage() {
           <p className={styles['course-list__empty']}>등록된 강좌가 없습니다.</p>
         ) : (
           <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
-            {courses.map((course) => (
+            {courses.map((course, idx) => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>

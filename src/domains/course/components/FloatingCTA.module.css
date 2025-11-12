@@ -46,7 +46,7 @@
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-5);
   background: var(--color-brand);
-  color:   var(--color-text-light);
+  color: var(--color-text-light);
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -59,7 +59,11 @@
   background: var(--color-brand-700);
   background-color: var(--color-brand);
   outline: none;
+<<<<<<< Updated upstream
 color: var(--color-text);
+=======
+  color: var(--color-text-light);
+>>>>>>> Stashed changes
 }
 
 .floating-cta__button:disabled {
@@ -90,11 +94,37 @@ color: var(--color-text);
     background 0.2s ease;
 }
 
+.floating-cta__secondary.is-in-cart {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
 .floating-cta__secondary:hover,
 .floating-cta__secondary:focus-visible {
   border-color: var(--color-brand);
   color: var(--color-brand);
   background: rgba(248, 248, 248);
+}
+
+.floating-cta__secondary:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: default;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
 .floating-cta__meta-list {

@@ -30,9 +30,9 @@ export function CourseCard({ course }) {
 
         {course.tags?.length > 0 && (
           <ul className={styles['course-card__tags']}>
-            {course.tags.map((tag) => (
+            {course.tags.map((tag, idx) => (
               <li
-                key={tag}
+                key={`${course.id}-tag-${idx}`}
                 className={`${styles['course-card__tag']} ${styles['course-card__tag--category']}`}
               >
                 {tag}

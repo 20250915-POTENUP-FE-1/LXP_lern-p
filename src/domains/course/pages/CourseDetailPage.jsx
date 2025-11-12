@@ -5,6 +5,7 @@ import { LoginModal } from '../../auth/components/LoginModal';
 import { useAuthState } from '../../auth/hooks/useAuthState';
 import { CourseApplyModal } from '../components/CourseApplyModal';
 import { FloatingCTA } from '../components/FloatingCTA';
+import { useCart } from '../hooks/useCart';
 import { useCourseApply } from '../hooks/useCourseApply';
 import { useCourseDetail } from '../hooks/useCourseDetail';
 import styles from './CourseDetailPage.module.css';
@@ -24,6 +25,8 @@ export default function CourseDetailPage() {
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
 
+  const { incart, cartPending, handleAddCart } = useCart(user, id);
+
   const handleTabClick = (e, tabId) => {
     e.preventDefault();
     setActiveTab(tabId);
@@ -38,6 +41,19 @@ export default function CourseDetailPage() {
     applyModal.open();
   };
 
+  const handleCartClick = async () => {
+    if (!course) return;
+    if (!user) {
+      loginModal.open();
+      return;
+    }
+    if (isEnrolled) return;
+
+    if (!incart) {
+      await handleAddCart();
+    }
+  };
+
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
   if (!course) return <div className={styles.error}>강좌를 찾을 수 없습니다</div>;
 
@@ -45,7 +61,11 @@ export default function CourseDetailPage() {
   const courseInfo = { ...course, totalLectures };
 
   return (
-    <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
+    <main
+      key={id}
+      className={`${styles['course-detail']} container`}
+      aria-labelledby="course-detail-title"
+    >
       <div className={styles['course-detail__layout']}>
         <img
           className={styles['course-detail__hero']}
@@ -60,8 +80,8 @@ export default function CourseDetailPage() {
 
             {course.tags?.length > 0 && (
               <ul className={styles['course-detail__tags']}>
-                {course.tags.map((tag, idx) => (
-                  <li key={idx} className={styles['course-detail__tag']}>
+                {(course.tags || []).map((tag, idx) => (
+                  <li key={`${id}-tag-${idx || tag}`} className={styles['course-detail__tag']}>
                     #{tag}
                   </li>
                 ))}
@@ -85,19 +105,21 @@ export default function CourseDetailPage() {
                 { key: 'intro', label: '강좌 소개' },
                 { key: 'curriculum', label: '커리큘럼' },
                 { key: 'instructor', label: '강사 정보' },
-              ].map(({ key, label }) => (
-                <li key={key}>
-                  <a
-                    href={`#${key}`}
-                    className={`${styles['course-tabs__link']} ${
-                      activeTab === key ? styles.active : ''
-                    }`}
-                    onClick={(e) => handleTabClick(e, key)}
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
+              ].map(({ key, label }, idx) => {
+                return (
+                  <li key={key}>
+                    <a
+                      href={`#${key}`}
+                      className={`${styles['course-tabs__link']} ${
+                        activeTab === key ? styles.active : ''
+                      }`}
+                      onClick={(e) => handleTabClick(e, key)}
+                    >
+                      {label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -115,12 +137,12 @@ export default function CourseDetailPage() {
               {sections.length === 0 ? (
                 <p>커리큘럼이 없습니다</p>
               ) : (
-                sections.map((sec) => (
-                  <details key={sec.id}>
+                sections.map((sec, idx) => (
+                  <details key={`sec-${sec.id}-${idx}`}>
                     <summary>{sec.title}</summary>
                     <ul>
-                      {lectures[sec.id]?.map((lec) => (
-                        <li key={lec.id}>
+                      {lectures[sec.id]?.map((lec, lidx) => (
+                        <li key={`lec-${sec.id}-${lec.id}-${lidx}`}>
                           {lec.title} ({lec.duration}분)
                         </li>
                       ))}
@@ -149,7 +171,10 @@ export default function CourseDetailPage() {
           totalLectures={courseInfo.totalLectures}
           totalTime={course.totalTime}
           level={course.level}
-          // onAddToCart={() => console.log('장바구니 담기 클릭')}
+          incart={incart}
+          cartPending={cartPending}
+          onAddToCart={handleCartClick}
+          disableCart={isEnrolled}
         />
       </div>
 
