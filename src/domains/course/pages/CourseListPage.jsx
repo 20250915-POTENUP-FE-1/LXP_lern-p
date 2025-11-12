@@ -23,7 +23,7 @@ export default function CourseListPage() {
   }, []);
 
   return (
-    <main className={`${styles['course-list']} container`} aria-label="강좌 목록" padding="0PX">
+    <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
       {/* 본문 */}
       <div
         style={{
