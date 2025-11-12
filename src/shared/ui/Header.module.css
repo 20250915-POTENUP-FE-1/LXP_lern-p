@@ -114,13 +114,14 @@
 
 .header__action--cta {
   background: var(--color-brand);
-  color: var(--color-text);
+  color: var(--color-text-light);
   border-color: var(--color-brand);
 }
 
 .header__action--cta:hover,
 .header__action--cta:focus-visible {
   background: var(--color-brand-700);
+  color: var(--color-text-light);
 }
 
 .header__profile {
@@ -145,6 +146,7 @@
 .header__avatar {
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
+  color: var(--color-text-light)
 }
 
 .header__profile-wrapper {

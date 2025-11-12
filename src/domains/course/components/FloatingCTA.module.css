@@ -62,9 +62,9 @@
 .floating-cta__button:hover,
 .floating-cta__button:focus-visible {
   background: var(--color-brand-700);
-  background-color: var(--color-brand);
+  background-color: var(--color-brand-700);
   outline: none;
-color: var(--color-text);
+color: var(--color-text-light);
 }
 
 .floating-cta__button:disabled {
@@ -82,7 +82,7 @@ color: var(--color-text);
   text-align: center;
   display: block;
   text-decoration: none;
-  color: var(--color-brand-700);
+  color: var(--color-text-muted);
   background: transparent;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);

@@ -265,7 +265,7 @@
 .btn--primary {
   border: none;
   background: var(--color-brand);
-  color: var(--color-text);
+  color: var(--color-text-light);
 }
 
 .btn--primary:hover,
