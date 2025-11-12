@@ -163,6 +163,8 @@
   color: var(--color-brand-700);
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
+  background: var(--color-surface-alt);
+  font-weight: bold;
 }
 
 .course-card__tag--level {

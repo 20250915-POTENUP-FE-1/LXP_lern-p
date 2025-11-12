@@ -13,10 +13,7 @@
   grid-column: 1 / -1;
   min-height: 240px;
   border-radius: var(--radius-lg);
-  background:
-    radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.25), transparent 55%),
-    radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.25), transparent 60%),
-    var(--color-elevated);
+  background: var(--color-elevated);
   border: 1px solid var(--color-border);
   /* box-shadow: var(--shadow-md); */
 }
