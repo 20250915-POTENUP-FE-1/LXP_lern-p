@@ -11,7 +11,7 @@ export function CourseCard({ course }) {
       <div className={styles['course-card__thumb-wrapper']}>
         <img
           className={styles['course-card__thumb']}
-          src={course.thumbnail}
+          src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
@@ -30,9 +30,9 @@ export function CourseCard({ course }) {
 
         {course.tags?.length > 0 && (
           <ul className={styles['course-card__tags']}>
-            {course.tags.map((tag) => (
+            {course.tags.map((tag, index) => (
               <li
-                key={tag}
+                key={index}
                 className={`${styles['course-card__tag']} ${styles['course-card__tag--category']}`}
               >
                 {tag}
