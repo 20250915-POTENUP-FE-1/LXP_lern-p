@@ -29,12 +29,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(
-      135deg,
-      rgba(79, 70, 229, 0.4),
-      rgba(56, 189, 248, 0.4)
-    ),
-    rgba(255, 255, 255, 0.08);
+  background: var(--color-brand);
   border: 1px solid var(--color-border);
 }
 
@@ -95,7 +90,7 @@
 .profile__btn--edit {
   background: var(--color-brand);
   border-color: var(--color-brand);
-  color: var(--color-text);
+  color: var(--color-brand-50);
 }
 
 .profile__btn--edit:hover,
@@ -284,7 +279,7 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
@@ -312,7 +307,7 @@
 .authored__btn--primary {
   background: var(--color-brand);
   border-color: var(--color-brand);
-  color: var(--color-text);
+  color: var(--color-brand-50);
 }
 
 .authored__btn--primary:hover,
@@ -338,8 +333,8 @@
   justify-content: center;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-brand);
-  color: var(--color-brand);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   text-decoration: none;
   font-weight: 600;
   transition: background 0.2s ease, color 0.2s ease;
@@ -347,5 +342,6 @@
 
 .cart__cta:hover,
 .cart__cta:focus-visible {
-  background: rgba(79, 70, 229, 0.12);
+  border-color: var(--color-brand);
+  color: var(--color-brand)
 }

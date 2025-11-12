@@ -1,9 +1,9 @@
 :root {
   color-scheme: light;
   /* brand */
-  --color-brand: #4f46e5;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  --color-brand: #EF6817;
+  --color-brand-600: #ff7b2c;
+  --color-brand-700: #ff7b2c;
   --color-brand-50: #eef2ff;
 
   /* neutrals */
@@ -76,7 +76,7 @@ body,
 
 body {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: 'Pretendard';
   font-size: var(--text-md);
   line-height: 1.5;
   background: var(--color-bg);
@@ -315,7 +315,7 @@ a:focus-visible {
   font-weight: 600;
   text-decoration: none;
   background: var(--color-brand);
-  color: var(--color-text);
+  color: var(--color-brand-50);
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -325,7 +325,7 @@ a:focus-visible {
 .modal__button:hover,
 .modal__button:focus-visible {
   background: var(--color-brand-700);
-  color: var(--color-text);
+  color: var(--color-brand-50);
 }
 
 .modal__button--ghost {
