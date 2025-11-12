@@ -46,7 +46,7 @@
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-5);
   background: var(--color-brand);
-  color: var(--color-brand-50);
+  color:   var(--color-text-light);
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -57,7 +57,9 @@
 .floating-cta__button:hover,
 .floating-cta__button:focus-visible {
   background: var(--color-brand-700);
+  background-color: var(--color-brand);
   outline: none;
+color: var(--color-text);
 }
 
 .floating-cta__button:disabled {
@@ -92,6 +94,7 @@
 .floating-cta__secondary:focus-visible {
   border-color: var(--color-brand);
   color: var(--color-brand);
+  background: rgba(248, 248, 248);
 }
 
 .floating-cta__meta-list {

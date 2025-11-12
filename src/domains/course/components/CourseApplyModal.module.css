@@ -1,0 +1,73 @@
+/* 리스트 베이스 */
+.course-apply__list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) 0;
+  display: grid;
+  gap: 0; /* 구분선으로 섹션 나눔 */
+}
+
+/* 항목 레이아웃: 레이블 120px · 값 가변 */
+.modal__field {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  padding: 14px 4px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.course-apply__list .modal__field:first-child {
+  border-top: 1px dashed var(--color-border);
+}
+
+/* 레이블: 작고 은은하게 */
+.modal__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  letter-spacing: 0.1px;
+}
+
+/* 값: 본문 대비 살짝 강조 */
+.modal__value {
+  font-size: var(--text-md);
+  color: var(--color-text);
+}
+
+/* 모달 내부 여백·스크롤 최적화 */
+.modal__body {
+  overflow-y: auto;
+  max-height: calc(100dvh - 220px);
+  padding-right: 4px;
+  padding-bottom: var(--space-2);
+}
+
+/* 상단 타이틀 대비 강화(선택) */
+.modal__title {
+  color: var(--color-text);
+  letter-spacing: -0.2px;
+}
+
+/* 닫기 버튼 hover 컬러를 brand로 교체 (보라톤 제거) */
+.modal__close:hover,
+.modal__close:focus-visible {
+  background: rgb(255 98 0 / 0.12);
+  color: var(--color-brand);
+}
+
+/* 브랜드 선택 영역 컬러도 통일 (보라톤 제거) */
+::selection {
+  background: rgb(255 98 0 / 0.25);
+  color: var(--color-text);
+}
+
+/* 버튼: 텍스트 가독성 보장 */
+.modal__button {
+  color: #fff;
+}
+
+.modal__button:hover,
+.modal__button:focus-visible {
+  color: #fff;
+}
+
