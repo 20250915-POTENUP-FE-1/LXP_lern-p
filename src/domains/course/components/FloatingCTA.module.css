@@ -59,7 +59,7 @@
   background: var(--color-brand-700);
   background-color: var(--color-brand);
   outline: none;
-  color: black;
+color: var(--color-text);
 }
 
 .floating-cta__button:disabled {
