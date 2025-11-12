@@ -30,6 +30,7 @@
   .app-shell__main {
     padding-inline: var(--space-5);
     padding-block: var(--space-8);
+    padding-top: 0px;
   }
 }
 

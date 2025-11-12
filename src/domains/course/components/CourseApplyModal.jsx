@@ -1,5 +1,6 @@
 import { Modal } from '@/shared/ui/Modal';
 import { useNavigate } from 'react-router';
+import styles from './CourseApplyModal.module.css';
 
 /**
  * 강좌 신청 확인 모달
@@ -43,35 +44,35 @@ export function CourseApplyModal({ isOpen, onClose, course, user, isEnrolled, ap
         </button>
       </header>
 
-      <div className="modal__body">
-        <ul className="course-apply__list">
-          <li className="modal__field">
-            <span className="modal__label">강좌명</span>
-            <span className="modal__value">{course.title ?? '—'}</span>
+      <div className={styles['modal__body']}>
+        <ul className={styles['course-apply__list']}>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>강좌명</span>
+            <span className={styles['modal__value']}>{course.title ?? '—'}</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">요약</span>
-            <span className="modal__value">{course.summary ?? '—'}</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>요약</span>
+            <span className={styles['modal__value']}>{course.summary ?? '—'}</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">강사명</span>
-            <span className="modal__value">{course.instructorName ?? '—'}</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>강사명</span>
+            <span className={styles['modal__value']}>{course.instructorName ?? '—'}</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">커리큘럼</span>
-            <span className="modal__value">총 {course.totalLectures ?? 0}강</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>커리큘럼</span>
+            <span className={styles['modal__value']}>총 {course.totalLectures ?? 0}강</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">총 시간</span>
-            <span className="modal__value">{course.duration ?? 0}분</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>총 시간</span>
+            <span className={styles['modal__value']}>{course.duration ?? 0}분</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">난이도</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>난이도</span>
             <span className="modal__value">{course.level ?? '—'}</span>
           </li>
-          <li className="modal__field">
-            <span className="modal__label">결제</span>
-            <span className="modal__value">{priceLabel}</span>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>결제</span>
+            <span className={styles['modal__value']}>{priceLabel}</span>
           </li>
         </ul>
       </div>
