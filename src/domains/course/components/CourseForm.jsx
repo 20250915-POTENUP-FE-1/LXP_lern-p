@@ -170,6 +170,9 @@ export function CourseForm() {
               onChange={handleChange}
               className={styles['course-form__select']}
             >
+              <option value="" disabled>
+                난이도 선택
+              </option>
               <option>입문</option>
               <option>초급</option>
               <option>중급</option>
