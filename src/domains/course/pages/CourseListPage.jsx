@@ -25,46 +25,17 @@ export default function CourseListPage() {
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
       {/* 본문 */}
-      <div
-        style={{
-          transform: 'translateX(-25%)',
-          width: '200%',
-          minHeight: '300px',
-          background: 'black',
-          color: '#fff',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: '30px',
-          marginBottom: '50px',
-          padding: '60px 40px',
-          gap: '30px',
-        }}
-      >
-        {/* 메인 문구 */}
-        <div
-          style={{
-            fontSize: '50px',
-            fontWeight: '700',
-            textAlign: 'center',
-            lineHeight: '1.3',
-          }}
-        >
-          강사, 학생 둘 다 되는 게 <span style={{ color: '#FF8C42' }}>런피</span>
-        </div>
+      <div className={styles['bannerContainer']}>
+        <div className={styles['bannerContent']}>
+          {/* 메인 문구 */}
+          <div className={styles['mainText']}>
+            강사, 학생 둘 다 되는 게 <span className={styles['highlightText']}>런피</span>
+          </div>
 
-        {/* 보조 문구 */}
-        <div
-          style={{
-            fontSize: '22px',
-            fontWeight: '400',
-            color: 'rgba(255, 255, 255, 0.85)',
-            textAlign: 'center',
-            lineHeight: '1.5',
-          }}
-        >
-          한 번의 클릭으로 배움과 가르침을 모두 경험하세요
+          {/* 보조 문구 */}
+          <div className={styles['subText']}>
+            한 번의 클릭으로 배움과 가르침을 모두 경험하세요
+          </div>
         </div>
       </div>
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">

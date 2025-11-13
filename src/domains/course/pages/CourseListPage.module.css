@@ -1,3 +1,43 @@
+.bannerContainer {
+  position: relative;
+  width: calc(100% + 40px);
+  transform: translateX(-20px);
+  overflow: hidden;
+}
+
+.bannerContent {
+  transform: translateX(-25%);
+  width: 200%;
+  min-height: 300px;
+  background: black;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  margin-bottom: 50px;
+  padding: 60px 40px;
+  gap: 30px;
+}
+
+.mainText {
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.highlightText {
+  color: #FF8C42;
+}
+
+.subText {
+  font-size: 22px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
 .course-list {
   display: grid;
   gap: var(--space-5);
