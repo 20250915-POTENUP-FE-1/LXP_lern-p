@@ -37,8 +37,8 @@
 }
 
 .profile-section__icon {
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
   color: #666; /* 아이콘 기본 색상 */
   stroke-width: 1.6;
 }
@@ -89,7 +89,10 @@
   text-decoration: none;
   font-size: var(--text-sm);
   font-weight: 500;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .profile__btn:hover,
@@ -201,11 +204,7 @@
 
 .progress__bar {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--color-brand),
-    var(--color-brand-700)
-  );
+  background: linear-gradient(90deg, var(--color-brand), var(--color-brand-700));
 }
 
 .enrolled-card__percent {
@@ -288,7 +287,10 @@
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .authored__btn:hover,
@@ -335,11 +337,13 @@
   color: var(--color-text-muted);
   text-decoration: none;
   font-weight: 600;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .cart__cta:hover,
 .cart__cta:focus-visible {
   border-color: var(--color-brand);
-  color: var(--color-brand)
+  color: var(--color-brand);
 }
