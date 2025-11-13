@@ -12,6 +12,8 @@
 .course-detail__hero {
   width: 100%;
   grid-column: 1 / -1;
+  height: clamp(200px, 30vw, 360px);
+  object-fit: cover;
   min-height: 240px;
   border-radius: var(--radius-lg);
   background: var(--color-elevated);
@@ -253,6 +255,6 @@
 
 @media (min-width: 1200px) {
   .course-detail__hero {
-    min-height: 360px;
+    min-height: 300px;
   }
 }

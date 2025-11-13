@@ -3,6 +3,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logout } from '@/domains/auth/services/authService';
 import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
+import { User } from "lucide-react";
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import styles from './Header.module.css';
@@ -114,9 +115,10 @@ export function Header() {
                   onClick={() => setMenuOpen((prev) => !prev)}
                   className={styles['header__profile']}
                 >
-                  <span className={styles['header__avatar']}>
+                  {/* <span className={styles['header__avatar']}>
                     {user.displayName?.[0]?.toUpperCase() ?? 'U'}
-                  </span>
+                  </span> */}
+                  <User className={styles['header__profile-icon']} />
                 </button>
 
                 {menuOpen && (

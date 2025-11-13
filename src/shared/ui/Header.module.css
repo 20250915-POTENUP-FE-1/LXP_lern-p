@@ -113,9 +113,11 @@
 }
 
 .header__action--cta {
-  background: var(--color-brand);
-  color: var(--color-text-light);
-  border-color: var(--color-brand);
+  border: 1px solid var(--color-border);
+  transition: border-color 0.2s 
+ease, background 0.2s 
+ease, color 0.2s 
+ease;
 }
 
 .header__action--cta:hover,
@@ -131,8 +133,8 @@
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-700));
-  color: var(--color-text);
+  background: #f1f3f5;
+  color: #666;
   font-weight: 700;
   text-decoration: none;
   transition: transform 0.2s ease;

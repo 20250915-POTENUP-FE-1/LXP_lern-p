@@ -29,8 +29,18 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: var(--color-brand);
-  border: 1px solid var(--color-border);
+  background-color: #f1f3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-section__icon {
+  width: 50px;
+  height: 50px;
+  color: #666; /* 아이콘 기본 색상 */
+  stroke-width: 1.6;
 }
 
 .profile-section__identity {
@@ -87,15 +97,9 @@
   border-color: var(--color-brand);
 }
 
-.profile__btn--edit {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: var(--color-text-light);
-}
-
 .profile__btn--edit:hover,
 .profile__btn--edit:focus-visible {
-  background: var(--color-brand-700);
+  color: var(--color-brand);
 }
 
 .profile-section__row {
