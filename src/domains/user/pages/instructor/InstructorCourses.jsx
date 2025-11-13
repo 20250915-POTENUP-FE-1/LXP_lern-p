@@ -41,7 +41,7 @@ export default function InstructorCourses() {
       </h1>
       <div className={styles['authored__actions']}>
         <Link
-          href="/courses/create"
+          to="/courses/create"
           data-modal-target="#instructor-request-modal"
           data-requires-role="instructor"
           className={`${styles['authored__btn']} ${styles['authored__btn--primary']}`}

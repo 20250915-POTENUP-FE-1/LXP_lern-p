@@ -73,11 +73,12 @@
 
 .course-detail__meta-people {
   display: inline-flex;
+  align-items: center;
   gap: var(--space-1);
 }
 
 .course-detail__meta-people svg {
-  height: var(--space-5);
+  height: var(--space-4);
 }
 
 .course-detail__meta-item {

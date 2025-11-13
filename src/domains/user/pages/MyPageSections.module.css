@@ -309,14 +309,8 @@
 }
 
 .authored__btn--primary {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: var(--color-text-light);
-}
-
-.authored__btn--primary:hover,
-.authored__btn--primary:focus-visible {
-  background: var(--color-brand-700);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .cart {
