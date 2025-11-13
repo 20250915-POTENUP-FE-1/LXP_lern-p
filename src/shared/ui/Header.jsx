@@ -89,7 +89,7 @@ export function Header() {
               {user && !isInstructor && (
                 <button
                   type="button"
-                  className={`${styles['header__action']} ${styles['header__action--ghost']}`}
+                  className={`${styles['header__action']} ${styles['header__action--cta']}`}
                   onClick={roleModal.open}
                 >
                   강사 권한 요청
