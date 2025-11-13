@@ -6,16 +6,14 @@
 }
 
 .bannerContent {
-  transform: translateX(-25%);
-  width: 200%;
-  min-height: 300px;
+  width: 100%;
   background: black;
   color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 30px;
+  border-radius: 16px;
   margin-bottom: 50px;
   padding: 60px 40px;
   gap: 30px;

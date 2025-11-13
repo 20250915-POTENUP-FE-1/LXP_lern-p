@@ -92,6 +92,7 @@
   border-color: var(--color-brand);
   color: var(--color-brand-700);
   text-decoration: none;
+  font-weight: 700;
 }
 
 .mypage-nav__item:has(.mypage-nav__link[aria-current="page"]) .mypage-nav__link {

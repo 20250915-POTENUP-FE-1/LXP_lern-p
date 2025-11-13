@@ -1,6 +1,7 @@
 import styles from '@/domains/user/pages/MyPageSections.module.css';
 import { formatUserDate } from "@/domains/user/utils/formatUserDate";
 import { User } from "lucide-react";
+import { NavLink } from 'react-router';
 import { useAuthState } from '../../auth/hooks/useAuthState';
 
 
@@ -16,12 +17,12 @@ export default function Profile() {
           내 정보
         </h1>
         <div className={styles['profile__actions']}>
-          <a
-            href="/mypage/edit"
+          <NavLink
+            to="/mypage"
             className={`${styles['profile__btn']} ${styles['profile__btn--edit']}`}
           >
             정보 수정
-          </a>
+          </NavLink>
         </div>
       </div>
 

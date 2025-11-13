@@ -41,7 +41,7 @@ export function MyPageSidebar() {
           <ul className={styles['mypage-nav']}>
             <li className={styles['mypage-nav__item']}>
               <NavLink to="/mypage/instructor/courses" className={styles['mypage-nav__link']}>
-                내가 등록한 강의
+                내가 등록한 강좌
               </NavLink>
             </li>
           </ul>
@@ -82,7 +82,7 @@ export function MyPageSidebar() {
               <ul className={styles['mypage-nav']}>
                 <li className={styles['mypage-nav__item']}>
                   <NavLink to="/mypage/instructor/courses" className={styles['mypage-nav__link']}>
-                    내가 등록한 강의
+                    내가 등록한 강좌
                   </NavLink>
                 </li>
               </ul>
