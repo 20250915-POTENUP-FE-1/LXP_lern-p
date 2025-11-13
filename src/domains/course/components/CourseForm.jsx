@@ -25,10 +25,11 @@ export function CourseForm() {
 
   const [sections, setSections] = useState([
     {
-      id: 1, // 프론트엔드 임시 ID
+      id: '',
       title: '', // 섹션 제목
       lectures: [
         {
+          id: '',
           title: '', // 강의 제목
           duration: 0, // 분 단위
           videoUrl: '', // 로컬/Storage URL
@@ -66,8 +67,7 @@ export function CourseForm() {
   };
 
   const handleSectionAdd = () => {
-    const nextId = sections.length + 1;
-    setSections([...sections, { id: nextId, title: `섹션 ${nextId}`, lectures: [] }]);
+    setSections([...sections, { id: crypto.randomUUID(), title: '', lectures: [] }]);
   };
 
   const handleSectionDelete = (sectionId) => {
@@ -81,10 +81,7 @@ export function CourseForm() {
         section.id === sectionId
           ? {
               ...section,
-              lectures: [
-                ...section.lectures,
-                { id: section.lectures.length + 1, title: '새 강의', duration: 0 },
-              ],
+              lectures: [...section.lectures, { id: crypto.randomUUID(), title: '', duration: 0 }],
             }
           : section,
       ),
