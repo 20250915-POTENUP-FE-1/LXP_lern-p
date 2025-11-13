@@ -47,6 +47,8 @@ export default function CourseDetailPage() {
   const totalLectures = sections.reduce((sum, sec) => sum + (lectures[sec.id]?.length || 0), 0);
   const courseInfo = { ...course, totalLectures };
 
+  const isOwner = user?.id === course.instructorId;
+
   return (
     <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
       <div className={styles['course-detail__layout']}>
@@ -124,7 +126,33 @@ export default function CourseDetailPage() {
                     <ul>
                       {lectures[sec.id]?.map((lec) => (
                         <li key={lec.id}>
-                          {lec.title} ({lec.duration}분)
+                          <div className={styles['course-detail__lecture']}>
+                            <span className={styles['course-detail__lecture-title']}>
+                              {lec.title} ({lec.duration}분)
+                            </span>
+
+                            {/* 잠금 상태 */}
+                            {!isEnrolled && !isOwner && (
+                              <div className={styles['course-detail__lecture-locked']}>
+                                <span className={styles['course-detail__lecture-lock-icon']}>
+                                  🔒
+                                </span>
+                                <span className={styles['course-detail__lecture-lock-text']}>
+                                  수강 후 열람 가능
+                                </span>
+                              </div>
+                            )}
+
+                            {/* 재생 버튼 */}
+                            {lec.videoUrl && (isEnrolled || isOwner) && (
+                              <button
+                                className={styles['course-detail__lecture-play']}
+                                onClick={() => openVideoPlayer(lec.videoUrl)}
+                              >
+                                재생
+                              </button>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -148,6 +176,7 @@ export default function CourseDetailPage() {
           isFree={course.isFree}
           isEnrolled={isEnrolled}
           onApply={handleApplyClick}
+          isOwner={isOwner}
           instructorName={course.instructorName}
           totalLectures={courseInfo.totalLectures}
           totalTime={formatDuration(course.duration)}
