@@ -1,4 +1,5 @@
 import { useModal } from '@/shared/hooks/useModal';
+import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { LoginModal } from '../../auth/components/LoginModal';
@@ -9,6 +10,7 @@ import { useCourseApply } from '../hooks/useCourseApply';
 import { useCourseDetail } from '../hooks/useCourseDetail';
 import { formatDuration } from '../utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
+
 
 export default function CourseDetailPage() {
   const { id } = useParams();
@@ -70,7 +72,7 @@ export default function CourseDetailPage() {
             )}
 
             <ul className={styles['course-detail__meta']}>
-              <li>👥 {course.studentCount ?? 0}명 수강중</li>
+              <li className={styles['course-detail__meta-people']}><Users /> {course.studentCount ?? 0}명 수강중</li>
               <li>{course.level}</li>
             </ul>
 
@@ -91,7 +93,7 @@ export default function CourseDetailPage() {
                   <a
                     href={`#${key}`}
                     className={`${styles['course-tabs__link']} ${
-                      activeTab === key ? styles.active : ''
+                      activeTab === key ? styles['active'] : ''
                     }`}
                     onClick={(e) => handleTabClick(e, key)}
                   >

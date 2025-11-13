@@ -141,7 +141,7 @@ color: var(--color-text-light);
 @media (min-width: 768px) {
   .floating-cta {
     position: sticky; /* 사이드바에 붙음 */
-    top: var(--space-11);
+    top: var(--space-100);
     bottom: auto;
     margin-top: 0; /* 스크롤 트릭 제거 */
     align-self: start;

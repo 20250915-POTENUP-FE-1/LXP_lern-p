@@ -71,6 +71,15 @@
   font-size: var(--text-sm);
 }
 
+.course-detail__meta-people {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.course-detail__meta-people svg {
+  height: var(--space-5);
+}
+
 .course-detail__meta-item {
   display: inline-flex;
   align-items: center;
@@ -110,11 +119,15 @@
 
 .course-tabs__link:hover,
 .course-tabs__link:focus-visible {
-  color: var(--color-text);
+  color: var(--color-brand-);
 }
 
 .course-tabs__link[aria-current='page'] {
-  color: var(--color-brand-700);
+  color: var(--color-brand);
+}
+
+.course-tabs__link.active {
+  color: var(--color-brand);
 }
 
 .course-tabs__link[aria-current='page']::after {
