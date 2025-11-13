@@ -40,7 +40,9 @@ export function SelectCategory({ value = [], onChange }) {
           onChange={handleFirstChange}
           className={styles['course-form__select']}
         >
-          <option value="">1차 카테고리 선택</option>
+          <option value="" disabled>
+            1차 카테고리 선택
+          </option>
           {firstCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -55,7 +57,9 @@ export function SelectCategory({ value = [], onChange }) {
           className={styles['course-form__select']}
           disabled={!first}
         >
-          <option value="">2차 카테고리 선택</option>
+          <option value="" disabled>
+            2차 카테고리 선택
+          </option>
           {secondCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -70,7 +74,9 @@ export function SelectCategory({ value = [], onChange }) {
           className={styles['course-form__select']}
           disabled={!second}
         >
-          <option value="">3차 카테고리 선택</option>
+          <option value="" disabled>
+            3차 카테고리 선택
+          </option>
           {thirdCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
