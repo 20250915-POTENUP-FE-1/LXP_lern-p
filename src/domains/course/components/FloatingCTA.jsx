@@ -4,6 +4,7 @@ export function FloatingCTA({
   price,
   isFree,
   isEnrolled,
+  isOwner,
   instructorName,
   totalLectures,
   totalTime,
@@ -26,12 +27,12 @@ export function FloatingCTA({
           <button
             type="button"
             className={`${styles['floating-cta__button']} ${
-              isEnrolled ? styles['floating-cta__button--disabled'] : ''
+              isEnrolled || isOwner ? styles['floating-cta__button--disabled'] : ''
             }`}
             onClick={onApply}
-            disabled={isEnrolled}
+            disabled={isEnrolled || isOwner}
           >
-            {isEnrolled ? '수강중' : '수강신청하기'}
+            {isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기'}
           </button>
 
           {/* 장바구니 버튼 */}
