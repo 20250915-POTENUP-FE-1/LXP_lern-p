@@ -1,5 +1,5 @@
-import { Header } from '@/shared/ui/Header';
 import { Outlet } from 'react-router';
+import { Header } from '@/shared/ui/Header';
 import styles from './Layouts.module.css';
 
 export default function AppLayout() {

@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 import { CourseCard } from '@/domains/course/components/CourseCard';
 import { getAllCourses } from '@/domains/course/services/courseService';
-import { useEffect, useState } from 'react';
 import styles from './CourseListPage.module.css';
 
 export default function CourseListPage() {
@@ -33,9 +33,7 @@ export default function CourseListPage() {
           </div>
 
           {/* 보조 문구 */}
-          <div className={styles['subText']}>
-            한 번의 클릭으로 배움과 가르침을 모두 경험하세요
-          </div>
+          <div className={styles['subText']}>한 번의 클릭으로 배움과 가르침을 모두 경험하세요</div>
         </div>
       </div>
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">

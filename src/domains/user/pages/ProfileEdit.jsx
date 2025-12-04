@@ -1,7 +1,5 @@
 function ProfileEdit() {
-  return (
-    <div>ProfileEdit</div>
-  )
+  return <div>ProfileEdit</div>;
 }
 
-export default ProfileEdit
+export default ProfileEdit;

@@ -1,8 +1,8 @@
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { subscribeAuthState } from '@/domains/auth/services/authService';
 import { createUserProfile } from '@/domains/user/services/userService';
 import { db } from '@/shared/lib/firebase/firestore';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
 
 export const useAuthState = () => {
   const [user, setUser] = useState(null);

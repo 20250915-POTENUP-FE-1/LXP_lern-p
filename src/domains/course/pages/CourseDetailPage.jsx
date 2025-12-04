@@ -1,7 +1,9 @@
-import { useModal } from '@/shared/hooks/useModal';
 import { Users } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '../../auth/components/LoginModal';
 import { useAuthState } from '../../auth/hooks/useAuthState';
 import { CourseApplyModal } from '../components/CourseApplyModal';
@@ -10,7 +12,6 @@ import { useCourseApply } from '../hooks/useCourseApply';
 import { useCourseDetail } from '../hooks/useCourseDetail';
 import { formatDuration } from '../utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
-
 
 export default function CourseDetailPage() {
   const { id } = useParams();
@@ -52,7 +53,7 @@ export default function CourseDetailPage() {
   return (
     <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
       <div className={styles['course-detail__layout']}>
-        <img
+        <Image
           className={styles['course-detail__hero']}
           src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
@@ -74,13 +75,13 @@ export default function CourseDetailPage() {
             )}
 
             <ul className={styles['course-detail__meta']}>
-              <li className={styles['course-detail__meta-people']}><Users /> {course.studentCount ?? 0}명 수강중</li>
+              <li className={styles['course-detail__meta-people']}>
+                <Users /> {course.studentCount ?? 0}명 수강중
+              </li>
               <li>{course.level}</li>
             </ul>
 
-            {course.summary && (
-              <p className={styles['course-detail__summary']}>"{course.summary}"</p>
-            )}
+            {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
           </header>
 
           {/* 탭 */}
@@ -92,7 +93,7 @@ export default function CourseDetailPage() {
                 { key: 'instructor', label: '강사 정보' },
               ].map(({ key, label }) => (
                 <li key={key}>
-                  <a
+                  <Link
                     href={`#${key}`}
                     className={`${styles['course-tabs__link']} ${
                       activeTab === key ? styles['active'] : ''
@@ -100,7 +101,7 @@ export default function CourseDetailPage() {
                     onClick={(e) => handleTabClick(e, key)}
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

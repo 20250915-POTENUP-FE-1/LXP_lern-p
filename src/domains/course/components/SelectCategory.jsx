@@ -14,7 +14,7 @@ export function SelectCategory({ value = [], onChange }) {
   // 첫, 두, 세 카테고리 중 하나라도 바뀌면 상위로 알림
   useEffect(() => {
     if (onChange) onChange([first, second, third].filter(Boolean));
-  }, [first, second, third]);
+  }, [first, second, third, onChange]);
 
   const handleFirstChange = (e) => {
     setFirst(e.target.value);

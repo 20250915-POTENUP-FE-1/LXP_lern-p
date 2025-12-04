@@ -1,6 +1,6 @@
-import { validateForm } from '@/shared/util/validateForm';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { validateForm } from '@/shared/util/validateForm';
 import { createUserProfile } from '../../user/services/UserService';
 import { signUp } from '../services/authService';
 import { validateSignUp } from '../utils/validateSignUp';

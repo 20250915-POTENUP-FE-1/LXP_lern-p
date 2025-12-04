@@ -51,7 +51,7 @@
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-5);
   background: var(--color-brand);
-  color:   var(--color-text-light);
+  color: var(--color-text-light);
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -64,7 +64,7 @@
   background: var(--color-brand-700);
   background-color: var(--color-brand-700);
   outline: none;
-color: var(--color-text-light);
+  color: var(--color-text-light);
 }
 
 .floating-cta__button:disabled {

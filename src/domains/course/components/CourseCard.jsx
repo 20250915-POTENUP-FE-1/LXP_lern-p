@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link } from 'react-router';
 import styles from './CourseCard.module.css';
 
@@ -9,7 +10,7 @@ export function CourseCard({ course }) {
       aria-label={`${course.title} 상세 보기`}
     >
       <div className={styles['course-card__thumb-wrapper']}>
-        <img
+        <Image
           className={styles['course-card__thumb']}
           src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
