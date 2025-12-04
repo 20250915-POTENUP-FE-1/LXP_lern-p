@@ -1,7 +1,7 @@
-import { Modal } from '@/shared/ui/Modal';
-import { validateForm } from '@/shared/util/validateForm';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import { Modal } from '@/shared/ui/Modal';
+import { validateForm } from '@/shared/util/validateForm';
 import { login } from '../services/authService';
 
 export function LoginModal({ isOpen, onClose }) {

@@ -1,12 +1,11 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.validate": ["javascript", "javascriptreact"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.fixAll.eslint": "explicit",
-    "source.addMissingImports": "explicit",
-    "source.organizeImports": "explicit"
+    "source.addMissingImports": "explicit"
   },
   "files.eol": "\n",
   "prettier.requireConfig": true

@@ -1,5 +1,5 @@
-import { Modal } from '@/shared/ui/Modal';
 import { useNavigate } from 'react-router';
+import { Modal } from '@/shared/ui/Modal';
 import styles from './CourseApplyModal.module.css';
 
 /**

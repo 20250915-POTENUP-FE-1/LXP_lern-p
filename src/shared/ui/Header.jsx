@@ -1,11 +1,11 @@
+import { User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logout } from '@/domains/auth/services/authService';
 import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
-import { User } from "lucide-react";
-import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
 import styles from './Header.module.css';
 
 export function Header() {

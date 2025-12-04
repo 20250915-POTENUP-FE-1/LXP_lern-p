@@ -84,7 +84,10 @@
   color: var(--color-text-muted);
   text-decoration: none;
   font-size: var(--text-sm);
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .mypage-nav__link:hover,
@@ -95,7 +98,7 @@
   font-weight: 700;
 }
 
-.mypage-nav__item:has(.mypage-nav__link[aria-current="page"]) .mypage-nav__link {
+.mypage-nav__item:has(.mypage-nav__link[aria-current='page']) .mypage-nav__link {
   border-color: var(--color-brand);
   color: var(--color-brand);
   font-weight: bold;

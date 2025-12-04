@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { useState } from 'react';
 import styles from './CourseForm.module.css';
 
@@ -21,7 +22,7 @@ export function ThumbnailUploader({ onUploadComplete }) {
     <aside className={styles['upload-card']}>
       {thumbnailUrl && (
         <div className={styles['upload__preview']}>
-          <img src={thumbnailUrl} alt="썸네일 미리보기" />
+          <Image src={thumbnailUrl} alt="썸네일 미리보기" />
         </div>
       )}
 

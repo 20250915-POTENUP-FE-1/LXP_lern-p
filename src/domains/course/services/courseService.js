@@ -1,4 +1,3 @@
-import { db } from '@/shared/lib/firebase/firestore';
 import {
   addDoc,
   arrayUnion,
@@ -14,6 +13,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { db } from '@/shared/lib/firebase/firestore';
 
 /** 모든 강좌 목록 조회 */
 export const getAllCourses = async () => {

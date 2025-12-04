@@ -1,5 +1,5 @@
-import { db } from '@/shared/lib/firebase/firestore';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/shared/lib/firebase/firestore';
 
 export async function getEnrolledCourses(userId) {
   // 1) 해당 유저의 수강 내역 가져오기

@@ -1,19 +1,19 @@
-import React from "react";
-import styles from "./CourseCreatePage.module.css";
-import { CourseForm } from "@/domains/course/components/CourseForm";
+import React from 'react';
+import { CourseForm } from '@/domains/course/components/CourseForm';
+import styles from './CourseCreatePage.module.css';
 
 export default function CourseCreatePage() {
   return (
     <section
-      className={`${styles["course-create"]} container`}
+      className={`${styles['course-create']} container`}
       aria-labelledby="course-create-title"
     >
-      <header className={styles["course-create__header"]}>
-        <h1 id="course-create-title" className={styles["course-create__title"]}>
+      <header className={styles['course-create__header']}>
+        <h1 id="course-create-title" className={styles['course-create__title']}>
           강좌 등록
         </h1>
       </header>
-      <div className={styles["course-create__body"]}>
+      <div className={styles['course-create__body']}>
         <CourseForm />
       </div>
     </section>

@@ -1,9 +1,8 @@
-import styles from '@/domains/user/pages/MyPageSections.module.css';
-import { formatUserDate } from "@/domains/user/utils/formatUserDate";
-import { User } from "lucide-react";
+import { User } from 'lucide-react';
 import { NavLink } from 'react-router';
+import styles from '@/domains/user/pages/MyPageSections.module.css';
+import { formatUserDate } from '@/domains/user/utils/formatUserDate';
 import { useAuthState } from '../../auth/hooks/useAuthState';
-
 
 export default function Profile() {
   const { user, loading } = useAuthState();
@@ -28,13 +27,15 @@ export default function Profile() {
 
       {/* 프로필 헤더 카드 */}
       <section className={styles['profile-section__header-card']} aria-label="프로필 요약">
-        <div className={styles['profile-section__avatar']} aria-hidden="true" >
+        <div className={styles['profile-section__avatar']} aria-hidden="true">
           <User className={styles['profile-section__icon']} />
         </div>
         <div className={styles['profile-section__identity']}>
           <h2 className={styles['profile-section__name']}>{user.name}님</h2>
           <p className={styles['profile-section__email']}>{user.email}</p>
-          <p className={styles['profile-section__since']}>가입일: {formatUserDate(user.createdAt)}</p>
+          <p className={styles['profile-section__since']}>
+            가입일: {formatUserDate(user.createdAt)}
+          </p>
         </div>
       </section>
 

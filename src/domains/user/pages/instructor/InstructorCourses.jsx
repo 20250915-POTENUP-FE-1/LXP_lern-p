@@ -1,8 +1,8 @@
+import { useEffect, useState } from 'react';
+import { Link, NavLink } from 'react-router';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import styles from '@/domains/user/pages/MyPageSections.module.css';
 import { getInstructorCourses } from '@/domains/user/services/instructorService';
-import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router';
 
 export default function InstructorCourses() {
   const { user, loading: userLoading } = useAuthState();
@@ -12,14 +12,18 @@ export default function InstructorCourses() {
   // user.id 준비된 뒤 → 데이터 가져오기
   useEffect(() => {
     if (userLoading || !user?.id) return;
-    setCoursesLoading(true);
-    getInstructorCourses(user.id)
-      .then(setCourses)
-      .catch((err) => {
+    (async () => {
+      setCoursesLoading(true);
+      try {
+        const data = await getInstructorCourses(user.id);
+        setCourses(data);
+      } catch (err) {
         console.error(err);
-      })
-      .finally(() => setCoursesLoading(false));
-  }, [user?.id, userLoading]);
+      } finally {
+        setCoursesLoading(false);
+      }
+    })();
+  }, [userLoading, user?.id]);
 
   // 로딩 UI
   if (userLoading || coursesLoading) {

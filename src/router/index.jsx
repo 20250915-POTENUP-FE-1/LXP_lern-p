@@ -1,3 +1,4 @@
+import { createBrowserRouter } from 'react-router';
 import SignUpPage from '@/domains/auth/pages/SignUpPage';
 import CourseCreatePage from '@/domains/course/pages/CourseCreatePage';
 import CourseDetailPage from '@/domains/course/pages/CourseDetailPage';
@@ -8,7 +9,6 @@ import InstructorCourses from '@/domains/user/pages/instructor/InstructorCourses
 import Profile from '@/domains/user/pages/Profile';
 import AppLayout from '@/layouts/AppLayout';
 import AuthLayout from '@/layouts/AuthLayout';
-import { createBrowserRouter } from 'react-router';
 import MyPage from '../domains/user/pages/Mypage';
 import { RequireAuth } from './guards/RequireAuth';
 import { RequireInstructor } from './guards/RequireInstructor';

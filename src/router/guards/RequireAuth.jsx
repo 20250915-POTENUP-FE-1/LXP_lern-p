@@ -1,6 +1,6 @@
 // guards/RequireAuth.jsx
-import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { Navigate, useLocation } from 'react-router';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 export function RequireAuth({ children }) {
   const { user, loading } = useAuthState();

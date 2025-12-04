@@ -1,8 +1,9 @@
+import Link from 'next/link';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { useCourseCreate } from '@/domains/course/hooks/useCourseCreate';
 import { validateForm } from '@/shared/util/validateForm';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import styles from './CourseForm.module.css';
 import { LectureUploader } from './LectureUploader';
 import { SelectCategory } from './SelectCategory';
@@ -322,9 +323,9 @@ export function CourseForm() {
         >
           {loading ? '등록 중...' : '등록하기'}
         </button>
-        <a href="/courses" className={`${styles['btn']} ${styles['btn--ghost']}`}>
+        <Link href="/courses" className={`${styles['btn']} ${styles['btn--ghost']}`}>
           취소
-        </a>
+        </Link>
       </div>
 
       {error && <p style={{ color: 'red' }}>오류: {error}</p>}

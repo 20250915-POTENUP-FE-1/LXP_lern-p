@@ -1,5 +1,5 @@
-import { db } from '@/shared/lib/firebase/firestore';
 import { arrayUnion, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/shared/lib/firebase/firestore';
 
 export const createUserProfile = async ({ id, email, name, avatarUrl = '' }) => {
   const userProfile = {

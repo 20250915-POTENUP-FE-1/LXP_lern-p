@@ -40,7 +40,9 @@
   color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .search-bar__button:hover,

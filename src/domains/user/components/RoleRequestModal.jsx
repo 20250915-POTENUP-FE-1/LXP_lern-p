@@ -1,7 +1,7 @@
-import { updateUserToInstructor } from '@/domains/user/services/userService';
-import { Modal } from '@/shared/ui/Modal';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { updateUserToInstructor } from '@/domains/user/services/userService';
+import { Modal } from '@/shared/ui/Modal';
 
 export function RoleRequestModal({ isOpen, onClose, user }) {
   const navigate = useNavigate();
