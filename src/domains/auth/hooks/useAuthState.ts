@@ -8,10 +8,9 @@ import {
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { db } from '@/shared/lib/firebase/firestore'
-import type { AuthUserResponse } from '@/domains/auth/types/auth'
 import type { User } from '@/domains/user/types/user'
 import { createUserProfile } from '@/domains/user/services/userService'
-import { subscribeAuthState } from '@/domains/auth/services/authService'
+import { AuthUserResponse, subscribeAuthState } from '@/domains/auth/services/authService'
 
 type UseAuthStateReturn = {
   user: User | null

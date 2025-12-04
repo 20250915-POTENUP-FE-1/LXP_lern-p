@@ -9,7 +9,15 @@ import {
   type Unsubscribe,
 } from 'firebase/auth';
 import { auth } from '@/shared/lib/firebase/auth';
-import type { SignUpRequest, LoginRequest, AuthUserResponse } from '../types/auth';
+import type { SignUpRequest, LoginRequest } from '../types/auth';
+
+/** Firebase Auth 기준으로 우리가 사용하는 유저 응답 타입 (Response) */
+export type AuthUserResponse = {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+}
 
 /**
  * 회원가입
