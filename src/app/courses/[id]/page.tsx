@@ -1,5 +1,3 @@
-// app/courses/[id]/page.tsx
-
 import CourseDetailPage from '@/domains/course/pages/CourseDetailPage';
 
 type PageProps = {

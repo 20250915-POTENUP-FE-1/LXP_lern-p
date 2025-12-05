@@ -4,7 +4,7 @@ import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { User, Section, Lecture } from '../types/types';
+import type { User, Section, Lecture } from '../types/course';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -15,7 +15,6 @@ import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
 
-// 탭 타입
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
 export type CourseDetailPageProps = {
@@ -23,7 +22,6 @@ export type CourseDetailPageProps = {
 };
 
 export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
-  // useAuthState 반환값에 타입 강제
   const { user } = useAuthState() as { user: User | null };
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
@@ -34,7 +32,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
   const { course, sections, lectures, loading } = useCourseDetail(courseId);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, courseId);
 
-  // 1차 가드: 로딩 / 데이터 없을 때
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
   }
@@ -107,7 +104,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
           </header>
 
-          {/* 탭 네비게이션 */}
           <nav className={styles['course-tabs']}>
             <ul className={styles['course-tabs__list']}>
               {[
@@ -130,7 +126,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
             </ul>
           </nav>
 
-          {/* 탭 콘텐츠 */}
           {activeTab === 'intro' && (
             <section className={styles['course-detail__section']}>
               <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
@@ -192,7 +187,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
           )}
         </article>
 
-        {/* 데스크탑용 사이드 CTA */}
         <FloatingCTA
           price={course.price}
           isFree={course.isFree}
@@ -206,7 +200,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
         />
       </div>
 
-      {/* 모달 */}
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
       <CourseApplyModal
         isOpen={applyModal.isOpen}

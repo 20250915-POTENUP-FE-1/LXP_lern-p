@@ -1,8 +1,7 @@
-// src/domains/course/components/FloatingCTA.tsx
-'use client'
+'use client';
 
-import type { FloatingCTAProps } from '../types/types'
-import styles from './FloatingCTA.module.css'
+import type { FloatingCTAProps } from '../types/course';
+import styles from './FloatingCTA.module.css';
 
 export const FloatingCTA = ({
   price,
@@ -16,48 +15,72 @@ export const FloatingCTA = ({
   level,
   onAddToCart,
 }: FloatingCTAProps) => {
-  // 버튼 라벨 분기
-  const primaryLabel = isOwner ? '내 강의 관리' : isEnrolled ? '수강중 / 학습하기' : '수강신청하기'
+  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기';
 
-  const isPrimaryDisabled = isOwner // 필요에 따라 조정
+  const isPrimaryDisabled = isEnrolled || isOwner;
 
   return (
-    <aside className={styles['floating-cta']}>
-      <div className={styles['floating-cta__card']}>
-        {/* 가격 영역 */}
+    <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
+      <div className={styles['floating-cta__panel']}>
         <div className={styles['floating-cta__price']}>
-          {isFree ? (
-            <span className={styles['floating-cta__price-free']}>무료 강의</span>
-          ) : (
-            <span className={styles['floating-cta__price-value']}>{price.toLocaleString()}원</span>
+          <strong className={styles['floating-cta__price-value']}>
+            {isFree ? '무료' : `₩${price?.toLocaleString() ?? 0}`}
+          </strong>
+        </div>
+
+        <div className={styles['floating-cta__actions']}>
+          <button
+            type="button"
+            className={`${styles['floating-cta__button']} ${
+              isPrimaryDisabled ? styles['floating-cta__button--disabled'] : ''
+            }`}
+            onClick={onApply}
+            disabled={isPrimaryDisabled}
+          >
+            {primaryLabel}
+          </button>
+
+          {!isFree && !isEnrolled && !isOwner && onAddToCart && (
+            <button
+              type="button"
+              className={styles['floating-cta__secondary']}
+              onClick={onAddToCart}
+            >
+              장바구니 담기
+            </button>
           )}
         </div>
 
-        {/* 메타 정보 */}
-        <div className={styles['floating-cta__meta']}>
-          <p className={styles['floating-cta__instructor']}>{instructorName} 강사</p>
-          <p className={styles['floating-cta__info']}>
-            강의 {totalLectures}개 · {totalTime} · {level}
-          </p>
-        </div>
+        <ul className={styles['floating-cta__meta-list']}>
+          <li className={styles['floating-cta__meta-row']}>
+            <span className={styles['floating-cta__meta-label']}>강사</span>
+            <span className={styles['floating-cta__meta-value']}>{instructorName ?? '미정'}</span>
+          </li>
 
-        {/* 주요 CTA 버튼 */}
-        <button
-          type="button"
-          className={styles['floating-cta__primary']}
-          onClick={onApply}
-          disabled={isPrimaryDisabled}
-        >
-          {primaryLabel}
-        </button>
+          <li className={styles['floating-cta__divider']} />
 
-        {/* 선택: 장바구니 버튼 */}
-        {!isFree && !isEnrolled && !isOwner && onAddToCart && (
-          <button type="button" className={styles['floating-cta__secondary']} onClick={onAddToCart}>
-            장바구니 담기
-          </button>
-        )}
+          <li className={styles['floating-cta__meta-row']}>
+            <span className={styles['floating-cta__meta-label']}>총 강의</span>
+            <span className={styles['floating-cta__meta-value']}>
+              {totalLectures ? `${totalLectures}강` : '정보 없음'}
+            </span>
+          </li>
+
+          <li className={styles['floating-cta__divider']} />
+
+          <li className={styles['floating-cta__meta-row']}>
+            <span className={styles['floating-cta__meta-label']}>총 시간</span>
+            <span className={styles['floating-cta__meta-value']}>{totalTime ?? '5시간 20분'}</span>
+          </li>
+
+          <li className={styles['floating-cta__divider']} />
+
+          <li className={styles['floating-cta__meta-row']}>
+            <span className={styles['floating-cta__meta-label']}>난이도</span>
+            <span className={styles['floating-cta__meta-value']}>{level ?? '초급'}</span>
+          </li>
+        </ul>
       </div>
     </aside>
-  )
-}
+  );
+};

@@ -1,4 +1,3 @@
-// src/domains/auth/types.ts
 export type User = {
   id: string;
   email: string;
@@ -10,7 +9,6 @@ export type User = {
   createdAt: string;
   updatedAt: string;
 };
-// src/domains/course/types.ts
 
 export type Course = {
   id: string;
@@ -22,24 +20,22 @@ export type Course = {
   instructorId: string;
   instructorName: string;
 
-  category: string[]; // ["프로그래밍","웹","프론트엔드"]
-  level: string; // "초급" 등
+  category: string[];
+  level: string;
   tags: string[];
 
   price: number;
   isFree: boolean;
 
   studentCount: number;
-  // averageRating?: number;
-  // reviewCount?: number;
 
-  duration: number; // 총 길이(분)
+  duration: number;
   status: 'draft' | 'published' | 'hidden';
 
   createdAt: string;
   updatedAt: string;
 
-  sections: string[]; // section id[]
+  sections: string[];
 };
 
 export type Section = {
@@ -47,7 +43,7 @@ export type Section = {
   courseId: string;
   title: string;
   sequence: number;
-  lectures: string[]; // lecture id[]
+  lectures: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -64,11 +60,10 @@ export type Lecture = {
   updatedAt: string;
 };
 
-// 강의 상세에서 쓰는 응답 구조 (이미 getCourse가 이렇게 리턴한다고 가정)
 export type CourseDetailResponse = {
   course: Course | null;
   sections: Section[];
-  lectures: Record<string, Lecture[]>; // key = sectionId
+  lectures: Record<string, Lecture[]>;
 };
 
 export type Enrollment = {
@@ -79,9 +74,7 @@ export type Enrollment = {
   enrolledAt: string;
 };
 
-// =============================
 // Course Detail Hooks 타입
-// =============================
 export type UseCourseDetailResult = {
   course: Course | null;
   sections: Section[];
@@ -95,9 +88,7 @@ export type UseCourseApplyResult = {
   handleApply: () => Promise<void>;
 };
 
-// =============================
 // Floating CTA Props 타입
-// =============================
 export type FloatingCTAProps = {
   price: number;
   isFree: boolean;
@@ -113,14 +104,11 @@ export type FloatingCTAProps = {
   onAddToCart?: () => void;
 };
 
-// =============================
 // Course Detail Tab 타입
-// =============================
 export type CourseDetailTabKey = 'intro' | 'curriculum' | 'instructor';
 
-// =============================
 // Detail View용 통합 타입
-// =============================
+
 export type CourseWithDetail = Course & {
   sections: Section[];
   lectures: Record<string, Lecture[]>;

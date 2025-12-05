@@ -1,19 +1,18 @@
-// src/domains/course/components/CourseApplyModal.tsx
-'use client'
+'use client';
 
-import type { Course } from '../types/types'
-import type { User } from '../types/types'
-import styles from './CourseApplyModal.module.css'
+import type { Course } from '../types/course';
+import type { User } from '../types/course';
+import styles from './CourseApplyModal.module.css';
 
 export type CourseApplyModalProps = {
-  isOpen: boolean
-  onClose: () => void
-  course: Course & { totalLectures?: number }
-  user: User | null
-  isEnrolled: boolean
-  applying: boolean
-  onApply: () => Promise<void>
-}
+  isOpen: boolean;
+  onClose: () => void;
+  course: Course & { totalLectures?: number };
+  user: User | null;
+  isEnrolled: boolean;
+  applying: boolean;
+  onApply: () => Promise<void>;
+};
 
 export const CourseApplyModal = ({
   isOpen,
@@ -24,12 +23,12 @@ export const CourseApplyModal = ({
   applying,
   onApply,
 }: CourseApplyModalProps) => {
-  if (!isOpen) return null
+  if (!isOpen || !course) return null;
 
   const handleConfirm = async () => {
-    await onApply()
-    onClose()
-  }
+    await onApply();
+    onClose();
+  };
 
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true">
@@ -64,5 +63,5 @@ export const CourseApplyModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
