@@ -1,4 +1,3 @@
-// auth.ts
 import {
   createUserWithEmailAndPassword,
   deleteUser,
