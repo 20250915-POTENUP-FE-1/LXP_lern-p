@@ -1,3 +1,7 @@
-export default function EnrolledCoursesPage() {
-  return <div></div>;
+import EnrolledClientPage from "@/domains/user/pages/EnrolledClientPage";
+
+export default async function EnrolledCoursesPage() {
+  return (
+    <EnrolledClientPage />
+  );
 }

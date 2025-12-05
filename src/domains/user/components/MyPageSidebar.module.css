@@ -98,11 +98,12 @@
   font-weight: 700;
 }
 
-.mypage-nav__item:has(.mypage-nav__link[aria-current='page']) .mypage-nav__link {
+.mypage-nav__link.active {
   border-color: var(--color-brand);
   color: var(--color-brand);
   font-weight: bold;
 }
+
 
 .mypage-nav__section {
   display: grid;
