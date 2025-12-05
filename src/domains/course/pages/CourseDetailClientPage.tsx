@@ -19,7 +19,7 @@ import { useParams } from 'next/navigation';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
-export type CourseDetailPageProps = {
+export type CourseDetailClientPageProps = {
   courseId: string;
 };
 
