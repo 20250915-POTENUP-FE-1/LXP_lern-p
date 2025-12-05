@@ -21,8 +21,8 @@ import type {
   Section,
   Lecture,
   CourseDetailResponse,
-  CreateCourseInput,
-  CreateSectionInput,
+  CreateCourseRequest,
+  CreateSectionRequest,
 } from '../types/course';
 
 export const getAllCourses = async (): Promise<Course[]> => {
@@ -142,8 +142,8 @@ export const getEnrollmentStatus = async (userId: string, courseId: string): Pro
 
 export const createCourse = async (
   user: User,
-  courseData: CreateCourseInput,
-  sectionList: CreateSectionInput[],
+  courseData: CreateCourseRequest,
+  sectionList: CreateSectionRequest[],
 ): Promise<string> => {
   if (!user?.id) throw new Error('로그인이 필요합니다.');
 
