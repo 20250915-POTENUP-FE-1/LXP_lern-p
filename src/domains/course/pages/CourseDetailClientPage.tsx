@@ -13,13 +13,13 @@ import { FloatingCTA } from '@/domains/course/components/FloatingCTA';
 import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
-import styles from './CourseDetailPage.module.css';
+import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import { User } from '@/domains/user/types/user';
 import { useParams } from 'next/navigation';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
-export type CourseDetailPageProps = {
+export type CourseDetailClientPageProps = {
   courseId: string;
 };
 

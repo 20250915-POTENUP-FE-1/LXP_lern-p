@@ -1,16 +1,23 @@
 import Image from 'next/image';
-import { Link } from 'react-router';
-import styles from './CourseCard.module.css';
+import styles from '@/app/CourseCard.module.css';
+import Link from 'next/link';
+import { Course } from '../types/course';
 
-export function CourseCard({ course }) {
+export type CourseCardProps = {
+  course: Course;
+};
+
+export function CourseCard({ course }: CourseCardProps) {
   return (
     <Link
-      to={`/courses/${course.id}`}
+      href={`/courses/${course.id}`}
       className={styles['course-card']}
       aria-label={`${course.title} 상세 보기`}
     >
       <div className={styles['course-card__thumb-wrapper']}>
         <Image
+          width={1200} // 혹은 800
+          height={675}
           className={styles['course-card__thumb']}
           src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}

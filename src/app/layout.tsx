@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './index.css';
+import { AppShell } from '@/shared/ui/AppShell';
 
 export const metadata: Metadata = {
   title: 'LernP ',
@@ -10,7 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body>
-        <div id="root">{children}</div>
+        <div id="root">
+          <AppShell> {children}</AppShell>
+        </div>
         <div id="modal-root"></div>
       </body>
     </html>

@@ -39,13 +39,11 @@ export const signUp = async ({
     photoURL: user.photoURL,
   };
 };
-
 /**
  * 로그인
  */
 export const login = async ({ email, password }: LoginRequest): Promise<AuthUserResponse> => {
   const { user } = await signInWithEmailAndPassword(auth, email, password);
-
   return {
     uid: user.uid,
     email: user.email,
@@ -53,7 +51,6 @@ export const login = async ({ email, password }: LoginRequest): Promise<AuthUser
     photoURL: user.photoURL,
   };
 };
-
 /**
  * 로그아웃
  */
@@ -70,7 +67,6 @@ export function subscribeAuthState(callback: (user: AuthUserResponse | null) => 
       callback(null);
       return;
     }
-
     callback({
       uid: user.uid,
       email: user.email,
@@ -79,7 +75,6 @@ export function subscribeAuthState(callback: (user: AuthUserResponse | null) => 
     });
   });
 }
-
 /**
  * 계정 삭제
  */
