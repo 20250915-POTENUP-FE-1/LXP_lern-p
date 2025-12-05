@@ -8,14 +8,16 @@ import {
   type Unsubscribe,
 } from 'firebase/auth';
 import { auth } from '@/shared/lib/firebase/auth';
-import type { SignUpRequest, LoginRequest } from '@/domains/user/types/auth';
+import type { SignUpRequest, LoginRequest } from '../types/auth';
+
 /** Firebase Auth 기준으로 우리가 사용하는 유저 응답 타입 (Response) */
 export type AuthUserResponse = {
-  uid: string
-  email: string | null
-  displayName: string | null
-  photoURL: string | null
-}
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+};
+
 /**
  * 회원가입
  */
@@ -25,9 +27,11 @@ export const signUp = async ({
   displayName,
 }: SignUpRequest): Promise<AuthUserResponse> => {
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
   if (displayName) {
     await updateProfile(user, { displayName });
   }
+
   return {
     uid: user.uid,
     email: user.email,
@@ -53,12 +57,11 @@ export const login = async ({ email, password }: LoginRequest): Promise<AuthUser
 export const logout = async (): Promise<void> => {
   await signOut(auth);
 };
+
 /**
  * Auth 상태 subscribe
  */
-export function subscribeAuthState(
-  callback: (user: AuthUserResponse | null) => void,
-): Unsubscribe {
+export function subscribeAuthState(callback: (user: AuthUserResponse | null) => void): Unsubscribe {
   return onAuthStateChanged(auth, (user) => {
     if (!user) {
       callback(null);

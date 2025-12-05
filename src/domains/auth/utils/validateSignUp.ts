@@ -1,4 +1,11 @@
-export const validateSignUp = ({ name, email, password, passwordConfirm }) => {
+import type { SignUpForm } from '../types/auth';
+
+export const validateSignUp = ({
+  name,
+  email,
+  password,
+  passwordConfirm,
+}: SignUpForm): string | null => {
   if (!name || !email || !password) {
     return '모든 필드를 입력해주세요.';
   }

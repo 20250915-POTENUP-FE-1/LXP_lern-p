@@ -1,16 +1,26 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { Modal } from '@/shared/ui/Modal';
-import { validateForm } from '@/shared/util/validateForm';
-import { login } from '../services/authService';
+'use client';
 
-export function LoginModal({ isOpen, onClose }) {
-  const [formData, setFormData] = useState({
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import type { FirebaseError } from 'firebase/app';
+import Link from 'next/link';
+import { validateForm } from '@/shared/util/validateForm';
+import type { LoginForm } from '@/domains/auth/types/auth';
+import { Modal } from '@/shared/ui/Modal';
+import { login } from '@/domains/auth/services/authService';
+
+type LoginModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
+
   const isInvalid = validateForm(formData);
   const showError = (isInvalid && (formData.email || formData.password)) || !!error;
 
@@ -22,7 +32,7 @@ export function LoginModal({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
 
     setFormData((prev) => ({
@@ -33,7 +43,7 @@ export function LoginModal({ isOpen, onClose }) {
     if (error) setError('');
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (isInvalid) {
@@ -45,15 +55,20 @@ export function LoginModal({ isOpen, onClose }) {
     setLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login({
+        email: formData.email,
+        password: formData.password,
+      });
       onClose();
-    } catch (err) {
+    } catch (error: unknown) {
+      const err = error as FirebaseError & { code?: string };
+
       const message =
         {
           'auth/invalid-email': '올바른 이메일 형식이 아닙니다.',
           'auth/user-not-found': '등록되지 않은 이메일입니다.',
           'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
-        }[err.code] ?? '로그인에 실패했습니다.';
+        }[err.code ?? ''] ?? '로그인에 실패했습니다.';
 
       setError(message);
     } finally {
@@ -99,7 +114,6 @@ export function LoginModal({ isOpen, onClose }) {
             />
           </div>
 
-          {/* 에러 메시지 */}
           {error && <p className="modal__error-text">{error}</p>}
         </div>
 
@@ -109,7 +123,7 @@ export function LoginModal({ isOpen, onClose }) {
           </button>
           <div className="modal__actions--bottom">
             아직 계정이 없으신가요?
-            <Link className="modal__actions--link" to="/signup">
+            <Link className="modal__actions--link" href="/signup">
               회원가입
             </Link>
           </div>

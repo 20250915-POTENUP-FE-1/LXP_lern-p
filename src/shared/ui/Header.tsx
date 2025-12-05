@@ -1,26 +1,33 @@
+'use client';
+
 import { User } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
+import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logout } from '@/domains/auth/services/authService';
-import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
-import { useModal } from '@/shared/hooks/useModal';
 import styles from './Header.module.css';
 
 export function Header() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const { user, loading } = useAuthState();
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const loginModal = useModal(false);
   const roleModal = useModal(false);
 
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 바깥 클릭 → 드롭다운 닫기
   useEffect(() => {
-    const onDown = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const onDown = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
     };
@@ -28,53 +35,48 @@ export function Header() {
     return () => document.removeEventListener('mousedown', onDown);
   }, []);
 
-  // Guard가 넘긴 location.state로 모달 오픈
+  // URL query 로부터 모달 강제 오픈 (Next.js에서 state 기반 모달 대체)
   useEffect(() => {
-    const s = location.state;
-    if (!s) return;
+    const modal = searchParams.get('modal');
+    if (!modal) return;
 
-    if (s.modal === 'login') loginModal.open();
-    if (s.modal === 'roleRequest' && user) roleModal.open(); // 권한 요청은 로그인 상태에서만
+    if (modal === 'login') loginModal.open();
+    if (modal === 'roleRequest' && user) roleModal.open();
 
-    // 한 번 열고 나면 state 제거하여 루프/잔여상태 방지
-    if (s.modal) {
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.state, user, navigate, location.pathname, loginModal, roleModal]);
-
-  const closeLogin = () => loginModal.close();
-  const closeRoleRequest = () => roleModal.close();
+    // 모달 열고 나면 URL 정리
+    router.replace(pathname);
+  }, [searchParams, user, router, pathname, loginModal, roleModal]);
 
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
 
   const handleLogout = async () => {
     setMenuOpen(false);
-    // 먼저 홈으로 네비게이트(쿼리/스테이트 초기화) → 그 다음 실제 로그아웃
-    navigate('/', { replace: true, state: null });
+
     await logout();
+
+    // 홈으로 이동 + 상태 갱신
+    router.push('/');
+    router.refresh();
   };
 
   if (loading) return null;
 
   return (
     <>
-      <header className={styles['header']} role="banner" aria-label="상단 내비게이션">
+      <header className={styles['header']} role="banner">
         <div className={styles['header__inner']}>
-          {/* 좌측: 로고 */}
+          {/* 왼쪽: 로고 */}
           <div className={styles['header__left']}>
-            <Link to="/" className={styles['header__logo']} aria-label="홈으로 이동">
+            <Link href="/" className={styles['header__logo']} aria-label="홈으로 이동">
               <span className={styles['header__logo-text']}>LernP</span>
             </Link>
           </div>
 
-          {/* 가운데 비움 */}
           <div className={styles['header__center']} aria-hidden="true" />
 
-          {/* 우측: 액션 + 프로필 */}
+          {/* 오른쪽: 액션 */}
           <div className={styles['header__right']}>
-            {/* 버튼 영역 */}
             <nav className={styles['header__actions']} aria-label="사용자 작업">
-              {/* 1) 게스트일 때 → 로그인 버튼 */}
               {!user && (
                 <button
                   type="button"
@@ -85,7 +87,6 @@ export function Header() {
                 </button>
               )}
 
-              {/* 2) 로그인했지만 강사 아님 → 강사 권한 요청 버튼 */}
               {user && !isInstructor && (
                 <button
                   type="button"
@@ -96,10 +97,9 @@ export function Header() {
                 </button>
               )}
 
-              {/* 3) 로그인 + 강사 권한 O → 강좌 등록 */}
               {user && isInstructor && (
                 <Link
-                  to="/courses/create"
+                  href="/courses/create"
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
                 >
                   강좌 등록하기
@@ -107,7 +107,7 @@ export function Header() {
               )}
             </nav>
 
-            {/* 4) 프로필 아바타 + 드롭다운 */}
+            {/* 프로필 */}
             {user && (
               <div ref={dropdownRef} className={styles['header__profile-wrapper']}>
                 <button
@@ -115,9 +115,6 @@ export function Header() {
                   onClick={() => setMenuOpen((prev) => !prev)}
                   className={styles['header__profile']}
                 >
-                  {/* <span className={styles['header__avatar']}>
-                    {user.displayName?.[0]?.toUpperCase() ?? 'U'}
-                  </span> */}
                   <User className={styles['header__profile-icon']} />
                 </button>
 
@@ -125,7 +122,7 @@ export function Header() {
                   <ul className={styles['header__dropdown']} role="menu">
                     <li role="menuitem">
                       <Link
-                        to="/mypage"
+                        href="/mypage"
                         className={styles['header__dropdown-item']}
                         onClick={() => setMenuOpen(false)}
                       >
@@ -150,8 +147,9 @@ export function Header() {
         </div>
       </header>
 
-      <LoginModal isOpen={loginModal.isOpen} onClose={closeLogin} />
-      <RoleRequestModal isOpen={roleModal.isOpen} onClose={closeRoleRequest} user={user} />
+      {/* 모달들 */}
+      <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
+      <RoleRequestModal isOpen={roleModal.isOpen} onClose={roleModal.close} user={user} />
     </>
   );
 }

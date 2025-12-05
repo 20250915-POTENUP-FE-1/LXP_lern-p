@@ -1,5 +1,3 @@
-import Profile from "./profile/page";
-
-export default function MyPage() {
-  return <Profile />;
+export default function ProfilePage() {
+  return <div></div>;
 }
