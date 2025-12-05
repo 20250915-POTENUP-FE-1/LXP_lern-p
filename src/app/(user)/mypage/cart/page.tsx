@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import styles from '@/app/(user)/MyPageSections.module.css';
+import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 
 export default function CartPage() {
   return (

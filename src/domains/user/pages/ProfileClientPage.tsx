@@ -2,7 +2,7 @@
 
 import { User } from 'lucide-react';
 import Link from "next/link";
-import styles from '@/app/(user)/MyPageSections.module.css';
+import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { formatUserDate } from '@/domains/user/utils/formatUserDate';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import styles from '@/app/(user)/MyPageSections.module.css';
+import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { useAuthState } from "@/domains/auth/hooks/useAuthState";
 import { getEnrolledCourses } from "@/domains/user/services/enrolledService";
 import type { EnrolledCourse } from "@/domains/user/types/enrolled";
