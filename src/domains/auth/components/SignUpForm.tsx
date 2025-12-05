@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { useActionState } from 'react'
-import { useFormStatus } from 'react-dom'
-import styles from '@/app/(auth)/AuthPages.module.css'
-import { useModal } from '@/shared/hooks/useModal'
-import { validateSignUp } from '@/domains/auth/utils/validateSignUp'
-import type { SignUpForm as SignUpFormValues } from '@/domains/auth/types/auth'
-import { signUpAction, type SignUpActionState } from '../actions/signUpAction'
-import { LoginModal } from './LoginModal'
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+import styles from '@/app/(auth)/AuthPages.module.css';
+import { useModal } from '@/shared/hooks/useModal';
+import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
+import type { SignUpForm as SignUpFormValues } from '@/domains/auth/types/auth';
+import { signUpAction, type SignUpActionState } from '../actions/signUpAction';
+import { LoginModal } from './LoginModal';
 
 const initialState: SignUpActionState = {
   error: '',
-}
+};
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus()
+  const { pending } = useFormStatus();
 
   return (
     <button type="submit" className={styles['form__submit']} disabled={pending || disabled}>
       {pending ? '가입 중...' : '회원가입'}
     </button>
-  )
+  );
 }
 
 export function SignUpForm() {
@@ -30,42 +30,42 @@ export function SignUpForm() {
     email: '',
     password: '',
     passwordConfirm: '',
-  })
+  });
 
-  const [clientError, setClientError] = useState<string>('')
-  const [state, formAction] = useActionState(signUpAction, initialState)
+  const [clientError, setClientError] = useState<string>('');
+  const [state, formAction] = useActionState(signUpAction, initialState);
 
-  const loginModal = useModal(false)
+  const loginModal = useModal(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
+    const { id, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
       [id]: value,
-    }))
+    }));
 
-    if (clientError) setClientError('')
-  }
+    if (clientError) setClientError('');
+  };
 
-  const validationMessage = validateSignUp(formData)
-  const isInvalid = !!validationMessage
+  const validationMessage = validateSignUp(formData);
+  const isInvalid = !!validationMessage;
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     if (isInvalid) {
-      e.preventDefault()
-      setClientError(validationMessage ?? '입력값을 다시 확인해주세요.')
+      e.preventDefault();
+      setClientError(validationMessage ?? '입력값을 다시 확인해주세요.');
     } else {
-      setClientError('')
+      setClientError('');
     }
-  }
+  };
 
-  const errorMessage = clientError || state.error
+  const errorMessage = clientError || state.error;
 
   const isPwMismatch =
     formData.password.length > 0 &&
     formData.passwordConfirm.length > 0 &&
-    formData.password !== formData.passwordConfirm
+    formData.password !== formData.passwordConfirm;
 
   return (
     <>
@@ -159,5 +159,5 @@ export function SignUpForm() {
 
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
     </>
-  )
+  );
 }

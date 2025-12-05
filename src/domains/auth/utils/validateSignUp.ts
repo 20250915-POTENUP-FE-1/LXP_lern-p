@@ -1,4 +1,4 @@
-import type { SignUpForm } from '../types/auth'
+import type { SignUpForm } from '../types/auth';
 
 export const validateSignUp = ({
   name,
@@ -7,16 +7,16 @@ export const validateSignUp = ({
   passwordConfirm,
 }: SignUpForm): string | null => {
   if (!name || !email || !password) {
-    return '모든 필드를 입력해주세요.'
+    return '모든 필드를 입력해주세요.';
   }
 
   if (password.length < 6) {
-    return '비밀번호는 6자 이상이어야 합니다.'
+    return '비밀번호는 6자 이상이어야 합니다.';
   }
 
   if (password !== passwordConfirm) {
-    return '비밀번호가 일치하지 않습니다.'
+    return '비밀번호가 일치하지 않습니다.';
   }
 
-  return null
-}
+  return null;
+};

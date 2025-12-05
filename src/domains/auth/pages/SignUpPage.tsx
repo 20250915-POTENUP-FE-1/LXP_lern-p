@@ -1,15 +1,11 @@
-import {
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import type { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { validateForm } from '@/shared/util/validateForm';
 import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
 import type { SignUpForm } from '@/domains/auth/types/auth';
-import styles from './AuthPages.module.css';
+import styles from '@/app/(auth)/AuthPages.module.css';
 import { createUserProfile } from '@/domains/user/services/userService';
 import { signUp } from '@/domains/auth/services/authService';
 
@@ -92,11 +88,7 @@ export default function SignUpPage() {
         회원가입
       </h1>
 
-      <form
-        onSubmit={handleSignUp}
-        className={styles['form']}
-        aria-label="회원가입 폼"
-      >
+      <form onSubmit={handleSignUp} className={styles['form']} aria-label="회원가입 폼">
         <div className={styles['form__group']}>
           <label htmlFor="name" className={styles['form__label']}>
             닉네임
@@ -144,10 +136,7 @@ export default function SignUpPage() {
           <p className={styles['form__help']}>안전한 비밀번호를 사용해주세요.</p>
         </div>
 
-        <div
-          className={styles['form__group']}
-          data-error={isPwMismatch}
-        >
+        <div className={styles['form__group']} data-error={isPwMismatch}>
           <label htmlFor="passwordConfirm" className={styles['form__label']}>
             비밀번호 확인
           </label>
@@ -168,11 +157,7 @@ export default function SignUpPage() {
           </p>
         )}
 
-        <button
-          type="submit"
-          className={styles['form__submit']}
-          disabled={loading || isInvalid}
-        >
+        <button type="submit" className={styles['form__submit']} disabled={loading || isInvalid}>
           {loading ? '가입 중...' : '회원가입'}
         </button>
       </form>

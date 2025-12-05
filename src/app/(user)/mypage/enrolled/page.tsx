@@ -1,3 +1,3 @@
 export default function EnrolledCoursesPage() {
-  return <div></div>
+  return <div></div>;
 }

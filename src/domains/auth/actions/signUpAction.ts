@@ -52,11 +52,13 @@ export async function signUpAction(
     const err = error as FirebaseError & { code?: string };
 
     const message =
-      ({
-        'auth/invalid-email': '올바른 이메일 형식이 아닙니다.',
-        'auth/email-already-in-use': '이미 사용 중인 이메일입니다.',
-        'auth/weak-password': '비밀번호가 너무 약합니다.',
-      } as Record<string, string>)[err.code ?? ''] ?? '회원가입 중 오류가 발생했습니다.';
+      (
+        {
+          'auth/invalid-email': '올바른 이메일 형식이 아닙니다.',
+          'auth/email-already-in-use': '이미 사용 중인 이메일입니다.',
+          'auth/weak-password': '비밀번호가 너무 약합니다.',
+        } as Record<string, string>
+      )[err.code ?? ''] ?? '회원가입 중 오류가 발생했습니다.';
 
     return { error: message };
   }
