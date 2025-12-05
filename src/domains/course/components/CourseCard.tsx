@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import styles from '@/app/CourseCard.module.css';
 import Link from 'next/link';
+import styles from '@/domains/course/components/CourseCard.module.css';
 import { Course } from '../types/course';
 
 export type CourseCardProps = {
