@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { subscribeAuthState } from '@/domains/auth/services/authService';
 import { createUserProfile } from '@/domains/user/services/userService';
 import { db } from '@/shared/lib/firebase/firestore';
-import type { User } from '@/domains/auth/types/user';
+import type { User } from '@/domains/user/types/user';
 import type { User as FirebaseUser } from "firebase/auth";
 
 export type AuthState = {
