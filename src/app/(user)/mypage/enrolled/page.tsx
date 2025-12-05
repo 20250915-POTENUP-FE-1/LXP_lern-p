@@ -5,7 +5,7 @@ import Link from "next/link";
 import styles from "@/domains/user/pages/MyPageSections.module.css";
 import { useAuthState } from "@/domains/auth/hooks/useAuthState";
 import { getEnrolledCourses } from "@/domains/user/services/enrolledService";
-import type { EnrolledCourse } from "@/domains/user/types/enrolled"; // 타입이 있다면
+import type { EnrolledCourse } from "@/domains/user/types/enrolled";
 
 export default function Enrolled() {
   const {user, loading: userLoading } = useAuthState();
@@ -24,7 +24,7 @@ export default function Enrolled() {
         const data = await getEnrolledCourses(user.id);
         setEnrolledList(data);
       } catch (err) {
-        console.error("❌ 수강 목록 가져오기 실패:", err);
+        console.error(err);
       } finally {
         setEnrolledLoading(false);
       }
