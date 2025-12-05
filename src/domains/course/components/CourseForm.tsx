@@ -1,99 +1,185 @@
+'use client';
+
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { useCourseCreate } from '@/domains/course/hooks/useCourseCreate';
+import { createCourse } from '@/domains/course/services/courseService';
+import type {
+  CreateCourseRequest,
+  CreateSectionRequest,
+  CreateLectureRequest,
+} from '@/domains/course/types/course';
 import { validateForm } from '@/shared/util/validateForm';
-import styles from './CourseForm.module.css';
+
 import { LectureUploader } from './LectureUploader';
 import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
+import styles from './CourseForm.module.css';
+
+type CourseForm = {
+  title: string;
+  summary: string;
+  description: string;
+  category: string[];
+  level: string;
+  price: number | ''; // input 제어용
+  thumbnailUrl: string;
+};
+
+type LectureDraft = CreateLectureRequest & {
+  id: string;
+};
+
+type SectionDraft = {
+  id: string;
+  title: string;
+  lectures: LectureDraft[];
+};
+
+const createEmptyLecture = (): LectureDraft => ({
+  id:
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : String(Date.now() + Math.random()),
+  title: '',
+  duration: 0,
+  videoUrl: '',
+});
+
+const createEmptySection = (): SectionDraft => ({
+  id:
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : String(Date.now() + Math.random()),
+  title: '',
+  lectures: [createEmptyLecture()],
+});
 
 export function CourseForm() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuthState();
-  const { createCourse, loading, error, success } = useCourseCreate();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CourseForm>({
     title: '',
     summary: '',
     description: '',
     category: [],
     level: '',
-    price: 0,
+    price: '',
     thumbnailUrl: '',
   });
 
-  const [sections, setSections] = useState([
-    {
-      id: '',
-      title: '', // 섹션 제목
-      lectures: [
-        {
-          id: '',
-          title: '', // 강의 제목
-          duration: 0, // 분 단위
-          videoUrl: '', // 로컬/Storage URL
-        },
-      ],
-    },
-  ]);
-  const isInvalid =
-    validateForm(formData) || // 기본 입력값 검사
-    sections.length === 0 || // 섹션이 하나도 없을 때
+  const [sections, setSections] = useState<SectionDraft[]>([createEmptySection()]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState(false);
+
+  // 기본 입력값 검사 + 섹션/강의 유효성
+  const baseInvalid = validateForm(formData);
+  const structureInvalid =
+    sections.length === 0 ||
     sections.some(
       (section) =>
-        !section.title.trim() || // 섹션 제목이 비어 있음
-        section.lectures.length === 0 || // 강의가 없음
+        !section.title.trim() ||
+        section.lectures.length === 0 ||
         section.lectures.some(
-          (lecture) => !lecture.title.trim() || !lecture.videoUrl.trim(), // 강의 제목 또는 영상이 비어 있음
+          (lecture) => !lecture.title.trim() || !lecture.videoUrl || !lecture.videoUrl.trim(),
         ),
     );
+  const isInvalid = baseInvalid || structureInvalid;
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [id]: id === 'price' ? (value === '' ? '' : Number(value)) : value,
+    }));
   };
 
-  const handleCourseCreate = async (e) => {
+  const handleCourseCreate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return alert('로그인이 필요합니다.');
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+    if (isInvalid) {
+      alert('필수 정보를 모두 입력해주세요.');
+      return;
+    }
+
+    setError('');
+    setSuccess(false);
+    setLoading(true);
+
     try {
-      console.log(formData);
-      const courseId = await createCourse(user, formData, sections);
-      navigate(`/courses/${courseId}`);
+      // CreateCourseRequest으로 매핑
+      const courseInput: CreateCourseRequest = {
+        title: formData.title,
+        summary: formData.summary,
+        description: formData.description,
+        thumbnailUrl: formData.thumbnailUrl,
+        category: formData.category,
+        level: formData.level,
+        price: Number(formData.price || 0),
+      };
+
+      // CreateSectionRequest으로 매핑 (id 제거)
+      const sectionInput: CreateSectionRequest[] = sections.map((section) => ({
+        title: section.title,
+        lectures: section.lectures.map<CreateLectureRequest>((lecture) => ({
+          title: lecture.title,
+          videoUrl: lecture.videoUrl,
+          duration: lecture.duration,
+        })),
+      }));
+
+      const courseId = await createCourse(user, courseInput, sectionInput);
+      setSuccess(true);
+      router.replace(`/courses/${courseId}`);
     } catch (err) {
-      console.error('등록 실패: ' + err.message);
+      console.error(err);
+      setError(err instanceof Error ? err.message : '강좌 등록 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSectionAdd = () => {
-    setSections([...sections, { id: crypto.randomUUID(), title: '', lectures: [] }]);
+    setSections((prev) => [...prev, createEmptySection()]);
   };
 
-  const handleSectionDelete = (sectionId) => {
+  const handleSectionDelete = (sectionId: string) => {
     if (!window.confirm('정말 이 섹션을 삭제하시겠습니까?')) return;
-    setSections(sections.filter((s) => s.id !== sectionId));
+    setSections((prev) => prev.filter((s) => s.id !== sectionId));
   };
 
-  const handleLectureAdd = (sectionId) => {
+  const handleLectureAdd = (sectionId: string) => {
     setSections((prev) =>
       prev.map((section) =>
         section.id === sectionId
           ? {
               ...section,
-              lectures: [...section.lectures, { id: crypto.randomUUID(), title: '', duration: 0 }],
+              lectures: [...section.lectures, createEmptyLecture()],
             }
           : section,
       ),
     );
   };
 
-  /** 강의 삭제 */
-  const handleLectureDelete = (sectionId, lectureId) => {
+  const handleLectureDelete = (sectionId: string, lectureId: string) => {
     setSections((prev) =>
-      prev.map((s) =>
-        s.id === sectionId ? { ...s, lectures: s.lectures.filter((l) => l.id !== lectureId) } : s,
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              lectures: section.lectures.filter((lec) => lec.id !== lectureId),
+            }
+          : section,
       ),
     );
   };
@@ -140,7 +226,7 @@ export function CourseForm() {
             </label>
             <textarea
               id="description"
-              rows="6"
+              rows={6}
               value={formData.description}
               onChange={handleChange}
               className={styles['course-form__textarea']}
@@ -209,11 +295,12 @@ export function CourseForm() {
         </div>
       </div>
 
-      {/* 섹션 영역 */}
+      {/* 섹션 / 강의 구성 */}
       <div className={styles['course-form__field']}>
         <label htmlFor="lecture" className={styles['form__label']}>
           섹션 <span className={styles['course-form__req']}>*</span>
         </label>
+
         <section className={styles['sections']} aria-label="섹션 구성">
           {sections.map((section, sectionIdx) => (
             <div key={section.id} className={styles['section']}>
@@ -266,6 +353,7 @@ export function CourseForm() {
                         placeholder="강의 제목 입력"
                       />
                     </div>
+
                     <LectureUploader
                       onUploadComplete={({ videoUrl, duration }) => {
                         setSections((prev) =>
@@ -314,8 +402,12 @@ export function CourseForm() {
         </section>
       </div>
 
-      {/* 저장/취소 버튼 */}
+      {/* 저장/취소 */}
+
       <div className={styles['form-actions']}>
+        <Link href="/courses" className={`${styles['btn']} ${styles['btn--ghost']}`}>
+          취소
+        </Link>
         <button
           type="submit"
           disabled={loading || isInvalid}
@@ -323,9 +415,6 @@ export function CourseForm() {
         >
           {loading ? '등록 중...' : '등록하기'}
         </button>
-        <Link href="/courses" className={`${styles['btn']} ${styles['btn--ghost']}`}>
-          취소
-        </Link>
       </div>
 
       {error && <p style={{ color: 'red' }}>오류: {error}</p>}
