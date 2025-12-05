@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
-import styles from './CourseListPage.module.css';
+import styles from '@/app/CourseListPage.module.css';
 import { Course } from '../types/course';
 
 export default function CourseListClientPage() {

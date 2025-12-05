@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styles from './CourseCard.module.css';
+import styles from '@/app/CourseCard.module.css';
 import Link from 'next/link';
 import { Course } from '../types/course';
 
