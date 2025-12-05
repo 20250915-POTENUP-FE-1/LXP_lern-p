@@ -1,0 +1,13 @@
+// app/courses/[id]/page.tsx
+
+import CourseDetailPage from '@/domains/course/pages/CourseDetailPage';
+
+type PageProps = {
+  params: { id: string };
+};
+
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
+
+  return <CourseDetailPage courseId={id} />;
+}

@@ -1,5 +1,7 @@
-import Image from 'next/image'
+import React from 'react';
 
-export default function CourseDetailPage() {
-  return <div></div>
+function page() {
+  return <div>page</div>;
 }
+
+export default page;
