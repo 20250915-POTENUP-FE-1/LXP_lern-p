@@ -1,22 +1,15 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { type PropsWithChildren, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  children: ReactNode;
 };
 
-export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
-  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const el = document.getElementById('modal-root');
-    setModalRoot(el);
-  }, []);
-
+export const Modal = ({ isOpen, onClose, children }: PropsWithChildren<ModalProps>) => {
+  // 스크롤 락 처리
   useEffect(() => {
     if (!isOpen) return;
 
@@ -28,13 +21,17 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
     };
   }, [isOpen]);
 
-  if (!isOpen || !modalRoot) return null;
+  if (!isOpen) return null;
+
+  // SSR 환경 대비
+  if (typeof document === 'undefined') return null;
+
+  const modalRoot = document.getElementById('modal-root');
+  if (!modalRoot) return null;
 
   return createPortal(
     <div id="modal" className="modal is-open" role="dialog" aria-modal="true">
-      {/* 배경 오버레이 */}
       <div className="modal__overlay" onClick={onClose} aria-label="닫기" />
-      {/* 콘텐츠 */}
       <div className="modal__content" onClick={(e) => e.stopPropagation()} role="document">
         {children}
       </div>
