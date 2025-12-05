@@ -150,17 +150,6 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
                               {lec.title} ({lec.duration}분)
                             </span>
 
-                            {!isEnrolled && !isOwner && (
-                              <div className={styles['course-detail__lecture-locked']}>
-                                <span className={styles['course-detail__lecture-lock-icon']}>
-                                  🔒
-                                </span>
-                                <span className={styles['course-detail__lecture-lock-text']}>
-                                  수강 후 열람 가능
-                                </span>
-                              </div>
-                            )}
-
                             {lec.videoUrl && (isEnrolled || isOwner) && (
                               <button
                                 className={styles['course-detail__lecture-play']}

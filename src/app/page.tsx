@@ -7,5 +7,3 @@ export default function CourseListPage() {
     </AppShell>
   );
 }
-
-export default page;

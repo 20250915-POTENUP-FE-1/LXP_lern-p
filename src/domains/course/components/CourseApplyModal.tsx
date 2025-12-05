@@ -3,6 +3,7 @@
 import type { Course } from '../types/course';
 import type { User } from '../types/course';
 import styles from './CourseApplyModal.module.css';
+import { Modal } from '@/shared/ui/Modal';
 
 export type CourseApplyModalProps = {
   isOpen: boolean;
@@ -31,37 +32,63 @@ export const CourseApplyModal = ({
   };
 
   return (
-    <div className={styles.backdrop} role="dialog" aria-modal="true">
-      <div className={styles.modal}>
-        <h2 className={styles.title}>강좌 수강 신청</h2>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <header className="modal__header">
+        <h2 id="course-apply-title" className="modal__title">
+          강좌 신청 확인
+        </h2>
+        <button type="button" className="modal__close" aria-label="닫기" onClick={onClose}>
+          ×
+        </button>
+      </header>
 
-        <p className={styles.courseTitle}>{course.title}</p>
-        <p className={styles.meta}>
-          {course.instructorName} · 강의 {course.totalLectures ?? course.sections.length}개
-        </p>
-
-        {!user && <p className={styles.notice}>수강 신청을 위해 로그인이 필요합니다.</p>}
-
-        {user && isEnrolled && <p className={styles.notice}>이미 수강중인 강좌입니다.</p>}
-
-        {user && !isEnrolled && (
-          <p className={styles.notice}>이 강좌를 수강 목록에 추가하시겠습니까?</p>
-        )}
-
-        <div className={styles.actions}>
-          <button type="button" onClick={onClose} className={styles.buttonSecondary}>
-            취소
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={!user || isEnrolled || applying}
-            className={styles.buttonPrimary}
-          >
-            {applying ? '신청 중...' : isEnrolled ? '수강중' : '신청하기'}
-          </button>
-        </div>
+      <div className={styles['modal__body']}>
+        <ul className={styles['course-apply__list']}>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>강좌명</span>
+            <span className={styles['modal__value']}>{course.title ?? '—'}</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>요약</span>
+            <span className={styles['modal__value']}>{course.summary ?? '—'}</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>강사명</span>
+            <span className={styles['modal__value']}>{course.instructorName ?? '—'}</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>커리큘럼</span>
+            <span className={styles['modal__value']}>총 {course.totalLectures ?? 0}강</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>총 시간</span>
+            <span className={styles['modal__value']}>{course.duration ?? 0}분</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>난이도</span>
+            <span className="modal__value">{course.level ?? '—'}</span>
+          </li>
+          <li className={styles['modal__field']}>
+            <span className={styles['modal__label']}>결제</span>
+            <span className={styles['modal__value']}>{course.price}원</span>
+          </li>
+        </ul>
       </div>
-    </div>
+
+      {!user && <p className={styles.notice}>수강 신청을 위해 로그인이 필요합니다.</p>}
+
+      {user && isEnrolled && <p className={styles.notice}>이미 수강중인 강좌입니다.</p>}
+
+      <footer className="modal__actions">
+        <button
+          type="button"
+          className="modal__button"
+          onClick={handleConfirm}
+          disabled={!user || isEnrolled || applying}
+        >
+          {applying ? '신청 중...' : isEnrolled ? '수강중' : '신청하기'}
+        </button>
+      </footer>
+    </Modal>
   );
 };
