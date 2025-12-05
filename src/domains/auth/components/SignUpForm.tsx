@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import styles from '@/app/(auth)/AuthPages.module.css';
 import { useModal } from '@/shared/hooks/useModal';
 import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
 import type { SignUpForm as SignUpFormValues } from '@/domains/auth/types/auth';
+import { login } from '@/domains/auth/services/authService';
 import { signUpAction, type SignUpActionState } from '../actions/signUpAction';
 import { LoginModal } from './LoginModal';
 
 const initialState: SignUpActionState = {
   error: '',
+  success: false,
 };
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -25,6 +28,8 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 }
 
 export function SignUpForm() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<SignUpFormValues>({
     name: '',
     email: '',
@@ -57,6 +62,7 @@ export function SignUpForm() {
       setClientError(validationMessage ?? '입력값을 다시 확인해주세요.');
     } else {
       setClientError('');
+      // 여기서 따로 preventDefault 안 하면 서버액션(formAction)이 호출됨
     }
   };
 
@@ -66,6 +72,26 @@ export function SignUpForm() {
     formData.password.length > 0 &&
     formData.passwordConfirm.length > 0 &&
     formData.password !== formData.passwordConfirm;
+
+  // 서버 액션 성공 후 자동 로그인 + 홈 이동
+  useEffect(() => {
+    if (!state.success) return;
+
+    (async () => {
+      try {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        });
+        router.push('/');
+      } catch (err) {
+        console.error(err);
+        // 원하면 여기서 안내 문구도 추가 가능
+        // setClientError('회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 페이지에서 다시 로그인해주세요.');
+        router.push('/signin');
+      }
+    })();
+  }, [state.success, formData.email, formData.password, router]);
 
   return (
     <>

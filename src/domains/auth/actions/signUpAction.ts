@@ -1,6 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import type { FirebaseError } from 'firebase/app';
 import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
 import type { SignUpForm } from '@/domains/auth/types/auth';
@@ -9,10 +8,11 @@ import { createUserProfile } from '@/domains/user/services/userService';
 
 export type SignUpActionState = {
   error?: string;
+  success: boolean;
 };
 
 export async function signUpAction(
-  prevState: SignUpActionState,
+  _prevState: SignUpActionState,
   formData: FormData,
 ): Promise<SignUpActionState> {
   const name = String(formData.get('name') ?? '');
@@ -30,7 +30,7 @@ export async function signUpAction(
   // 1) 서버에서 한 번 더 validation
   const errorMsg = validateSignUp(input);
   if (errorMsg) {
-    return { error: errorMsg };
+    return { error: errorMsg, success: false };
   }
 
   try {
@@ -48,6 +48,9 @@ export async function signUpAction(
       name: authUser.displayName ?? name,
       avatarUrl: authUser.photoURL ?? null,
     });
+
+    // 여기서는 성공 플래그만 넘김 (redirect 안 함)
+    return { success: true };
   } catch (error: unknown) {
     const err = error as FirebaseError & { code?: string };
 
@@ -60,9 +63,6 @@ export async function signUpAction(
         } as Record<string, string>
       )[err.code ?? ''] ?? '회원가입 중 오류가 발생했습니다.';
 
-    return { error: message };
+    return { error: message, success: false };
   }
-
-  // 4) 성공 시 홈으로 이동
-  redirect('/');
 }
