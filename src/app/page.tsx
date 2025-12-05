@@ -1,7 +1,11 @@
-import React from 'react';
+import { AppShell } from '@/shared/ui/AppShell';
 
-function page() {
-  return <div>page</div>;
+export default function CourseListPage() {
+  return (
+    <AppShell>
+      <div></div>
+    </AppShell>
+  );
 }
 
 export default page;

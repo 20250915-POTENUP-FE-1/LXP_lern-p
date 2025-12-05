@@ -1,32 +1,33 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { type PropsWithChildren, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  children: ReactNode;
 };
 
-export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, children }: PropsWithChildren<ModalProps>) => {
+  // 스크롤 락 처리
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (!isOpen) return;
+
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = prev;
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  if (typeof window === 'undefined') return null;
+  // SSR 환경 대비
+  if (typeof document === 'undefined') return null;
 
   const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) {
-    console.warn(' #modal-root 요소를 찾을 수 없습니다');
-    return null;
-  }
+  if (!modalRoot) return null;
 
   return createPortal(
     <div id="modal" className="modal is-open" role="dialog" aria-modal="true">
