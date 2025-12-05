@@ -5,27 +5,23 @@ import Link from "next/link";
 import styles from "@/domains/user/pages/MyPageSections.module.css";
 import { useAuthState } from "@/domains/auth/hooks/useAuthState";
 import { getInstructorCourses } from "@/domains/user/services/instructorService";
-import type { InstructorCourse } from "@/domains/user/types/instructor"; // 있다면 타입 사용
+import type { InstructorCourse } from "@/domains/user/types/instructor";
 
-export default function InstructorCourses(): JSX.Element {
+export default function InstructorCourses() {
   const { user, loading: userLoading } = useAuthState();
   const [courses, setCourses] = useState<InstructorCourse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState<boolean>(false);
-
-  // 🟨 임시 로그인 주입(테스트용) — 나중에 이 1줄만 지우면 끝!
-  const mockUser = { id: "i123", name: "강사오리", roles: ["INSTRUCTOR"] };
-  const _user = user ?? mockUser;
 
   /**
    * 강의 목록 불러오기
    */
   useEffect(() => {
-    if (userLoading || !_user?.id) return;
+    if (userLoading || !user?.id) return;
 
     (async () => {
       setCoursesLoading(true);
       try {
-        const data = await getInstructorCourses(_user.id);
+        const data = await getInstructorCourses(user.id);
         setCourses(data);
       } catch (err) {
         console.error("❌ 강좌 가져오기 실패:", err);
@@ -33,7 +29,7 @@ export default function InstructorCourses(): JSX.Element {
         setCoursesLoading(false);
       }
     })();
-  }, [userLoading, _user?.id]);
+  }, [userLoading, user?.id]);
 
   /**
    * 로딩 UI

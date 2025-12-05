@@ -9,11 +9,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 export default function Profile() {
   const { user, loading } = useAuthState();
 
-    // 🟨 ⭐ 임시 로그인 user 주입 (나중에 이 한 줄만 지우면 끝!)
-  const mockUser = { id: "u123", name: "김오리", email: "duck@example.com", createdAt: "2025-01-01" };
-  const _user = user ?? mockUser; // ← 지울 줄: 이 한 줄만 삭제하면 기존 구조 그대로
-
-  if (loading || !_user) return null;
+  if (loading || !user) return null;
 
   return (
     <article className={styles['profile-section']} aria-labelledby="mypage-profile-title">
@@ -39,10 +35,10 @@ export default function Profile() {
         </div>
 
         <div className={styles['profile-section__identity']}>
-          <h2 className={styles['profile-section__name']}>{_user.name}님</h2>
-          <p className={styles['profile-section__email']}>{_user.email}</p>
+          <h2 className={styles['profile-section__name']}>{user.name}님</h2>
+          <p className={styles['profile-section__email']}>{user.email}</p>
           <p className={styles['profile-section__since']}>
-            가입일: {formatUserDate(_user.createdAt)}
+            가입일: {formatUserDate(user.createdAt)}
           </p>
         </div>
       </section>
@@ -51,14 +47,14 @@ export default function Profile() {
       <div className={styles['profile-section__card']}>
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>이름</span>
-          <span className={styles['profile-section__value']}>{_user.name}</span>
+          <span className={styles['profile-section__value']}>{user.name}</span>
         </div>
 
         <div className={styles['profile-section__divider']} />
 
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>이메일</span>
-          <span className={styles['profile-section__value']}>{_user.email}</span>
+          <span className={styles['profile-section__value']}>{user.email}</span>
         </div>
 
         <div className={styles['profile-section__divider']} />
@@ -66,7 +62,7 @@ export default function Profile() {
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>가입일</span>
           <span className={styles['profile-section__value']}>
-            {formatUserDate(_user.createdAt)}
+            {formatUserDate(user.createdAt)}
           </span>
         </div>
       </div>
