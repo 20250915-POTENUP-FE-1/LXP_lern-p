@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react';
 import { applyCourse, getEnrollmentStatus } from '../services/courseService';
+import { User } from '../types/course';
 
-/**
- * 강좌 수강 신청 관련 훅
- * @param {Object} currentUser - Firebase Auth 사용자 객체
- * @param {string} courseId - 강의 ID
- * @returns {{ isEnrolled: boolean, applying: boolean, handleApply: Function }}
- */
-export function useCourseApply(currentUser, courseId) {
-  const [isEnrolled, setIsEnrolled] = useState(false);
-  const [applying, setApplying] = useState(false);
+export function useCourseApply(currentUser: User | null, courseId: string) {
+  const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
+  const [applying, setApplying] = useState<boolean>(false);
 
-  // 수강 여부 확인
   useEffect(() => {
     if (!currentUser?.id || !courseId) {
       setIsEnrolled(false);
@@ -29,7 +23,6 @@ export function useCourseApply(currentUser, courseId) {
     })();
   }, [currentUser?.id, courseId]);
 
-  // 수강 신청
   const handleApply = async () => {
     if (!currentUser?.id) {
       throw new Error('로그인이 필요합니다');
