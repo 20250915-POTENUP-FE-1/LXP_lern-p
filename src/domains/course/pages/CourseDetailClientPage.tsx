@@ -1,34 +1,50 @@
-import { Users } from 'lucide-react';
+'use client';
+
+import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useParams } from 'react-router';
+
+import type { Section, Lecture } from '../types/course';
 import { useModal } from '@/shared/hooks/useModal';
-import { LoginModal } from '../../auth/components/LoginModal';
-import { useAuthState } from '../../auth/hooks/useAuthState';
-import { CourseApplyModal } from '../components/CourseApplyModal';
-import { FloatingCTA } from '../components/FloatingCTA';
-import { useCourseApply } from '../hooks/useCourseApply';
-import { useCourseDetail } from '../hooks/useCourseDetail';
-import { formatDuration } from '../utils/formatDuration';
+import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
+import { CourseApplyModal } from '@/domains/course/components/CourseApplyModal';
+import { FloatingCTA } from '@/domains/course/components/FloatingCTA';
+import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
+import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
+import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
+import { User } from '@/domains/user/types/user';
+import { useParams } from 'next/navigation';
 
-export default function CourseDetailPage() {
-  const { id } = useParams();
-  const { user } = useAuthState();
+type TabKey = 'intro' | 'curriculum' | 'instructor';
 
-  // 탭 상태
-  const [activeTab, setActiveTab] = useState('intro');
+export type CourseDetailPageProps = {
+  courseId: string;
+};
 
-  // 모달 제어
+export default function CourseDetailClientPage() {
+  const { id } = useParams<{ id: string }>();
+
+  const { user } = useAuthState() as { user: User | null };
+
+  const [activeTab, setActiveTab] = useState<TabKey>('intro');
+
   const loginModal = useModal(false);
   const applyModal = useModal(false);
 
-  // 데이터 훅
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
 
-  const handleTabClick = (e, tabId) => {
+  if (loading) {
+    return <div className={styles.loading}>로딩 중...</div>;
+  }
+
+  if (!course) {
+    return <div className={styles.error}>강좌를 찾을 수 없습니다</div>;
+  }
+
+  const handleTabClick = (e: MouseEvent<HTMLAnchorElement>, tabId: TabKey) => {
     e.preventDefault();
     setActiveTab(tabId);
   };
@@ -42,23 +58,31 @@ export default function CourseDetailPage() {
     applyModal.open();
   };
 
-  if (loading) return <div className={styles.loading}>로딩 중...</div>;
-  if (!course) return <div className={styles.error}>강좌를 찾을 수 없습니다</div>;
+  const handleCourseLearn = (videoUrl: string) => {
+    if (!videoUrl) return;
+    window.open(videoUrl, '_blank', 'noopener,noreferrer');
+  };
 
-  const totalLectures = sections.reduce((sum, sec) => sum + (lectures[sec.id]?.length || 0), 0);
+  const totalLectures = sections.reduce(
+    (sum: number, sec: Section) => sum + (lectures[sec.id]?.length || 0),
+    0,
+  );
+
   const courseInfo = { ...course, totalLectures };
-
-  const isOwner = user?.id === course.instructorId;
+  const isOwner = !!user && user.id === course.instructorId;
 
   return (
     <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
       <div className={styles['course-detail__layout']}>
         <Image
+          width={800}
+          height={450}
           className={styles['course-detail__hero']}
           src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
+
         <article className={styles['course-detail__main']}>
           <header className={styles['course-detail__header']}>
             <h1 className={styles['course-detail__title']}>{course.title}</h1>
@@ -66,7 +90,7 @@ export default function CourseDetailPage() {
 
             {course.tags?.length > 0 && (
               <ul className={styles['course-detail__tags']}>
-                {course.tags.map((tag, idx) => (
+                {course.tags.map((tag: string, idx: number) => (
                   <li key={idx} className={styles['course-detail__tag']}>
                     #{tag}
                   </li>
@@ -76,7 +100,7 @@ export default function CourseDetailPage() {
 
             <ul className={styles['course-detail__meta']}>
               <li className={styles['course-detail__meta-people']}>
-                <Users /> {course.studentCount ?? 0}명 수강중
+                {course.studentCount ?? 0}명 수강중
               </li>
               <li>{course.level}</li>
             </ul>
@@ -84,13 +108,12 @@ export default function CourseDetailPage() {
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
           </header>
 
-          {/* 탭 */}
           <nav className={styles['course-tabs']}>
             <ul className={styles['course-tabs__list']}>
               {[
-                { key: 'intro', label: '강좌 소개' },
-                { key: 'curriculum', label: '커리큘럼' },
-                { key: 'instructor', label: '강사 정보' },
+                { key: 'intro' as TabKey, label: '강좌 소개' },
+                { key: 'curriculum' as TabKey, label: '커리큘럼' },
+                { key: 'instructor' as TabKey, label: '강사 정보' },
               ].map(({ key, label }) => (
                 <li key={key}>
                   <Link
@@ -107,7 +130,6 @@ export default function CourseDetailPage() {
             </ul>
           </nav>
 
-          {/* 탭 콘텐츠 */}
           {activeTab === 'intro' && (
             <section className={styles['course-detail__section']}>
               <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
@@ -121,18 +143,17 @@ export default function CourseDetailPage() {
               {sections.length === 0 ? (
                 <p>커리큘럼이 없습니다</p>
               ) : (
-                sections.map((sec) => (
+                sections.map((sec: Section) => (
                   <details key={sec.id} open>
                     <summary>{sec.title}</summary>
                     <ul>
-                      {lectures[sec.id]?.map((lec) => (
+                      {lectures[sec.id]?.map((lec: Lecture) => (
                         <li key={lec.id}>
                           <div className={styles['course-detail__lecture']}>
                             <span className={styles['course-detail__lecture-title']}>
                               {lec.title} ({lec.duration}분)
                             </span>
 
-                            {/* 잠금 상태 */}
                             {!isEnrolled && !isOwner && (
                               <div className={styles['course-detail__lecture-locked']}>
                                 <span className={styles['course-detail__lecture-lock-icon']}>
@@ -143,12 +164,10 @@ export default function CourseDetailPage() {
                                 </span>
                               </div>
                             )}
-
-                            {/* 재생 버튼 */}
                             {lec.videoUrl && (isEnrolled || isOwner) && (
                               <button
                                 className={styles['course-detail__lecture-play']}
-                                onClick={() => openVideoPlayer(lec.videoUrl)}
+                                onClick={() => handleCourseLearn(lec.videoUrl)}
                               >
                                 재생
                               </button>
@@ -171,7 +190,6 @@ export default function CourseDetailPage() {
           )}
         </article>
 
-        {/* 데스크탑용 사이드 CTA */}
         <FloatingCTA
           price={course.price}
           isFree={course.isFree}
@@ -182,13 +200,9 @@ export default function CourseDetailPage() {
           totalLectures={courseInfo.totalLectures}
           totalTime={formatDuration(course.duration)}
           level={course.level}
-          // onAddToCart={() => console.log('장바구니 담기 클릭')}
         />
       </div>
 
-      {/* 모바일용 하단 고정 CTA */}
-
-      {/* 모달 */}
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
       <CourseApplyModal
         isOpen={applyModal.isOpen}

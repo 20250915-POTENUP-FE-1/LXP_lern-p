@@ -1,47 +1,70 @@
+'use client';
+
 import styles from './FloatingCTA.module.css';
 
-export function FloatingCTA({
+export type FloatingCTAProps = {
+  price: number;
+  isFree: boolean;
+  isEnrolled: boolean;
+  onApply: () => void;
+  isOwner: boolean;
+
+  instructorName: string;
+  totalLectures: number;
+  totalTime: string;
+  level: string;
+
+  onAddToCart?: () => void;
+};
+
+export const FloatingCTA = ({
   price,
   isFree,
   isEnrolled,
+  onApply,
   isOwner,
   instructorName,
   totalLectures,
   totalTime,
   level,
-  onApply,
   onAddToCart,
-}) {
+}: FloatingCTAProps) => {
+  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기';
+
+  const isPrimaryDisabled = isEnrolled || isOwner;
+
   return (
     <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
       <div className={styles['floating-cta__panel']}>
-        {/* 상단: 가격 */}
         <div className={styles['floating-cta__price']}>
           <strong className={styles['floating-cta__price-value']}>
             {isFree ? '무료' : `₩${price?.toLocaleString() ?? 0}`}
           </strong>
         </div>
 
-        {/* 버튼 그룹 */}
         <div className={styles['floating-cta__actions']}>
           <button
             type="button"
             className={`${styles['floating-cta__button']} ${
-              isEnrolled || isOwner ? styles['floating-cta__button--disabled'] : ''
+              isPrimaryDisabled ? styles['floating-cta__button--disabled'] : ''
             }`}
             onClick={onApply}
-            disabled={isEnrolled || isOwner}
+            disabled={isPrimaryDisabled}
           >
-            {isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기'}
+            {primaryLabel}
           </button>
 
-          {/* 장바구니 버튼 */}
-          <button type="button" className={styles['floating-cta__secondary']} onClick={onAddToCart}>
-            장바구니 담기
-          </button>
+          {!isFree && !isEnrolled && !isOwner && onAddToCart && (
+            <button
+              type="button"
+              className={styles['floating-cta__secondary']}
+              onClick={onAddToCart}
+            >
+              장바구니 담기
+            </button>
+          )}
         </div>
 
-        {/* 하단 메타 정보 */}
         <ul className={styles['floating-cta__meta-list']}>
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>강사</span>
@@ -49,6 +72,7 @@ export function FloatingCTA({
           </li>
 
           <li className={styles['floating-cta__divider']} />
+
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>총 강의</span>
             <span className={styles['floating-cta__meta-value']}>
@@ -57,12 +81,14 @@ export function FloatingCTA({
           </li>
 
           <li className={styles['floating-cta__divider']} />
+
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>총 시간</span>
             <span className={styles['floating-cta__meta-value']}>{totalTime ?? '5시간 20분'}</span>
           </li>
 
           <li className={styles['floating-cta__divider']} />
+
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>난이도</span>
             <span className={styles['floating-cta__meta-value']}>{level ?? '초급'}</span>
@@ -71,4 +97,4 @@ export function FloatingCTA({
       </div>
     </aside>
   );
-}
+};

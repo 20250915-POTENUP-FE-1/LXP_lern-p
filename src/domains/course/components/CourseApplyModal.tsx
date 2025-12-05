@@ -1,15 +1,33 @@
-import { useNavigate } from 'react-router';
-import { Modal } from '@/shared/ui/Modal';
+'use client';
+
+import type { Course } from '../types/course';
+import type { User } from '@/domains/user/types/user';
 import styles from './CourseApplyModal.module.css';
+import { Modal } from '@/shared/ui/Modal';
+import { useRouter } from 'next/navigation';
 
-/**
- * 강좌 신청 확인 모달
- * - 상태는 상위(CourseDetailPage)에서 props로 전달받음
- */
-export function CourseApplyModal({ isOpen, onClose, course, user, isEnrolled, applying, onApply }) {
-  const navigate = useNavigate();
+export type CourseApplyModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  course: Course & { totalLectures?: number };
+  user: User | null;
+  isEnrolled: boolean;
+  applying: boolean;
+  onApply: () => Promise<void>;
+};
 
+export const CourseApplyModal = ({
+  isOpen,
+  onClose,
+  course,
+  user,
+  isEnrolled,
+  applying,
+  onApply,
+}: CourseApplyModalProps) => {
   if (!isOpen || !course) return null;
+
+  const router = useRouter();
 
   const priceLabel = course.isFree
     ? '무료'
@@ -21,15 +39,20 @@ export function CourseApplyModal({ isOpen, onClose, course, user, isEnrolled, ap
     if (!user) {
       alert('로그인이 필요합니다.');
       onClose();
+      router.push('/');
       return;
     }
 
     try {
       await onApply();
       onClose();
-    } catch (error) {
-      console.error(error.message ?? '수강 신청에 실패했습니다.');
-      navigate('/');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error('수강 신청에 실패했습니다.', error);
+      }
+      router.push('/');
     }
   };
 
@@ -89,4 +112,4 @@ export function CourseApplyModal({ isOpen, onClose, course, user, isEnrolled, ap
       </footer>
     </Modal>
   );
-}
+};
