@@ -1,7 +1,21 @@
 'use client';
 
-import type { FloatingCTAProps } from '../types/course';
 import styles from './FloatingCTA.module.css';
+
+export type FloatingCTAProps = {
+  price: number;
+  isFree: boolean;
+  isEnrolled: boolean;
+  onApply: () => void;
+  isOwner: boolean;
+
+  instructorName: string;
+  totalLectures: number;
+  totalTime: string;
+  level: string;
+
+  onAddToCart?: () => void;
+};
 
 export const FloatingCTA = ({
   price,

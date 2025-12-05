@@ -1,9 +1,10 @@
 'use client';
 
 import type { Course } from '../types/course';
-import type { User } from '../types/course';
+import type { User } from '@/domains/user/types/user';
 import styles from './CourseApplyModal.module.css';
 import { Modal } from '@/shared/ui/Modal';
+import { useRouter } from 'next/navigation';
 
 export type CourseApplyModalProps = {
   isOpen: boolean;
@@ -26,9 +27,33 @@ export const CourseApplyModal = ({
 }: CourseApplyModalProps) => {
   if (!isOpen || !course) return null;
 
-  const handleConfirm = async () => {
-    await onApply();
-    onClose();
+  const router = useRouter();
+
+  const priceLabel = course.isFree
+    ? '무료'
+    : course.price
+      ? `₩${Number(course.price).toLocaleString()}`
+      : '—';
+
+  const handleApplyCourse = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      onClose();
+      router.push('/');
+      return;
+    }
+
+    try {
+      await onApply();
+      onClose();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error('수강 신청에 실패했습니다.', error);
+      }
+      router.push('/');
+    }
   };
 
   return (
@@ -70,23 +95,19 @@ export const CourseApplyModal = ({
           </li>
           <li className={styles['modal__field']}>
             <span className={styles['modal__label']}>결제</span>
-            <span className={styles['modal__value']}>{course.price.toLocaleString()}원</span>
+            <span className={styles['modal__value']}>{priceLabel}</span>
           </li>
         </ul>
       </div>
-
-      {!user && <p className={styles.notice}>수강 신청을 위해 로그인이 필요합니다.</p>}
-
-      {user && isEnrolled && <p className={styles.notice}>이미 수강중인 강좌입니다.</p>}
 
       <footer className="modal__actions">
         <button
           type="button"
           className="modal__button"
-          onClick={handleConfirm}
-          disabled={!user || isEnrolled || applying}
+          onClick={handleApplyCourse}
+          disabled={applying || isEnrolled}
         >
-          {applying ? '신청 중...' : isEnrolled ? '수강중' : '신청하기'}
+          {isEnrolled ? '수강 중' : course.isFree ? '신청하기' : '수강 신청'}
         </button>
       </footer>
     </Modal>

@@ -1,15 +1,3 @@
-export type User = {
-  id: string;
-  email: string;
-  name: string;
-  roles: ('USER' | 'INSTRUCTOR')[];
-  cart: string[];
-  enrolledCourses: string[];
-  createdCourses: string[];
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type Course = {
   id: string;
   title: string;
@@ -60,12 +48,6 @@ export type Lecture = {
   updatedAt: string;
 };
 
-export type CourseDetailResponse = {
-  course: Course | null;
-  sections: Section[];
-  lectures: Record<string, Lecture[]>;
-};
-
 export type Enrollment = {
   id: string;
   userId: string;
@@ -74,42 +56,29 @@ export type Enrollment = {
   enrolledAt: string;
 };
 
-// Course Detail Hooks 타입
-export type UseCourseDetailResult = {
+export type CourseDetailResponse = {
   course: Course | null;
   sections: Section[];
   lectures: Record<string, Lecture[]>;
-  loading: boolean;
 };
 
-export type UseCourseApplyResult = {
-  isEnrolled: boolean;
-  applying: boolean;
-  handleApply: () => Promise<void>;
+export type CreateLectureInput = {
+  title: string;
+  videoUrl?: string;
+  duration: number;
 };
 
-// Floating CTA Props 타입
-export type FloatingCTAProps = {
-  price: number;
-  isFree: boolean;
-  isEnrolled: boolean;
-  onApply: () => void;
-  isOwner: boolean;
+export type CreateSectionInput = {
+  title: string;
+  lectures: CreateLectureInput[];
+};
 
-  instructorName: string;
-  totalLectures: number;
-  totalTime: string;
+export type CreateCourseInput = {
+  title: string;
+  summary: string;
+  description: string;
+  thumbnailUrl: string;
+  category: string[];
   level: string;
-
-  onAddToCart?: () => void;
-};
-
-// Course Detail Tab 타입
-export type CourseDetailTabKey = 'intro' | 'curriculum' | 'instructor';
-
-// Detail View용 통합 타입
-
-export type CourseWithDetail = Course & {
-  sections: Section[];
-  lectures: Record<string, Lecture[]>;
+  price: number | string;
 };

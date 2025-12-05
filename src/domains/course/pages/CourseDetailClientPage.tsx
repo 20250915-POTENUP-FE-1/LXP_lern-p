@@ -4,7 +4,7 @@ import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { User, Section, Lecture } from '../types/course';
+import type { Section, Lecture } from '../types/course';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -14,6 +14,8 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from './CourseDetailPage.module.css';
+import { User } from '@/domains/user/types/user';
+import { useParams } from 'next/navigation';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -21,7 +23,9 @@ export type CourseDetailPageProps = {
   courseId: string;
 };
 
-export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
+export default function CourseDetailClientPage() {
+  const { id } = useParams<{ id: string }>();
+
   const { user } = useAuthState() as { user: User | null };
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
@@ -29,8 +33,8 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
   const loginModal = useModal(false);
   const applyModal = useModal(false);
 
-  const { course, sections, lectures, loading } = useCourseDetail(courseId);
-  const { isEnrolled, applying, handleApply } = useCourseApply(user, courseId);
+  const { course, sections, lectures, loading } = useCourseDetail(id);
+  const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -54,7 +58,7 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
     applyModal.open();
   };
 
-  const openVideoPlayer = (videoUrl: string) => {
+  const handleCourseLearn = (videoUrl: string) => {
     if (!videoUrl) return;
     window.open(videoUrl, '_blank', 'noopener,noreferrer');
   };
@@ -71,12 +75,12 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
     <main className={`${styles['course-detail']} container`} aria-labelledby="course-detail-title">
       <div className={styles['course-detail__layout']}>
         <Image
+          width={800}
+          height={450}
           className={styles['course-detail__hero']}
           src={course.thumbnailUrl}
           alt={`${course.title} 썸네일`}
           loading="lazy"
-          width={800}
-          height={450}
         />
 
         <article className={styles['course-detail__main']}>
@@ -163,7 +167,7 @@ export default function CourseDetailPage({ courseId }: CourseDetailPageProps) {
                             {lec.videoUrl && (isEnrolled || isOwner) && (
                               <button
                                 className={styles['course-detail__lecture-play']}
-                                onClick={() => openVideoPlayer(lec.videoUrl)}
+                                onClick={() => handleCourseLearn(lec.videoUrl)}
                               >
                                 재생
                               </button>

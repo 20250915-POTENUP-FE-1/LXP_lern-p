@@ -15,8 +15,15 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
 
-import type { Course, Section, Lecture, CourseDetailResponse } from '../types/course';
-import type { User } from '../types/course';
+import type {
+  Course,
+  Section,
+  Lecture,
+  CourseDetailResponse,
+  CreateCourseInput,
+  CreateSectionInput,
+} from '../types/course';
+import type { User } from '@/domains/user/types/user';
 
 export const getAllCourses = async (): Promise<Course[]> => {
   try {
@@ -131,27 +138,6 @@ export const getEnrollmentStatus = async (userId: string, courseId: string): Pro
     console.error('getEnrollmentStatus 실패:', err);
     return false;
   }
-};
-
-export type CreateLectureInput = {
-  title: string;
-  videoUrl?: string;
-  duration: number;
-};
-
-export type CreateSectionInput = {
-  title: string;
-  lectures: CreateLectureInput[];
-};
-
-export type CreateCourseInput = {
-  title: string;
-  summary: string;
-  description: string;
-  thumbnailUrl: string;
-  category: string[];
-  level: string;
-  price: number | string;
 };
 
 export const createCourse = async (
