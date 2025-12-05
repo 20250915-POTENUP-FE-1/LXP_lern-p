@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
 
+import type { User } from '@/domains/user/types/user';
 import type {
   Course,
   Section,
@@ -23,7 +24,6 @@ import type {
   CreateCourseInput,
   CreateSectionInput,
 } from '../types/course';
-import type { User } from '@/domains/user/types/user';
 
 export const getAllCourses = async (): Promise<Course[]> => {
   try {
