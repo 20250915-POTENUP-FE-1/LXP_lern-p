@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import styles from '@/domains/user/pages/MyPageSections.module.css';
+import styles from '@/app/(user)/MyPageSections.module.css';
 
-export default function Cart() {
+export default function CartPage() {
   return (
     <section className={styles['cart']} aria-labelledby="mypage-cart-title">
       <h1 id="mypage-cart-title" className={styles['profile-section__title']}>
