@@ -1,4 +1,4 @@
-import layout from '@/domains/user/pages/MyPage.module.css';
+import layout from './MyPage.module.css';
 import MyPageSidebar from '@/domains/user/components/MyPageSidebar';
 import { AppShell } from '@/shared/ui/AppShell';
 
