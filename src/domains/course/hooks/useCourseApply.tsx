@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { applyCourse, getEnrollmentStatus } from '../services/courseService';
-import { User } from '../types/course';
+import { User } from '@/domains/user/types/user';
 
 export function useCourseApply(currentUser: User | null, courseId: string) {
   const [isEnrolled, setIsEnrolled] = useState<boolean>(false);

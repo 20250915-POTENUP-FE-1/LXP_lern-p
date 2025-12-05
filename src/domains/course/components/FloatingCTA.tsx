@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './FloatingCTA.module.css';
+import styles from '@/app/courses/[id]/FloatingCTA.module.css';
 
 export type FloatingCTAProps = {
   price: number;

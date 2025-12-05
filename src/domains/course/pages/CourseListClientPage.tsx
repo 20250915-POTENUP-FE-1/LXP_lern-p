@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
-import { CourseCard } from '@/domains/course/components/CourseCard';
-import { getAllCourses } from '@/domains/course/services/courseService';
-import styles from './CourseListPage.module.css';
+'use client';
 
-export default function CourseListPage() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+import { useEffect, useState } from 'react';
+import { CourseCard } from '../components/CourseCard';
+import { getAllCourses } from '../services/courseService';
+import styles from '@/app/CourseListPage.module.css';
+import { Course } from '../types/course';
+
+export default function CourseListClientPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -36,6 +39,7 @@ export default function CourseListPage() {
           <div className={styles['subText']}>한 번의 클릭으로 배움과 가르침을 모두 경험하세요</div>
         </div>
       </div>
+      <div></div>
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
         {loading ? (
           <p className={styles['course-list__loading']}>불러오는 중...</p>
