@@ -70,7 +70,7 @@ export const CourseApplyModal = ({
           </li>
           <li className={styles['modal__field']}>
             <span className={styles['modal__label']}>결제</span>
-            <span className={styles['modal__value']}>{course.price}원</span>
+            <span className={styles['modal__value']}>{course.price.toLocaleString()}원</span>
           </li>
         </ul>
       </div>
