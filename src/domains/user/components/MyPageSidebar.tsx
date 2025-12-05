@@ -22,7 +22,7 @@ export default function MyPageSidebar() {
           <h4 className={styles['mypage-nav__section-title']}>내 계정</h4>
           <ul className={styles['mypage-nav']}>
             <li className={styles['mypage-nav__item']}>
-              <Link href="/mypage" className={`${styles["mypage-nav__link"]} ${isActive("/mypage")}`}>
+              <Link href="/mypage" className={`${styles["mypage-nav__link"]} ${isActive("/mypage")} ${isActive("/mypage/profile")}`}>
                 내 정보
               </Link>
             </li>
@@ -70,7 +70,7 @@ export default function MyPageSidebar() {
               <h4 className={styles['mypage-nav__section-title']}>내 계정</h4>
               <ul className={styles['mypage-nav']}>
                 <li className={styles['mypage-nav__item']}>
-                  <Link href="/mypage" className={`${styles["mypage-nav__link"]} ${isActive("/mypage")}`}>
+                  <Link href="/mypage" className={`${styles["mypage-nav__link"]} ${isActive("/mypage")} ${isActive("/mypage/profile")}`}>
                     내 정보
                   </Link>
                 </li>
