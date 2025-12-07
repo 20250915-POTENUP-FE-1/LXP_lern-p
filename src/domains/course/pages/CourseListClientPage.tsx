@@ -5,10 +5,12 @@ import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
 import styles from '@/app/CourseListPage.module.css';
 import { Course } from '../types/course';
+import { CourseSort, SortOption } from '../components/CourseSort';
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [sort, setSort] = useState<SortOption>('latest');
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -24,6 +26,49 @@ export default function CourseListClientPage() {
 
     fetchCourses();
   }, []);
+
+  const sortedCourses = [...courses].sort((a, b) => {
+    const getTime = (c: Course): number => {
+      const v = c.createdAt as any;
+
+      if (!v) return 0;
+
+      // 문자열 또는 숫자 (예: "2025-01-01", 1710000000000)
+      if (typeof v === 'string' || typeof v === 'number') {
+        const t = new Date(v).getTime();
+        return Number.isNaN(t) ? 0 : t;
+      }
+
+      // Date 인스턴스
+      if (v instanceof Date) {
+        return v.getTime();
+      }
+
+      // Firestore Timestamp 같은 객체 (toDate() 메서드 있는 경우)
+      if (typeof v.toDate === 'function') {
+        return v.toDate().getTime();
+      }
+
+      return 0;
+    };
+
+    const timeA = getTime(a);
+    const timeB = getTime(b);
+
+    switch (sort) {
+      case 'latest':
+        // 최신순: 더 최근(큰 값)이 앞으로
+        return timeB - timeA;
+      case 'oldest':
+        // 오래된 순: 더 예전(작은 값)이 앞으로
+        return timeA - timeB;
+      case 'popular':
+        // 수강인원순
+        return (b.studentCount ?? 0) - (a.studentCount ?? 0);
+      default:
+        return 0;
+    }
+  });
 
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
@@ -46,11 +91,17 @@ export default function CourseListClientPage() {
         ) : courses.length === 0 ? (
           <p className={styles['course-list__empty']}>등록된 강좌가 없습니다.</p>
         ) : (
-          <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
-            {courses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
+          <>
+            <div className={styles['course-list__toolbar']}>
+              <CourseSort value={sort} onChange={(nextSort) => setSort(nextSort)} />
+            </div>
+
+            <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
+              {sortedCourses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </>
         )}
       </section>
     </main>

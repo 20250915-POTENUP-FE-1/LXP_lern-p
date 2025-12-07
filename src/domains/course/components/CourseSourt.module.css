@@ -1,0 +1,22 @@
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* margin-bottom은 여기서 빼고, 툴바에서만 관리 */
+}
+
+.label {
+  font-size: 14px;
+  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select {
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 14px;
+  background-color: #ffffff;
+}
