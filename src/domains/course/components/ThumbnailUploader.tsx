@@ -1,17 +1,23 @@
+'use client';
+
+import { useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
-import { useState } from 'react';
 import styles from './CourseForm.module.css';
 
-export function ThumbnailUploader({ onUploadComplete }) {
-  const [thumbnailUrl, setThumbnailUrl] = useState(null);
+type ThumbnailUploaderProps = {
+  onUploadComplete?: (url: string) => void;
+};
 
-  const handleFileChange = async (e) => {
+export function ThumbnailUploader({ onUploadComplete }: ThumbnailUploaderProps) {
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      const base64Url = reader.result;
+      const base64Url = String(reader.result ?? '');
       setThumbnailUrl(base64Url);
       onUploadComplete?.(base64Url);
     };
@@ -22,7 +28,7 @@ export function ThumbnailUploader({ onUploadComplete }) {
     <aside className={styles['upload-card']}>
       {thumbnailUrl && (
         <div className={styles['upload__preview']}>
-          <Image src={thumbnailUrl} alt="썸네일 미리보기" />
+          <Image src={thumbnailUrl} alt="썸네일 미리보기" width={320} height={200} />
         </div>
       )}
 

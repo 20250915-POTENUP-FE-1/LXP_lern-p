@@ -1,34 +1,44 @@
-import { useEffect, useState } from 'react';
+'use client';
+
+import { ChangeEvent } from 'react';
 import { CATEGORY } from '../constants/category';
 import styles from './CourseForm.module.css';
 
-export function SelectCategory({ value = [], onChange }) {
-  const [first, setFirst] = useState(value[0] || '');
-  const [second, setSecond] = useState(value[1] || '');
-  const [third, setThird] = useState(value[2] || '');
+type SelectCategoryProps = {
+  value?: string[];
+  onChange?: (value: string[]) => void;
+  id?: string;
+};
 
-  const firstCategories = Object.keys(CATEGORY).filter((key) => key !== '전체');
-  const secondCategories = first ? Object.keys(CATEGORY[first]) : [];
-  const thirdCategories = first && second ? CATEGORY[first][second] || [] : [];
+type CategoryObject = Record<string, Record<string, string[]>>;
 
-  // 첫, 두, 세 카테고리 중 하나라도 바뀌면 상위로 알림
-  useEffect(() => {
-    if (onChange) onChange([first, second, third].filter(Boolean));
-  }, [first, second, third, onChange]);
+const CATEGORY_OBJ = CATEGORY as CategoryObject;
 
-  const handleFirstChange = (e) => {
-    setFirst(e.target.value);
-    setSecond('');
-    setThird('');
+export function SelectCategory({ value = [], onChange, id }: SelectCategoryProps) {
+  const first = value[0] ?? '';
+  const second = value[1] ?? '';
+  const third = value[2] ?? '';
+
+  const firstCategories = Object.keys(CATEGORY_OBJ).filter((key) => key !== '전체');
+  const secondCategories = first ? Object.keys(CATEGORY_OBJ[first] ?? {}) : [];
+  const thirdCategories = first && second ? (CATEGORY_OBJ[first]?.[second] ?? []) : [];
+
+  const handleFirstChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const nextFirst = e.target.value;
+    // 1차만 선택된 상태로 리셋
+    onChange?.([nextFirst]);
   };
 
-  const handleSecondChange = (e) => {
-    setSecond(e.target.value);
-    setThird('');
+  const handleSecondChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const nextSecond = e.target.value;
+    // 1차 + 2차까지만
+    onChange?.([first, nextSecond]);
   };
 
-  const handleThirdChange = (e) => {
-    setThird(e.target.value);
+  const handleThirdChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const nextThird = e.target.value;
+    // 1차 + 2차 + 3차
+    onChange?.([first, second, nextThird]);
   };
 
   return (
@@ -36,6 +46,7 @@ export function SelectCategory({ value = [], onChange }) {
       <div className={styles['course-form__category-group']}>
         {/* 1차 카테고리 */}
         <select
+          id={id}
           value={first}
           onChange={handleFirstChange}
           className={styles['course-form__select']}
@@ -85,7 +96,6 @@ export function SelectCategory({ value = [], onChange }) {
         </select>
       </div>
 
-      {/* 선택 상태 표시 */}
       <p className={styles['course-form__hint']}>
         선택된 카테고리:{' '}
         {first && second && third ? `${first} > ${second} > ${third}` : '아직 선택되지 않음'}

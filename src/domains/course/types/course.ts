@@ -62,18 +62,19 @@ export type CourseDetailResponse = {
   lectures: Record<string, Lecture[]>;
 };
 
-export type CreateLectureInput = {
+/** 요청 DTO 쪽 네이밍 */
+export type CreateLectureRequest = {
   title: string;
   videoUrl?: string;
   duration: number;
 };
 
-export type CreateSectionInput = {
+export type CreateSectionRequest = {
   title: string;
-  lectures: CreateLectureInput[];
+  lectures: CreateLectureRequest[];
 };
 
-export type CreateCourseInput = {
+export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;

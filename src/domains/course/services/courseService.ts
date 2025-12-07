@@ -15,15 +15,15 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
 
+import type { User } from '@/domains/user/types/user';
 import type {
   Course,
   Section,
   Lecture,
   CourseDetailResponse,
-  CreateCourseInput,
-  CreateSectionInput,
+  CreateCourseRequest,
+  CreateSectionRequest,
 } from '../types/course';
-import type { User } from '@/domains/user/types/user';
 
 export const getAllCourses = async (): Promise<Course[]> => {
   try {
@@ -142,8 +142,8 @@ export const getEnrollmentStatus = async (userId: string, courseId: string): Pro
 
 export const createCourse = async (
   user: User,
-  courseData: CreateCourseInput,
-  sectionList: CreateSectionInput[],
+  courseData: CreateCourseRequest,
+  sectionList: CreateSectionRequest[],
 ): Promise<string> => {
   if (!user?.id) throw new Error('로그인이 필요합니다.');
 
