@@ -56,7 +56,6 @@ function compareCourses(a: SortableCourse, b: SortableCourse, sort: SortValue): 
   return 0;
 }
 
-// 👉 정렬 로직을 외부에서 재사용할 수 있게 export
 export function sortCourses<T extends SortableCourse>(courses: T[], sort: SortValue): T[] {
   const copied = [...courses];
   return copied.sort((a, b) => compareCourses(a, b, sort));
