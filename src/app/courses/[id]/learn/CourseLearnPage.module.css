@@ -1,17 +1,8 @@
-:root {
-  /* use global design tokens where possible */
-  --brand: var(--color-brand);
-  --brand-foreground: var(--color-text-light);
-  --muted: var(--color-text-muted);
-  --card-bg: var(--color-surface);
-  --bg: var(--color-bg);
-  --border: var(--color-border);
-  --accent: rgba(239,104,23,0.08); /* subtle brand tint */
-}
-
 .course-learn {
+  /* use global tokens from src/app/global.css; only define local accent */
+  --accent: rgba(239,104,23,0.08);
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--color-bg);
   color: var(--color-text);
   display: flex;
   flex-direction: column;
@@ -109,7 +100,7 @@
 .course-learn__pdf-preview__icon {
   width: 64px;
   height: 64px;
-  color: var(--brand);
+  color: var(--color-brand);
   margin-bottom: 12px;
 }
 
@@ -121,13 +112,13 @@
 }
 
 .course-learn__pdf-preview__desc {
-  color: var(--muted);
+  color: var(--color-text-muted);
   margin-bottom: 12px;
 }
 
 .course-learn__brand-btn {
-  background: var(--brand);
-  color: var(--brand-foreground);
+  background: var(--color-brand);
+  color: var(--color-text-light);
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
@@ -138,8 +129,8 @@
 }
 
 .course-learn__info-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px;
 }
@@ -159,8 +150,8 @@
 
 .course-learn__aside {
   width: 100%;
-  border-top: 1px solid var(--border);
-  background: var(--card-bg);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 @media (min-width: 1024px) {
@@ -173,7 +164,7 @@
 
 .course-learn__curriculum {
   padding: 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .course-learn__curriculum__title {
@@ -183,7 +174,7 @@
 
 .course-learn__curriculum__meta {
   font-size: var(--text-sm);
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .course-learn__curriculum__list {
@@ -216,7 +207,7 @@
 
 .course-learn__section-meta {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .course-learn__section-content {
@@ -245,7 +236,7 @@
 .course-learn__lecture-icon {
   width: 20px;
   height: 20px;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .course-learn__lecture-text {
@@ -262,6 +253,6 @@
 
 .course-learn__lecture-meta {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
