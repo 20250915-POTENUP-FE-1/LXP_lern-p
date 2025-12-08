@@ -1,5 +1,4 @@
 .course-learn {
-  /* use global tokens from src/app/global.css; only define local accent */
   --accent: rgba(239,104,23,0.08);
   min-height: 100vh;
   background: var(--color-bg);

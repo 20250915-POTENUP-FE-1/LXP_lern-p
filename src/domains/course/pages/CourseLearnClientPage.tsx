@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Play, FileText, Download, CheckCircle, ArrowLeft } from "lucide-react";
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
+import type { CourseDetailResponse } from '@/domains/course/types/course';
 
-
-type Lecture = {
+type UILecture = {
   id: string;
   title: string;
   type: "video" | "pdf";
@@ -17,113 +17,108 @@ type Lecture = {
   pdfUrl?: string;
 };
 
-type Section = {
+type UISection = {
   id: string;
   title: string;
   description: string;
-  lectures: Lecture[];
+  lectures: UILecture[];
 };
 
-type Course = {
+type UICourse = {
   id: string;
   title: string;
   instructor: string;
   description: string;
-  sections: Section[];
+  sections: UISection[];
 };
 
-// 더미 데이터
-const courseData: Course = {
-  id: "1",
-  title: "에헴",
-  instructor: "lee2 강사",
-  description: "테스트 입니다",
+const dummyCourseDetail: CourseDetailResponse = {
+  course: {
+    id: '1',
+    title: '에헴',
+    summary: '테스트 요약',
+    description: '테스트 입니다',
+    thumbnailUrl: '/thumb.jpg',
+    instructorId: 'instr1',
+    instructorName: 'lee2 강사',
+    category: ['programming'],
+    level: 'beginner',
+    tags: ['test'],
+    price: 0,
+    isFree: true,
+    studentCount: 123,
+    duration: 3600,
+    status: 'published',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    sections: ['s1', 's2', 's3'],
+  },
   sections: [
-    {
-      id: "s1",
-      title: "섹션 1: 시작하기",
-      description: "강좌의 기본적인 내용을 소개합니다.",
-      lectures: [
-        {
-          id: "l1",
-          title: "강좌 소개",
-          type: "video",
-          duration: "10:30",
-          description: "이 강좌에서 배울 내용에 대해 알아봅니다.",
-          completed: true,
-          videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-        },
-        {
-          id: "l2",
-          title: "학습 자료 다운로드",
-          type: "pdf",
-          description: "강좌에서 사용할 학습 자료입니다.",
-          completed: false,
-          pdfUrl: "/sample.pdf",
-        },
-      ],
-    },
-    {
-      id: "s2",
-      title: "섹션 2: 기초 개념",
-      description: "핵심 개념들을 학습합니다.",
-      lectures: [
-        {
-          id: "l3",
-          title: "기초 개념 1",
-          type: "video",
-          duration: "15:20",
-          description: "첫 번째 기초 개념에 대해 배웁니다.",
-          completed: false,
-          videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-        },
-        {
-          id: "l4",
-          title: "기초 개념 2",
-          type: "video",
-          duration: "12:45",
-          description: "두 번째 기초 개념에 대해 배웁니다.",
-          completed: false,
-          videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-        },
-        {
-          id: "l5",
-          title: "기초 개념 정리 자료",
-          type: "pdf",
-          description: "기초 개념을 정리한 PDF 자료입니다.",
-          completed: false,
-          pdfUrl: "/sample.pdf",
-        },
-      ],
-    },
-    {
-      id: "s3",
-      title: "섹션 3: 심화 학습",
-      description: "더 깊은 내용을 학습합니다.",
-      lectures: [
-        {
-          id: "l6",
-          title: "심화 주제 1",
-          type: "video",
-          duration: "20:00",
-          description: "심화 주제에 대해 학습합니다.",
-          completed: false,
-          videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-        },
-      ],
-    },
+    { id: 's1', courseId: '1', title: '섹션 1: 시작하기', sequence: 1, lectures: ['l1', 'l2'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 's2', courseId: '1', title: '섹션 2: 기초 개념', sequence: 2, lectures: ['l3', 'l4', 'l5'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 's3', courseId: '1', title: '섹션 3: 심화 학습', sequence: 3, lectures: ['l6'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   ],
+  lectures: {
+    s1: [
+      { id: 'l1', sectionId: 's1', courseId: '1', title: '강좌 소개', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 630, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'l2', sectionId: 's1', courseId: '1', title: '학습 자료 다운로드', videoUrl: '', duration: 0, sequence: 2, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    ],
+    s2: [
+      { id: 'l3', sectionId: 's2', courseId: '1', title: '기초 개념 1', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 920, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'l4', sectionId: 's2', courseId: '1', title: '기초 개념 2', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 765, sequence: 2, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'l5', sectionId: 's2', courseId: '1', title: '기초 개념 정리 자료', videoUrl: '', duration: 0, sequence: 3, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    ],
+    s3: [
+      { id: 'l6', sectionId: 's3', courseId: '1', title: '심화 주제 1', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 1200, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    ],
+  },
 };
+
+function formatDurationSeconds(seconds: number) {
+  if (!seconds || seconds <= 0) return undefined;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function buildUICourseFromDetail(detail: CourseDetailResponse): UICourse {
+  const course = detail.course;
+  const sections = detail.sections.map((sec) => ({
+    id: sec.id,
+    title: sec.title,
+    description: '',
+    lectures: (detail.lectures[sec.id] || []).map((lec) => ({
+      id: lec.id,
+      title: lec.title,
+      type: (lec.videoUrl ? 'video' : 'pdf') as 'video' | 'pdf',
+      duration: lec.duration ? formatDurationSeconds(lec.duration) : undefined,
+      description: '',
+      completed: false,
+      videoUrl: lec.videoUrl || undefined,
+      pdfUrl: lec.videoUrl ? undefined : '/sample.pdf',
+    })),
+  }));
+
+  return {
+    id: course?.id ?? '0',
+    title: course?.title ?? '',
+    instructor: course?.instructorName ?? '',
+    description: course?.description ?? '',
+    sections,
+  };
+}
+
+const courseData: UICourse = buildUICourseFromDetail(dummyCourseDetail);
 
 export default function CourseLearnPage() {
-  const [currentLecture, setCurrentLecture] = useState<Lecture>(courseData.sections[0].lectures[0]);
+  const [currentLecture, setCurrentLecture] = useState<UILecture>(courseData.sections[0].lectures[0]);
   const [openSections, setOpenSections] = useState<string[]>(["s1"]);
 
   const toggleSection = (sectionId: string) => {
     setOpenSections((prev) => (prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId]));
   };
 
-  const handleLectureClick = (lecture: Lecture) => {
+  const handleLectureClick = (lecture: UILecture) => {
     setCurrentLecture(lecture);
   };
 
