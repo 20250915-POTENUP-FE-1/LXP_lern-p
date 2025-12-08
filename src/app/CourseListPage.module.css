@@ -45,9 +45,12 @@
 
 .course-list__toolbar {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+  width: 100%;
+  align-self: stretch;
 }
 
 .course-list__grid {
