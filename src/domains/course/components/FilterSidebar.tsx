@@ -1,7 +1,29 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './FilterSidebar.module.css';
 
 export function FilterSidebar() {
+  const router = useRouter();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((item) => item !== category) : [...prev, category],
+    );
+    router.push(`/?cat=${category}`); // 카테고리 쿼리로 URL 업데이트
+  };
+
+  const handleLevelChange = (level: string) => {
+    setSelectedLevels((prev) =>
+      prev.includes(level) ? prev.filter((item) => item !== level) : [...prev, level],
+    );
+    router.push(`/?level=${level}`); // 난이도 쿼리로 URL 업데이트
+  };
+
   return (
     <>
       <nav
@@ -18,106 +40,24 @@ export function FilterSidebar() {
             <h3 id="filter-cat-title" className={styles['filter__section-title']}>
               카테고리
             </h3>
-
             <ul className={`${styles['filter__list']} ${styles['filter__list--depth1']}`}>
               <li className={styles['filter__item']}>
-                <Link href="/?cat=frontend" className={styles['filter__link']}>
+                <Link
+                  href="/?cat=frontend"
+                  className={styles['filter__link']}
+                  onClick={() => handleCategoryChange('frontend')}
+                >
                   프론트엔드
                 </Link>
-                <ul className={`${styles['filter__list']} ${styles['filter__list--depth2']}`}>
-                  <li className={styles['filter__item']}>
-                    <Link href="/?cat=frontend-react" className={styles['filter__link']}>
-                      React
-                    </Link>
-                    <ul className={`${styles['filter__list']} ${styles['filter__list--depth3']}`}>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=frontend-react-beginner"
-                          className={styles['filter__link']}
-                          aria-current="page"
-                        >
-                          입문
-                        </Link>
-                      </li>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=frontend-react-intermediate"
-                          className={styles['filter__link']}
-                        >
-                          중급
-                        </Link>
-                      </li>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=frontend-react-advanced"
-                          className={styles['filter__link']}
-                        >
-                          고급
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li className={styles['filter__item']}>
-                    <Link href="/?cat=frontend-vue" className={styles['filter__link']}>
-                      Vue
-                    </Link>
-                    <ul className={`${styles['filter__list']} ${styles['filter__list--depth3']}`}>
-                      <li className={styles['filter__item']}>
-                        <Link href="/?cat=frontend-vue-beginner" className={styles['filter__link']}>
-                          입문
-                        </Link>
-                      </li>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=frontend-vue-intermediate"
-                          className={styles['filter__link']}
-                        >
-                          중급
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
               </li>
-
               <li className={styles['filter__item']}>
-                <Link href="/?cat=backend" className={styles['filter__link']}>
+                <Link
+                  href="/?cat=backend"
+                  className={styles['filter__link']}
+                  onClick={() => handleCategoryChange('backend')}
+                >
                   백엔드
                 </Link>
-                <ul className={`${styles['filter__list']} ${styles['filter__list--depth2']}`}>
-                  <li className={styles['filter__item']}>
-                    <Link href="/?cat=backend-spring" className={styles['filter__link']}>
-                      Spring
-                    </Link>
-                    <ul className={`${styles['filter__list']} ${styles['filter__list--depth3']}`}>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=backend-spring-beginner"
-                          className={styles['filter__link']}
-                        >
-                          입문
-                        </Link>
-                      </li>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=backend-spring-intermediate"
-                          className={styles['filter__link']}
-                        >
-                          중급
-                        </Link>
-                      </li>
-                      <li className={styles['filter__item']}>
-                        <Link
-                          href="/?cat=backend-spring-advanced"
-                          className={styles['filter__link']}
-                        >
-                          고급
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
               </li>
             </ul>
           </section>
@@ -132,19 +72,31 @@ export function FilterSidebar() {
             <ul className={styles['filter__list']}>
               <li className={styles['filter__item']}>
                 <label className={styles['filter__checkbox']}>
-                  <input type="checkbox" className={styles['filter__checkbox-input']} />
+                  <input
+                    type="checkbox"
+                    className={styles['filter__checkbox-input']}
+                    onChange={() => handleLevelChange('beginner')}
+                  />
                   <span className={styles['filter__checkbox-label']}>입문</span>
                 </label>
               </li>
               <li className={styles['filter__item']}>
                 <label className={styles['filter__checkbox']}>
-                  <input type="checkbox" className={styles['filter__checkbox-input']} />
+                  <input
+                    type="checkbox"
+                    className={styles['filter__checkbox-input']}
+                    onChange={() => handleLevelChange('intermediate')}
+                  />
                   <span className={styles['filter__checkbox-label']}>중급</span>
                 </label>
               </li>
               <li className={styles['filter__item']}>
                 <label className={styles['filter__checkbox']}>
-                  <input type="checkbox" className={styles['filter__checkbox-input']} />
+                  <input
+                    type="checkbox"
+                    className={styles['filter__checkbox-input']}
+                    onChange={() => handleLevelChange('advanced')}
+                  />
                   <span className={styles['filter__checkbox-label']}>고급</span>
                 </label>
               </li>
@@ -188,19 +140,31 @@ export function FilterSidebar() {
               <ul className={styles['filter__list']}>
                 <li className={styles['filter__item']}>
                   <label className={styles['filter__checkbox']}>
-                    <input type="checkbox" className={styles['filter__checkbox-input']} />
+                    <input
+                      type="checkbox"
+                      className={styles['filter__checkbox-input']}
+                      onChange={() => handleLevelChange('beginner')}
+                    />
                     <span className={styles['filter__checkbox-label']}>입문</span>
                   </label>
                 </li>
                 <li className={styles['filter__item']}>
                   <label className={styles['filter__checkbox']}>
-                    <input type="checkbox" className={styles['filter__checkbox-input']} />
+                    <input
+                      type="checkbox"
+                      className={styles['filter__checkbox-input']}
+                      onChange={() => handleLevelChange('intermediate')}
+                    />
                     <span className={styles['filter__checkbox-label']}>중급</span>
                   </label>
                 </li>
                 <li className={styles['filter__item']}>
                   <label className={styles['filter__checkbox']}>
-                    <input type="checkbox" className={styles['filter__checkbox-input']} />
+                    <input
+                      type="checkbox"
+                      className={styles['filter__checkbox-input']}
+                      onChange={() => handleLevelChange('advanced')}
+                    />
                     <span className={styles['filter__checkbox-label']}>고급</span>
                   </label>
                 </li>
