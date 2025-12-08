@@ -405,9 +405,13 @@ export function CourseForm() {
       {/* 저장/취소 */}
 
       <div className={styles['form-actions']}>
-        <Link href="/courses" className={`${styles['btn']} ${styles['btn--ghost']}`}>
+        <button
+          type="button"
+          className={`${styles['btn']} ${styles['btn--ghost']}`}
+          onClick={() => router.back()}
+        >
           취소
-        </Link>
+        </button>
         <button
           type="submit"
           disabled={loading || isInvalid}
