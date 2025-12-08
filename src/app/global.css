@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 :root {
   color-scheme: light;
   /* brand */
@@ -150,8 +152,8 @@ a:focus-visible {
   padding-inline: var(--space-4);
 }
 
-:global(main),
-:global(#root > main) {
+main,
+#root > main {
   width: min(var(--layout-width), 100%);
   margin: 0 auto;
   padding-inline: var(--space-4);
@@ -162,8 +164,8 @@ a:focus-visible {
     padding-inline: 0;
   }
 
-  :global(main),
-  :global(#root > main) {
+  main,
+  #root > main {
     padding-inline: var(--space-5);
   }
 }
@@ -173,8 +175,8 @@ a:focus-visible {
     padding-inline: 0;
   }
 
-  :global(main),
-  :global(#root > main) {
+  main,
+  #root > main {
     padding-inline: var(--space-6);
   }
 }
