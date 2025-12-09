@@ -3,7 +3,7 @@ import type { Progress } from '@/domains/enrollment/types/progress';
 
 export type LearnLectureResource = {
   resourceId: number;
-  resourceType: 'VIDEO' | 'PDF';
+  resourceType: ResourceType;
   fileUrl: string;
   isDownloadable: boolean;
 };
