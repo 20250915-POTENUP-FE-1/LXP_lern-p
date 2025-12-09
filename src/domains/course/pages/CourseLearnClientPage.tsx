@@ -1,15 +1,24 @@
-"use client";
+// src/domains/course/pages/CourseLearnClientPage.tsx
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { ChevronDown, ChevronRight, Play, FileText, Download, CheckCircle, ArrowLeft } from "lucide-react";
+import { useState } from 'react';
+import Link from 'next/link';
+import {
+  ChevronDown,
+  ChevronRight,
+  Play,
+  FileText,
+  Download,
+  CheckCircle,
+  ArrowLeft,
+} from 'lucide-react';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
-import type { CourseDetailResponse } from '@/domains/course/types/course';
+import type { LearnPageData } from '@/domains/course/types/learn';
 
 type UILecture = {
   id: string;
   title: string;
-  type: "video" | "pdf";
+  type: 'video' | 'pdf';
   duration?: string;
   description: string;
   completed: boolean;
@@ -32,48 +41,6 @@ type UICourse = {
   sections: UISection[];
 };
 
-const dummyCourseDetail: CourseDetailResponse = {
-  course: {
-    id: '1',
-    title: '에헴',
-    summary: '테스트 요약',
-    description: '테스트 입니다',
-    thumbnailUrl: '/thumb.jpg',
-    instructorId: 'instr1',
-    instructorName: 'lee2 강사',
-    category: ['programming'],
-    level: 'beginner',
-    tags: ['test'],
-    price: 0,
-    isFree: true,
-    studentCount: 123,
-    duration: 3600,
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    sections: ['s1', 's2', 's3'],
-  },
-  sections: [
-    { id: 's1', courseId: '1', title: '섹션 1: 시작하기', sequence: 1, lectures: ['l1', 'l2'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: 's2', courseId: '1', title: '섹션 2: 기초 개념', sequence: 2, lectures: ['l3', 'l4', 'l5'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: 's3', courseId: '1', title: '섹션 3: 심화 학습', sequence: 3, lectures: ['l6'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  ],
-  lectures: {
-    s1: [
-      { id: 'l1', sectionId: 's1', courseId: '1', title: '강좌 소개', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 630, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-      { id: 'l2', sectionId: 's1', courseId: '1', title: '학습 자료 다운로드', videoUrl: '', duration: 0, sequence: 2, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    ],
-    s2: [
-      { id: 'l3', sectionId: 's2', courseId: '1', title: '기초 개념 1', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 920, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-      { id: 'l4', sectionId: 's2', courseId: '1', title: '기초 개념 2', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 765, sequence: 2, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-      { id: 'l5', sectionId: 's2', courseId: '1', title: '기초 개념 정리 자료', videoUrl: '', duration: 0, sequence: 3, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    ],
-    s3: [
-      { id: 'l6', sectionId: 's3', courseId: '1', title: '심화 주제 1', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', duration: 1200, sequence: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    ],
-  },
-};
-
 function formatDurationSeconds(seconds: number) {
   if (!seconds || seconds <= 0) return undefined;
   const mins = Math.floor(seconds / 60);
@@ -81,41 +48,71 @@ function formatDurationSeconds(seconds: number) {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-function buildUICourseFromDetail(detail: CourseDetailResponse): UICourse {
-  const course = detail.course;
-  const sections = detail.sections.map((sec) => ({
-    id: sec.id,
+function buildUICourseFromLearnData(learnData: LearnPageData): UICourse {
+  const course = learnData.course;
+
+  const baseDescription = course.description ?? '';
+  const baseSummary = course.summary ?? '';
+
+  const sections: UISection[] = course.sections.map((sec) => ({
+    id: String(sec.sectionId),
     title: sec.title,
     description: '',
-    lectures: (detail.lectures[sec.id] || []).map((lec) => ({
-      id: lec.id,
-      title: lec.title,
-      type: (lec.videoUrl ? 'video' : 'pdf') as 'video' | 'pdf',
-      duration: lec.duration ? formatDurationSeconds(lec.duration) : undefined,
-      description: '',
-      completed: false,
-      videoUrl: lec.videoUrl || undefined,
-      pdfUrl: lec.videoUrl ? undefined : '/sample.pdf',
-    })),
+    lectures: sec.lectures.map((lec) => {
+      const isVideo = lec.resource.resourceType === 'VIDEO';
+      const fileUrl = lec.resource.fileUrl;
+
+      return {
+        id: String(lec.lectureId),
+        title: lec.title,
+        type: isVideo ? 'video' : 'pdf',
+        duration: lec.duration ? formatDurationSeconds(lec.duration) : undefined,
+        description:
+          (isVideo ? baseDescription : '강의 자료를 다운로드해 학습을 보완하세요.') ||
+          baseSummary ||
+          '',
+        completed: false, // TODO: progress 연동 시 true/false 처리
+        videoUrl: isVideo ? fileUrl : undefined,
+        pdfUrl: !isVideo ? fileUrl : undefined,
+      };
+    }),
   }));
 
   return {
-    id: course?.id ?? '0',
-    title: course?.title ?? '',
-    instructor: course?.instructorName ?? '',
-    description: course?.description ?? '',
+    id: String(course.courseId),
+    title: course.title,
+    instructor: course.instructor.name,
+    description: course.description ?? '',
     sections,
   };
 }
 
-const courseData: UICourse = buildUICourseFromDetail(dummyCourseDetail);
+type CourseLearnClientProps = {
+  learnData: LearnPageData;
+};
 
-export default function CourseLearnPage() {
-  const [currentLecture, setCurrentLecture] = useState<UILecture>(courseData.sections[0].lectures[0]);
-  const [openSections, setOpenSections] = useState<string[]>(["s1"]);
+export default function CourseLearnClient({ learnData }: CourseLearnClientProps) {
+  const courseData: UICourse = buildUICourseFromLearnData(learnData);
+
+  const initialLecture =
+    courseData.sections[0]?.lectures[0] ??
+    ({
+      id: 'placeholder',
+      title: '준비 중인 강의입니다.',
+      type: 'video',
+      description: '',
+      completed: false,
+    } as UILecture);
+
+  const [currentLecture, setCurrentLecture] = useState<UILecture>(initialLecture);
+  const [openSections, setOpenSections] = useState<string[]>(
+    courseData.sections[0] ? [courseData.sections[0].id] : [],
+  );
 
   const toggleSection = (sectionId: string) => {
-    setOpenSections((prev) => (prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId]));
+    setOpenSections((prev) =>
+      prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId],
+    );
   };
 
   const handleLectureClick = (lecture: UILecture) => {
@@ -127,7 +124,10 @@ export default function CourseLearnPage() {
   };
 
   const getCompletedLectures = () => {
-    return courseData.sections.reduce((acc, section) => acc + section.lectures.filter((l) => l.completed).length, 0);
+    return courseData.sections.reduce(
+      (acc, section) => acc + section.lectures.filter((l) => l.completed).length,
+      0,
+    );
   };
 
   return (
@@ -154,24 +154,37 @@ export default function CourseLearnPage() {
         <main className={styles['course-learn__main']}>
           {/* 비디오/PDF 플레이어 */}
           <div className={styles['course-learn__player-wrap']}>
-            {currentLecture.type === "video" ? (
+            {currentLecture.type === 'video' ? (
               <div className={styles['course-learn__player']}>
-                <video key={currentLecture.id} className={styles['course-learn__video']} controls autoPlay>
-                  <source src={currentLecture.videoUrl} type="video/mp4" />
+                <video
+                  key={currentLecture.id}
+                  className={styles['course-learn__video']}
+                  controls
+                  autoPlay
+                >
+                  {currentLecture.videoUrl && (
+                    <source src={currentLecture.videoUrl} type="video/mp4" />
+                  )}
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
             ) : (
               <div className={styles['course-learn__pdf-preview']}>
                 <FileText className={styles['course-learn__pdf-preview__icon']} />
-                <h3 className={styles['course-learn__pdf-preview__title']}>{currentLecture.title}</h3>
-                <p className={styles['course-learn__pdf-preview__desc']}>{currentLecture.description}</p>
-                <a href={currentLecture.pdfUrl} download>
-                  <button className={styles['course-learn__brand-btn']}>
-                    <Download className={styles['course-learn__icon']} />
-                    PDF 다운로드
-                  </button>
-                </a>
+                <h3 className={styles['course-learn__pdf-preview__title']}>
+                  {currentLecture.title}
+                </h3>
+                <p className={styles['course-learn__pdf-preview__desc']}>
+                  {currentLecture.description}
+                </p>
+                {currentLecture.pdfUrl && (
+                  <a href={currentLecture.pdfUrl} download>
+                    <button className={styles['course-learn__brand-btn']}>
+                      <Download className={styles['course-learn__icon']} />
+                      PDF 다운로드
+                    </button>
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -179,14 +192,20 @@ export default function CourseLearnPage() {
           {/* 현재 강의 정보 */}
           <div className={styles['course-learn__info-card']}>
             <div className={styles['course-learn__info-row']}>
-              {currentLecture.type === "video" ? <Play className={styles['course-learn__icon']} /> : <FileText className={styles['course-learn__icon']} />}
+              {currentLecture.type === 'video' ? (
+                <Play className={styles['course-learn__icon']} />
+              ) : (
+                <FileText className={styles['course-learn__icon']} />
+              )}
               <span className={styles['course-learn__progress']}>
-                {currentLecture.type === "video" ? "영상 강의" : "PDF 자료"}
+                {currentLecture.type === 'video' ? '영상 강의' : 'PDF 자료'}
                 {currentLecture.duration && ` · ${currentLecture.duration}`}
               </span>
             </div>
             <h2 className={styles['course-learn__info-title']}>{currentLecture.title}</h2>
-            <p className={styles['course-learn__pdf-preview__desc']}>{currentLecture.description}</p>
+            <p className={styles['course-learn__pdf-preview__desc']}>
+              {currentLecture.description}
+            </p>
           </div>
         </main>
 
@@ -194,28 +213,55 @@ export default function CourseLearnPage() {
         <aside className={styles['course-learn__aside']}>
           <div className={styles['course-learn__curriculum']}>
             <h3 className={styles['course-learn__curriculum__title']}>커리큘럼</h3>
-            <p className={styles['course-learn__curriculum__meta']}>{getTotalLectures()}개 강의 · {getCompletedLectures()}개 완료</p>
+            <p className={styles['course-learn__curriculum__meta']}>
+              {getTotalLectures()}개 강의 · {getCompletedLectures()}개 완료
+            </p>
           </div>
           <div className={styles['course-learn__curriculum__list']}>
             {courseData.sections.map((section) => (
               <div key={section.id}>
-                <button onClick={() => toggleSection(section.id)} className={styles['course-learn__section-btn']}>
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  className={styles['course-learn__section-btn']}
+                >
                   <div className={styles['course-learn__section-info']}>
                     <h4 className={styles['course-learn__section-title']}>{section.title}</h4>
-                    <p className={styles['course-learn__section-meta']}>{section.lectures.length}개 강의</p>
+                    <p className={styles['course-learn__section-meta']}>
+                      {section.lectures.length}개 강의
+                    </p>
                   </div>
-                  {openSections.includes(section.id) ? <ChevronDown className={styles['course-learn__icon']} /> : <ChevronRight className={styles['course-learn__icon']} />}
+                  {openSections.includes(section.id) ? (
+                    <ChevronDown className={styles['course-learn__icon']} />
+                  ) : (
+                    <ChevronRight className={styles['course-learn__icon']} />
+                  )}
                 </button>
                 {openSections.includes(section.id) && (
                   <div className={styles['course-learn__section-content']}>
                     {section.lectures.map((lecture) => (
-                      <button key={lecture.id} onClick={() => handleLectureClick(lecture)} className={`${styles['course-learn__lecture-btn']} ${currentLecture.id === lecture.id ? styles['course-learn__lecture-btn--active'] : ""}`}>
+                      <button
+                        key={lecture.id}
+                        onClick={() => handleLectureClick(lecture)}
+                        className={`${styles['course-learn__lecture-btn']} ${
+                          currentLecture.id === lecture.id
+                            ? styles['course-learn__lecture-btn--active']
+                            : ''
+                        }`}
+                      >
                         <div className={styles['course-learn__lecture-icon']}>
-                          {lecture.completed ? <CheckCircle className={styles['course-learn__icon']} /> : lecture.type === "video" ? <Play className={styles['course-learn__icon']} /> : <FileText className={styles['course-learn__icon']} />}
+                          {lecture.completed ? (
+                            <CheckCircle className={styles['course-learn__icon']} />
+                          ) : lecture.type === 'video' ? (
+                            <Play className={styles['course-learn__icon']} />
+                          ) : (
+                            <FileText className={styles['course-learn__icon']} />
+                          )}
                         </div>
                         <div className={styles['course-learn__lecture-text']}>
                           <p className={styles['course-learn__lecture-title']}>{lecture.title}</p>
-                          <p className={styles['course-learn__lecture-meta']}>{lecture.type === "video" ? lecture.duration : "PDF"}</p>
+                          <p className={styles['course-learn__lecture-meta']}>
+                            {lecture.type === 'video' ? lecture.duration : 'PDF'}
+                          </p>
                         </div>
                       </button>
                     ))}

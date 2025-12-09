@@ -18,7 +18,7 @@ export type Course = {
   studentCount: number;
 
   duration: number;
-  status: 'draft' | 'published' | 'hidden';
+  status: 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
 
   createdAt: string;
   updatedAt: string;
@@ -46,14 +46,6 @@ export type Lecture = {
   sequence: number;
   createdAt: string;
   updatedAt: string;
-};
-
-export type Enrollment = {
-  id: string;
-  userId: string;
-  courseId: string;
-  progress: number;
-  enrolledAt: string;
 };
 
 export type CourseDetailResponse = {

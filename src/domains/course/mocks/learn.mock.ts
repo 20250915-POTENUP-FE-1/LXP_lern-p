@@ -1,0 +1,141 @@
+// src/domains/course/mocks/learn.mock.ts
+import type { LearnPageData } from '@/domains/course/types/learn';
+
+export const MOCK_LEARN_PAGE_DATA: LearnPageData = {
+  course: {
+    courseId: 10,
+    categories: ['프로그래밍', '프론트엔드'],
+    title: '스프링 부트 JPA 활용 1편',
+    summary: '스프링 부트의 핵심 개념을 3시간 만에 마스터합니다.',
+    description: '실무 JPA 완전 정복',
+    price: 55000,
+    status: 'PUBLISHED',
+    level: 'BEGINNER',
+    thumbnailUrl: 'https://cdn.example.com/thumb.png',
+    instructor: {
+      id: 5,
+      name: '김영한',
+      profileUrl: 'https://cdn.example.com/profile.png',
+    },
+    isPurchased: true,
+    studentCount: 10,
+    totalduration: 6000,
+    sections: [
+      {
+        sectionId: 101,
+        title: '섹션 1. 프로젝트 환경 설정',
+        order: 1,
+        lectures: [
+          {
+            lectureId: 2001,
+            title: '프로젝트 생성 (맛보기)',
+            duration: 620,
+            isPreview: true,
+            orderIndex: 1,
+            resource: {
+              resourceId: 1,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: 2002,
+            title: '라이브러리 살펴보기',
+            duration: 0,
+            isPreview: false,
+            orderIndex: 2,
+            resource: {
+              resourceId: 2,
+              resourceType: 'PDF',
+              fileUrl: '/sample.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: 102,
+        title: '섹션 2. JPA 기초 개념',
+        order: 2,
+        lectures: [
+          {
+            lectureId: 2003,
+            title: '엔티티 매핑 기본',
+            duration: 920,
+            isPreview: false,
+            orderIndex: 1,
+            resource: {
+              resourceId: 3,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: 2004,
+            title: '연관관계 매핑',
+            duration: 765,
+            isPreview: false,
+            orderIndex: 2,
+            resource: {
+              resourceId: 4,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: 2005,
+            title: '섹션 2 정리 자료',
+            duration: 0,
+            isPreview: false,
+            orderIndex: 3,
+            resource: {
+              resourceId: 5,
+              resourceType: 'PDF',
+              fileUrl: '/sample.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: 103,
+        title: '섹션 3. 심화 학습',
+        order: 3,
+        lectures: [
+          {
+            lectureId: 2006,
+            title: '실무 예제 1',
+            duration: 1200,
+            isPreview: false,
+            orderIndex: 1,
+            resource: {
+              resourceId: 6,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  enrollment: {
+    id: '5001',
+    userId: 'u-1',
+    courseId: '10',
+    progress: 45,
+    enrolledAt: '2025-11-01T09:00:00',
+    updatedAt: '2025-11-15T10:00:00',
+  },
+  progress: {
+    learningRecordId: 8001,
+    enrollmentId: 5001,
+    progressRate: 60,
+    lastVideoId: 2001,
+    lastWatchedDuration: 180,
+    updatedAt: '2025-12-02T09:30:00',
+  },
+};
