@@ -1,4 +1,3 @@
-// src/domains/course/pages/CourseLearnClientPage.tsx
 'use client';
 
 import { useState } from 'react';
