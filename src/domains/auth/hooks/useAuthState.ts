@@ -1,103 +1,41 @@
 'use client';
 
-import {
-  doc,
-  getDoc,
-  onSnapshot,
-  type Unsubscribe as FirestoreUnsubscribe,
-  Timestamp,
-  serverTimestamp,
-} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { db } from '@/shared/lib/firebase/firestore';
+import { getUserProfile } from '@/domains/user/services/userService'; // Spring Boot API 호출로 사용자 프로필 가져오기
 import type { User } from '@/domains/user/types/user';
-import { createUserProfile } from '@/domains/user/services/userService';
-import { AuthUserResponse, subscribeAuthState } from '@/domains/auth/services/authService';
 
-type UseAuthStateReturn = {
-  user: User | null;
-  loading: boolean;
-  initialized: boolean;
-};
-
-type FirestoreUserDoc = {
-  id: string;
-  email: string | null;
-  name: string;
-  roles?: User['roles'];
-  cart?: User['cart'];
-  enrolledCourses?: User['enrolledCourses'];
-  createdCourses?: User['createdCourses'];
-  avatarUrl?: string | null;
-  createdAt?: Timestamp | ReturnType<typeof serverTimestamp> | null;
-  updatedAt?: Timestamp | ReturnType<typeof serverTimestamp> | null;
-};
-
-const toDateOrNow = (
-  value: Timestamp | ReturnType<typeof serverTimestamp> | null | undefined,
-): Date => {
-  if (value instanceof Timestamp) return value.toDate();
-  return new Date();
-};
-
-export const useAuthState = (): UseAuthStateReturn => {
-  const [user, setUser] = useState<User | null>(null);
+export const useAuthState = () => {
+  const [user, setUser] = useState<User | null>(null); // User 타입으로 초기화
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    let unsubscribeUserDoc: FirestoreUnsubscribe | null = null;
+    const fetchUserProfile = async () => {
+      try {
+        const userProfile = await getUserProfile(); // 받아온 UserResponse
 
-    const unsubscribeAuth = subscribeAuthState((authUser: AuthUserResponse | null) => {
-      void (async () => {
-        if (!authUser) {
-          setUser(null);
-          setInitialized(true);
-          if (unsubscribeUserDoc) unsubscribeUserDoc();
-          return;
+        if (userProfile) {
+          const userData: User = {
+            id: userProfile.id,
+            email: userProfile.email,
+            name: userProfile.nickname, // UserResponse의 nickname을 User의 name으로 매핑
+            roles: userProfile.roles,
+            cart: [], // 초기값 빈 배열로 설정
+            enrolledCourses: [], // 초기값 빈 배열로 설정
+            createdCourses: [], // 초기값 빈 배열로 설정
+            createdAt: new Date(userProfile.createdAt), // UserResponse의 createdAt을 Date로 변환
+          };
+
+          setUser(userData); // 변환된 User 객체로 상태 업데이트
         }
 
-        const ref = doc(db, 'users', authUser.uid);
-        let userDocSnap = await getDoc(ref);
-
-        if (!userDocSnap.exists()) {
-          await createUserProfile({
-            id: authUser.uid,
-            email: authUser.email,
-            name: authUser.displayName ?? '',
-            avatarUrl: authUser.photoURL ?? null,
-          });
-          userDocSnap = await getDoc(ref);
-        }
-
-        if (unsubscribeUserDoc) unsubscribeUserDoc();
-
-        unsubscribeUserDoc = onSnapshot(ref, (snap) => {
-          if (!snap.exists()) return;
-
-          const data = snap.data() as FirestoreUserDoc;
-
-          setUser({
-            id: authUser.uid,
-            email: authUser.email ?? '',
-            name: data.name ?? authUser.displayName ?? '',
-            roles: data.roles ?? ['USER'],
-            cart: data.cart ?? [],
-            enrolledCourses: data.enrolledCourses ?? [],
-            createdCourses: data.createdCourses ?? [],
-            avatarUrl: data.avatarUrl ?? authUser.photoURL ?? undefined,
-            createdAt: toDateOrNow(data.createdAt),
-            updatedAt: toDateOrNow(data.updatedAt),
-          });
-
-          setInitialized(true);
-        });
-      })();
-    });
-
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribeUserDoc) unsubscribeUserDoc();
+        setInitialized(true);
+      } catch (error) {
+        console.error('사용자 프로필 조회에 실패하였습니다', error);
+        setInitialized(true);
+      }
     };
+
+    fetchUserProfile();
   }, []);
 
   return { user, loading: !initialized, initialized };
