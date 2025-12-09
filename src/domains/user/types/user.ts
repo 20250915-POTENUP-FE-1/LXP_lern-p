@@ -1,4 +1,4 @@
-export type Role = 'USER' | 'INSTRUCTOR' | 'ADMIN'; // 추후 'USER' -> 'STUDENT' 로 변경
+export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
 
 export type User = {
   id: string;
@@ -10,7 +10,26 @@ export type User = {
   createdCourses: string[];
   avatarUrl?: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 };
 
-export type UserResponse = User | null;
+export type UserResponse = {
+  id: string;
+  email: string;
+  nickname: string;
+  roles: Role[];
+  createdAt: Date;
+};
+
+export type UpdateProfileRequest = {
+  nickname: string;
+};
+
+export type UpdateProfileResponse = {
+  nickname: string;
+};
+
+export type updateStudentToInstructorResponse = {
+  userId: string;
+  roles: Role[];
+};
