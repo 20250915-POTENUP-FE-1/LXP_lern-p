@@ -93,7 +93,7 @@ export async function getApi<T = unknown>(endpoint: string, options: RequestInit
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function postApi<T = unknown>(endpoint: string, data: unknown): Promise<T> {
+export async function postApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'POST',
     body: JSON.stringify(data),
