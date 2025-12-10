@@ -29,6 +29,5 @@ export const updateStudentToInstructor = async (
 ): Promise<updateStudentToInstructorResponse> => {
   return await postApi<updateStudentToInstructorResponse>(
     `/api/admin/users/${userId}/roles/instructor`,
-    {},
   );
 };
