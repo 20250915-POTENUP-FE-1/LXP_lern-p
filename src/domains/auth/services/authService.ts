@@ -1,7 +1,14 @@
 import { deleteApi, postApi } from '@/shared/lib/api/fetchApi'; // postApi만 사용
-import type { SignUpRequest, LoginRequest, SignUpResponse, LoginResponse } from '../types/auth';
+import type {
+  SignUpRequest,
+  LoginRequest,
+  SignUpResponse,
+  LoginResponse,
+  SendEmailVerificationResponse,
+  SendEmailVerificationRequest,
+} from '../types/auth';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
  * 회원가입
@@ -11,8 +18,7 @@ export const signUp = async ({
   password,
   nickname,
 }: SignUpRequest): Promise<SignUpResponse> => {
-  // 기본 fetch 사용
-  const response = await fetch(`${BASE_URL}/api/auth/signup`, {
+  const response = await fetch(`${BASE_URL}/api/auth/signup-and-login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -60,4 +66,26 @@ export const logout = async (): Promise<void> => {
  */
 export const deleteAccount = async (): Promise<void> => {
   return await deleteApi<void>('/api/users/me');
+};
+
+/**
+ * 이메일 인증
+ */
+export const sendEmailVerification = async ({
+  email,
+}: SendEmailVerificationRequest): Promise<SendEmailVerificationResponse> => {
+  const response = await fetch(`${BASE_URL}/api/auth/email-verification`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`이메일 인증 실패: ${response.statusText}`);
+  }
+
+  const resJson = await response.json();
+  return resJson.data;
 };
