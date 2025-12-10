@@ -2,7 +2,13 @@ import type { Metadata } from 'next';
 import './index.css';
 import { getUserProfile } from '@/domains/user/services/userService';
 import { User } from '@/domains/user/types/user';
+import { MSWProvider } from './_providers/msw-provider';
 import { AuthProvider } from './_providers/AuthProvider';
+
+if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+  const { server } = await import('@/mocks/server');
+  server.listen();
+}
 
 export const metadata: Metadata = {
   title: 'LernP ',
@@ -40,7 +46,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="ko">
       <body>
         <div id="root">
-          <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
+          <MSWProvider>
+            <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
+          </MSWProvider>
         </div>
         <div id="modal-root"></div>
       </body>
