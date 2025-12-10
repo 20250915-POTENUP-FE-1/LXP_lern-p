@@ -4,13 +4,13 @@ import type {
   updateStudentToInstructorResponse,
   UserResponse,
 } from '@/domains/user/types/user';
-import { fetchApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
+import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
 
 /**
  * 사용자 프로필 조회
  */
 export const getUserProfile = async (): Promise<UserResponse> => {
-  return await fetchApi<UserResponse>(`/api/users/me`);
+  return await getApi<UserResponse>(`/api/users/me`);
 };
 
 /**
