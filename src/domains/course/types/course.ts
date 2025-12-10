@@ -50,7 +50,7 @@ export type Lecture = {
   updatedAt: string;
 };
 
-export type CourseDraft = {
+export type CourseDraftForm = {
   title: string;
   summary: string;
   description: string;
@@ -60,7 +60,7 @@ export type CourseDraft = {
   thumbnailUrl: string;
 };
 
-export type LectureDraft = {
+export type LectureDraftForm = {
   id: string;
   title: string;
   duration: number;
@@ -69,10 +69,10 @@ export type LectureDraft = {
   resource: LectureResource;
 };
 
-export type SectionDraft = {
+export type SectionDraftForm = {
   id: string;
   title: string;
-  lectures: LectureDraft[];
+  lectures: LectureDraftForm[];
 };
 
 export type Enrollment = {
@@ -94,8 +94,6 @@ export type CourseDetailResponse = {
   sections: Section[];
   lectures: Record<string, Lecture[]>;
 };
-
-export type CourseStatus = Course['status'];
 
 /** 요청 DTO 쪽 네이밍 */
 export type CreateCourseRequest = {

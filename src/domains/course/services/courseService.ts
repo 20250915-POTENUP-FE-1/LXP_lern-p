@@ -1,14 +1,4 @@
-// src/domains/course/services/courseService.ts
-
-import type { User } from '@/domains/user/types/user';
-import type {
-  Course,
-  Section,
-  Lecture,
-  CourseDetailResponse,
-  SectionDraft,
-  CourseDraft,
-} from '../types/course';
+import type { Course, Section, Lecture, CourseDetailResponse } from '../types/course';
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -133,5 +123,3 @@ export const getEnrollmentStatus = async (userId: string, courseId: string): Pro
     return false;
   }
 };
-
-// ===== 10~11. 폼 데이터 조회 =====

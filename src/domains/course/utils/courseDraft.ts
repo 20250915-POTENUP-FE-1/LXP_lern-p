@@ -1,4 +1,4 @@
-import { CourseDraft, CreateSectionRequest, LectureDraft, SectionDraft } from '../types/course';
+import { CourseDraftForm, LectureDraftForm, SectionDraftForm } from '../types/course';
 
 // 공통 ID 생성 유틸
 const generateId = () =>
@@ -6,7 +6,7 @@ const generateId = () =>
     ? crypto.randomUUID()
     : String(Date.now() + Math.random());
 
-export const createEmptyLecture = (): LectureDraft => ({
+export const createEmptyLecture = (): LectureDraftForm => ({
   id: generateId(),
   title: '',
   duration: 0,
@@ -19,13 +19,13 @@ export const createEmptyLecture = (): LectureDraft => ({
   },
 });
 
-export const createEmptySection = (): SectionDraft => ({
+export const createEmptySection = (): SectionDraftForm => ({
   id: generateId(),
   title: '',
   lectures: [createEmptyLecture()],
 });
 
-export const buildSectionDraft = (sections: SectionDraft[]): SectionDraft[] =>
+export const buildSectionDraft = (sections: SectionDraftForm[]): SectionDraftForm[] =>
   sections.map((section) => ({
     ...section,
     lectures: section.lectures.map((lecture) => ({
@@ -44,7 +44,7 @@ export type CourseFormState = {
   thumbnailUrl: string;
 };
 
-export const buildCourseDraft = (form: CourseFormState): CourseDraft => ({
+export const buildCourseDraft = (form: CourseFormState): CourseDraftForm => ({
   title: form.title,
   summary: form.summary,
   description: form.description,

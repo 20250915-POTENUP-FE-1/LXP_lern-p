@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { CourseDraft, SectionDraft } from '../types/course';
+import { CourseDraftForm, SectionDraftForm } from '../types/course';
 import {
   buildSectionDraft,
   CourseFormState,
@@ -28,8 +28,8 @@ export function useSectionForm() {
   const courseId = typeof params.id === 'string' ? params.id : '';
   const mode: SectionFormMode = pathname?.includes('/edit') ? 'edit' : 'create';
 
-  const [sections, setSections] = useState<SectionDraft[]>([createEmptySection()]);
-  const [step1Data, setStep1Data] = useState<CourseDraft | null>(null);
+  const [sections, setSections] = useState<SectionDraftForm[]>([createEmptySection()]);
+  const [step1Data, setStep1Data] = useState<CourseDraftForm | null>(null);
   const [loading, setLoading] = useState(false); // data fetch/loading gate
   const [submitting, setSubmitting] = useState(false); // final submit loading
   const [drafting, setDrafting] = useState(false); // draft save loading
@@ -87,7 +87,7 @@ export function useSectionForm() {
           return;
         }
         try {
-          const parsed: CourseDraft = JSON.parse(savedStep1Data);
+          const parsed: CourseDraftForm = JSON.parse(savedStep1Data);
           setStep1Data(parsed);
         } catch (err) {
           console.error('Failed to parse saved step 1 data:', err);
@@ -155,7 +155,7 @@ export function useSectionForm() {
     setSubmitting(true);
 
     try {
-      const courseInput = { ...step1Data } as CourseDraft;
+      const courseInput = { ...step1Data } as CourseDraftForm;
       const sectionInput = buildSectionDraft(sections); // Step 2 DTO
       let currentDraftId = courseId; // 1. Draft ID 확보: Create Mode이고 ID가 없으면 Step 1 데이터를 기반으로 Draft 생성
 
@@ -236,7 +236,7 @@ export function useSectionForm() {
     setSuccess(false);
     setDrafting(true);
     try {
-      const courseInput = { ...step1Data } as CourseDraft;
+      const courseInput = { ...step1Data } as CourseDraftForm;
       const sectionInput = buildSectionDraft(sections);
       let currentDraftId = courseId;
 
