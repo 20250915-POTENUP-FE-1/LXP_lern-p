@@ -1,6 +1,6 @@
-import { LearnPageData, UICourse, UISection } from '../types/learn';
+import { CourseLearn, UICourse, UISection } from '../types/learn';
 
-export function createLearnPageUIModel(learnData: LearnPageData): UICourse {
+export function createLearnPageUIModel(learnData: CourseLearn): UICourse {
   const course = learnData.course;
 
   const baseDescription = course.description ?? '';

@@ -1,7 +1,7 @@
 import { MOCK_LEARN_PAGE_DATA } from '@/domains/course/mocks/learn.mock';
 import type {
   LearnCourse,
-  LearnPageData,
+  CourseLearn,
   CourseDetailResponse,
   EnrollmentListResponse,
   ProgressResponse,
@@ -25,7 +25,7 @@ async function fetchCourse(courseId: string): Promise<LearnCourse> {
 
 async function fetchEnrollmentByCourseId(
   courseId: number,
-): Promise<(LearnPageData['enrollment'] & { enrollmentId: number }) | null> {
+): Promise<(CourseLearn['enrollment'] & { enrollmentId: number }) | null> {
   const res = await fetch(`${API_BASE}/api/enrollments?status=ENROLLED&page=1&size=50`, {
     cache: 'no-store',
   });
@@ -42,7 +42,7 @@ async function fetchEnrollmentByCourseId(
 
 async function fetchProgressByEnrollmentId(
   enrollmentId: number,
-): Promise<LearnPageData['progress'] | null> {
+): Promise<CourseLearn['progress'] | null> {
   const res = await fetch(`${API_BASE}/api/progresses/${enrollmentId}`, {
     cache: 'no-store',
   });
@@ -55,7 +55,7 @@ async function fetchProgressByEnrollmentId(
   return json.data;
 }
 
-export async function getLearnPageData(courseIdParam: string): Promise<LearnPageData> {
+export async function getLearnPageData(courseIdParam: string): Promise<CourseLearn> {
   // 더미 모드일 경우
   if (USE_MOCK) {
     return MOCK_LEARN_PAGE_DATA;
@@ -76,7 +76,7 @@ export async function getLearnPageData(courseIdParam: string): Promise<LearnPage
 
   return {
     course,
-    enrollment: enrollmentWithId ? (enrollment as LearnPageData['enrollment']) : null,
+    enrollment: enrollmentWithId ? (enrollment as CourseLearn['enrollment']) : null,
     progress,
   };
 }

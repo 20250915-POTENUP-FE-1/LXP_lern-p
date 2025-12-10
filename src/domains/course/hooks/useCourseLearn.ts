@@ -1,9 +1,7 @@
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
-import type { LearnPageData, UICourse, UILecture } from '@/domains/course/types/learn';
-import { createLearnPageUIModel } from '../utils/createLearnPageUIModel';
-
+import type { CourseLearn, UICourse, UILecture } from '@/domains/course/types/learn';
 export type UseCourseLearnReturn = {
   courseData: UICourse;
   currentLecture: UILecture;
@@ -14,8 +12,27 @@ export type UseCourseLearnReturn = {
   completedLectures: number;
 };
 
-export function useCourseLearn(learnData: LearnPageData): UseCourseLearnReturn {
-  const courseData = useMemo(() => createLearnPageUIModel(learnData), [learnData]);
+export function useCourseLearn(learnData: CourseLearn): UseCourseLearnReturn {
+  const courseData = useMemo<UICourse>(() => {
+    return {
+      id: learnData.course.courseId.toString(),
+      title: learnData.course.title,
+      instructor: learnData.course.instructor.name,
+      description: learnData.course.description,
+      sections: learnData.course.sections.map((section) => ({
+        id: section.sectionId.toString(),
+        title: section.title,
+        description: '',
+        lectures: section.lectures.map((lec) => ({
+          id: lec.lectureId.toString(),
+          title: lec.title,
+          type: lec.resource.resourceType,
+          description: '',
+          completed: false,
+        })),
+      })),
+    };
+  }, [learnData]);
 
   const initialLecture = useMemo<UILecture>(() => {
     return (

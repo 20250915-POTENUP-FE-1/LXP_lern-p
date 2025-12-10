@@ -11,11 +11,11 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
-import type { LearnPageData } from '@/domains/course/types/learn';
+import type { CourseLearn } from '@/domains/course/types/learn';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 
 type CourseLearnClientProps = {
-  learnData: LearnPageData;
+  learnData: CourseLearn;
 };
 
 export default function CourseLearnClient({ learnData }: CourseLearnClientProps) {

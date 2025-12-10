@@ -1,6 +1,6 @@
-import type { LearnPageData } from '@/domains/course/types/learn';
+import type { CourseLearn } from '@/domains/course/types/learn';
 
-export const MOCK_LEARN_PAGE_DATA: LearnPageData = {
+export const MOCK_LEARN_PAGE_DATA: CourseLearn = {
   course: {
     courseId: 10,
     categories: ['프로그래밍', '프론트엔드'],
@@ -122,12 +122,13 @@ export const MOCK_LEARN_PAGE_DATA: LearnPageData = {
     ],
   },
   enrollment: {
-    id: '5001',
+    enrollmentId: '5001',
     userId: 'u-1',
     courseId: '10',
     progress: 45,
     enrolledAt: '2025-11-01T09:00:00',
     updatedAt: '2025-11-15T10:00:00',
+    status: 'ENROLLED',
   },
   progress: {
     learningRecordId: 8001,

@@ -1,6 +1,6 @@
 import { collection, getDocs, query, where, DocumentData } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-import type { EnrolledCourse } from '@/domains/user/types/enrolled';
+import type { EnrolledCourse } from '@/domains/user/types/enrollment';
 
 export async function getEnrolledCourses(userId: string): Promise<EnrolledCourse[]> {
   const enrolledSnap = await getDocs(

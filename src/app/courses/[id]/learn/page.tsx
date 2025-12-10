@@ -6,7 +6,7 @@ type LearnPageProps = {
 };
 
 export default async function CourseLearnPage({ params }: LearnPageProps) {
-  const { id } = params;
+  const { id } = await params;
   const learnData = await getLearnPageData(id);
 
   return <CourseLearnClient learnData={learnData} />;
