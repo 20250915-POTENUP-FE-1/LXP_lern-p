@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { CourseCard } from '../components/CourseCard';
-import { getAllCourses } from '../services/courseService';
+import { getAllPublishedCourses } from '../services/courseService';
 import styles from '@/app/CourseListPage.module.css';
 
 import type { Course } from '../types/course';
@@ -21,7 +21,7 @@ export default function CourseListClientPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await getAllCourses();
+        const data = await getAllPublishedCourses();
         setCourses(data as CourseWithMeta[]);
       } catch (error) {
         console.error('강좌 목록 불러오기 실패:', error);

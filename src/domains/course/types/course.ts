@@ -1,3 +1,6 @@
+import { db } from '@/shared/lib/firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+
 export type Course = {
   id: string;
   title: string;
@@ -25,6 +28,8 @@ export type Course = {
 
   sections: string[];
 };
+
+export type CourseStatus = Course['status'];
 
 export type Section = {
   id: string;
@@ -62,6 +67,15 @@ export type CourseDetailResponse = {
   lectures: Record<string, Lecture[]>;
 };
 
+export type SectionFormProps = {
+  mode: 'create' | 'edit';
+  courseId?: string;
+};
+export type CourseFormProps = {
+  mode: 'create' | 'edit';
+  courseId?: string;
+};
+
 /** 요청 DTO 쪽 네이밍 */
 export type CreateLectureRequest = {
   title: string;
@@ -82,4 +96,33 @@ export type CreateCourseRequest = {
   category: string[];
   level: string;
   price: number | string;
+};
+
+{
+  /*fetchCourseData의 반환 타입, updateCourseBasicInfo 및 saveCourseDraft의 인풋 타입*/
+}
+export type CourseDraft = {
+  title: string;
+  summary: string;
+  description: string;
+  category: string[];
+  level: string;
+  price: number | string;
+  thumbnailUrl: string;
+};
+
+{
+  /*fetchCourseWithSections 에서 사용됨??*/
+}
+export type LectureDraft = {
+  id: string;
+  title: string;
+  duration: number;
+  videoUrl: string;
+};
+
+export type SectionDraft = {
+  id: string;
+  title: string;
+  lectures: LectureDraft[];
 };
