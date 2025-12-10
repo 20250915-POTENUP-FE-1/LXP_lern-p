@@ -1,5 +1,6 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
 import type { SignUpForm } from '@/domains/auth/types/auth';
 import { signUp } from '@/domains/auth/services/authService';
@@ -33,10 +34,20 @@ export async function signUpAction(
 
   try {
     // 서버에 회원가입 요청
-    await signUp({
+    const data = await signUp({
       nickname: name,
       email,
       password,
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set('accessToken', data.accessToken, {
+      httpOnly: true,
+      path: '/',
+    });
+    cookieStore.set('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      path: '/',
     });
 
     // 성공적으로 가입 시, 성공 상태 반환
