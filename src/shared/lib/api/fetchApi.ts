@@ -1,6 +1,8 @@
+'use server';
+
 import { cookies } from 'next/headers';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export type ApiResponse<T = unknown> = {
   status: string; // HTTP 상태 코드 (예: '200', '400' 등)
@@ -23,7 +25,6 @@ export async function fetchApi<T = unknown>(
     // 쿠키에서 accessToken 꺼내기
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
-    const refreshToken = cookieStore.get('refreshToken')?.value;
 
     // 인증 헤더 설정
     const headers = {
@@ -55,24 +56,10 @@ export async function fetchApi<T = unknown>(
       });
     }
 
-    // 만약 응답이 401 (액세스 토큰 만료)일 경우
+    // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
     if (response.status === 401) {
-      // 리프레시 토큰이 있을 경우 새로 액세스 토큰을 가져오기 위한 재호출
-      if (refreshToken) {
-        // 리프레시 토큰을 사용하여 기존의 API 재호출
-        const newResponse = await fetch(`${BASE_URL}${endpoint}`, {
-          method: options.method || 'GET',
-          headers: {
-            ...headers,
-            Authorization: `Bearer ${refreshToken}`, // 리프레시 토큰을 사용하여 재시도
-          },
-          body: options.body,
-        });
-        const newResJson = await newResponse.json();
-        return newResJson.data;
-      } else {
-        throw new Error('리프레시 토큰이 만료되었습니다. 재호출 실패');
-      }
+      // 재로그인
+      throw new Error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
     }
 
     // 에러 코드 처리
