@@ -18,7 +18,7 @@ export type UserResponse = {
   email: string;
   nickname: string;
   roles: Role[];
-  createdAt: Date;
+  createdAt: string;
 };
 
 export type UpdateProfileRequest = {
