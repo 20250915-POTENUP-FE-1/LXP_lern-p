@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/domains/user/types/user';
-import { updateUserToInstructor } from '@/domains/user/services/userService';
+import { updateStudentToInstructor } from '@/domains/user/services/userService';
 import { Modal } from '@/shared/ui/Modal';
 
 type RoleRequestModalProps = {
@@ -17,16 +17,15 @@ export function RoleRequestModal({ isOpen, onClose, user }: RoleRequestModalProp
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
-    // 혹시라도 user가 null이면 바로 막기
     if (!user) return;
 
     try {
       setLoading(true);
-      // Firestore roles 업데이트 (예: ["USER", "INSTRUCTOR"])
-      await updateUserToInstructor(user.id);
+      await updateStudentToInstructor(user.id);
 
       onClose();
       router.push('/mypage');
+      router.refresh();
     } catch (err) {
       console.error('강사 권한 부여 실패:', err);
     } finally {
