@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0 0;
+  padding: 12px 16px;
 }
 
 .course-learn__header-left {
@@ -64,7 +64,6 @@
 .course-learn__main {
   flex: 1;
   padding: 16px;
-  padding-left: 0;
 }
 
 .course-learn__player-wrap {
