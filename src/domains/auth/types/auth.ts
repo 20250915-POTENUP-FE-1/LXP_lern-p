@@ -1,4 +1,4 @@
-import { Role } from 'firebase/ai';
+import { Role } from '@/domains/user/types/user';
 
 export type SignUpForm = {
   name: string;
@@ -15,7 +15,7 @@ export type LoginForm = {
 export type SignUpRequest = {
   email: string;
   password: string;
-  nickname?: string;
+  nickname: string;
 };
 
 export type SignUpResponse = {
@@ -39,4 +39,12 @@ export type LoginResponse = SignUpResponse;
 export type RoleResponse = {
   userId: string;
   roles: Role[];
+};
+
+export type SendEmailVerificationRequest = {
+  email: string;
+};
+
+export type SendEmailVerificationResponse = {
+  email: string;
 };
