@@ -18,7 +18,7 @@ export type Course = {
   studentCount: number;
 
   duration: number;
-  status: 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
+  status: 'DRAFT' | 'PUBLISHED' | 'DELETED';
 
   createdAt: string;
   updatedAt: string;
