@@ -1,6 +1,3 @@
-import { db } from '@/shared/lib/firebase/firestore';
-import { doc, getDoc } from 'firebase/firestore';
-
 export type Course = {
   id: string;
   title: string;
@@ -98,15 +95,6 @@ export type CourseDetailResponse = {
   lectures: Record<string, Lecture[]>;
 };
 
-export type SectionFormProps = {
-  mode: 'create' | 'edit';
-  courseId?: string;
-};
-export type CourseFormProps = {
-  mode: 'create' | 'edit';
-  courseId?: string;
-};
-
 export type CourseStatus = Course['status'];
 
 /** 요청 DTO 쪽 네이밍 */
@@ -151,28 +139,3 @@ export type UpdateLectureRequest = {
     fileUrl?: string;
   };
 };
-
-// 공용 API 응답 타입
-export type ApiResponse<T> = {
-  status: string;
-  code: string;
-  message: string;
-  data: T;
-};
-
-export type ApiErrorBody = {
-  status: string;
-  code: string;
-  message: string;
-};
-
-export class ApiError extends Error {
-  constructor(
-    public code: string,
-    message: string,
-    public status?: number,
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}

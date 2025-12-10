@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { CourseDraft, SectionDraft, SectionFormProps } from '../types/course';
+import { CourseDraft, SectionDraft } from '../types/course';
 import {
   buildSectionDraft,
   CourseFormState,
@@ -17,14 +17,22 @@ import {
 } from '../services/courseEditService';
 import { createDraftCourse, publishDraftCourse } from '../services/courseCreateService';
 
-export function useSectionForm({ mode, courseId }: SectionFormProps) {
+type SectionFormMode = 'create' | 'edit';
+
+export function useSectionForm() {
   const { user } = useAuthState();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams<{ id?: string }>();
+
+  const courseId = typeof params.id === 'string' ? params.id : '';
+  const mode: SectionFormMode = pathname?.includes('/edit') ? 'edit' : 'create';
 
   const [sections, setSections] = useState<SectionDraft[]>([createEmptySection()]);
   const [step1Data, setStep1Data] = useState<CourseDraft | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // data fetch/loading gate
+  const [submitting, setSubmitting] = useState(false); // final submit loading
+  const [drafting, setDrafting] = useState(false); // draft save loading
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -129,6 +137,8 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (submitting || drafting) return; // 이미 처리 중이면 중복 실행 방지
+
     if (!user) {
       // 로그인 검사 추가
       alert('로그인이 필요합니다.');
@@ -142,7 +152,7 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
 
     setError('');
     setSuccess(false);
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       const courseInput = { ...step1Data } as CourseDraft;
@@ -173,7 +183,7 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
       console.error(err);
       setError(err instanceof Error ? err.message : '강좌 등록 중 오류가 발생했습니다.');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -211,6 +221,8 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
     );
   };
   const handleDraftSave = async () => {
+    if (drafting || submitting) return; // 동시 처리 방지
+
     if (!user) {
       alert('로그인이 필요합니다.');
       return;
@@ -222,7 +234,7 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
 
     setError('');
     setSuccess(false);
-    setLoading(true);
+    setDrafting(true);
     try {
       const courseInput = { ...step1Data } as CourseDraft;
       const sectionInput = buildSectionDraft(sections);
@@ -244,7 +256,7 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
       console.error('데이터 저장 실패:', err);
       setError(err instanceof Error ? err.message : '임시 저장 중 오류가 발생했습니다.');
     } finally {
-      setLoading(false);
+      setDrafting(false);
     }
   };
 
@@ -263,6 +275,8 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
     sections,
     step1Data,
     loading,
+    submitting,
+    drafting,
     error,
     success,
     isInvalid,

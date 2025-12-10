@@ -4,11 +4,6 @@ import { ChangeEvent } from 'react';
 import { CATEGORY } from '../constants/category';
 import styles from './CourseForm.module.css';
 
-type SectionFormProps = {
-  mode: 'create' | 'edit';
-  courseId?: string;
-};
-
 type SelectCategoryProps = {
   value?: string[];
   onChange?: (value: string[]) => void;

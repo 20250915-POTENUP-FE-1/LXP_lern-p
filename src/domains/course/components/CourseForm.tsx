@@ -3,14 +3,11 @@
 import styles from './CourseForm.module.css';
 import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
-import type { CourseFormProps } from '../types/course';
 import { useCourseForm } from '../hooks/useCourseForm';
-import router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-export function CourseForm(props: CourseFormProps) {
-  const courseId = props.courseId;
-  const mode: 'create' | 'edit' = props.mode;
-
+export function CourseForm() {
+  const router = useRouter();
   const {
     formData,
     loading,
@@ -20,9 +17,8 @@ export function CourseForm(props: CourseFormProps) {
     handleFormSubmit,
     handleChange,
     handleCategoryChange,
-    handleThumbnailComplete,
-    handleCancel,
-  } = useCourseForm(props);
+    handleThumbnailUpload,
+  } = useCourseForm();
 
   return (
     <form onSubmit={handleFormSubmit} className={styles['course-form']} aria-label="강좌 등록 폼">
@@ -112,7 +108,7 @@ export function CourseForm(props: CourseFormProps) {
             <label htmlFor="thumbnail" className={styles['form__label']}>
               썸네일 <span className={styles['course-form__req']}>*</span>
             </label>
-            <ThumbnailUploader onUploadComplete={handleThumbnailComplete} />
+            <ThumbnailUploader onUploadComplete={handleThumbnailUpload} />
           </div>
 
           {/* 가격 */}
@@ -138,7 +134,7 @@ export function CourseForm(props: CourseFormProps) {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={handleCancel}
+          onClick={() => router.back()}
         >
           취소
         </button>

@@ -1,18 +1,19 @@
 'use client';
-import type { SectionFormProps } from '@/domains/course/types/course';
 import { useRouter } from 'next/navigation';
 
 import styles from './CourseForm.module.css';
 import { LectureUploader } from './LectureUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
 
-export function SectionForm(props: SectionFormProps) {
+export function SectionForm() {
   const router = useRouter();
 
   const {
     sections,
     step1Data,
     loading,
+    submitting,
+    drafting,
     error,
     success,
     isInvalid,
@@ -26,7 +27,7 @@ export function SectionForm(props: SectionFormProps) {
     handleLectureUpload,
     handleFinalSubmit,
     handlePrevStep,
-  } = useSectionForm(props);
+  } = useSectionForm();
 
   if (!step1Data) {
     return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
@@ -123,30 +124,32 @@ export function SectionForm(props: SectionFormProps) {
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
           onClick={handlePrevStep}
+          disabled={loading}
         >
           이전 단계
         </button>
         <button
           type="button"
           onClick={handleDraftSave} // 새로 만든 핸들러 연결
-          disabled={loading}
+          disabled={loading || drafting}
           className={`${styles['btn']} ${styles['btn--ghost']}`}
         >
-          임시 저장
+          {drafting ? '임시 저장 중...' : '임시 저장'}
         </button>
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
           onClick={() => router.back()}
+          disabled={loading}
         >
           취소
         </button>
         <button
           type="submit"
-          disabled={loading || isInvalid}
+          disabled={loading || submitting || isInvalid}
           className={`${styles['btn']} ${styles['btn--primary']}`}
         >
-          {loading ? '등록 중...' : '등록하기'}
+          {submitting ? '등록 중...' : '등록하기'}
         </button>
       </div>
       {success && <p style={{ color: 'green' }}>강좌가 성공적으로 등록되었습니다!</p>}

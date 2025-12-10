@@ -114,7 +114,7 @@
 }
 
 .upload__preview {
-  width: 50%;
+  width: 100%;
   aspect-ratio: 16 / 11;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);

@@ -1,18 +1,22 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
 
-import type { CourseFormProps } from '../types/course';
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
 import { fetchCourseData, updateDraftCourse } from '../services/courseEditService';
 
-export function useCourseForm({ mode, courseId }: CourseFormProps) {
+type CourseFormMode = 'create' | 'edit';
+
+export function useCourseForm() {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuthState();
+  const params = useParams<{ id?: string }>();
 
+  const courseId = typeof params.id === 'string' ? params.id : '';
+  const mode: CourseFormMode = pathname?.includes('/edit') ? 'edit' : 'create';
   const [formData, setFormData] = useState<CourseFormState>({
     title: '',
     summary: '',
@@ -45,7 +49,7 @@ export function useCourseForm({ mode, courseId }: CourseFormProps) {
     }));
   };
 
-  const handleThumbnailComplete = (url: string) => {
+  const handleThumbnailUpload = (url: string) => {
     setFormData((prev) => ({
       ...prev,
       thumbnailUrl: url,
@@ -136,10 +140,6 @@ export function useCourseForm({ mode, courseId }: CourseFormProps) {
     }
   }, [mode, courseId]);
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   return {
     formData,
     loading,
@@ -149,7 +149,6 @@ export function useCourseForm({ mode, courseId }: CourseFormProps) {
     handleFormSubmit,
     handleChange,
     handleCategoryChange,
-    handleThumbnailComplete,
-    handleCancel,
+    handleThumbnailUpload,
   };
 }
