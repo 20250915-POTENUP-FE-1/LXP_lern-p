@@ -1,31 +1,36 @@
 import { CourseDraft, CreateSectionRequest, LectureDraft, SectionDraft } from '../types/course';
 
+// 공통 ID 생성 유틸
+const generateId = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : String(Date.now() + Math.random());
+
 export const createEmptyLecture = (): LectureDraft => ({
-  id:
-    typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : String(Date.now() + Math.random()),
+  id: generateId(),
   title: '',
   duration: 0,
   videoUrl: '',
+  isPreview: false,
+  resource: {
+    resourceType: 'VIDEO',
+    isDownloadable: false,
+    fileUrl: '',
+  },
 });
 
 export const createEmptySection = (): SectionDraft => ({
-  id:
-    typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : String(Date.now() + Math.random()),
+  id: generateId(),
   title: '',
   lectures: [createEmptyLecture()],
 });
 
-export const buildSectionDraft = (sections: SectionDraft[]): CreateSectionRequest[] =>
+export const buildSectionDraft = (sections: SectionDraft[]): SectionDraft[] =>
   sections.map((section) => ({
-    title: section.title,
+    ...section,
     lectures: section.lectures.map((lecture) => ({
-      title: lecture.title,
-      videoUrl: lecture.videoUrl,
-      duration: lecture.duration,
+      ...lecture,
+      duration: Number(lecture.duration) || 0,
     })),
   }));
 

@@ -1,24 +1,21 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { CourseDraft, SectionDraft, SectionFormProps } from '../types/course';
 import {
-  buildCourseDraft,
   buildSectionDraft,
   CourseFormState,
   createEmptyLecture,
   createEmptySection,
 } from '../utils/courseDraft';
 import {
-  createCourse,
-  createDraftCourse,
   fetchCourseWithSections,
-  publishDraftCourse,
   updateDraftCourse,
   updateDraftSection,
-} from '../services/courseService';
+} from '../services/courseEditService';
+import { createDraftCourse, publishDraftCourse } from '../services/courseCreateService';
 
 export function useSectionForm({ mode, courseId }: SectionFormProps) {
   const { user } = useAuthState();
@@ -163,7 +160,7 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
       if (mode === 'create') {
         // 신규 생성 플로우: 최종적으로 'published' 상태로 변경
         await publishDraftCourse(currentDraftId);
-        alert('강좌가 성공적으로 등록 및 발행되었습니다!');
+        alert('강좌가 발행 되었습니다');
       } else if (mode === 'edit') {
         // Edit 모드: draft 상태 유지 (status 변경 없음)
         alert('강좌가 임시 저장되었습니다.');
@@ -234,7 +231,6 @@ export function useSectionForm({ mode, courseId }: SectionFormProps) {
       if (mode === 'create' && !currentDraftId) {
         currentDraftId = await createDraftCourse(user, courseInput);
       } else if (currentDraftId) {
-        // 기존 Draft 수정
         await updateDraftCourse(currentDraftId, courseInput);
       } else {
         throw new Error('처리할 수 없는 Draft 상태입니다.');

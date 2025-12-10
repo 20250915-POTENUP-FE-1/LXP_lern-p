@@ -3,9 +3,10 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
-import { createDraftCourse, fetchCourseData, updateDraftCourse } from '../services/courseService';
+
 import type { CourseFormProps } from '../types/course';
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
+import { fetchCourseData, updateDraftCourse } from '../services/courseEditService';
 
 export function useCourseForm({ mode, courseId }: CourseFormProps) {
   const router = useRouter();
@@ -105,7 +106,7 @@ export function useCourseForm({ mode, courseId }: CourseFormProps) {
           setFormData({
             ...data,
             price: data.price.toString(),
-          });
+          } as CourseFormState);
         } catch (err) {
           setError('강좌 정보를 불러오는데 실패했습니다.');
           console.error('Edit Mode 로드 실패:', err);

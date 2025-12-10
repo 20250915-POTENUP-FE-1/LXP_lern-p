@@ -29,8 +29,6 @@ export type Course = {
   sections: string[];
 };
 
-export type CourseStatus = Course['status'];
-
 export type Section = {
   id: string;
   courseId: string;
@@ -48,9 +46,36 @@ export type Lecture = {
   title: string;
   videoUrl: string;
   duration: number;
+  isPreview: boolean;
+  resource: LectureResource;
   sequence: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type CourseDraft = {
+  title: string;
+  summary: string;
+  description: string;
+  category: string[];
+  level: string;
+  price: number | string;
+  thumbnailUrl: string;
+};
+
+export type LectureDraft = {
+  id: string;
+  title: string;
+  duration: number;
+  videoUrl: string;
+  isPreview: boolean;
+  resource: LectureResource;
+};
+
+export type SectionDraft = {
+  id: string;
+  title: string;
+  lectures: LectureDraft[];
 };
 
 export type Enrollment = {
@@ -59,6 +84,12 @@ export type Enrollment = {
   courseId: string;
   progress: number;
   enrolledAt: string;
+};
+
+export type LectureResource = {
+  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+  isDownloadable: boolean;
+  fileUrl: string;
 };
 
 export type CourseDetailResponse = {
@@ -76,53 +107,72 @@ export type CourseFormProps = {
   courseId?: string;
 };
 
+export type CourseStatus = Course['status'];
+
 /** 요청 DTO 쪽 네이밍 */
-export type CreateLectureRequest = {
-  title: string;
-  videoUrl?: string;
-  duration: number;
-};
-
-export type CreateSectionRequest = {
-  title: string;
-  lectures: CreateLectureRequest[];
-};
-
 export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
   thumbnailUrl: string;
-  category: string[];
-  level: string;
+  categoryId: number;
   price: number | string;
+  courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+};
+export type UpdateCourseRequest = CreateCourseRequest;
+
+export type CreateSectionRequest = {
+  title: string;
+  orderIndex: number;
+};
+export type UpdateSectionRequest = {
+  title: string;
+  orderIndex: number;
 };
 
-{
-  /*fetchCourseData의 반환 타입, updateCourseBasicInfo 및 saveCourseDraft의 인풋 타입*/
+export type CreateLectureRequest = {
+  title: string;
+  totalDurationSeconds: number;
+  isPreview: boolean;
+  orderIndex: number;
+  resource: {
+    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    isDownloadable: boolean;
+    fileUrl?: string;
+  };
+};
+
+export type UpdateLectureRequest = {
+  title: string;
+  totalDurationSeconds: number;
+  isPreview: boolean;
+  resource: {
+    isDownloadable: boolean;
+    fileUrl?: string;
+  };
+};
+
+// 공용 API 응답 타입
+export type ApiResponse<T> = {
+  status: string;
+  code: string;
+  message: string;
+  data: T;
+};
+
+export type ApiErrorBody = {
+  status: string;
+  code: string;
+  message: string;
+};
+
+export class ApiError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public status?: number,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
 }
-export type CourseDraft = {
-  title: string;
-  summary: string;
-  description: string;
-  category: string[];
-  level: string;
-  price: number | string;
-  thumbnailUrl: string;
-};
-
-{
-  /*fetchCourseWithSections 에서 사용됨??*/
-}
-export type LectureDraft = {
-  id: string;
-  title: string;
-  duration: number;
-  videoUrl: string;
-};
-
-export type SectionDraft = {
-  id: string;
-  title: string;
-  lectures: LectureDraft[];
-};

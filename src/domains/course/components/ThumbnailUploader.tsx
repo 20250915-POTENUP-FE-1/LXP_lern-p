@@ -27,7 +27,7 @@ export function ThumbnailUploader({ onUploadComplete }: ThumbnailUploaderProps) 
   return (
     <aside className={styles['upload-card']}>
       {thumbnailUrl && (
-        <div className={styles['upload__preview']}>
+        <div className={styles['upload__preview_img']}>
           <Image src={thumbnailUrl} alt="썸네일 미리보기" width={320} height={200} />
         </div>
       )}
