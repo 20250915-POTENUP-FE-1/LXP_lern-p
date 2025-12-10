@@ -1,4 +1,3 @@
-// src/domains/course/mocks/learn.mock.ts
 import type { LearnPageData } from '@/domains/course/types/learn';
 
 export const MOCK_LEARN_PAGE_DATA: LearnPageData = {

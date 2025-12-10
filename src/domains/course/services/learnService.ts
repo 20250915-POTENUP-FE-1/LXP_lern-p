@@ -1,16 +1,14 @@
-// src/domains/course/services/learnService.ts
 import { MOCK_LEARN_PAGE_DATA } from '@/domains/course/mocks/learn.mock';
-import type { LearnCourse, LearnPageData } from '@/domains/course/types/learn';
+import type {
+  LearnCourse,
+  LearnPageData,
+  CourseDetailResponse,
+  EnrollmentListResponse,
+  ProgressResponse,
+} from '@/domains/course/types/learn';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
-type CourseDetailResponse = {
-  status: string;
-  code: string;
-  message: string;
-  data: LearnCourse;
-};
 
 async function fetchCourse(courseId: string): Promise<LearnCourse> {
   const res = await fetch(`${API_BASE}/api/courses/${courseId}`, {
@@ -24,24 +22,6 @@ async function fetchCourse(courseId: string): Promise<LearnCourse> {
   const json: CourseDetailResponse = await res.json();
   return json.data;
 }
-
-type EnrollmentListItem = LearnPageData['enrollment'] & {
-  enrollmentId: number;
-  courseId: number;
-};
-
-type EnrollmentListResponse = {
-  status: string;
-  code: string;
-  message: string;
-  data: {
-    content: EnrollmentListItem[];
-    totalElements: number;
-    totalPages: number;
-    pageNumber: number;
-    pageSize: number;
-  };
-};
 
 async function fetchEnrollmentByCourseId(
   courseId: number,
@@ -59,13 +39,6 @@ async function fetchEnrollmentByCourseId(
 
   return matched ?? null;
 }
-
-type ProgressResponse = {
-  status: string;
-  code: string;
-  message: string;
-  data: LearnPageData['progress'];
-};
 
 async function fetchProgressByEnrollmentId(
   enrollmentId: number,
