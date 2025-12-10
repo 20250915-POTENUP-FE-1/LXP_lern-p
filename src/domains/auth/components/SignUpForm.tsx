@@ -8,7 +8,6 @@ import styles from '@/app/(auth)/AuthPages.module.css';
 import { useModal } from '@/shared/hooks/useModal';
 import { validateSignUp } from '@/domains/auth/utils/validateSignUp';
 import type { SignUpForm as SignUpFormValues } from '@/domains/auth/types/auth';
-import { login } from '@/domains/auth/services/authService';
 import { signUpAction, type SignUpActionState } from '../actions/signUpAction';
 import { LoginModal } from './LoginModal';
 
@@ -16,16 +15,6 @@ const initialState: SignUpActionState = {
   error: '',
   success: false,
 };
-
-function SubmitButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-
-  return (
-    <button type="submit" className={styles['form__submit']} disabled={pending || disabled}>
-      {pending ? '가입 중...' : '회원가입'}
-    </button>
-  );
-}
 
 export function SignUpForm() {
   const router = useRouter();
@@ -39,6 +28,8 @@ export function SignUpForm() {
 
   const [clientError, setClientError] = useState<string>('');
   const [state, formAction] = useActionState(signUpAction, initialState);
+
+  const { pending } = useFormStatus();
 
   const loginModal = useModal(false);
 
@@ -73,25 +64,13 @@ export function SignUpForm() {
     formData.passwordConfirm.length > 0 &&
     formData.password !== formData.passwordConfirm;
 
-  // 서버 액션 성공 후 자동 로그인 + 홈 이동
+  // 서버 액션 성공 후 홈 이동
   useEffect(() => {
     if (!state.success) return;
 
-    (async () => {
-      try {
-        await login({
-          email: formData.email,
-          password: formData.password,
-        });
-        router.push('/');
-      } catch (err) {
-        console.error(err);
-        // 원하면 여기서 안내 문구도 추가 가능
-        // setClientError('회원가입은 완료되었지만 자동 로그인에 실패했습니다. 로그인 페이지에서 다시 로그인해주세요.');
-        router.push('/signin');
-      }
-    })();
-  }, [state.success, formData.email, formData.password, router]);
+    router.push('/');
+    // router.refresh(); // 필요하면
+  }, [state.success, router]);
 
   return (
     <>
@@ -133,7 +112,6 @@ export function SignUpForm() {
             placeholder="you@example.com"
           />
         </div>
-
         <div className={styles['form__group']}>
           <label htmlFor="password" className={styles['form__label']}>
             비밀번호
@@ -173,7 +151,9 @@ export function SignUpForm() {
           </p>
         )}
 
-        <SubmitButton disabled={isInvalid} />
+        <button type="submit" className={styles['form__submit']} disabled={pending || isInvalid}>
+          {pending ? '가입 중...' : '회원가입'}
+        </button>
       </form>
 
       <div className={styles['auth-page__actions']}>
