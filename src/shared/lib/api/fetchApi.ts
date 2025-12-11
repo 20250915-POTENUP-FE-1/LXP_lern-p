@@ -128,7 +128,7 @@ export async function deleteApi<T = unknown>(endpoint: string): Promise<T> {
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function patchApi<T = unknown>(endpoint: string, data: unknown): Promise<T> {
+export async function patchApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'PATCH',
     body: JSON.stringify(data),
