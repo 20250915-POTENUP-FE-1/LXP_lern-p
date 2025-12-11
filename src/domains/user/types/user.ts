@@ -29,7 +29,7 @@ export type UpdateProfileResponse = {
   nickname: string;
 };
 
-export type updateStudentToInstructorResponse = {
-  userId: string;
+export type UpdateStudentToInstructorResponse = {
+  id: string;
   roles: Role[];
 };

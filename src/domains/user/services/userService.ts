@@ -1,7 +1,7 @@
 import type {
   UpdateProfileRequest,
   UpdateProfileResponse,
-  updateStudentToInstructorResponse,
+  UpdateStudentToInstructorResponse,
   UserResponse,
 } from '@/domains/user/types/user';
 import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
@@ -24,10 +24,6 @@ export const updateProfile = async ({
 
 /** 수강생 -> 강사
  */
-export const updateStudentToInstructor = async (
-  userId: string,
-): Promise<updateStudentToInstructorResponse> => {
-  return await postApi<updateStudentToInstructorResponse>(
-    `/api/admin/users/${userId}/roles/instructor`,
-  );
+export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstructorResponse> => {
+  return await postApi<UpdateStudentToInstructorResponse>(`/api/users/me/roles/instructor`);
 };

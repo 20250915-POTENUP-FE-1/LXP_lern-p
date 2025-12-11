@@ -21,7 +21,7 @@ export function RoleRequestModal({ isOpen, onClose, user }: RoleRequestModalProp
 
     try {
       setLoading(true);
-      await updateStudentToInstructor(user.id);
+      await updateStudentToInstructor();
 
       onClose();
       router.push('/mypage');

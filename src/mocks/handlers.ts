@@ -10,7 +10,7 @@ import type {
 import type {
   UpdateProfileRequest,
   UpdateProfileResponse,
-  updateStudentToInstructorResponse,
+  UpdateStudentToInstructorResponse,
   UserResponse,
 } from '@/domains/user/types/user';
 import type { ApiResponse } from '@/shared/lib/api/fetchApi';
@@ -209,23 +209,21 @@ export const handlers = [
   ),
 
   // --- 수강생 → 강사 전환 (인증 필요, 관리자 or 본인 가정) ---
-  http.post<PathParams, null, ApiResponse<updateStudentToInstructorResponse>>(
-    `${BASE_URL}/api/admin/users/:userId/roles/instructor`,
-    async ({ request, params }) => {
-      const authError = requireAuth<updateStudentToInstructorResponse>(request);
+  http.post<PathParams, null, ApiResponse<UpdateStudentToInstructorResponse>>(
+    `${BASE_URL}/api/users/me/roles/instructor`,
+    async ({ request }) => {
+      const authError = requireAuth<UpdateStudentToInstructorResponse>(request);
       if (authError) return authError;
 
-      const { userId } = params;
-
-      const data: updateStudentToInstructorResponse = {
-        userId: userId as string,
+      const data: UpdateStudentToInstructorResponse = {
+        id: mockUser.id,
         roles: ['STUDENT', 'INSTRUCTOR'],
       };
 
       mockUser.roles = ['STUDENT', 'INSTRUCTOR'];
 
-      return HttpResponse.json<ApiResponse<updateStudentToInstructorResponse>>(
-        ok<updateStudentToInstructorResponse>(data),
+      return HttpResponse.json<ApiResponse<UpdateStudentToInstructorResponse>>(
+        ok<UpdateStudentToInstructorResponse>(data),
         {
           status: 200,
           headers: {
