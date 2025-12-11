@@ -1,5 +1,7 @@
+import { Role } from '@/domains/user/types/user';
+
 export type SignUpForm = {
-  name: string;
+  nickname: string;
   email: string;
   password: string;
   passwordConfirm: string;
@@ -10,15 +12,39 @@ export type LoginForm = {
   password: string;
 };
 
-/** 회원가입 요청에 사용할 Request 타입 */
 export type SignUpRequest = {
   email: string;
   password: string;
-  displayName?: string;
+  nickname: string;
 };
 
-/** 로그인 요청에 사용할 Request 타입 */
+export type SignUpResponse = {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+  user: {
+    nickname: string;
+    roles: Role[];
+  };
+};
+
 export type LoginRequest = {
   email: string;
   password: string;
+};
+
+export type LoginResponse = SignUpResponse;
+
+export type RoleResponse = {
+  userId: string;
+  roles: Role[];
+};
+
+export type SendEmailVerificationRequest = {
+  email: string;
+};
+
+export type SendEmailVerificationResponse = {
+  email: string;
 };
