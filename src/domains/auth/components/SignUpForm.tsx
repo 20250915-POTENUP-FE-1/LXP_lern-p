@@ -20,7 +20,7 @@ export function SignUpForm() {
   const router = useRouter();
 
   const [formData, setFormData] = useState<SignUpFormValues>({
-    name: '',
+    nickname: '',
     email: '',
     password: '',
     passwordConfirm: '',
@@ -85,11 +85,11 @@ export function SignUpForm() {
             닉네임
           </label>
           <input
-            id="name"
-            name="name"
+            id="nickname"
+            name="nickname"
             type="text"
             className={styles['form__control']}
-            value={formData.name}
+            value={formData.nickname}
             onChange={handleChange}
             autoComplete="nickname"
             placeholder="예: lernP_lover"

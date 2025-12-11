@@ -3,7 +3,7 @@ export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
 export type User = {
   id: string;
   email: string;
-  name: string;
+  nickname: string;
   roles: Role[];
   cart: string[];
   enrolledCourses: string[];
@@ -19,15 +19,14 @@ export type UserResponse = {
   nickname: string;
   roles: Role[];
   createdAt: string;
+  updatedAt: string;
 };
 
 export type UpdateProfileRequest = {
   nickname: string;
 };
 
-export type UpdateProfileResponse = {
-  nickname: string;
-};
+export type UpdateProfileResponse = UserResponse;
 
 export type UpdateStudentToInstructorResponse = {
   id: string;

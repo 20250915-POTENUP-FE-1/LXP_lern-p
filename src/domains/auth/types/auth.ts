@@ -1,7 +1,7 @@
 import { Role } from '@/domains/user/types/user';
 
 export type SignUpForm = {
-  name: string;
+  nickname: string;
   email: string;
   password: string;
   passwordConfirm: string;

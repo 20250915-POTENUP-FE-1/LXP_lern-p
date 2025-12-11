@@ -154,7 +154,7 @@ export const createCourse = async (
       description: courseData.description,
       thumbnailUrl: courseData.thumbnailUrl,
       instructorId: user.id,
-      instructorName: user.name,
+      instructorName: user.nickname,
       category: courseData.category,
       level: courseData.level,
       tags: [courseData.level || '', courseData.category?.[2] || ''],

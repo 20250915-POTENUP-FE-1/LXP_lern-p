@@ -56,7 +56,8 @@ const mockUser: UserResponse = {
   email: 'mock@test.com',
   nickname: '모킹테스트',
   roles: ['STUDENT'],
-  createdAt: '2025-12-01T10:20:30',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 };
 
 export const handlers = [
@@ -177,11 +178,11 @@ export const handlers = [
       const body = await request.json();
       const { nickname } = body;
 
-      const data: UpdateProfileResponse = { nickname };
       mockUser.nickname = nickname;
+      mockUser.updatedAt = new Date().toISOString();
 
       return HttpResponse.json<ApiResponse<UpdateProfileResponse>>(
-        ok<UpdateProfileResponse>(data),
+        ok<UpdateProfileResponse>(mockUser),
         {
           status: 200,
           headers: {

@@ -14,13 +14,13 @@ export async function signUpAction(
   _prevState: SignUpActionState,
   formData: FormData,
 ): Promise<SignUpActionState> {
-  const name = String(formData.get('name') ?? '');
+  const nickname = String(formData.get('nickname') ?? '');
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
   const passwordConfirm = String(formData.get('passwordConfirm') ?? '');
 
   const input: SignUpForm = {
-    name,
+    nickname,
     email,
     password,
     passwordConfirm,
@@ -35,7 +35,7 @@ export async function signUpAction(
   try {
     // 서버에 회원가입 요청
     const data = await signUp({
-      nickname: name,
+      nickname,
       email,
       password,
     });
