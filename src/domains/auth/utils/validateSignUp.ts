@@ -1,12 +1,12 @@
 import type { SignUpForm } from '../types/auth';
 
 export const validateSignUp = ({
-  name,
+  nickname,
   email,
   password,
   passwordConfirm,
 }: SignUpForm): string | null => {
-  if (!name || !email || !password) {
+  if (!nickname || !email || !password) {
     return '모든 필드를 입력해주세요.';
   }
 

@@ -1,16 +1,22 @@
 'use client';
 
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import type { FirebaseError } from 'firebase/app';
+import { useEffect, useState, useActionState, type ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
+import { useFormStatus } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { validateForm } from '@/shared/util/validateForm';
 import type { LoginForm } from '@/domains/auth/types/auth';
 import { Modal } from '@/shared/ui/Modal';
-import { login } from '@/domains/auth/services/authService';
+import { loginAction, type LoginActionState } from '@/domains/auth/actions/loginAction';
 
 type LoginModalProps = {
   isOpen: boolean;
   onClose: () => void;
+};
+
+const initialState: LoginActionState = {
+  success: false,
+  error: undefined,
 };
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
@@ -18,19 +24,26 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     email: '',
     password: '',
   });
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+
+  const [clientError, setClientError] = useState<string>('');
+  const [state, formAction] = useActionState<LoginActionState, FormData>(loginAction, initialState);
+
+  const { pending } = useFormStatus();
 
   const isInvalid = validateForm(formData);
-  const showError = (isInvalid && (formData.email || formData.password)) || !!error;
+  const showError =
+    (isInvalid && (formData.email || formData.password)) || !!clientError || !!state.error;
 
+  // 서버 액션 성공 시 모달 닫기
+  const router = useRouter();
   useEffect(() => {
-    if (isOpen) {
-      setFormData({ email: '', password: '' });
-      setError('');
-      setLoading(false);
+    if (state.success) {
+      (async () => {
+        onClose();
+        router.refresh();
+      })();
     }
-  }, [isOpen]);
+  }, [state.success, onClose]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -40,39 +53,16 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       [id]: value,
     }));
 
-    if (error) setError('');
+    if (clientError) setClientError('');
   };
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     if (isInvalid) {
-      setError('이메일과 비밀번호를 모두 입력해주세요.');
-      return;
-    }
-
-    setError('');
-    setLoading(true);
-
-    try {
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-      onClose();
-    } catch (error: unknown) {
-      const err = error as FirebaseError & { code?: string };
-
-      const message =
-        {
-          'auth/invalid-email': '올바른 이메일 형식이 아닙니다.',
-          'auth/user-not-found': '등록되지 않은 이메일입니다.',
-          'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
-        }[err.code ?? ''] ?? '로그인에 실패했습니다.';
-
-      setError(message);
-    } finally {
-      setLoading(false);
+      e.preventDefault();
+      setClientError('입력값을 다시 확인해주세요.');
+    } else {
+      setClientError('');
+      // 여기서 따로 preventDefault 안 하면 서버액션(formAction)이 호출됨
     }
   };
 
@@ -87,7 +77,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </button>
       </header>
 
-      <form className="modal__form" aria-label="로그인 폼" onSubmit={handleLogin}>
+      <form
+        className="modal__form"
+        aria-label="로그인 폼"
+        action={formAction}
+        onSubmit={handleSubmit}
+      >
         <div className="modal__body">
           <div className={`modal__field ${showError ? 'modal__field--error' : ''}`}>
             <label htmlFor="email" className="modal__label">
@@ -95,6 +90,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               className="modal__input"
               value={formData.email}
@@ -107,6 +103,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               className="modal__input"
               value={formData.password}
@@ -114,12 +111,15 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             />
           </div>
 
-          {error && <p className="modal__error-text">{error}</p>}
+          {/* 클라 에러 또는 서버 에러 표시 */}
+          {(clientError || state.error) && (
+            <p className="modal__error-text">{clientError || state.error}</p>
+          )}
         </div>
 
         <footer className="modal__actions">
-          <button type="submit" className="modal__button" disabled={loading || isInvalid}>
-            {loading ? '로그인 중...' : '로그인'}
+          <button type="submit" className="modal__button" disabled={pending || isInvalid}>
+            {pending ? '로그인 중...' : '로그인'}
           </button>
           <div className="modal__actions--bottom">
             아직 계정이 없으신가요?

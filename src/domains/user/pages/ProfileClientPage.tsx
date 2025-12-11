@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
 import { User } from 'lucide-react';
-import Link from "next/link";
+import Link from 'next/link';
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { formatUserDate } from '@/domains/user/utils/formatUserDate';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -35,7 +35,7 @@ export default function ProfilePage() {
         </div>
 
         <div className={styles['profile-section__identity']}>
-          <h2 className={styles['profile-section__name']}>{user.name}님</h2>
+          <h2 className={styles['profile-section__name']}>{user.nickname}님</h2>
           <p className={styles['profile-section__email']}>{user.email}</p>
           <p className={styles['profile-section__since']}>
             가입일: {formatUserDate(user.createdAt)}
@@ -47,7 +47,7 @@ export default function ProfilePage() {
       <div className={styles['profile-section__card']}>
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>이름</span>
-          <span className={styles['profile-section__value']}>{user.name}</span>
+          <span className={styles['profile-section__value']}>{user.nickname}</span>
         </div>
 
         <div className={styles['profile-section__divider']} />
@@ -61,9 +61,7 @@ export default function ProfilePage() {
 
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>가입일</span>
-          <span className={styles['profile-section__value']}>
-            {formatUserDate(user.createdAt)}
-          </span>
+          <span className={styles['profile-section__value']}>{formatUserDate(user.createdAt)}</span>
         </div>
       </div>
     </article>
