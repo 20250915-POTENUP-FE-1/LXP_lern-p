@@ -1,9 +1,12 @@
 import type { User } from '@/domains/user/types/user';
-import type { Course, CourseDraft, SectionDraft } from '../types/course';
+import type { Course, CourseDraftForm, SectionDraftForm } from '../types/course';
 import { API_BASE, handleResponse } from './courseService';
 import { updateDraftSection } from './courseEditService';
 
-export const createDraftCourse = async (user: User, draftData: CourseDraft): Promise<string> => {
+export const createDraftCourse = async (
+  user: User,
+  draftData: CourseDraftForm,
+): Promise<string> => {
   if (!user?.id) throw new Error('로그인이 필요합니다.');
 
   try {
@@ -41,8 +44,12 @@ export const createDraftCourse = async (user: User, draftData: CourseDraft): Pro
   }
 };
 
-export const publishDraftCourse = async (courseId: string): Promise<void> => {
+export const publishDraftCourse = async (courseId: string): Promise<boolean> => {
   if (!courseId) throw new Error('Invalid course ID');
+  const chesckCoursePublish = confirm('강좌를 발행하면 수정할 수 없습니다. 최종 발행하시겠습니까?');
+  if (!chesckCoursePublish) {
+    return false; // 사용자가 취소하면 false 반환
+  }
 
   try {
     await fetch(`${API_BASE}/courses/${courseId}`, {
@@ -53,6 +60,7 @@ export const publishDraftCourse = async (courseId: string): Promise<void> => {
         updatedAt: new Date().toISOString(),
       }),
     }).then((res) => handleResponse(res));
+    return true; // 발행 성공하면 true 반환
   } catch (err) {
     console.error('publishDraftCourse 실패:', err);
     throw new Error('강좌 발행 중 오류가 발생했습니다.');
@@ -61,8 +69,8 @@ export const publishDraftCourse = async (courseId: string): Promise<void> => {
 
 export const createCourse = async (
   user: User,
-  courseDraft: CourseDraft,
-  sectionDrafts: SectionDraft[],
+  courseDraft: CourseDraftForm,
+  sectionDrafts: SectionDraftForm[],
   shouldPublish: boolean = false,
 ): Promise<string> => {
   if (!user?.id) throw new Error('로그인이 필요합니다.');

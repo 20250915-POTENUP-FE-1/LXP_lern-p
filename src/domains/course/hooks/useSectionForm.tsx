@@ -19,7 +19,13 @@ import { createDraftCourse, publishDraftCourse } from '../services/courseCreateS
 
 type SectionFormMode = 'create' | 'edit';
 
-export function useSectionForm() {
+type UseSectionFormParams = {
+  mode?: SectionFormMode;
+  courseId?: string;
+};
+
+export function useSectionForm(options?: UseSectionFormParams) {
+  const { mode: modeProp, courseId: courseIdProp } = options ?? {};
   const { user } = useAuthState();
   const router = useRouter();
   const pathname = usePathname();
@@ -169,16 +175,21 @@ export function useSectionForm() {
 
       if (mode === 'create') {
         // 신규 생성 플로우: 최종적으로 'published' 상태로 변경
-        await publishDraftCourse(currentDraftId);
+        const publishSuccess = await publishDraftCourse(currentDraftId);
+        if (!publishSuccess) {
+          // 사용자가 confirm에서 취소한 경우 - 페이지에서 벗어나지 않고 돌아감
+          setSubmitting(false);
+          return;
+        }
         alert('강좌가 발행 되었습니다');
       } else if (mode === 'edit') {
         // Edit 모드: draft 상태 유지 (status 변경 없음)
         alert('강좌가 임시 저장되었습니다.');
       }
-
+      
       setSuccess(true);
       sessionStorage.removeItem('courseDraft_step1');
-      router.replace('/instructor/courses/');
+      router.replace(`/courses/${currentDraftId}`);
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : '강좌 등록 중 오류가 발생했습니다.');

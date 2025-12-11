@@ -6,7 +6,12 @@ import { ThumbnailUploader } from './ThumbnailUploader';
 import { useCourseForm } from '../hooks/useCourseForm';
 import { useRouter } from 'next/navigation';
 
-export function CourseForm() {
+export type CourseFormProps = {
+  mode?: 'create' | 'edit';
+  courseId?: string;
+};
+
+export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
   const router = useRouter();
   const {
     formData,

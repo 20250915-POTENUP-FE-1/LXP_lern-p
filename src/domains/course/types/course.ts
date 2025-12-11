@@ -95,6 +95,28 @@ export type CourseDetailResponse = {
   lectures: Record<string, Lecture[]>;
 };
 
+export type CreateLectureResponse = {
+  lectureId: number;
+  title: string;
+  isPreview: boolean;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+  resource: {
+    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    isDownloadable: boolean;
+    fileUrl: string;
+  };
+};
+
+export type CreateSectionResponse = {
+  sectionId: number;
+  title: string;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** 요청 DTO 쪽 네이밍 */
 export type CreateCourseRequest = {
   title: string;

@@ -65,8 +65,8 @@ export default function InstructorCoursesPage() {
 
       <div className={styles['authored']}>
         {courses.map((course) => (
-          <div className={styles['authored__item']}>
-            <Link href={`/courses/${course.id}`} key={course.id}>
+          <div key={course.id} className={styles['authored__item']}>
+            <Link href={`/courses/${course.id}`}>
               <div className={styles['authored__meta']}>
                 <h3 className={styles['authored__title']}>{course.title}</h3>
                 <p className={styles['authored__category']}>
@@ -77,9 +77,9 @@ export default function InstructorCoursesPage() {
               </div>
             </Link>
             <div className={styles['authored__actions']}>
-              <Link href={`/courses/${course.id}/edit?step=1`} className={styles['authored__btn']}>
+              {/*<Link href={`/courses/${course.id}/edit?step=1`} className={styles['authored__btn']}>
                 수정
-              </Link>
+              </Link>*/}
               <button
                 type="button"
                 className={`${styles['authored__btn']} ${styles['authored__btn--delete']}`}

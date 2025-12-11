@@ -5,7 +5,12 @@ import styles from './CourseForm.module.css';
 import { LectureUploader } from './LectureUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
 
-export function SectionForm() {
+export type SectionFormProps = {
+  mode?: 'create' | 'edit';
+  courseId?: string;
+};
+
+export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
   const router = useRouter();
 
   const {
@@ -130,20 +135,21 @@ export function SectionForm() {
         </button>
         <button
           type="button"
-          onClick={handleDraftSave} // 새로 만든 핸들러 연결
-          disabled={loading || drafting}
-          className={`${styles['btn']} ${styles['btn--ghost']}`}
-        >
-          {drafting ? '임시 저장 중...' : '임시 저장'}
-        </button>
-        <button
-          type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
           onClick={() => router.back()}
           disabled={loading}
         >
           취소
         </button>
+        {/*<button //임시저장 버튼 숨기기
+          type="button"
+          onClick={handleDraftSave} // 새로 만든 핸들러 연결
+          disabled={loading || drafting}
+          className={`${styles['btn']} ${styles['btn--ghost']} ${styles['color-gray']}`}
+        >
+          {drafting ? '임시 저장 중...' : '임시 저장'}
+        </button>*/}
+
         <button
           type="submit"
           disabled={loading || submitting || isInvalid}
