@@ -5,9 +5,9 @@ export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED'
  * 사용자가 강좌를 수강한 기록
  */
 export type Enrollment = {
-  id: number;
-  userId: number;
-  courseId: number;
+  id: string;
+  userId: string;
+  courseId: string;
   status: EnrollmentStatus;
   createdAt: string;
 };
@@ -23,4 +23,19 @@ export type EnrollmentWithCourse = Enrollment & {
     categories: string[]; // 단일 category는 도메인 상 모순
     thumbnailUrl: string | null;
   };
+};
+
+export type EnrolledCourse = {
+  id: string;
+  userId: string;
+  courseId: string;
+  progress: number;
+  createdAt: string | null;
+  updatedAt: string | null;
+  course: {
+    id: string;
+    title: string;
+    category: string | string[];
+    thumbnailUrl: string | null;
+  } | null;
 };

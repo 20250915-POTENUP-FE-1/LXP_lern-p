@@ -1,14 +1,14 @@
 import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 export type LearnLectureResource = {
-  resourceId: number;
+  resourceId: string;
   resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
   fileUrl: string;
   isDownloadable: boolean;
 };
 
 export type LearnLecture = {
-  lectureId: number;
+  lectureId: string;
   title: string;
   duration: number;
   isPreview: boolean;
@@ -17,14 +17,14 @@ export type LearnLecture = {
 };
 
 export type LearnSection = {
-  sectionId: number;
+  sectionId: string;
   title: string;
   order: number;
   lectures: LearnLecture[];
 };
 
 export type LearnCourse = {
-  courseId: number;
+  courseId: string;
   title: string;
   summary: string;
   description: string;
@@ -35,7 +35,7 @@ export type LearnCourse = {
   thumbnailUrl: string;
 
   instructor: {
-    id: number;
+    id: string;
     name: string;
     profileUrl: string;
   };
@@ -48,9 +48,10 @@ export type LearnCourse = {
 };
 
 export type LearnEnrollmentResponse = {
-  enrollmentId: number;
-  courseId: number;
-  studentId: number;
+  enrollmentId: string;
+  userId: string;
+  courseId: string;
+  studentId: string;
   status: EnrollmentStatus;
   progressRate: number;
   createdAt: string;
@@ -58,16 +59,16 @@ export type LearnEnrollmentResponse = {
 };
 
 export type LearnProgressResponse = {
-  learningRecordId: number;
-  enrollmentId: number;
+  learningRecordId: string;
+  enrollmentId: string;
   progressRate: number;
-  lastVideoId: number;
+  lastVideoId: string;
   lastWatchedDuration: number;
   updatedAt: string;
 };
 
 export type CourseLearn = {
   course: LearnCourse;
-  enrollment: LearnEnrollmentResponse | null;
-  progress: LearnProgressResponse | null;
+  enrollment: LearnEnrollmentResponse;
+  progress: LearnProgressResponse;
 };
