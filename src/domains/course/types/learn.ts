@@ -1,9 +1,8 @@
-import type { Enrollment } from '@/domains/user/types/enrollment';
+import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
-/* --------------------------------------------- */
-/* 1. Domain Models (백엔드 엔티티 그대로 사용) */
-/* --------------------------------------------- */
-
+/* ---------------------------------------------
+ * 1. Lecture / Section / Course Domain Models
+ * --------------------------------------------- */
 export type LearnLectureResource = {
   resourceId: number;
   resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -29,26 +28,42 @@ export type LearnSection = {
 
 export type LearnCourse = {
   courseId: number;
-  categories: string[];
   title: string;
   summary: string;
   description: string;
+  categories: string[];
+  level: string;
   price: number;
   status: string;
-  level: string;
   thumbnailUrl: string;
+
   instructor: {
     id: number;
     name: string;
     profileUrl: string;
   };
+
   isPurchased: boolean;
   studentCount: number;
   totalduration: number;
+
   sections: LearnSection[];
 };
 
-export type LearnProgress = {
+/* ---------------------------------------------
+ * 2. Enrollment (단건 조회)
+ * --------------------------------------------- */
+export type LearnEnrollmentResponse = {
+  enrollmentId: number;
+  courseId: number;
+  status: EnrollmentStatus;
+  expiredAt: string;
+};
+
+/* ---------------------------------------------
+ * 3. Progress (단건 조회)
+ * --------------------------------------------- */
+export type LearnProgressResponse = {
   learningRecordId: number;
   enrollmentId: number;
   progressRate: number;
@@ -57,33 +72,11 @@ export type LearnProgress = {
   updatedAt: string;
 };
 
+/* ---------------------------------------------
+ * 4. Combined Learn Page Model
+ * --------------------------------------------- */
 export type CourseLearn = {
   course: LearnCourse;
-  enrollment: Enrollment | null;
-  progress: LearnProgress | null;
+  enrollment: LearnEnrollmentResponse | null;
+  progress: LearnProgressResponse | null;
 };
-
-/* --------------------------------------------- */
-/* 2. Response DTO (data 필드만 유지)           */
-/* --------------------------------------------- */
-
-export type ApiResponse<T> = { data: T };
-
-export type CourseDetailResponse = ApiResponse<LearnCourse>;
-
-export type EnrollmentListItem = Enrollment & {
-  enrollmentId: number;
-  courseId: number;
-};
-
-export type EnrollmentListPage = {
-  content: EnrollmentListItem[];
-  totalElements: number;
-  totalPages: number;
-  pageNumber: number;
-  pageSize: number;
-};
-
-export type EnrollmentListResponse = ApiResponse<EnrollmentListPage>;
-
-export type ProgressResponse = ApiResponse<LearnProgress | null>;

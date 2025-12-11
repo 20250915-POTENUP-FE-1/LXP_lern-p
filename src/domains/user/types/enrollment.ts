@@ -8,7 +8,7 @@ export type Enrollment = {
   id: number;
   userId: number;
   courseId: number;
-  status: 'ENROLLED' | 'COMPLETED';
+  status: EnrollmentStatus;
   createdAt: string;
 };
 

@@ -1,82 +1,30 @@
-import { MOCK_LEARN_PAGE_DATA } from '@/domains/course/mocks/learn.mock';
 import type {
   LearnCourse,
-  CourseLearn,
-  CourseDetailResponse,
-  EnrollmentListResponse,
-  ProgressResponse,
+  LearnEnrollmentResponse,
+  LearnProgressResponse,
 } from '@/domains/course/types/learn';
+import { getApi } from '@/shared/lib/api/fetchApi';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_URL ?? '';
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? '';
 
-async function fetchCourse(courseId: string): Promise<LearnCourse> {
-  const res = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
+export async function getCourse(courseId: number): Promise<LearnCourse> {
+  return getApi<LearnCourse>(`${BASE_URL}/api/courses/${courseId}`, {
+    cache: 'no-store',
+  });
+}
+
+export async function getEnrollment(enrollmentId: number): Promise<LearnEnrollmentResponse | null> {
+  const res = await getApi<LearnEnrollmentResponse>(`${BASE_URL}/api/enrollments/${enrollmentId}`, {
     cache: 'no-store',
   });
 
-  if (!res.ok) {
-    throw new Error('강좌 조회에 실패했습니다.');
-  }
-
-  const json: CourseDetailResponse = await res.json();
-  return json.data;
+  return res ?? null;
 }
 
-async function fetchEnrollmentByCourseId(
-  courseId: number,
-): Promise<(CourseLearn['enrollment'] & { enrollmentId: number }) | null> {
-  const res = await fetch(`${BASE_URL}/api/enrollments?status=ENROLLED&page=1&size=50`, {
+export async function getProgress(enrollmentId: number): Promise<LearnProgressResponse | null> {
+  const res = await getApi<LearnProgressResponse>(`${BASE_URL}/api/progresses/${enrollmentId}`, {
     cache: 'no-store',
   });
 
-  if (!res.ok) {
-    return null;
-  }
-
-  const json: EnrollmentListResponse = await res.json();
-  const matched = json.data.content.find((item) => item.courseId === courseId);
-
-  return matched ?? null;
-}
-
-async function fetchProgressByEnrollmentId(
-  enrollmentId: number,
-): Promise<CourseLearn['progress'] | null> {
-  const res = await fetch(`${BASE_URL}/api/progresses/${enrollmentId}`, {
-    cache: 'no-store',
-  });
-
-  if (!res.ok) {
-    return null;
-  }
-
-  const json: ProgressResponse = await res.json();
-  return json.data;
-}
-
-export async function getLearnPageData(courseIdParam: string): Promise<CourseLearn> {
-  // 더미 모드일 경우
-  if (USE_MOCK) {
-    return MOCK_LEARN_PAGE_DATA;
-  }
-
-  const courseId = Number(courseIdParam);
-
-  const [course, enrollmentWithId] = await Promise.all([
-    fetchCourse(courseIdParam),
-    fetchEnrollmentByCourseId(courseId),
-  ]);
-
-  const progress = enrollmentWithId
-    ? await fetchProgressByEnrollmentId(enrollmentWithId.enrollmentId)
-    : null;
-
-  const { enrollmentId: _enrollmentId, ...enrollment } = enrollmentWithId ?? {};
-
-  return {
-    course,
-    enrollment: enrollmentWithId ? (enrollment as CourseLearn['enrollment']) : null,
-    progress,
-  };
+  return res ?? null;
 }
