@@ -5,7 +5,7 @@ import Image from 'next/image';
 import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {
-  value?: string | null;
+  value?: string;
   onUploadComplete?: (url: string) => void;
 };
 

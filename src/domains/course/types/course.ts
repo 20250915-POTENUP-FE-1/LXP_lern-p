@@ -179,8 +179,6 @@ export type CreateLectureResponse = {
   };
 };
 
-//===== 1. 강좌 생성/수정/발행 응답 =====
-/*
 export type CourseIdResponse = {
   courseId: number;
 };
@@ -190,7 +188,6 @@ export type PublishCourseResponse = {
   title: string;
   courseState: 'PUBLISHED' | 'DRAFT' | 'HIDDEN';
 };
-===== 2. 강좌 상세/임시 상세 조회 응답 =====
 
 export type CourseDetailApiSectionLectureResource = {
   resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
@@ -201,7 +198,7 @@ export type CourseDetailApiSectionLectureResource = {
 export type CourseDetailApiSectionLecture = {
   lectureId: number;
   title: string;
-  totalDurationSeconds?: number;  //
+  totalDurationSeconds?: number; //
   isPreview: boolean;
   orderIndex: number;
   resources: CourseDetailApiSectionLectureResource[];
@@ -210,8 +207,8 @@ export type CourseDetailApiSectionLecture = {
 export type CourseDetailApiSection = {
   sectionId: number;
   title: string;
-  order?: number;          //
-  orderIndex?: number;     // 
+  order?: number; //
+  orderIndex?: number; //
   lectures: CourseDetailApiSectionLecture[];
 };
 
@@ -239,8 +236,6 @@ export type CourseDetailApiData = {
   lastModifiedAt?: string;
 };
 
-
-
 // ===== 3. 강좌 목록 조회 응답 =====
 export type CourseListItemApi = {
   courseId: number;
@@ -262,7 +257,6 @@ export type PaginatedCoursesApi = {
   totalPages: number;
   hasNext: boolean;
 };
-
 
 // ===== 4. 섹션/강의 순서 변경 요청 =====
 
@@ -294,4 +288,3 @@ export type ApiResponse<T> = {
   message: string;
   data: T;
 };
-*/

@@ -114,7 +114,7 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
               썸네일 <span className={styles['course-form__req']}>*</span>
             </label>
             <ThumbnailUploader
-              value={formData.thumbnailUrl || null}
+              value={formData.thumbnailUrl}
               onUploadComplete={handleThumbnailUpload}
             />
           </div>
