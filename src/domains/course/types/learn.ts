@@ -13,7 +13,7 @@ export type LearnLectureResource = {
 export type LearnLecture = {
   lectureId: number;
   title: string;
-  duration: number; // seconds
+  duration: number;
   isPreview: boolean;
   orderIndex: number;
   resource: LearnLectureResource;
@@ -56,7 +56,10 @@ export type LearnCourse = {
 export type LearnEnrollmentResponse = {
   enrollmentId: number;
   courseId: number;
+  studentId: number;
   status: EnrollmentStatus;
+  progressRate: number;
+  createdAt: string;
   expiredAt: string;
 };
 
