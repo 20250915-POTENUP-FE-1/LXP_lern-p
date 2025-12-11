@@ -12,11 +12,13 @@ export const createEmptyLecture = (): LectureDraftForm => ({
   duration: 0,
   videoUrl: '',
   isPreview: false,
-  resource: {
-    resourceType: 'VIDEO',
-    isDownloadable: false,
-    fileUrl: '',
-  },
+  resource: [
+    {
+      resourceType: 'VIDEO', // 기본값은 VIDEO로 시작
+      isDownloadable: false,
+      fileUrl: '',
+    },
+  ],
 });
 
 export const createEmptySection = (): SectionDraftForm => ({

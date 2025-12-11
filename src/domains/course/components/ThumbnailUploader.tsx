@@ -1,15 +1,24 @@
 'use client';
 
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {
+  value?: string | null;
   onUploadComplete?: (url: string) => void;
 };
 
-export function ThumbnailUploader({ onUploadComplete }: ThumbnailUploaderProps) {
+export function ThumbnailUploader({ value, onUploadComplete }: ThumbnailUploaderProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (value) {
+      setThumbnailUrl(value);
+    } else {
+      setThumbnailUrl(null);
+    }
+  }, [value]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

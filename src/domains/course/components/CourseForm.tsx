@@ -113,7 +113,10 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
             <label htmlFor="thumbnail" className={styles['form__label']}>
               썸네일 <span className={styles['course-form__req']}>*</span>
             </label>
-            <ThumbnailUploader onUploadComplete={handleThumbnailUpload} />
+            <ThumbnailUploader
+              value={formData.thumbnailUrl || null}
+              onUploadComplete={handleThumbnailUpload}
+            />
           </div>
 
           {/* 가격 */}

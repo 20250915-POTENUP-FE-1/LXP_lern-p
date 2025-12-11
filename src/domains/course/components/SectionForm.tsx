@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 
 import styles from './CourseForm.module.css';
-import { LectureUploader } from './LectureUploader';
+import { ResourceUploader } from './ResourceUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
 
 export type SectionFormProps = {
@@ -74,6 +74,23 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                 {section.lectures.map((lecture) => (
                   <li key={lecture.id} className={styles['lecture-list__item']}>
                     <div className={styles['lecture-list__edit-group']}>
+                      <ResourceUploader
+                        initialValue={
+                          lecture.resource[0]
+                            ? {
+                                resourceType: lecture.resource[0].resourceType,
+                                fileUrl: lecture.resource[0].fileUrl,
+                                isDownloadable: lecture.resource[0].isDownloadable,
+                                duration: lecture.duration,
+                                fileName: undefined, // 나중에 확장 가능
+                              }
+                            : undefined
+                        }
+                        onUploadComplete={(result) =>
+                          handleLectureUpload(section.id, lecture.id, result)
+                        }
+                      />
+
                       <input
                         type="text"
                         value={lecture.title}
@@ -84,12 +101,6 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                         placeholder="강의 제목 입력"
                       />
                     </div>
-
-                    <LectureUploader
-                      onUploadComplete={({ videoUrl, duration }) =>
-                        handleLectureUpload(section.id, lecture.id, { videoUrl, duration })
-                      }
-                    />
 
                     <button
                       type="button"
@@ -128,7 +139,10 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={handlePrevStep}
+          onClick={() => {
+            sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
+            handlePrevStep();
+          }}
           disabled={loading}
         >
           이전 단계

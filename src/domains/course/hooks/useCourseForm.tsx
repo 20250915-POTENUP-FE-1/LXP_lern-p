@@ -136,6 +136,7 @@ export function useCourseForm() {
         }
       } else {
         sessionStorage.removeItem('courseDraft_step1');
+        sessionStorage.removeItem('courseDraft_step2');
       }
     }
   }, [mode, courseId]);

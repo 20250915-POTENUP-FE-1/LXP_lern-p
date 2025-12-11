@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { CourseDraftForm, SectionDraftForm } from '../types/course';
+import { CourseDraftForm, LectureResource, SectionDraftForm } from '../types/course';
 import {
   buildSectionDraft,
   CourseFormState,
@@ -16,6 +16,8 @@ import {
   updateDraftSection,
 } from '../services/courseEditService';
 import { createDraftCourse, publishDraftCourse } from '../services/courseCreateService';
+import { UploadResult } from '../components/ResourceUploader';
+import router from 'next/router';
 
 type SectionFormMode = 'create' | 'edit';
 
@@ -41,17 +43,39 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const [drafting, setDrafting] = useState(false); // draft save loading
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   const structureInvalid =
     sections.length === 0 ||
-    sections.some(
-      (section) =>
-        !section.title.trim() ||
-        section.lectures.length === 0 ||
-        section.lectures.some(
-          (lecture) => !lecture.title.trim() || !lecture.videoUrl || !lecture.videoUrl.trim(),
-        ),
-    );
+    sections.some((section) => {
+      if (!section.title.trim()) return true;
+      if (section.lectures.length === 0) return true;
+
+      return section.lectures.some((lecture) => {
+        if (!lecture.title.trim()) return true;
+        const videoUrl = lecture.videoUrl?.trim();
+
+        const resources = lecture.resource ?? [];
+        const primaryResource = Array.isArray(resources) ? resources[0] : resources;
+
+        const resourceType = primaryResource?.resourceType;
+        const fileUrl = primaryResource?.fileUrl?.trim();
+
+        // VIDEO일 때: videoUrl 필수
+        if (resourceType === 'VIDEO') {
+          return !videoUrl;
+        }
+
+        // 문서(PDF/DOC/ZIP)일 때: fileUrl 필수
+        if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP') {
+          return !fileUrl;
+        }
+
+        // 예외 처리(정의되지 않은 타입) → invalid
+        return true;
+      });
+    });
+
   const isInvalid = structureInvalid;
 
   const [formData, setFormData] = useState<CourseFormState>({
@@ -64,6 +88,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
     thumbnailUrl: '',
   });
   useEffect(() => {
+    if (initialized) return;
     const load = async () => {
       if (mode === 'edit') {
         if (!courseId) {
@@ -83,6 +108,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
           );
         } finally {
           setLoading(false);
+          setInitialized(true);
         }
       } else {
         if (typeof window === 'undefined') return;
@@ -99,11 +125,22 @@ export function useSectionForm(options?: UseSectionFormParams) {
           console.error('Failed to parse saved step 1 data:', err);
           router.replace('/courses/create?step=1');
         }
+
+        const savedStep2Data = sessionStorage.getItem('courseDraft_step2');
+        if (savedStep2Data) {
+          try {
+            const parsedSections: SectionDraftForm[] = JSON.parse(savedStep2Data);
+            setSections(parsedSections);
+          } catch (err) {
+            console.error('Failed to parse saved step 2 data:', err);
+          }
+        }
+        setInitialized(true);
       }
     };
 
     load();
-  }, [mode, courseId, router]);
+  }, [mode, courseId, router, initialized]);
 
   const handleSectionAdd = () => {
     setSections((prev) => [...prev, createEmptySection()]);
@@ -186,7 +223,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
         // Edit 모드: draft 상태 유지 (status 변경 없음)
         alert('강좌가 임시 저장되었습니다.');
       }
-      
+
       setSuccess(true);
       sessionStorage.removeItem('courseDraft_step1');
       router.replace(`/courses/${currentDraftId}`);
@@ -214,25 +251,43 @@ export function useSectionForm(options?: UseSectionFormParams) {
       ),
     );
   };
-
-  const handleLectureUpload = (
-    sectionId: string,
-    lectureId: string,
-    payload: { videoUrl: string; duration: number },
-  ) => {
+  const handleLectureUpload = (sectionId: string, lectureId: string, result: UploadResult) => {
     setSections((prev) =>
-      prev.map((s) =>
-        s.id === sectionId
-          ? {
-              ...s,
-              lectures: s.lectures.map((l) => (l.id === lectureId ? { ...l, ...payload } : l)),
-            }
-          : s,
+      prev.map((section) =>
+        section.id !== sectionId
+          ? section
+          : {
+              ...section,
+              lectures: section.lectures.map((lecture) => {
+                if (lecture.id !== lectureId) return lecture;
+
+                const isVideo = result.resourceType === 'VIDEO';
+
+                const newResource: LectureResource = {
+                  resourceType: result.resourceType,
+                  isDownloadable: isVideo ? false : result.isDownloadable,
+                  fileUrl: result.fileUrl,
+                };
+
+                const nextDuration =
+                  isVideo && result.duration != null ? result.duration : lecture.duration;
+
+                const nextVideoUrl = isVideo ? result.fileUrl : lecture.videoUrl;
+
+                return {
+                  ...lecture,
+                  duration: nextDuration,
+                  videoUrl: nextVideoUrl,
+                  resource: [newResource],
+                };
+              }),
+            },
       ),
     );
   };
+
   const handleDraftSave = async () => {
-    if (drafting || submitting) return; // 동시 처리 방지
+    if (submitting) return; // 동시 처리 방지
 
     if (!user) {
       alert('로그인이 필요합니다.');
@@ -272,15 +327,20 @@ export function useSectionForm(options?: UseSectionFormParams) {
   };
 
   const handlePrevStep = () => {
+    sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
+
     if (mode === 'edit' && courseId) {
-      // 임시 수정 후 이전단계
       router.push(`/courses/${courseId}/edit?step=1`);
     } else {
-      // 신규 생성 플로우
       router.push('/courses/create?step=1&from=section');
     }
   };
 
+  useEffect(() => {
+    if (mode !== 'create') return;
+    if (!initialized) return;
+    sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
+  }, [sections, mode, initialized]);
   return {
     user,
     sections,

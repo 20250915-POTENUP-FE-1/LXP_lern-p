@@ -1,8 +1,14 @@
-import type { Section, Lecture, SectionDraft, CourseDraft } from '../types/course';
+import type {
+  Section,
+  Lecture,
+  CourseDraftForm,
+  SectionDraftForm,
+  LectureResource,
+} from '../types/course';
 import { API_BASE, handleResponse, getCourse } from './courseService';
 
 // ===== 6. 임시 강좌 기본 정보 수정 =====
-export const updateDraftCourse = async (courseId: string, data: CourseDraft): Promise<void> => {
+export const updateDraftCourse = async (courseId: string, data: CourseDraftForm): Promise<void> => {
   if (!courseId) throw new Error('Invalid course ID');
 
   try {
@@ -31,7 +37,7 @@ export const updateDraftCourse = async (courseId: string, data: CourseDraft): Pr
 // ===== 7. 섹션/강의 전체 갈아끼우기 =====
 export const updateDraftSection = async (
   courseId: string,
-  sectionDrafts: SectionDraft[],
+  sectionDrafts: SectionDraftForm[],
 ): Promise<void> => {
   if (!courseId) throw new Error('Invalid course ID');
 
@@ -84,6 +90,15 @@ export const updateDraftSection = async (
       for (let j = 0; j < secDraft.lectures.length; j++) {
         const lecDraft = secDraft.lectures[j];
 
+        const primaryResource: LectureResource =
+          lecDraft.resource && lecDraft.resource.length > 0
+            ? lecDraft.resource[0]
+            : {
+                resourceType: 'VIDEO',
+                isDownloadable: false,
+                fileUrl: lecDraft.videoUrl || '',
+              };
+
         const lectureRes = await fetch(`${API_BASE}/lectures`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -94,11 +109,7 @@ export const updateDraftSection = async (
             videoUrl: lecDraft.videoUrl || '',
             duration: lecDraft.duration || 0,
             isPreview: lecDraft.isPreview || false,
-            resource: lecDraft.resource || {
-              resourceType: 'VIDEO',
-              isDownloadable: false,
-              fileUrl: lecDraft.videoUrl || '',
-            },
+            resource: primaryResource,
             sequence: j + 1,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -136,8 +147,8 @@ export const updateDraftSection = async (
 export const fetchCourseWithSections = async (
   courseId: string,
 ): Promise<{
-  courseDraft: CourseDraft;
-  sectionDrafts: SectionDraft[];
+  courseDraft: CourseDraftForm;
+  sectionDrafts: SectionDraftForm[];
 }> => {
   const { course, sections, lectures } = await getCourse(courseId);
 
@@ -145,7 +156,7 @@ export const fetchCourseWithSections = async (
     throw new Error('강좌 정보를 찾을 수 없습니다.');
   }
 
-  const courseDraft: CourseDraft = {
+  const courseDraft: CourseDraftForm = {
     title: course.title,
     summary: course.summary,
     description: course.description,
@@ -155,27 +166,34 @@ export const fetchCourseWithSections = async (
     price: course.price,
   };
 
-  const sectionDrafts: SectionDraft[] = sections.map((sec) => ({
+  const sectionDrafts: SectionDraftForm[] = sections.map((sec) => ({
     id: sec.id,
     title: sec.title,
-    lectures: (lectures[sec.id] || []).map((lec) => ({
-      id: lec.id,
-      title: lec.title,
-      duration: lec.duration,
-      videoUrl: lec.videoUrl,
-      isPreview: lec.isPreview || false,
-      resource: lec.resource || {
+    lectures: (lectures[sec.id] || []).map((lec) => {
+      const baseResource = lec.resource ?? {
         resourceType: 'VIDEO',
         isDownloadable: false,
         fileUrl: lec.videoUrl,
-      },
-    })),
-  }));
+      };
 
+      const normalizedResources: LectureResource[] = Array.isArray(baseResource)
+        ? baseResource
+        : [baseResource];
+
+      return {
+        id: lec.id,
+        title: lec.title,
+        duration: lec.duration,
+        videoUrl: lec.videoUrl,
+        isPreview: lec.isPreview || false,
+        resource: normalizedResources,
+      };
+    }),
+  }));
   return { courseDraft, sectionDrafts };
 };
 
-export const fetchCourseData = async (courseId: string): Promise<CourseDraft> => {
+export const fetchCourseData = async (courseId: string): Promise<CourseDraftForm> => {
   const { course } = await getCourse(courseId);
 
   if (!course) {
