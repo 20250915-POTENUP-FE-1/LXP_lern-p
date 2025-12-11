@@ -7,11 +7,11 @@ import type {
   ProgressResponse,
 } from '@/domains/course/types/learn';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_URL ?? '';
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 async function fetchCourse(courseId: string): Promise<LearnCourse> {
-  const res = await fetch(`${API_BASE}/api/courses/${courseId}`, {
+  const res = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
     cache: 'no-store',
   });
 
@@ -26,7 +26,7 @@ async function fetchCourse(courseId: string): Promise<LearnCourse> {
 async function fetchEnrollmentByCourseId(
   courseId: number,
 ): Promise<(CourseLearn['enrollment'] & { enrollmentId: number }) | null> {
-  const res = await fetch(`${API_BASE}/api/enrollments?status=ENROLLED&page=1&size=50`, {
+  const res = await fetch(`${BASE_URL}/api/enrollments?status=ENROLLED&page=1&size=50`, {
     cache: 'no-store',
   });
 
@@ -43,7 +43,7 @@ async function fetchEnrollmentByCourseId(
 async function fetchProgressByEnrollmentId(
   enrollmentId: number,
 ): Promise<CourseLearn['progress'] | null> {
-  const res = await fetch(`${API_BASE}/api/progresses/${enrollmentId}`, {
+  const res = await fetch(`${BASE_URL}/api/progresses/${enrollmentId}`, {
     cache: 'no-store',
   });
 

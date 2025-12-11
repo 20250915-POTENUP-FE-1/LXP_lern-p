@@ -1,79 +1,59 @@
-'use client';
+import { useMemo, useState, useEffect } from 'react';
+import type { CourseLearn } from '@/domains/course/types/learn';
+import { getLearnPageData } from '../services/learnService';
+import { useParams } from 'next/navigation';
+import { mapLecture, mapCourse } from '../utils/formatLecture';
 
-import { useMemo, useState, useCallback } from 'react';
-import type { CourseLearn, UICourse, UILecture } from '@/domains/course/types/learn';
-export type UseCourseLearnReturn = {
-  courseData: UICourse;
-  currentLecture: UILecture;
-  openSections: string[];
-  toggleSection: (sectionId: string) => void;
-  handleLectureClick: (lecture: UILecture) => void;
-  totalLectures: number;
-  completedLectures: number;
-};
+type ProcessedLecture = ReturnType<typeof mapLecture>;
+type ProcessedCourse = ReturnType<typeof mapCourse>;
 
-export function useCourseLearn(learnData: CourseLearn): UseCourseLearnReturn {
-  const courseData = useMemo<UICourse>(() => {
-    return {
-      id: learnData.course.courseId.toString(),
-      title: learnData.course.title,
-      instructor: learnData.course.instructor.name,
-      description: learnData.course.description,
-      sections: learnData.course.sections.map((section) => ({
-        id: section.sectionId.toString(),
-        title: section.title,
-        description: '',
-        lectures: section.lectures.map((lec) => ({
-          id: lec.lectureId.toString(),
-          title: lec.title,
-          type: lec.resource.resourceType,
-          description: '',
-          completed: false,
-        })),
-      })),
-    };
+export function useCourseLearn() {
+  const [learnData, setLearnData] = useState<CourseLearn | null>(null);
+
+  const params = useParams();
+  const { id: courseId } = params;
+
+  useEffect(() => {
+    getLearnPageData(courseId as string).then(setLearnData);
+  }, [courseId]);
+
+  const courseData: ProcessedCourse | null = useMemo(() => {
+    if (!learnData) return null;
+    return mapCourse(learnData.course);
   }, [learnData]);
 
-  const initialLecture = useMemo<UILecture>(() => {
-    return (
-      courseData.sections[0]?.lectures[0] ?? {
-        id: 'placeholder',
-        title: '준비 중인 강의입니다.',
-        type: 'VIDEO',
-        description: '',
-        completed: false,
-      }
-    );
+  const [currentLecture, setCurrentLecture] = useState<ProcessedLecture | null>(null);
+
+  useEffect(() => {
+    if (!courseData) {
+      setCurrentLecture(null);
+      return;
+    }
+
+    const first = courseData.sections[0]?.lectures[0] ?? null;
+    setCurrentLecture(first);
   }, [courseData]);
 
-  const [currentLecture, setCurrentLecture] = useState<UILecture>(initialLecture);
-  const [openSections, setOpenSections] = useState<string[]>(
-    courseData.sections[0] ? [courseData.sections[0].id] : [],
-  );
+  const [openSections, setOpenSections] = useState<number[]>([]);
 
-  const toggleSection = useCallback((sectionId: string) => {
-    setOpenSections((prev) =>
-      prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId],
-    );
-  }, []);
+  const totalLectures = courseData
+    ? courseData.sections.reduce((acc, section) => acc + section.lectures.length, 0)
+    : 0;
 
-  const handleLectureClick = useCallback((lecture: UILecture) => {
-    setCurrentLecture(lecture);
-  }, []);
-
-  const totalLectures = useMemo(
-    () => courseData.sections.reduce((acc, section) => acc + section.lectures.length, 0),
-    [courseData],
-  );
-
-  const completedLectures = useMemo(
-    () =>
-      courseData.sections.reduce(
+  const completedLectures = courseData
+    ? courseData.sections.reduce(
         (acc, section) => acc + section.lectures.filter((l) => l.completed).length,
         0,
-      ),
-    [courseData],
-  );
+      )
+    : 0;
+
+  const toggleSection = (id: number) => {
+    setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
+  };
+
+  const handleLectureClick = (lecture: ProcessedLecture) => {
+    setCurrentLecture(lecture);
+  };
 
   return {
     courseData,

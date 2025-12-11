@@ -1,24 +1,20 @@
 'use client';
 
-import Link from 'next/link';
+import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
+import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
+
 import {
-  ChevronDown,
-  ChevronRight,
+  ArrowLeft,
   Play,
   FileText,
   Download,
+  ChevronDown,
+  ChevronRight,
   CheckCircle,
-  ArrowLeft,
 } from 'lucide-react';
-import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
-import type { CourseLearn } from '@/domains/course/types/learn';
-import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
+import Link from 'next/link';
 
-type CourseLearnClientProps = {
-  learnData: CourseLearn;
-};
-
-export default function CourseLearnClient({ learnData }: CourseLearnClientProps) {
+export default function CourseLearnClient() {
   const {
     courseData,
     currentLecture,
@@ -27,7 +23,11 @@ export default function CourseLearnClient({ learnData }: CourseLearnClientProps)
     handleLectureClick,
     totalLectures,
     completedLectures,
-  } = useCourseLearn(learnData);
+  } = useCourseLearn();
+
+  if (!courseData || !currentLecture) {
+    return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
+  }
 
   return (
     <div className={styles['course-learn']}>
@@ -49,9 +49,8 @@ export default function CourseLearnClient({ learnData }: CourseLearnClientProps)
       </header>
 
       <div className={styles['course-learn__layout']}>
-        {/* 메인 컨텐츠 영역 */}
+        {/* 메인 플레이어 */}
         <main className={styles['course-learn__main']}>
-          {/* 비디오/PDF 플레이어 */}
           <div className={styles['course-learn__player-wrap']}>
             {currentLecture.type === 'VIDEO' ? (
               <div className={styles['course-learn__player']}>
@@ -79,8 +78,7 @@ export default function CourseLearnClient({ learnData }: CourseLearnClientProps)
                 {currentLecture.pdfUrl && (
                   <a href={currentLecture.pdfUrl} download>
                     <button className={styles['course-learn__brand-btn']}>
-                      <Download className={styles['course-learn__icon']} />
-                      PDF 다운로드
+                      <Download className={styles['course-learn__icon']} /> PDF 다운로드
                     </button>
                   </a>
                 )}
