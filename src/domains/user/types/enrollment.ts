@@ -5,13 +5,11 @@ export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED'
  * 사용자가 강좌를 수강한 기록
  */
 export type Enrollment = {
-  enrollmentId: string;
-  userId: string;
-  courseId: string;
-  status: EnrollmentStatus;
-  progress: number; // 진도율
-  enrolledAt: string; // null 허용 안하는게 도메인적으로 맞음
-  updatedAt: string;
+  id: number;
+  userId: number;
+  courseId: number;
+  status: 'ENROLLED' | 'COMPLETED';
+  createdAt: string;
 };
 
 /**
