@@ -10,7 +10,7 @@ export type LearnLectureResource = {
 export type LearnLecture = {
   lectureId: string;
   title: string;
-  duration: number;
+  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
   resource: LearnLectureResource;
@@ -42,7 +42,7 @@ export type LearnCourse = {
 
   isPurchased: boolean;
   studentCount: number;
-  totalduration: number;
+  totalDuration: number;
 
   sections: LearnSection[];
 };
