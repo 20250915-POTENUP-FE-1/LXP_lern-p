@@ -1,8 +1,5 @@
 import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
-/* ---------------------------------------------
- * 1. Lecture / Section / Course Domain Models
- * --------------------------------------------- */
 export type LearnLectureResource = {
   resourceId: number;
   resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
