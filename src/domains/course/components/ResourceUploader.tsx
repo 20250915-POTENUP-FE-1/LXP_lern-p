@@ -63,7 +63,6 @@ export function ResourceUploader({
   const [resourceType, setResourceType] = useState<ResourceType>(
     initialValue?.resourceType ?? 'VIDEO',
   );
-  console.log('ResourceUploader - InitialValue:', initialValue);
 
   const [uploading, setUploading] = useState(false);
   const [fileName, setFileName] = useState(initialValue?.fileName ?? '');
