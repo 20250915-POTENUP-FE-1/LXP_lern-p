@@ -4,23 +4,18 @@ export function mapLecture(lec: LearnLecture) {
   const minutes = Math.floor(lec.duration / 60);
   const seconds = lec.duration % 60;
 
+  const type = lec.resource?.resourceType;
+  const fileUrl = lec.resource?.fileUrl;
+
   return {
     id: lec.lectureId,
     title: lec.title,
-    type: lec.resource.resourceType,
     duration: `${minutes}:${String(seconds).padStart(2, '0')}`,
     description: '',
     completed: false,
-    videoUrl: lec.resource.resourceType === 'VIDEO' ? lec.resource.fileUrl : undefined,
-    pdfUrl: lec.resource.resourceType === 'PDF' ? lec.resource.fileUrl : undefined,
-  };
-}
-
-export function mapSection(section: LearnSection) {
-  return {
-    id: section.sectionId,
-    title: section.title,
-    lectures: section.lectures.map(mapLecture),
+    type,
+    videoUrl: type === 'VIDEO' ? fileUrl : undefined,
+    pdfUrl: type === 'PDF' ? fileUrl : undefined,
   };
 }
 
@@ -29,5 +24,13 @@ export function mapCourse(course: LearnCourse) {
     id: course.courseId,
     title: course.title,
     sections: course.sections.map(mapSection),
+  };
+}
+
+function mapSection(section: LearnSection) {
+  return {
+    id: section.sectionId,
+    title: section.title,
+    lectures: section.lectures.map(mapLecture),
   };
 }

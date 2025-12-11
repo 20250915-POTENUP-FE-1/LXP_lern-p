@@ -1,8 +1,5 @@
 import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
-/* ---------------------------------------------
- * 1. Lecture / Section / Course Domain Models
- * --------------------------------------------- */
 export type LearnLectureResource = {
   resourceId: number;
   resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -13,7 +10,7 @@ export type LearnLectureResource = {
 export type LearnLecture = {
   lectureId: number;
   title: string;
-  duration: number; // seconds
+  duration: number;
   isPreview: boolean;
   orderIndex: number;
   resource: LearnLectureResource;
@@ -50,19 +47,16 @@ export type LearnCourse = {
   sections: LearnSection[];
 };
 
-/* ---------------------------------------------
- * 2. Enrollment (단건 조회)
- * --------------------------------------------- */
 export type LearnEnrollmentResponse = {
   enrollmentId: number;
   courseId: number;
+  studentId: number;
   status: EnrollmentStatus;
+  progressRate: number;
+  createdAt: string;
   expiredAt: string;
 };
 
-/* ---------------------------------------------
- * 3. Progress (단건 조회)
- * --------------------------------------------- */
 export type LearnProgressResponse = {
   learningRecordId: number;
   enrollmentId: number;
@@ -72,9 +66,6 @@ export type LearnProgressResponse = {
   updatedAt: string;
 };
 
-/* ---------------------------------------------
- * 4. Combined Learn Page Model
- * --------------------------------------------- */
 export type CourseLearn = {
   course: LearnCourse;
   enrollment: LearnEnrollmentResponse | null;

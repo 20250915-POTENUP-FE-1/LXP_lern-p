@@ -10,7 +10,7 @@ import type {
 } from '@/domains/course/types/learn';
 
 import { getCourse, getEnrollment, getProgress } from '../services/learnService';
-import { mapCourse, mapLecture } from '../utils/formatLecture';
+import { mapCourse, mapLecture } from '../utils/mapCourse';
 
 type ProcessedCourse = ReturnType<typeof mapCourse>;
 type ProcessedLecture = ReturnType<typeof mapLecture>;
