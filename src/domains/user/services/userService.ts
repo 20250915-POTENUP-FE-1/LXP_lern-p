@@ -1,96 +1,38 @@
-import {
-  arrayUnion,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  Timestamp,
-} from 'firebase/firestore';
-import { db } from '@/shared/lib/firebase/firestore';
-import type { User, UserResponse } from '@/domains/user/types/user';
+import type {
+  UpdateProfileRequest,
+  UpdateProfileResponse,
+  UpdateStudentToInstructorResponse,
+  UserResponse,
+} from '@/domains/user/types/user';
+import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
 
-type FirestoreUserDoc = {
-  id: string;
-  email: string | null;
-  name: string;
-  roles?: User['roles'];
-  cart?: User['cart'];
-  enrolledCourses?: User['enrolledCourses'];
-  createdCourses?: User['createdCourses'];
-  avatarUrl?: string | null;
-  createdAt?: Timestamp | ReturnType<typeof serverTimestamp> | null;
-  updatedAt?: Timestamp | ReturnType<typeof serverTimestamp> | null;
+/**
+ * 사용자 프로필 조회
+ */
+export const getUserProfile = async (): Promise<UserResponse> => {
+  return await getApi<UserResponse>(`/api/users/me`);
 };
 
-export type CreateUserProfileRequest = {
-  id: string;
-  email: string | null;
-  name: string;
-  avatarUrl?: string | null;
+/**
+ * 사용자 프로필 업데이트
+ */
+export const updateProfile = async ({
+  nickname,
+}: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
+  return await patchApi<UpdateProfileResponse>('/api/users/me', { nickname });
 };
 
-const toDateOrNow = (
-  value: Timestamp | ReturnType<typeof serverTimestamp> | null | undefined,
-): Date => {
-  if (value instanceof Timestamp) return value.toDate();
-  return new Date();
+/** 수강생 -> 강사
+ */
+export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstructorResponse> => {
+  return await patchApi<UpdateStudentToInstructorResponse>(`/api/users/me/roles/instructor`);
 };
 
-export const createUserProfile = async ({
-  id,
-  email,
-  name,
-  avatarUrl = '',
-}: CreateUserProfileRequest): Promise<void> => {
-  const userProfile: FirestoreUserDoc = {
-    id,
-    email,
-    name,
-    roles: ['USER'],
-    cart: [],
-    enrolledCourses: [],
-    createdCourses: [],
-    avatarUrl,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-
-  await setDoc(doc(db, 'users', id), userProfile);
-};
-
-export const getUserProfile = async (uid: string): Promise<UserResponse> => {
-  try {
-    const snap = await getDoc(doc(db, 'users', uid));
-    if (!snap.exists()) return null;
-
-    const data = snap.data() as FirestoreUserDoc;
-
-    const user: User = {
-      id: data.id,
-      email: data.email ?? '',
-      name: data.name,
-      roles: data.roles ?? ['USER'],
-      cart: data.cart ?? [],
-      enrolledCourses: data.enrolledCourses ?? [],
-      createdCourses: data.createdCourses ?? [],
-      avatarUrl: data.avatarUrl ?? undefined,
-      createdAt: toDateOrNow(data.createdAt),
-      updatedAt: toDateOrNow(data.updatedAt),
-    };
-
-    return user;
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-    return null;
-  }
-};
-
-export const updateUserToInstructor = async (uid: string): Promise<void> => {
-  const ref = doc(db, 'users', uid);
-
-  await updateDoc(ref, {
-    roles: arrayUnion('INSTRUCTOR'),
-    updatedAt: serverTimestamp(),
-  });
+/**
+ * 사용자 프로필 조회
+ */
+export const getProfile = async ({
+  nickname,
+}: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
+  return await patchApi<UpdateProfileResponse>('/api/users/me', { nickname });
 };

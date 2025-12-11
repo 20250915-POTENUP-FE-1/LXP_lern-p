@@ -8,7 +8,7 @@ import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { logout } from '@/domains/auth/services/authService';
+import { logoutAction } from '@/domains/auth/actions/logoutAction';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -16,7 +16,7 @@ export function Header() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const { user, loading } = useAuthState();
+  const { user, loading, clearUser } = useAuthState();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const loginModal = useModal(false);
@@ -52,8 +52,9 @@ export function Header() {
   const handleLogout = async () => {
     setMenuOpen(false);
 
-    await logout();
+    await logoutAction();
 
+    clearUser();
     // 홈으로 이동 + 상태 갱신
     router.push('/');
     router.refresh();
