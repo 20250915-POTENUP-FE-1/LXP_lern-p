@@ -5,10 +5,10 @@ import { User } from '@/domains/user/types/user';
 import { MSWProvider } from './_providers/msw-provider';
 import { AuthProvider } from './_providers/AuthProvider';
 
-if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
-  const { server } = await import('@/mocks/server');
-  server.listen();
-}
+// if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+//   const { server } = await import('@/mocks/server');
+//   server.listen();
+// }
 
 export const metadata: Metadata = {
   title: 'LernP ',
@@ -24,7 +24,7 @@ async function fetchInitialUser(): Promise<User | null> {
     const user: User = {
       id: userProfile.id,
       email: userProfile.email,
-      name: userProfile.nickname,
+      nickname: userProfile.nickname,
       roles: userProfile.roles,
       cart: [],
       enrolledCourses: [],
@@ -35,6 +35,7 @@ async function fetchInitialUser(): Promise<User | null> {
     return user;
   } catch (e) {
     // 로그인 안 되어 있거나 에러 나면 null
+    console.error(e);
     return null;
   }
 }
@@ -46,9 +47,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="ko">
       <body>
         <div id="root">
-          <MSWProvider>
+          {/* <MSWProvider>
             <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
-          </MSWProvider>
+          </MSWProvider> */}
+          <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
         </div>
         <div id="modal-root"></div>
       </body>
