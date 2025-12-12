@@ -18,8 +18,8 @@ export default function EnrollmentClientPage() {
       try {
         const page = await getEnrollmentList({
           status: 'ENROLLED',
-          page: 1,
-          size: 30,
+          page: 0,
+          size: 10,
         });
 
         setItems(page.content);

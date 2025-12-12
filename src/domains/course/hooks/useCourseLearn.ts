@@ -26,8 +26,8 @@ type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
 async function getMyEnrollmentId(courseId: string): Promise<string | null> {
   const page = await getEnrollmentList({
     status: 'ENROLLED',
-    page: 1,
-    size: 30,
+    page: 0,
+    size: 10,
   });
 
   const match = page.content.find((item) => String(item.courseId) === String(courseId));
