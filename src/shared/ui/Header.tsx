@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from 'lucide-react';
+import { ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -78,6 +78,13 @@ export function Header() {
           {/* 오른쪽: 액션 */}
           <div className={styles['header__right']}>
             <nav className={styles['header__actions']} aria-label="사용자 작업">
+              <Link
+                href="/cart"
+                className={`${styles['header__action']} ${styles['header__action--icon']}`}
+                aria-label="장바구니"
+              >
+                <ShoppingCart className={styles['header__icon']} aria-hidden="true" />
+              </Link>
               {!user && (
                 <button
                   type="button"
