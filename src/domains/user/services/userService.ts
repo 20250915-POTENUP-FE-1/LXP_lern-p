@@ -36,13 +36,3 @@ export const getProfile = async ({
 }: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
   return await patchApi<UpdateProfileResponse>('/api/users/me', { nickname });
 };
-
-/**
- * 닉네임 수정
- */
-export async function updateMyProfile(payload: { nickname?: string }) {
-  return getApi('/api/users/me', {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
-}

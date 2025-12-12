@@ -6,7 +6,7 @@ import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { formatUserDate } from '@/domains/user/utils/formatUserDate';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { useEffect, useState } from 'react';
-import { updateMyProfile } from '../services/userService';
+import { updateProfile } from '@/domains/user/services/userService';
 
 export default function ProfilePage() {
   const { user, setUser, loading } = useAuthState();
@@ -26,7 +26,7 @@ export default function ProfilePage() {
     try {
       setIsSaving(true);
 
-      await updateMyProfile({ nickname });
+      await updateProfile({ nickname });
 
       setUser({
         ...user,

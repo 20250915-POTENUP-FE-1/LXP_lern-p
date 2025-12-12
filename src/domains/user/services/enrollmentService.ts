@@ -5,10 +5,6 @@ import type {
   EnrollmentProgress,
 } from '@/domains/user/types/enrollment';
 
-import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'false';
-
 /** ===============================
  * 1) 수강 목록 조회
  * GET /api/enrollments?status=ENROLLED&page=1&size=10
@@ -18,8 +14,6 @@ export async function getEnrollmentList(params?: {
   page?: number;
   size?: number;
 }): Promise<EnrollmentListPage> {
-  if (USE_MOCK) return MOCK_ENROLLMENT_LIST;
-
   const query = new URLSearchParams({
     status: params?.status ?? 'ENROLLED',
     page: String(params?.page ?? 1),
