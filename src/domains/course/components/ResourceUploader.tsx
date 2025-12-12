@@ -133,7 +133,7 @@ export function ResourceUploader({
 formData.append('file', file);
 formData.append('resourceType', resourceType);
 
-const uploadRes = await fetch(`${API_BASE}/files`, {
+const uploadRes = await fetch(`${BASE_URL}/files`, {
   method: 'POST',
   body: formData,
 });

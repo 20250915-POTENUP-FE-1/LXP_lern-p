@@ -51,7 +51,15 @@ export type Lecture = {
   updatedAt: string;
 };
 
-// === 1. 폼타입 (UI <-> 비즈니스 로직)
+export type Category = {
+  categoryId: number;
+  name: string;
+  children: CategoryChild[];
+};
+export type CategoryChild = {
+  categoryId: number;
+  name: string;
+};
 
 // 강좌 생성/ 수정
 export type CourseDraftForm = {
@@ -61,18 +69,20 @@ export type CourseDraftForm = {
   category: string[];
   level: string;
   price: number | string;
-  thumbnailUrl: string;
+  thumbnail: string;
 };
 
 // 섹션 생성 / 수정
-export type SectionDraftForm = {
+export type SectionDraftForm = DraftMeta & {
+  localId: string;
   id: string;
   title: string;
   lectures: LectureDraftForm[];
 };
 
 // 강의 생성 / 수정
-export type LectureDraftForm = {
+export type LectureDraftForm = DraftMeta & {
+  localId: string;
   id: string;
   title: string;
   duration: number;
@@ -82,6 +92,11 @@ export type LectureDraftForm = {
 };
 
 // === 2. 내부 데이터 구조
+
+export type DraftMeta = {
+  _dirty: boolean;
+  _deleted?: boolean;
+};
 
 // 강의 리소스 타입
 export type LectureResource = {
@@ -113,8 +128,8 @@ export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
-  thumbnailUrl: string;
-  categoryId: number;
+  thumbnail: string;
+  categoryId: string;
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 };
@@ -154,10 +169,12 @@ export type UpdateLectureRequest = {
   };
 };
 
-// ==== 4. API 응답 타입 (백엔드 → 프론트)
+// 강좌 생성 응답
+export type CreateCourseResponse = CourseIdResponse;
+
 // 섹션 생성 응답
 export type CreateSectionResponse = {
-  sectionId: number;
+  sectionId: string;
   title: string;
   orderIndex: number;
   createdAt: string;
@@ -166,7 +183,7 @@ export type CreateSectionResponse = {
 
 // 강의 생성 응답
 export type CreateLectureResponse = {
-  lectureId: number;
+  lectureId: string;
   title: string;
   isPreview: boolean;
   orderIndex: number;
@@ -180,111 +197,18 @@ export type CreateLectureResponse = {
 };
 
 export type CourseIdResponse = {
-  courseId: number;
+  courseId: string;
 };
 
-export type PublishCourseResponse = {
-  id: number;
-  title: string;
-  courseState: 'PUBLISHED' | 'DRAFT' | 'HIDDEN';
-};
-
-export type CourseDetailApiSectionLectureResource = {
-  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-  fileUrl: string;
-  isDownloadable: boolean;
-};
-
-export type CourseDetailApiSectionLecture = {
-  lectureId: number;
-  title: string;
-  totalDurationSeconds?: number; //
-  isPreview: boolean;
-  orderIndex: number;
-  resources: CourseDetailApiSectionLectureResource[];
-};
-
-export type CourseDetailApiSection = {
-  sectionId: number;
-  title: string;
-  order?: number; //
-  orderIndex?: number; //
-  lectures: CourseDetailApiSectionLecture[];
-};
-
-export type CourseDetailApiData = {
-  courseId: number;
-  categories: string[];
-  title: string;
-  summary: string;
-  description: string;
-  price: number;
-  status: 'PUBLISHED' | 'DRAFT';
-  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  thumbnailUrl: string | null;
-  instructor: {
-    id: number;
-    name: string;
-    profileUrl: string;
-  };
-  isPurchased: boolean;
-  studentCount: number;
-  totalduration: number;
-  sections: CourseDetailApiSection[];
-  // 임시생성 강좌 조회용 필드
-  instructorName?: string;
-  lastModifiedAt?: string;
-};
-
-// ===== 3. 강좌 목록 조회 응답 =====
-export type CourseListItemApi = {
-  courseId: number;
-  title: string;
-  categories: string[];
-  thumbnailUrl: string | null;
-  status: 'PUBLISHED' | 'DRAFT';
-  price: number;
-  studentCount: number;
-  rating: number;
-  lastModifiedAt: string;
-};
-
-export type PaginatedCoursesApi = {
-  content: CourseListItemApi[];
-  currentPage: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  hasNext: boolean;
-};
-
-// ===== 4. 섹션/강의 순서 변경 요청 =====
+// 섹션/강의 순서 변경 요청
 
 export type ReorderSectionsRequest = {
-  sectionIds: number[];
+  sectionIds: string[];
 };
 
 export type ReorderLecturesRequest = {
   lectures: {
-    lectureId: number;
+    lectureId: string;
     orderIndex: number;
   }[];
-};
-
-// ===== 5. 강의 목록 조회 응답 =====
-export type LectureListItemApi = {
-  sectionId: number;
-  lectureId: number;
-  title: string;
-  description: string;
-  orderIndex: number;
-  createdAt: string;
-};
-
-// ===== 7. API 공통 응답 래퍼 =====
-export type ApiResponse<T> = {
-  status: string;
-  code: string;
-  message: string;
-  data: T;
 };

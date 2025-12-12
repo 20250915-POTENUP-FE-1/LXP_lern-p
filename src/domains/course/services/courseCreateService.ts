@@ -1,25 +1,21 @@
-// src/domains/course/services/courseCreateService.ts
-
-import type { User } from '@/domains/user/types/user';
 import type {
   CourseDraftForm,
   SectionDraftForm,
   CreateCourseRequest,
-  CourseIdResponse,
+  LectureResource,
+  Category,
+  CreateCourseResponse,
 } from '../types/course';
-import { updateDraftSection } from './courseEditService';
-// fetchApi 유틸 (경로는 프로젝트 구조에 맞게 수정)
-import { postApi, patchApi } from '@/shared/lib/api/fetchApi'; // 예시 경로
 
-/**
- * CourseDraftForm → CreateCourseRequest 매핑
- * - categoryId, courseLevel 매핑 로직은 백엔드 규칙에 맞게 조정 필요
- */
+import { fetchApi, getApi, postApi } from '@/shared/lib/api/fetchApi';
+import { createSection } from './sectionService';
+import { createLecture } from './lectureService';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseRequest => {
-  // TODO: 실제 카테고리 ID 매핑 로직 적용
-  const categoryId = 1; // 임시 값. 실제로는 draft.category[0]을 기준으로 매핑해야 함.
+  const categoryId = 1;
 
-  // TODO: level → courseLevel 매핑 테이블 백엔드와 합의 후 수정
   const levelMap: Record<string, CreateCourseRequest['courseLevel']> = {
     beginner: 'BEGINNER',
     intermediate: 'INTERMEDIATE',
@@ -32,96 +28,137 @@ const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseRequest =>
     title: draft.title,
     summary: draft.summary,
     description: draft.description,
-    thumbnailUrl: draft.thumbnailUrl,
-    categoryId,
+    thumbnail: draft.thumbnail,
+    categoryId: String(categoryId),
     price: draft.price,
     courseLevel: levelMap[normalizedLevel] ?? 'BEGINNER',
   };
 };
 
-/**
- * 1단계: 임시 강좌 생성 (Draft 생성)
- * - 백엔드: 강좌 생성 API (임시 상태로 생성)
- * - 응답: { data: { courseId: number } }
- */
-export const createDraftCourse = async (
-  user: User,
-  draftData: CourseDraftForm,
-): Promise<string> => {
-  if (!user?.id) throw new Error('로그인이 필요합니다.');
+const applySectionDraftsForNewCourse = async (
+  courseId: string,
+  sectionDrafts: SectionDraftForm[],
+): Promise<void> => {
+  for (let sIndex = 0; sIndex < sectionDrafts.length; sIndex++) {
+    const secDraft = sectionDrafts[sIndex];
 
-  try {
-    const requestBody = mapDraftToCreateRequest(draftData);
-
-    // 엔드포인트는 실제 백엔드 path에 맞게 수정
-    // 예: '/instructor/courses' 또는 '/api/instructor/courses'
-    const result = await postApi<CourseIdResponse>('/instructor/courses', requestBody);
-
-    // fetchApi는 data만 반환하므로 result === { courseId: number }
-    return String(result.courseId);
-  } catch (err) {
-    console.error('createDraftCourse 실패:', err);
-    throw new Error('임시 강좌 생성 중 오류가 발생했습니다.');
-  }
-};
-
-/**
- * 2단계: 강좌 발행
- * - 백엔드: 강좌 발행 API
- *   - Body가 없는 경우: PATCH/POST 둘 중 협의된 방식 사용
- */
-export const publishDraftCourse = async (courseId: string): Promise<boolean> => {
-  if (!courseId) throw new Error('Invalid course ID');
-
-  const checkCoursePublish = confirm('강좌를 발행하면 수정할 수 없습니다. 최종 발행하시겠습니까?');
-  if (!checkCoursePublish) return false;
-
-  try {
-    // 예시 1) 바디 없는 발행 API
-    // await patchApi<void>(`/instructor/courses/${courseId}/publish`);
-
-    // 예시 2) status만 PATCH 하는 방식 (기존 JSON 서버 스타일 유지시)
-    await patchApi<void>(`/instructor/courses/${courseId}`, {
-      status: 'PUBLISHED',
+    const sectionRes = await createSection(courseId, {
+      title: secDraft.title,
+      orderIndex: sIndex + 1,
     });
+    const sectionId = String(sectionRes.sectionId ?? '');
 
-    return true;
-  } catch (err) {
-    console.error('publishDraftCourse 실패:', err);
-    throw new Error('강좌 발행 중 오류가 발생했습니다.');
+    for (let lIndex = 0; lIndex < secDraft.lectures.length; lIndex++) {
+      const lecDraft = secDraft.lectures[lIndex];
+
+      const resources = lecDraft.resource ?? [];
+      const primaryResource: LectureResource | undefined = Array.isArray(resources)
+        ? resources[0]
+        : (resources as any);
+
+      const totalDurationSeconds = lecDraft.duration ?? 0;
+
+      await createLecture(courseId, sectionId, {
+        title: lecDraft.title,
+        totalDurationSeconds,
+        isPreview: lecDraft.isPreview ?? false,
+        orderIndex: lIndex + 1,
+        resource: primaryResource
+          ? [
+              {
+                resourceType: primaryResource.resourceType,
+                isDownloadable: primaryResource.isDownloadable,
+                fileUrl: primaryResource.fileUrl,
+              },
+            ]
+          : undefined,
+      });
+    }
   }
 };
 
-/**
- * 3단계: 강좌 + 섹션/강의 생성 플로우
- * - (1) Draft 강좌 생성
- * - (2) 섹션/강의 전체 저장
- * - (3) 옵션에 따라 발행
- */
+// 강좌생성 API 호출
+export const createDraftCourse = async (
+  draftData: CourseDraftForm,
+  thumbnailFile?: File,
+): Promise<CreateCourseResponse> => {
+  const requestBody = mapDraftToCreateRequest(draftData);
+
+  const formData = new FormData();
+  formData.append('request', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
+
+  if (thumbnailFile) {
+    formData.append('thumbnail', thumbnailFile);
+  }
+
+  return await fetchApi<CreateCourseResponse>('/api/instructor/courses', {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+    // headers에 Content-Type 넣지 마세요. fetchApi가 FormData면 자동 제거합니다.
+  });
+};
+// 강좌 생성 시 data 방식
+
+async function multipartPost<T>(endpoint: string, formData: FormData): Promise<T> {
+  if (!BASE_URL) throw new Error('NEXT_PUBLIC_BASE_URL 누락');
+  console.log('BASE_URL =', BASE_URL);
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`강좌 생성 실패: ${res.status} - ${text}`);
+  }
+
+  const json = (await res.json()) as { code: string; message: string; data: T };
+  if (json.code?.startsWith('E')) throw new Error(json.message);
+  return json.data;
+}
+
+// 강좌 발행 API 호출
+
+export const publishDraftCourse = async (courseId: string): Promise<void> => {
+  const formData = new FormData();
+  formData.append('request', new Blob([JSON.stringify({})], { type: 'application/json' }));
+
+  await fetchApi<void>(`/api/instructor/courses/${courseId}/publish`, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+};
+
 export const createCourse = async (
-  user: User,
   courseDraft: CourseDraftForm,
   sectionDrafts: SectionDraftForm[],
   shouldPublish: boolean = false,
-): Promise<string> => {
-  if (!user?.id) throw new Error('로그인이 필요합니다.');
-
+): Promise<CreateCourseResponse> => {
   try {
-    // 1) Draft 강좌 생성
-    const draftId = await createDraftCourse(user, courseDraft);
+    const { courseId } = await createDraftCourse(courseDraft);
+    await applySectionDraftsForNewCourse(courseId, sectionDrafts);
 
-    // 2) 섹션/강의 저장 (이 함수는 JSON 서버 스타일이면,
-    //    나중에 백엔드 API로 교체할 때 별도로 리팩토링)
-    await updateDraftSection(draftId, sectionDrafts);
-
-    // 3) 필요 시 발행
     if (shouldPublish) {
-      await publishDraftCourse(draftId);
+      await publishDraftCourse(courseId);
     }
 
-    return draftId;
+    return { courseId };
   } catch (err) {
     console.error('createCourse 실패:', err);
     throw new Error('강좌 등록 중 오류가 발생했습니다.');
+  }
+};
+
+// 카테고리 조회 API 호출
+export const getCategories = async (): Promise<Category[]> => {
+  try {
+    const categories = await getApi<Category[]>('/api/categories');
+    return categories;
+  } catch (err) {
+    console.error('getCategories 실패:', err);
+    throw new Error('카테고리 목록을 불러오는 중 오류가 발생했습니다.');
   }
 };

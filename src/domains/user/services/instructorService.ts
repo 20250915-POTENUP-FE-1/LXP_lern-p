@@ -2,8 +2,7 @@
 
 import type { InstructorCourse } from '@/domains/user/types/instructor';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
-
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 // ===== 공통 응답 처리 =====
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
@@ -39,7 +38,7 @@ export async function getInstructorCourses(userId: string): Promise<InstructorCo
 
     // instructorId로 강좌 필터링 + 최신순 정렬
     const res = await fetch(
-      `${API_BASE}/courses?instructorId=${encodeURIComponent(userId)}&_sort=createdAt&_order=desc`,
+      `${BASE_URL}/courses?instructorId=${encodeURIComponent(userId)}&_sort=createdAt&_order=desc`,
     );
 
     const courses = await handleResponse<CourseApiResponse[]>(res);

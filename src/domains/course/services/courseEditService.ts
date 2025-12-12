@@ -1,212 +1,199 @@
-import type {
-  Section,
-  Lecture,
+import {
   CourseDraftForm,
+  CreateLectureResponse,
+  CreateSectionResponse,
   SectionDraftForm,
-  LectureResource,
 } from '../types/course';
-import { API_BASE, handleResponse, getCourse } from './courseService';
+import { getApi, postApi, patchApi, deleteApi } from '@/shared/lib/api/fetchApi';
 
-// ===== 6. 임시 강좌 기본 정보 수정 =====
-export const updateDraftCourse = async (courseId: string, data: CourseDraftForm): Promise<void> => {
-  if (!courseId) throw new Error('Invalid course ID');
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+// 1) 강좌 기본정보 수정 (PATCH)
+export const updateDraftCourse = async (
+  courseId: string,
+  payload: Partial<CourseDraftForm>,
+): Promise<void> => {
+  if (!courseId) throw new Error('Invalid courseId');
 
   try {
-    await fetch(`${API_BASE}/courses/${courseId}`, {
+    const formData = new FormData();
+    formData.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+    // 썸네일 변경이 포함되는 경우를 대비해서 추후 확장 가능
+    // if (thumbnailFile) {
+    //   formData.append('thumbnail', thumbnailFile);
+    // }
+
+    const res = await fetch(`${BASE_URL}/api/instructor/courses/${courseId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: data.title,
-        summary: data.summary,
-        description: data.description,
-        thumbnailUrl: data.thumbnailUrl,
-        category: data.category,
-        level: data.level,
-        price: Number(data.price),
-        isFree: Number(data.price) === 0,
-        tags: [data.level || '', data.category?.[0] || ''],
-        updatedAt: new Date().toISOString(),
-      }),
-    }).then((res) => handleResponse(res));
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`강좌 수정 실패: ${res.status} - ${text}`);
+    }
+
+    // 보통 수정 API는 body가 없거나 {status, code, message} 정도만 반환하므로 따로 파싱 안 해도 됨
   } catch (err) {
     console.error('updateDraftCourse 실패:', err);
-    throw new Error('임시 강좌 수정 중 오류가 발생했습니다.');
+    throw err instanceof Error ? err : new Error('강좌 수정 중 오류가 발생했습니다.');
   }
 };
 
-// ===== 7. 섹션/강의 전체 갈아끼우기 =====
-export const updateDraftSection = async (
+// 섹션 생성 API
+export const createSection = async (
   courseId: string,
-  sectionDrafts: SectionDraftForm[],
+  payload: { title: string; orderIndex: number },
+): Promise<CreateSectionResponse> => {
+  if (!courseId) throw new Error('Invalid courseId');
+
+  const result = await postApi<CreateSectionResponse>(
+    `/api/instructor/courses/${courseId}/sections`,
+    payload,
+  );
+  return result;
+};
+
+// 섹션 수정 API
+export const updateSection = async (
+  courseId: string,
+  sectionId: string,
+  payload: { title?: string; orderIndex?: number },
 ): Promise<void> => {
-  if (!courseId) throw new Error('Invalid course ID');
+  if (!courseId || !sectionId) throw new Error('Invalid section params');
 
-  try {
-    // 1) 기존 섹션 조회
-    const sectionsRes = await fetch(`${API_BASE}/sections?courseId=${courseId}`);
-    const sections = await handleResponse<Section[]>(sectionsRes);
-
-    // 2) 기존 섹션의 강의들 먼저 삭제
-    for (const sec of sections) {
-      const lecturesRes = await fetch(`${API_BASE}/lectures?sectionId=${sec.id}`);
-      const lectures = await handleResponse<Lecture[]>(lecturesRes);
-
-      for (const lec of lectures) {
-        await fetch(`${API_BASE}/lectures/${lec.id}`, { method: 'DELETE' });
-      }
-    }
-
-    // 3) 기존 섹션 삭제
-    for (const sec of sections) {
-      await fetch(`${API_BASE}/sections/${sec.id}`, { method: 'DELETE' });
-    }
-
-    // 4) 새 섹션/강의 생성
-    let totalDuration = 0;
-    const sectionIds: string[] = [];
-
-    for (let i = 0; i < sectionDrafts.length; i++) {
-      const secDraft = sectionDrafts[i];
-
-      // 섹션 생성
-      const sectionRes = await fetch(`${API_BASE}/sections`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courseId,
-          title: secDraft.title,
-          sequence: i + 1,
-          lectures: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }),
-      });
-      const newSection = await handleResponse<Section>(sectionRes);
-      sectionIds.push(newSection.id);
-
-      const lectureIds: string[] = [];
-
-      // 강의 생성
-      for (let j = 0; j < secDraft.lectures.length; j++) {
-        const lecDraft = secDraft.lectures[j];
-
-        const primaryResource: LectureResource =
-          lecDraft.resource && lecDraft.resource.length > 0
-            ? lecDraft.resource[0]
-            : {
-                resourceType: 'VIDEO',
-                isDownloadable: false,
-                fileUrl: lecDraft.videoUrl || '',
-              };
-
-        const lectureRes = await fetch(`${API_BASE}/lectures`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sectionId: newSection.id,
-            courseId,
-            title: lecDraft.title,
-            videoUrl: lecDraft.videoUrl || '',
-            duration: lecDraft.duration || 0,
-            isPreview: lecDraft.isPreview || false,
-            resource: primaryResource,
-            sequence: j + 1,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          }),
-        });
-        const newLecture = await handleResponse<Lecture>(lectureRes);
-        lectureIds.push(newLecture.id);
-        totalDuration += lecDraft.duration || 0;
-      }
-
-      // 섹션에 강의 ID 업데이트
-      await fetch(`${API_BASE}/sections/${newSection.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lectures: lectureIds }),
-      });
-    }
-
-    // 5) 강좌 메타데이터 업데이트
-    await fetch(`${API_BASE}/courses/${courseId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sections: sectionIds,
-        duration: totalDuration,
-        updatedAt: new Date().toISOString(),
-      }),
-    });
-  } catch (err) {
-    console.error('updateDraftSection 실패:', err);
-    throw new Error('임시 강좌 섹션 수정 중 오류가 발생했습니다.');
-  }
+  await patchApi<void>(`/api/instructor/courses/${courseId}/sections/${sectionId}`, payload);
+  //(`/instructor/courses/${courseId}/sections/${sectionId}`, payload)
 };
 
-export const fetchCourseWithSections = async (
+// 섹션 삭제 API
+export const deleteSection = async (courseId: string, sectionId: string): Promise<void> => {
+  if (!courseId || !sectionId) throw new Error('Invalid section params');
+
+  await deleteApi<void>(`/api/instructor/courses/${courseId}/sections/${sectionId}`);
+};
+
+// 강의 생성 API
+export const createLecture = async (
   courseId: string,
-): Promise<{
-  courseDraft: CourseDraftForm;
-  sectionDrafts: SectionDraftForm[];
-}> => {
-  const { course, sections, lectures } = await getCourse(courseId);
+  sectionId: string,
+  payload: {
+    title: string;
+    totalDurationSeconds: number;
+    isPreview: boolean;
+    orderIndex: number;
+    resource: any;
+  },
+): Promise<CreateLectureResponse> => {
+  if (!courseId || !sectionId) throw new Error('Invalid lecture params');
 
-  if (!course) {
-    throw new Error('강좌 정보를 찾을 수 없습니다.');
-  }
-
-  const courseDraft: CourseDraftForm = {
-    title: course.title,
-    summary: course.summary,
-    description: course.description,
-    thumbnailUrl: course.thumbnailUrl,
-    category: course.category,
-    level: course.level,
-    price: course.price,
-  };
-
-  const sectionDrafts: SectionDraftForm[] = sections.map((sec) => ({
-    id: sec.id,
-    title: sec.title,
-    lectures: (lectures[sec.id] || []).map((lec) => {
-      const baseResource = lec.resource ?? {
-        resourceType: 'VIDEO',
-        isDownloadable: false,
-        fileUrl: lec.videoUrl,
-      };
-
-      const normalizedResources: LectureResource[] = Array.isArray(baseResource)
-        ? baseResource
-        : [baseResource];
-
-      return {
-        id: lec.id,
-        title: lec.title,
-        duration: lec.duration,
-        videoUrl: lec.videoUrl,
-        isPreview: lec.isPreview || false,
-        resource: normalizedResources,
-      };
-    }),
-  }));
-  return { courseDraft, sectionDrafts };
+  const result = await postApi<CreateLectureResponse>(
+    `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
+    payload,
+  );
+  return result;
 };
 
-export const fetchCourseData = async (courseId: string): Promise<CourseDraftForm> => {
-  const { course } = await getCourse(courseId);
+// 강의 수정 API (PUT → PATCH로 바꾸고 싶으면 여기서 조정)
+export const updateLecture = async (
+  courseId: string,
+  lectureId: string,
+  payload: {
+    title?: string;
+    totalDurationSeconds?: number;
+    isPreview?: boolean;
+    orderIndex?: number;
+    resource?: any[];
+  },
+): Promise<void> => {
+  if (!courseId || !lectureId) throw new Error('Invalid lecture params');
 
-  if (!course) {
-    throw new Error('강좌를 찾을 수 없습니다.');
-  }
+  await patchApi<void>(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, payload);
+};
+
+// 강의 삭제 API
+export const deleteLecture = async (courseId: string, lectureId: string): Promise<void> => {
+  if (!courseId || !lectureId) throw new Error('Invalid lecture params');
+
+  await deleteApi<void>(`/api/instructor/courses/${courseId}/lectures/${lectureId}`);
+};
+
+// 8) 섹션 순서 변경 API
+export const reorderSections = async (courseId: string, sectionIds: string[]): Promise<void> => {
+  if (!courseId) throw new Error('Invalid courseId');
+
+  await patchApi<void>(`/api/instructor/courses/${courseId}/sections/reorder`, { sectionIds });
+};
+
+// 9) 강의 순서 변경 API
+export const reorderLectures = async (sectionId: string, lectureIds: string[]): Promise<void> => {
+  if (!sectionId) throw new Error('Invalid sectionId');
+
+  await patchApi<void>(`/api/instructor/sections/${sectionId}/lectures/reorder`, { lectureIds });
+};
+
+// 강좌 수정 API 호출
+export const fetchCourseData = async (courseId: string): Promise<CourseDraftForm> => {
+  if (!courseId) throw new Error('Invalid courseId');
+
+  // fetchApi/getApi는 이미 { status, code, message, data } 중 data만 반환한다고 가정
+  const c = await getApi<any>(`/api/instructor/courses/${courseId}`);
+
+  const category = Array.isArray(c.categoryIds)
+    ? c.categoryIds.map((id: unknown) => String(id))
+    : c.category
+      ? [String(c.category)]
+      : [];
 
   return {
-    title: course.title,
-    summary: course.summary,
-    description: course.description,
-    thumbnailUrl: course.thumbnailUrl,
-    category: course.category,
-    level: course.level,
-    price: course.price,
+    title: c.title ?? '',
+    summary: c.summary ?? '',
+    description: c.description ?? '',
+    thumbnail: c.thumbnailUrl ?? '',
+    category,
+    level: c.courseLevel ?? '',
+    price: c.price ?? 0,
   };
 };
+
+// 강좌 수정 API 호출 - 섹션+강의 포함
+export async function fetchCourseWithSections(courseId: string): Promise<{
+  courseDraft: CourseDraftForm;
+  sectionDrafts: SectionDraftForm[];
+}> {
+  if (!courseId) throw new Error('Invalid courseId');
+
+  const data = await getApi<any>(`/api/instructor/courses/${courseId}`);
+
+  const category = Array.isArray(data.categoryIds)
+    ? data.categoryIds.map((id: unknown) => String(id))
+    : data.category
+      ? [String(data.category)]
+      : [];
+
+  const courseDraft: CourseDraftForm = {
+    title: data.title ?? '',
+    summary: data.summary ?? '',
+    description: data.description ?? '',
+    thumbnail: data.thumbnailUrl ?? '',
+    category,
+    level: data.courseLevel ?? '',
+    price: data.price ?? 0,
+  };
+
+  const sectionDrafts: SectionDraftForm[] = (data.sections ?? []).map((sec: any) => ({
+    id: String(sec.id),
+    title: sec.title ?? '',
+    lectures: (sec.lectures ?? []).map((lec: any) => ({
+      id: String(lec.id),
+      title: lec.title ?? '',
+      duration: lec.totalDurationSeconds ?? 0,
+      videoUrl: lec.videoUrl ?? '',
+      resource: lec.resource,
+    })),
+  }));
+
+  return { courseDraft, sectionDrafts };
+}

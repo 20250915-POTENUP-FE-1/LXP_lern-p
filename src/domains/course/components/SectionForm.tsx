@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from './CourseForm.module.css';
 import { ResourceUploader } from './ResourceUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
+import { useState } from 'react';
 
 export type SectionFormProps = {
   mode?: 'create' | 'edit';
@@ -12,7 +13,7 @@ export type SectionFormProps = {
 
 export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
   const router = useRouter();
-
+  const [resolvedCourseId, setResolvedCourseId] = useState<string>('');
   const {
     sections,
     step1Data,
@@ -37,6 +38,13 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
   if (!step1Data) {
     return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
   }
+  const savedCourseId =
+    typeof window !== 'undefined' ? sessionStorage.getItem('draftCourseId') : null;
+
+  if (!savedCourseId) {
+    router.replace('/courses/create?step=1');
+    return;
+  }
 
   return (
     <form onSubmit={handleFinalSubmit}>
@@ -49,12 +57,12 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
 
         <section className={styles['course-form']} aria-label="섹션 구성">
           {sections.map((section, sectionIdx) => (
-            <div key={section.id} className={styles['section']}>
+            <div key={section.localId} className={styles['section']}>
               <header className={styles['section-list__header']}>
                 <input
                   type="text"
                   value={section.title}
-                  onChange={(e) => handleSectionTitleChange(section.id, e.target.value)}
+                  onChange={(e) => handleSectionTitleChange(section.localId, e.target.value)}
                   className={styles['course-form__input']}
                   placeholder={`섹션 ${sectionIdx + 1} 제목 입력`}
                 />
@@ -63,7 +71,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                   <button
                     type="button"
                     className={styles['section-list__action']}
-                    onClick={() => handleSectionDelete(section.id)}
+                    onClick={() => handleSectionDelete(section.localId)}
                   >
                     섹션 삭제
                   </button>
@@ -72,7 +80,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
 
               <ul className={styles['lecture-list']}>
                 {section.lectures.map((lecture) => (
-                  <li key={lecture.id} className={styles['lecture-list__item']}>
+                  <li key={lecture.localId} className={styles['lecture-list__item']}>
                     <div className={styles['lecture-list__edit-group']}>
                       <ResourceUploader
                         initialValue={
@@ -87,7 +95,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                             : undefined
                         }
                         onUploadComplete={(result) =>
-                          handleLectureUpload(section.id, lecture.id, result)
+                          handleLectureUpload(section.localId, lecture.localId, result)
                         }
                       />
 
@@ -95,7 +103,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                         type="text"
                         value={lecture.title}
                         onChange={(e) =>
-                          handleLectureTitleChange(section.id, lecture.id, e.target.value)
+                          handleLectureTitleChange(section.localId, lecture.localId, e.target.value)
                         }
                         className={styles['course-form__input']}
                         placeholder="강의 제목 입력"
@@ -105,7 +113,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                     <button
                       type="button"
                       className={`${styles['lecture-list__action']} ${styles['lecture-list__action--danger']}`}
-                      onClick={() => handleLectureDelete(section.id, lecture.id)}
+                      onClick={() => handleLectureDelete(section.localId, lecture.localId)}
                     >
                       강의 삭제
                     </button>
@@ -116,7 +124,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
               <button
                 type="button"
                 className={styles['section-list__action']}
-                onClick={() => handleLectureAdd(section.id)}
+                onClick={() => handleLectureAdd(section.localId)}
               >
                 + 강의 추가
               </button>

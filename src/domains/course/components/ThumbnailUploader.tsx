@@ -7,9 +7,14 @@ import styles from './CourseForm.module.css';
 type ThumbnailUploaderProps = {
   value?: string;
   onUploadComplete?: (url: string) => void;
+  onFileSelect?: (file: File | null) => void;
 };
 
-export function ThumbnailUploader({ value, onUploadComplete }: ThumbnailUploaderProps) {
+export function ThumbnailUploader({
+  value,
+  onUploadComplete,
+  onFileSelect,
+}: ThumbnailUploaderProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,6 +28,13 @@ export function ThumbnailUploader({ value, onUploadComplete }: ThumbnailUploader
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    onFileSelect?.(file); // 선택된 파일을 부모 컴포넌트로 전달
+    if (!file) {
+      setThumbnailUrl(null);
+      onUploadComplete?.('');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {

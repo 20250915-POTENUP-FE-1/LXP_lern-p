@@ -7,6 +7,7 @@ const generateId = () =>
     : String(Date.now() + Math.random());
 
 export const createEmptyLecture = (): LectureDraftForm => ({
+  localId: generateId(),
   id: generateId(),
   title: '',
   duration: 0,
@@ -19,12 +20,15 @@ export const createEmptyLecture = (): LectureDraftForm => ({
       fileUrl: '',
     },
   ],
+  _dirty: false,
 });
 
 export const createEmptySection = (): SectionDraftForm => ({
+  localId: generateId(),
   id: generateId(),
   title: '',
   lectures: [createEmptyLecture()],
+  _dirty: false,
 });
 
 export const buildSectionDraft = (sections: SectionDraftForm[]): SectionDraftForm[] =>
@@ -50,8 +54,8 @@ export const buildCourseDraft = (form: CourseFormState): CourseDraftForm => ({
   title: form.title,
   summary: form.summary,
   description: form.description,
-  thumbnailUrl: form.thumbnailUrl,
+  thumbnail: form.thumbnailUrl,
   category: form.category,
   level: form.level,
-  price: Number(form.price || 0),
+  price: form.price === '' ? 0 : Number(form.price),
 });

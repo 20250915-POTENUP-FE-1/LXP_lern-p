@@ -1,16 +1,12 @@
 'use server';
-
 import { cookies } from 'next/headers';
-
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
 export type ApiResponse<T = unknown> = {
   status: string; // HTTP 상태 코드 (예: '200', '400' 등)
   code: string; // 에러 코드 (예: EG001, EU001 등)
   message: string; // 에러 메시지
   data: T; // 응답 데이터
 };
-
 /**
  * 인증 토큰을 포함하여 API 요청을 보냄
  *
@@ -22,61 +18,59 @@ export async function fetchApi<T = unknown>(
   options: RequestInit = {},
 ): Promise<T> {
   try {
-    // 쿠키에서 accessToken 꺼내기
+    if (!BASE_URL) throw new Error('NEXT_PUBLIC_BASE_URL 누락');
+
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
 
-    // 인증 헤더 설정
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }), // 인증 토큰 포함
-      ...options.headers,
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+    const headers: Record<string, string> = {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...((options.headers as Record<string, string> | undefined) ?? {}),
     };
 
-    // API 통신
+    // JSON 요청일 때만 Content-Type 기본 부여
+    if (!isFormData) {
+      const hasContentType = Object.keys(headers).some((k) => k.toLowerCase() === 'content-type');
+      if (!hasContentType) headers['Content-Type'] = 'application/json';
+    } else {
+      // FormData면 Content-Type을 절대 직접 넣지 않음 (boundary 자동 설정 필요)
+      for (const k of Object.keys(headers)) {
+        if (k.toLowerCase() === 'content-type') delete headers[k];
+      }
+    }
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: options.method || 'GET',
-      headers,
       ...options,
+      headers,
     });
 
-    // 네트워크 오류 처리
     if (!response.ok) {
-      throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
+      const text = await response.text().catch(() => '');
+      throw new Error(
+        `API 요청 실패: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`,
+      );
     }
 
-    // 응답 데이터 파싱
-    const resJson = await response.json();
+    const resJson = (await response.json()) as ApiResponse<T>;
 
-    // 응답 헤더에 새로운 액세스 토큰이 있다면 쿠키 갱신
     const newAccessToken = response.headers.get('Authorization');
     if (newAccessToken) {
-      cookieStore.set('accessToken', newAccessToken, {
-        httpOnly: true,
-      });
+      cookieStore.set('accessToken', newAccessToken, { httpOnly: true });
     }
 
-    // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
-    if (response.status === 401) {
-      // 재로그인
-      throw new Error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
-    }
-
-    // 에러 코드 처리
-    if (resJson.code.startsWith('E')) {
+    if (resJson.code?.startsWith('E')) {
       throw new Error(resJson.message);
     }
 
-    return resJson.data;
+    return resJson.data as T;
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      // 네트워크 오류 또는 기타 API 오류 메시지 처리
-      throw new Error(error.message);
-    }
+    if (error instanceof Error) throw new Error(error.message);
     throw new Error('알 수 없는 오류가 발생했습니다.');
   }
 }
-
 /**
  * GET 요청을 위한 fetchApi wrapper
  *
@@ -86,51 +80,65 @@ export async function fetchApi<T = unknown>(
 export async function getApi<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T> {
   return fetchApi<T>(endpoint, { method: 'GET', ...options });
 }
-
 /**
  * POST 요청을 위한 fetchApi wrapper
  *
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function postApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
+export async function postApi<T = unknown>(
+  endpoint: string,
+  data?: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'POST',
     body: JSON.stringify(data),
+    ...options,
   });
 }
-
 /**
  * PUT 요청을 위한 fetchApi wrapper
  *
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function putApi<T = unknown>(endpoint: string, data: unknown): Promise<T> {
+export async function putApi<T = unknown>(
+  endpoint: string,
+  data: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'PUT',
     body: JSON.stringify(data),
+    ...options,
   });
 }
-
 /**
  * DELETE 요청을 위한 fetchApi wrapper
  *
  * @param endpoint API 엔드포인트
  */
-export async function deleteApi<T = unknown>(endpoint: string): Promise<T> {
-  return fetchApi<T>(endpoint, { method: 'DELETE' });
+export async function deleteApi<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return fetchApi<T>(endpoint, { method: 'DELETE', ...options });
 }
-
 /**
  * PATCH 요청을 위한 fetchApi wrapper
  *
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function patchApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
+export async function patchApi<T = unknown>(
+  endpoint: string,
+  data?: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'PATCH',
     body: JSON.stringify(data),
+    ...options,
   });
 }

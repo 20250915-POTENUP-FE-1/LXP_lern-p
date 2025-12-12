@@ -5,6 +5,7 @@ import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { useCourseForm } from '../hooks/useCourseForm';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export type CourseFormProps = {
   mode?: 'create' | 'edit';
@@ -23,6 +24,7 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
     handleChange,
     handleCategoryChange,
     handleThumbnailUpload,
+    handleThumbnailFileSelect,
   } = useCourseForm();
 
   return (
@@ -116,6 +118,7 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
             <ThumbnailUploader
               value={formData.thumbnailUrl}
               onUploadComplete={handleThumbnailUpload}
+              onFileSelect={handleThumbnailFileSelect}
             />
           </div>
 
