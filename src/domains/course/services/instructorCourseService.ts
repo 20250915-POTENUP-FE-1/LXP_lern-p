@@ -3,7 +3,7 @@ import type { InstructorCoursePage } from '@/domains/course/types/instructor';
 
 import { MOCK_INSTRUCTOR_COURSES } from '@/mocks/instructorCourse.mock';
 
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'false';
 
 /**
  * 내가 등록한 강좌 목록 조회
