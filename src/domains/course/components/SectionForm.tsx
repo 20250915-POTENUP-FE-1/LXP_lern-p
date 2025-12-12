@@ -84,13 +84,15 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                     <div className={styles['lecture-list__edit-group']}>
                       <ResourceUploader
                         initialValue={
-                          lecture.resource[0]
+                          lecture.resource?.[0]
                             ? {
-                                resourceType: lecture.resource[0].resourceType,
-                                fileUrl: lecture.resource[0].fileUrl,
-                                isDownloadable: lecture.resource[0].isDownloadable,
+                                resourceType:
+                                  (lecture.resource[0] as any).resourceType ??
+                                  (lecture.resource[0] as any).resourceType,
+                                fileUrl: lecture.resource[0].fileUrl ?? '',
+                                isDownloadable: !!lecture.resource[0].isDownloadable,
                                 duration: lecture.duration,
-                                fileName: undefined, // 나중에 확장 가능
+                                fileName: undefined,
                               }
                             : undefined
                         }

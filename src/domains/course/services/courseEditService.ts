@@ -6,7 +6,14 @@ import {
 } from '../types/course';
 import { getApi, postApi, patchApi, deleteApi } from '@/shared/lib/api/fetchApi';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+
+type ApiEnvelope<T> = {
+  status: string;
+  code: string;
+  message: string;
+  data: T;
+};
 
 // 1) 강좌 기본정보 수정 (PATCH)
 export const updateDraftCourse = async (
@@ -24,15 +31,16 @@ export const updateDraftCourse = async (
     //   formData.append('thumbnail', thumbnailFile);
     // }
 
-    const res = await fetch(`${BASE_URL}/api/instructor/courses/${courseId}`, {
+    const url = `${BASE_URL}/api/instructor/courses/${courseId}`;
+    const res = await fetch(url, {
       method: 'PATCH',
       body: formData,
       credentials: 'include',
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`강좌 수정 실패: ${res.status} - ${text}`);
+      const text = await res.text().catch(() => '');
+      throw new Error(`강좌 수정 실패: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
     }
 
     // 보통 수정 API는 body가 없거나 {status, code, message} 정도만 반환하므로 따로 파싱 안 해도 됨
@@ -76,6 +84,7 @@ export const deleteSection = async (courseId: string, sectionId: string): Promis
 };
 
 // 강의 생성 API
+/*
 export const createLecture = async (
   courseId: string,
   sectionId: string,
@@ -84,16 +93,102 @@ export const createLecture = async (
     totalDurationSeconds: number;
     isPreview: boolean;
     orderIndex: number;
-    resource: any;
+    resource?: { isDownloadable: boolean };
   },
+  file?: File,
+): Promise<CreateLectureResponse> => {
+  if (!courseId || !sectionId) {
+    throw new Error('Invalid lecture params');
+  }
+
+  const formData = new FormData();
+
+  // JSON → request 파트
+  formData.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+  // 파일 파트 (있을 때만)
+  if (file) {
+    formData.append('file', file);
+  }
+
+  return await postApi<CreateLectureResponse>(
+    `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
+    {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+      // multipart/form-data 사용을 위해 Content-Type 제거
+      headers: {
+        'Content-Type': undefined as unknown as string,
+      },
+    },
+  );
+};
+*/
+export const createLecture = async (
+  courseId: string,
+  sectionId: string,
+  payload: {
+    title: string;
+    totalDurationSeconds: number;
+    isPreview: boolean;
+    orderIndex: number;
+    resource?: {
+      resourceType: string;
+      isDownloadable: boolean;
+      fileUrl?: string;
+    }[];
+  },
+  file?: File,
 ): Promise<CreateLectureResponse> => {
   if (!courseId || !sectionId) throw new Error('Invalid lecture params');
 
-  const result = await postApi<CreateLectureResponse>(
-    `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
-    payload,
+  const formData = new FormData();
+
+  // API 명세: resourceType/fileUrl은 요청에 포함하지 않고, resource는 단일 객체 { isDownloadable }
+  const requestBody = {
+    ...payload,
+    resource: payload.resource?.[0]
+      ? { isDownloadable: Boolean(payload.resource[0].isDownloadable) }
+      : { isDownloadable: false },
+  };
+
+  formData.append('request', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  // 백엔드 엔드포인트로 직접 전송 (대용량 업로드 타임아웃 회피 + Next 라우트 경유 제거)
+  const accessToken =
+    typeof document !== 'undefined'
+      ? document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('accessToken='))
+          ?.split('=')[1]
+      : undefined;
+
+  const res = await fetch(
+    `${BASE_URL}/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
+    {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+    },
   );
-  return result;
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`강의 생성 실패: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
+  }
+
+  const json = (await res.json()) as ApiEnvelope<CreateLectureResponse>;
+  if (json.code?.startsWith('E')) {
+    throw new Error(json.message || '강의 생성 중 오류가 발생했습니다.');
+  }
+
+  return json.data;
 };
 
 // 강의 수정 API (PUT → PATCH로 바꾸고 싶으면 여기서 조정)

@@ -1,23 +1,49 @@
-import { postApi, patchApi, deleteApi } from '@/shared/lib/api/fetchApi';
-import { LectureResource } from '../types/course';
+import { postApi, patchApi, deleteApi, fetchApi } from '@/shared/lib/api/fetchApi';
+import { CreateLectureResponse, LectureResource } from '../types/course';
 
 // 강의 생성 API
-export async function createLecture(
+export const createLecture = async (
   courseId: string,
   sectionId: string,
-  body: {
+  payload: {
     title: string;
-    totalDurationSeconds?: number;
+    totalDurationSeconds: number;
     isPreview: boolean;
     orderIndex: number;
-    resource?: LectureResource[];
+    resource?: {
+      resourceType: string;
+      isDownloadable: boolean;
+      fileUrl?: string;
+    }[];
   },
-) {
-  return postApi<{ lectureId: string }>(
+  file?: File,
+): Promise<CreateLectureResponse> => {
+  if (!courseId || !sectionId) throw new Error('Invalid lecture params');
+
+  const formData = new FormData();
+
+  formData.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  console.log('📤 강의 생성 요청:', {
+    courseId,
+    sectionId,
+    payload,
+    hasFile: !!file,
+  });
+
+  return await fetchApi<CreateLectureResponse>(
     `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
-    body,
+    {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    },
   );
-}
+};
 
 // 강의 수정 API
 export async function updateLecture(

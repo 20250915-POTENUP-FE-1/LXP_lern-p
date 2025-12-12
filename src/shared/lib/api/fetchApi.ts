@@ -40,8 +40,9 @@ export async function fetchApi<T = unknown>(
         if (k.toLowerCase() === 'content-type') delete headers[k];
       }
     }
+    const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(url, {
       method: options.method || 'GET',
       ...options,
       headers,
@@ -71,6 +72,7 @@ export async function fetchApi<T = unknown>(
     throw new Error('알 수 없는 오류가 발생했습니다.');
   }
 }
+
 /**
  * GET 요청을 위한 fetchApi wrapper
  *

@@ -18,7 +18,11 @@ export function useCourseForm() {
   const { user } = useAuthState();
   const params = useParams<{ id?: string }>();
 
-  const courseId = typeof params.id === 'string' ? params.id : '';
+  const paramsId = typeof params.id === 'string' ? params.id : '';
+  const sessionCourseId =
+    typeof window !== 'undefined' ? (sessionStorage.getItem('draftCourseId') ?? '') : '';
+
+  const courseId = paramsId || sessionCourseId;
   const mode: CourseFormMode = pathname?.includes('/edit') ? 'edit' : 'create';
 
   const [formData, setFormData] = useState<CourseFormState>({

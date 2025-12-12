@@ -39,7 +39,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const params = useParams<{ id?: string }>();
 
   // URL 우선, props는 fallback
-  const courseId = typeof params.id === 'string' ? params.id : (courseIdProp ?? '');
   const mode: SectionFormMode = pathname?.includes('/edit') ? 'edit' : (modeProp ?? 'create');
 
   const [sections, setSections] = useState<SectionDraftForm[]>([createEmptySection()]);
@@ -54,6 +53,28 @@ export function useSectionForm(options?: UseSectionFormParams) {
   // === 유틸: 활성 섹션/강의만 필터링 (삭제 플래그 제외) ===
   const activeSections = sections.filter((sec) => !sec._deleted);
   const getActiveLectures = (sec: SectionDraftForm) => sec.lectures.filter((lec) => !lec._deleted);
+
+  const [resolvedCourseId, setResolvedCourseId] = useState('');
+
+  useEffect(() => {
+    const idFromUrl = typeof params.id === 'string' ? params.id : '';
+    if (idFromUrl) {
+      setResolvedCourseId(idFromUrl);
+      return;
+    }
+
+    if (courseIdProp) {
+      setResolvedCourseId(courseIdProp);
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('draftCourseId');
+      if (saved) setResolvedCourseId(saved);
+    }
+  }, [params.id, courseIdProp]);
+
+  const courseId = resolvedCourseId;
 
   // === 구조 검증 ===
   const structureInvalid =
@@ -93,6 +114,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
   // === 초기 로딩 ===
   useEffect(() => {
+    if (!courseId) return;
     if (initialized) return;
 
     const load = async () => {
@@ -257,6 +279,8 @@ export function useSectionForm(options?: UseSectionFormParams) {
         duration: nextDuration,
         videoUrl: nextVideoUrl,
         resource: [newResource],
+        // 파일이 전달된 경우에만 덮어쓰고, 없으면 기존 값을 유지
+        _file: (result as any).file ?? (lecture as any)._file ?? null,
       };
     });
   };
@@ -305,6 +329,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
           title: sec.title,
           orderIndex: sIndex + 1,
         });
+
         sectionId = String(created.sectionId);
       }
 
@@ -353,42 +378,55 @@ export function useSectionForm(options?: UseSectionFormParams) {
         })();
 
         let lectureId = lec.id ? String(lec.id) : undefined;
-
+        const file = (lec as any)._file ?? undefined;
         // 새 강의 생성
         if (!lectureId && hasLectureContent) {
-          const created = await createLecture(courseId, sectionId, {
-            title: lec.title,
-            totalDurationSeconds: lec.duration ?? 0,
-            isPreview: lec.isPreview ?? false,
-            orderIndex: lIndex + 1,
-            resource: primaryResource
-              ? {
-                  resourceType: primaryResource.resourceType,
-                  isDownloadable: primaryResource.isDownloadable,
-                  fileUrl: primaryResource.fileUrl,
-                }
-              : undefined,
-          });
+          const resourcePayload =
+            primaryResource && primaryResource.resourceType
+              ? [
+                  {
+                    resourceType: primaryResource.resourceType,
+                    isDownloadable: Boolean(primaryResource.isDownloadable),
+                    fileUrl: primaryResource.fileUrl,
+                  },
+                ]
+              : undefined;
+
+          const created = await createLecture(
+            courseId,
+            sectionId,
+            {
+              title: lec.title,
+              totalDurationSeconds: lec.duration ?? 0,
+              isPreview: lec.isPreview ?? false,
+              orderIndex: lIndex + 1,
+              resource: resourcePayload,
+            },
+            file,
+          );
 
           lectureId = String(created.lectureId);
         }
 
         // 기존 강의 수정
         if (lectureId && lec._dirty) {
+          const resourcePayload =
+            primaryResource && primaryResource.resourceType
+              ? [
+                  {
+                    resourceType: primaryResource.resourceType,
+                    isDownloadable: Boolean(primaryResource.isDownloadable),
+                    fileUrl: primaryResource.fileUrl,
+                  },
+                ]
+              : undefined;
+
           await updateLecture(courseId, lectureId, {
             title: lec.title,
             totalDurationSeconds: lec.duration ?? 0,
             isPreview: lec.isPreview ?? false,
             orderIndex: lIndex + 1,
-            resource: primaryResource
-              ? [
-                  {
-                    resourceType: primaryResource.resourceType,
-                    isDownloadable: primaryResource.isDownloadable,
-                    fileUrl: primaryResource.fileUrl,
-                  },
-                ]
-              : undefined,
+            resource: resourcePayload,
           });
         }
       }
@@ -425,7 +463,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
       await syncSectionsAndLectures(courseId);
 
       // 2) 강좌 발행
-      const publishSuccess = await publishDraftCourse(courseId);
+      await publishDraftCourse(courseId);
 
       alert('강좌가 발행되었습니다.');
       setSuccess(true);

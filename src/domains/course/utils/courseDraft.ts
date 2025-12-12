@@ -8,7 +8,7 @@ const generateId = () =>
 
 export const createEmptyLecture = (): LectureDraftForm => ({
   localId: generateId(),
-  id: generateId(),
+  id: '',
   title: '',
   duration: 0,
   videoUrl: '',
@@ -25,7 +25,7 @@ export const createEmptyLecture = (): LectureDraftForm => ({
 
 export const createEmptySection = (): SectionDraftForm => ({
   localId: generateId(),
-  id: generateId(),
+  id: '',
   title: '',
   lectures: [createEmptyLecture()],
   _dirty: false,

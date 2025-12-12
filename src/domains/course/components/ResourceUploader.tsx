@@ -13,6 +13,7 @@ export type UploadResult = {
   isDownloadable: boolean;
   duration?: number | null;
   fileName?: string | undefined;
+  file?: File;
 };
 
 type ResourceUploaderProps = {
@@ -107,7 +108,8 @@ export function ResourceUploader({
         isDownloadable,
         duration: videoDuration ?? undefined,
         fileName: file.name,
-      });
+        file,
+      } as any);
     } catch (err) {
       let msg = '파일 처리 중 오류가 발생했습니다.';
 
@@ -155,15 +157,6 @@ const storedUrl = uploadJson.data.fileUrl;  // 이제 진짜 URL*/
 
         setDuration(totalMinutes);
         setUploading(false);
-
-        onUploadComplete?.({
-          resourceType: 'VIDEO',
-          fileUrl: url,
-          isDownloadable: false,
-          duration: totalMinutes,
-          fileName: name,
-        });
-
         resolve(totalMinutes);
       };
 

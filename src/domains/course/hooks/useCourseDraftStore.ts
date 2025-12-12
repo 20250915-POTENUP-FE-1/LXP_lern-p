@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import { CourseDraftForm, SectionDraftForm, LectureDraftForm } from '../types/course';
+import {
+  CourseDraftForm,
+  SectionDraftForm,
+  LectureDraftForm,
+  LectureResource,
+} from '../types/course';
 import { createEmptySection, createEmptyLecture } from '../utils/courseDraft';
 import { createSection, updateSection, deleteSection } from '../services/sectionService';
 import { createLecture, updateLecture, deleteLecture } from '../services/lectureService';
@@ -89,48 +94,68 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
     const { courseId, sections } = get();
     if (!courseId) throw new Error('courseId 없음');
 
-    for (const [sectionIndex, section] of sections.entries()) {
-      if (section._deleted && section.id) {
-        await deleteSection(section.id);
-        continue;
-      }
+    const activeSections = sections.filter((s) => !s._deleted);
+
+    for (let sectionIndex = 0; sectionIndex < activeSections.length; sectionIndex++) {
+      const section = activeSections[sectionIndex];
+      const orderIndex = sectionIndex + 1;
 
       let sectionId = section.id;
 
       if (!sectionId && section.title.trim()) {
         const res = await createSection(courseId, {
           title: section.title,
-          orderIndex: sectionIndex,
+          orderIndex: sectionIndex + 1,
         });
-        sectionId = String(res.sectionId);
+        sectionId = res.sectionId;
+        set((s) => ({
+          sections: s.sections.map((sec) =>
+            sec.localId !== section.localId ? sec : { ...sec, id: res.sectionId },
+          ),
+        }));
       }
 
+      if (!sectionId) continue;
+
       if (sectionId && section._dirty) {
-        await updateSection(sectionId, {
+        await updateSection(courseId, sectionId, {
           title: section.title,
-          orderIndex: sectionIndex,
+          orderIndex,
         });
       }
 
       for (const [lectureIndex, lecture] of section.lectures.entries()) {
         if (lecture._deleted && lecture.id) {
-          await deleteLecture(lecture.id);
+          await deleteLecture(courseId, lecture.id);
           continue;
         }
 
         if (!lecture.id && lecture.title.trim()) {
-          const res = await createLecture(sectionId!, {
+          const res = await createLecture(courseId, sectionId, {
             title: lecture.title,
             totalDurationSeconds: lecture.duration,
             isPreview: lecture.isPreview,
             orderIndex: lectureIndex,
-            resource: lecture.resource[0],
+            resource: lecture.resource?.length ? lecture.resource : undefined,
           });
-          lecture.id = String(res.lectureId);
+          const createdLectureId = res.lectureId;
+          set((s) => ({
+            sections: s.sections.map((sec) =>
+              sec.localId !== section.localId
+                ? sec
+                : {
+                    ...sec,
+                    lectures: sec.lectures.map((l) =>
+                      l.localId !== lecture.localId ? l : { ...l, id: createdLectureId },
+                    ),
+                  },
+            ),
+          }));
+          continue;
         }
 
         if (lecture.id && lecture._dirty) {
-          await updateLecture(lecture.id, {
+          await updateLecture(courseId, lecture.id, {
             title: lecture.title,
             totalDurationSeconds: lecture.duration,
             isPreview: lecture.isPreview,

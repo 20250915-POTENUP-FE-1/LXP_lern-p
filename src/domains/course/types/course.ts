@@ -89,6 +89,7 @@ export type LectureDraftForm = DraftMeta & {
   videoUrl: string;
   isPreview: boolean;
   resource: LectureResource[];
+  file?: File;
 };
 
 // === 2. 내부 데이터 구조
@@ -100,9 +101,9 @@ export type DraftMeta = {
 
 // 강의 리소스 타입
 export type LectureResource = {
-  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-  isDownloadable: boolean;
-  fileUrl: string;
+  resourceType?: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP' | undefined;
+  isDownloadable?: boolean;
+  fileUrl?: string;
 };
 
 // 강좌 수강 상태
@@ -153,7 +154,6 @@ export type CreateLectureRequest = {
   isPreview: boolean;
   orderIndex: number;
   resource: {
-    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
     isDownloadable: boolean;
     fileUrl?: string;
   };

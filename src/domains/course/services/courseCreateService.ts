@@ -7,7 +7,7 @@ import type {
   CreateCourseResponse,
 } from '../types/course';
 
-import { fetchApi, getApi, postApi } from '@/shared/lib/api/fetchApi';
+import { fetchApi, getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
 import { createSection } from './sectionService';
 import { createLecture } from './lectureService';
 
@@ -34,7 +34,6 @@ const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseRequest =>
     courseLevel: levelMap[normalizedLevel] ?? 'BEGINNER',
   };
 };
-
 const applySectionDraftsForNewCourse = async (
   courseId: string,
   sectionDrafts: SectionDraftForm[],
@@ -44,7 +43,7 @@ const applySectionDraftsForNewCourse = async (
 
     const sectionRes = await createSection(courseId, {
       title: secDraft.title,
-      orderIndex: sIndex + 1,
+      orderIndex: sIndex,
     });
     const sectionId = String(sectionRes.sectionId ?? '');
 
@@ -58,25 +57,35 @@ const applySectionDraftsForNewCourse = async (
 
       const totalDurationSeconds = lecDraft.duration ?? 0;
 
-      await createLecture(courseId, sectionId, {
-        title: lecDraft.title,
-        totalDurationSeconds,
-        isPreview: lecDraft.isPreview ?? false,
-        orderIndex: lIndex + 1,
-        resource: primaryResource
-          ? [
-              {
-                resourceType: primaryResource.resourceType,
-                isDownloadable: primaryResource.isDownloadable,
-                fileUrl: primaryResource.fileUrl,
-              },
-            ]
-          : undefined,
-      });
+      const hasValidResource =
+        primaryResource &&
+        primaryResource.resourceType &&
+        primaryResource.resourceType !== undefined;
+
+      await createLecture(
+        courseId,
+        sectionId,
+        {
+          title: lecDraft.title,
+          totalDurationSeconds,
+          isPreview: lecDraft.isPreview ?? false,
+          orderIndex: lIndex + 1,
+          resource: hasValidResource
+            ? [
+                {
+                  resourceType: primaryResource.resourceType!, // ← ! 단언 (이미 체크함)
+                  // 백엔드 스펙상 boolean 필수이므로 기본값 false 보장
+                  isDownloadable: Boolean(primaryResource.isDownloadable),
+                  fileUrl: primaryResource.fileUrl,
+                },
+              ]
+            : undefined,
+        },
+        lecDraft.file,
+      );
     }
   }
 };
-
 // 강좌생성 API 호출
 export const createDraftCourse = async (
   draftData: CourseDraftForm,
@@ -95,41 +104,12 @@ export const createDraftCourse = async (
     method: 'POST',
     body: formData,
     credentials: 'include',
-    // headers에 Content-Type 넣지 마세요. fetchApi가 FormData면 자동 제거합니다.
   });
 };
-// 강좌 생성 시 data 방식
-
-async function multipartPost<T>(endpoint: string, formData: FormData): Promise<T> {
-  if (!BASE_URL) throw new Error('NEXT_PUBLIC_BASE_URL 누락');
-  console.log('BASE_URL =', BASE_URL);
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    method: 'POST',
-    body: formData,
-    credentials: 'include',
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`강좌 생성 실패: ${res.status} - ${text}`);
-  }
-
-  const json = (await res.json()) as { code: string; message: string; data: T };
-  if (json.code?.startsWith('E')) throw new Error(json.message);
-  return json.data;
-}
 
 // 강좌 발행 API 호출
-
 export const publishDraftCourse = async (courseId: string): Promise<void> => {
-  const formData = new FormData();
-  formData.append('request', new Blob([JSON.stringify({})], { type: 'application/json' }));
-
-  await fetchApi<void>(`/api/instructor/courses/${courseId}/publish`, {
-    method: 'POST',
-    body: formData,
-    credentials: 'include',
-  });
+  return await patchApi<void>(`/api/instructor/courses/${courseId}/publish`);
 };
 
 export const createCourse = async (
