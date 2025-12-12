@@ -93,10 +93,15 @@ export async function getApi<T = unknown>(endpoint: string, options: RequestInit
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function postApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
+export async function postApi<T = unknown>(
+  endpoint: string,
+  data?: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'POST',
     body: JSON.stringify(data),
+    ...options,
   });
 }
 
@@ -106,10 +111,15 @@ export async function postApi<T = unknown>(endpoint: string, data?: unknown): Pr
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function putApi<T = unknown>(endpoint: string, data: unknown): Promise<T> {
+export async function putApi<T = unknown>(
+  endpoint: string,
+  data: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'PUT',
     body: JSON.stringify(data),
+    ...options,
   });
 }
 
@@ -118,8 +128,11 @@ export async function putApi<T = unknown>(endpoint: string, data: unknown): Prom
  *
  * @param endpoint API 엔드포인트
  */
-export async function deleteApi<T = unknown>(endpoint: string): Promise<T> {
-  return fetchApi<T>(endpoint, { method: 'DELETE' });
+export async function deleteApi<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return fetchApi<T>(endpoint, { method: 'DELETE', ...options });
 }
 
 /**
@@ -128,9 +141,14 @@ export async function deleteApi<T = unknown>(endpoint: string): Promise<T> {
  * @param endpoint API 엔드포인트
  * @param data 요청 데이터
  */
-export async function patchApi<T = unknown>(endpoint: string, data?: unknown): Promise<T> {
+export async function patchApi<T = unknown>(
+  endpoint: string,
+  data?: unknown,
+  options: RequestInit = {},
+): Promise<T> {
   return fetchApi<T>(endpoint, {
     method: 'PATCH',
     body: JSON.stringify(data),
+    ...options,
   });
 }
