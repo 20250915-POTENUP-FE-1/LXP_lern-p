@@ -21,11 +21,25 @@ import type {
   GetCourseDetailResponse,
 } from '../types/course';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
 export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
-  return await getApi<GetAllCourseResponse>(`/api/courses`);
+  const response = await fetch(`${BASE_URL}/api/courses`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
+  }
+
+  const resJson = await response.json();
+  return resJson.data;
 };
 
 /**
