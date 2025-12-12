@@ -54,7 +54,9 @@ export const getCourseDetail = async (courseId: string): Promise<GetCourseDetail
  * 강좌 별 수강 정보 조회
  */
 export const getEnrollmentByCourseId = async (courseId: string): Promise<GetEnrollmentResponse> => {
-  return await getApi<GetEnrollmentResponse>(`/api/enrollments/course/${courseId}`);
+  return await getApi<GetEnrollmentResponse>(`/api/enrollments/course/${courseId}`, {
+    cache: 'no-store',
+  });
 };
 
 /**
