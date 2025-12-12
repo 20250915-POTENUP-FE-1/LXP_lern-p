@@ -47,7 +47,19 @@ export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
  * 강좌 상세 조회
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
-  return await getApi<GetCourseDetailResponse>(`/api/courses/${courseId}`);
+  const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);
+  }
+
+  const resJson = await response.json();
+  return resJson.data;
 };
 
 /**
