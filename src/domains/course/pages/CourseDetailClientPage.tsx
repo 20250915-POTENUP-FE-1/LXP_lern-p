@@ -3,8 +3,7 @@
 import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-import type { Section, Lecture } from '../types/course';
+import { useParams } from 'next/navigation';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -15,7 +14,7 @@ import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import { User } from '@/domains/user/types/user';
-import { useParams } from 'next/navigation';
+import type { Section, Lecture } from '../types/course';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -164,10 +163,10 @@ export default function CourseDetailClientPage() {
                                 </span>
                               </div>
                             )}
-                            {lec.videoUrl && (isEnrolled || isOwner) && (
+                            {lec.resource.fileUrl && (isEnrolled || isOwner) && (
                               <button
                                 className={styles['course-detail__lecture-play']}
-                                onClick={() => handleCourseLearn(lec.videoUrl)}
+                                onClick={() => handleCourseLearn(lec.resource.fileUrl)}
                               >
                                 재생
                               </button>
