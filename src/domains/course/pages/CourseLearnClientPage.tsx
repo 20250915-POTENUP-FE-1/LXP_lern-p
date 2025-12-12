@@ -13,6 +13,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 
 export default function CourseLearnClient() {
   const router = useRouter();
@@ -100,7 +101,7 @@ export default function CourseLearnClient() {
               )}
               <span className={styles['course-learn__progress']}>
                 {currentLecture.type === 'VIDEO' ? '영상 강의' : 'PDF 자료'}
-                {currentLecture.duration && ` · ${currentLecture.duration}`}
+                {currentLecture.duration && ` · ${formatLectureDuration(currentLecture.duration)}`}
               </span>
             </div>
             <h2 className={styles['course-learn__info-title']}>{currentLecture.title}</h2>
@@ -161,7 +162,9 @@ export default function CourseLearnClient() {
                         <div className={styles['course-learn__lecture-text']}>
                           <p className={styles['course-learn__lecture-title']}>{lecture.title}</p>
                           <p className={styles['course-learn__lecture-meta']}>
-                            {lecture.type === 'VIDEO' ? lecture.duration : 'PDF'}
+                            {lecture.type === 'VIDEO'
+                              ? formatLectureDuration(lecture.duration)
+                              : 'PDF'}
                           </p>
                         </div>
                       </button>
