@@ -1,4 +1,4 @@
-export type InstructorCourse = {
+export type InstructorCourseListItemResponse = {
   courseId: string;
   title: string;
   categories: string[];
@@ -10,8 +10,8 @@ export type InstructorCourse = {
   lastModifiedAt: string;
 };
 
-export type InstructorCoursePage = {
-  content: InstructorCourse[];
+export type InstructorCourseListResponse = {
+  content: InstructorCourseListItemResponse[];
   currentPage: number;
   size: number;
   totalElements: number;
