@@ -3,21 +3,40 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 
-import type {
-  CourseLearn,
-  LearnEnrollmentResponse,
-  LearnProgressResponse,
-} from '@/domains/course/types/learn';
+import type { CourseLearn } from '@/domains/course/types/learn';
 
-import { getCourse, getEnrollment, getProgress } from '../services/learnService';
-import { mapCourse, mapLecture } from '../utils/mapCourse';
+import {
+  getCourse,
+  getLearnEnrollment,
+  getLearnProgress,
+} from '@/domains/course/services/learnService';
 
+import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
+import { mapCourse } from '../utils/mapCourse';
+
+/** -------------------------------
+ * 타입 유추용 별칭
+ * ------------------------------- */
 type ProcessedCourse = ReturnType<typeof mapCourse>;
-type ProcessedLecture = ReturnType<typeof mapLecture>;
+type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
+
+/** -------------------------------
+ * courseId → 내 enrollmentId 찾기
+ * ------------------------------- */
+async function getMyEnrollmentId(courseId: string): Promise<string | null> {
+  const page = await getEnrollmentList({
+    status: 'ENROLLED',
+    page: 1,
+    size: 30,
+  });
+
+  const match = page.content.find((item) => String(item.courseId) === String(courseId));
+  return match ? match.enrollmentId : null;
+}
 
 export function useCourseLearn() {
   const { id: courseIdParam } = useParams();
-  const courseId = Number(courseIdParam);
+  const courseId = String(courseIdParam);
 
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
 
@@ -25,45 +44,62 @@ export function useCourseLearn() {
     if (!courseId) return;
 
     async function fetchAll() {
-      // 강좌 상세 조회
+      // 1) 강좌 상세
       const course = await getCourse(courseId);
 
-      // 수강 정보 단건 조회
-      const enrollment: LearnEnrollmentResponse | null =
-        course.isPurchased && course.studentCount > 0 ? await getEnrollment(courseId) : null;
+      // 2) 내 enrollmentId 찾기
+      const enrollmentId = await getMyEnrollmentId(courseId);
 
-      // 진도 조회
-      const progress: LearnProgressResponse | null = enrollment
-        ? await getProgress(enrollment.enrollmentId)
-        : null;
+      // 3) Learn 도메인용 enrollment / progress 조회
+      const enrollment = enrollmentId ? await getLearnEnrollment(enrollmentId) : null;
+      const progress = enrollmentId ? await getLearnProgress(enrollmentId) : null;
 
-      setLearnData({ course, enrollment, progress });
+      const next: CourseLearn = {
+        course,
+        enrollment,
+        progress,
+      };
+
+      setLearnData(next);
     }
 
     fetchAll();
   }, [courseId]);
 
+  /** UI용 courseData 가공 */
   const courseData: ProcessedCourse | null = useMemo(() => {
-    return learnData ? mapCourse(learnData.course) : null;
+    if (!learnData) return null;
+    const mapped = mapCourse(learnData.course, learnData.progress || undefined);
+    return mapped;
   }, [learnData]);
 
+  /** 현재 강의 */
   const [currentLecture, setCurrentLecture] = useState<ProcessedLecture | null>(null);
 
   useEffect(() => {
-    if (!courseData) return setCurrentLecture(null);
-    setCurrentLecture(courseData.sections[0]?.lectures[0] ?? null);
+    if (!courseData) {
+      setCurrentLecture(null);
+      return;
+    }
+
+    const firstLecture = courseData.sections[0]?.lectures[0] ?? null;
+
+    setCurrentLecture(firstLecture);
   }, [courseData]);
 
-  const [openSections, setOpenSections] = useState<number[]>([]);
+  /** 펼침 섹션 */
+  const [openSections, setOpenSections] = useState<string[]>([]);
 
-  const toggleSection = (id: number) => {
+  const toggleSection = (id: string) => {
     setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   };
 
+  /** 강의 클릭 */
   const handleLectureClick = (lec: ProcessedLecture) => {
     setCurrentLecture(lec);
   };
 
+  /** 총 강의 / 완료 강의 수 */
   const totalLectures = useMemo(() => {
     return courseData ? courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0) : 0;
   }, [courseData]);

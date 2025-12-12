@@ -5,29 +5,30 @@ import type {
 } from '@/domains/course/types/learn';
 import { getApi } from '@/shared/lib/api/fetchApi';
 
-/**
- * 강좌 상세 조회
- */
+import {
+  MOCK_LEARN_COURSE_MAP,
+  MOCK_LEARN_ENROLLMENT,
+  MOCK_LEARN_PROGRESS,
+} from '@/mocks/learn.mock';
+
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'false';
+
 export async function getCourse(courseId: string): Promise<LearnCourse> {
-  return await getApi<LearnCourse>(`/api/courses/${courseId}`, {
-    cache: 'no-store',
-  });
+  if (USE_MOCK) {
+    const mock = MOCK_LEARN_COURSE_MAP[courseId];
+    if (!mock) throw new Error(`Mock course not found: ${courseId}`);
+    return mock;
+  }
+
+  return getApi<LearnCourse>(`/api/courses/${courseId}`, { cache: 'no-store' });
 }
 
-/**
- * 수강 정보 조회 (단건)
- */
-export async function getEnrollment(enrollmentId: string): Promise<LearnEnrollmentResponse> {
-  return await getApi<LearnEnrollmentResponse>(`/api/enrollments/${enrollmentId}`, {
-    cache: 'no-store',
-  });
+export async function getLearnEnrollment(enrollmentId: string): Promise<LearnEnrollmentResponse> {
+  if (USE_MOCK) return MOCK_LEARN_ENROLLMENT;
+  return getApi(`/api/enrollments/${enrollmentId}`, { cache: 'no-store' });
 }
 
-/**
- * 학습 진척도 조회
- */
-export async function getProgress(enrollmentId: string): Promise<LearnProgressResponse> {
-  return await getApi<LearnProgressResponse>(`/api/progresses/${enrollmentId}`, {
-    cache: 'no-store',
-  });
+export async function getLearnProgress(enrollmentId: string): Promise<LearnProgressResponse> {
+  if (USE_MOCK) return MOCK_LEARN_PROGRESS;
+  return getApi(`/api/progresses/${enrollmentId}`, { cache: 'no-store' });
 }

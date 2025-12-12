@@ -1,8 +1,12 @@
-import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
+// ------------------------------------------------------
+// Learn 도메인 타입 (백엔드 API Response 그대로 매핑)
+// ------------------------------------------------------
+
+import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 export type LearnLectureResource = {
   resourceId: string;
-  resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
+  resourceType: 'VIDEO' | 'PDF';
   fileUrl: string;
   isDownloadable: boolean;
 };
@@ -69,6 +73,49 @@ export type LearnProgressResponse = {
 
 export type CourseLearn = {
   course: LearnCourse;
-  enrollment: LearnEnrollmentResponse;
-  progress: LearnProgressResponse;
+  enrollment: LearnEnrollmentResponse | null;
+  progress: LearnProgressResponse | null;
+};
+
+// ------------------------------------------------------
+// UI용 타입
+// ------------------------------------------------------
+
+export type UILecture = {
+  id: string;
+  title: string;
+  description?: string;
+  duration: number;
+  type: 'VIDEO' | 'PDF';
+  videoUrl?: string;
+  pdfUrl?: string;
+  completed: boolean;
+  isCurrent: boolean;
+};
+
+export type UISection = {
+  id: string;
+  title: string;
+  order: number;
+  lectures: UILecture[];
+};
+
+export type UICourse = {
+  courseId: string;
+  title: string;
+  summary: string;
+  description: string;
+  categories: string[];
+  level: string;
+  price: number;
+  status: string;
+  thumbnailUrl: string;
+
+  instructor: {
+    id: string;
+    name: string;
+    profileUrl: string;
+  };
+
+  sections: UISection[];
 };

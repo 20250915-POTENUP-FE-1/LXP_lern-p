@@ -12,9 +12,11 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function CourseLearnClient() {
+  const router = useRouter();
+
   const {
     courseData,
     currentLecture,
@@ -35,11 +37,13 @@ export default function CourseLearnClient() {
       <header className={styles['course-learn__header']}>
         <div className={styles['course-learn__header-inner']}>
           <div className={styles['course-learn__header-left']}>
-            <Link href="/">
-              <button className={styles['course-learn__back-btn']} aria-label="back">
-                <ArrowLeft className={styles['course-learn__icon']} />
-              </button>
-            </Link>
+            <button
+              className={styles['course-learn__back-btn']}
+              aria-label="back"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className={styles['course-learn__icon']} />
+            </button>
             <h1 className={styles['course-learn__title']}>{courseData.title}</h1>
           </div>
           <div className={styles['course-learn__progress']}>
@@ -52,7 +56,7 @@ export default function CourseLearnClient() {
         {/* 메인 플레이어 */}
         <main className={styles['course-learn__main']}>
           <div className={styles['course-learn__player-wrap']}>
-            {currentLecture.type === 'VIDEO' ? (
+            {currentLecture.type === 'VIDEO' && currentLecture.videoUrl ? (
               <div className={styles['course-learn__player']}>
                 <video
                   key={currentLecture.id}
