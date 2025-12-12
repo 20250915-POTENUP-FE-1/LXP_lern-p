@@ -168,6 +168,7 @@ export const createLecture = async (
           ?.split('=')[1]
       : undefined;
 
+  console.log(accessToken ? '✅ accessToken 포함' : '❌ accessToken 없음');
   const res = await fetch(
     `${BASE_URL}/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
     {
@@ -177,7 +178,7 @@ export const createLecture = async (
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
     },
   );
-
+  console.log('📤 강의 생성 응답:', res);
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`강의 생성 실패: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
