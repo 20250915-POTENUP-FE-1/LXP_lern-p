@@ -19,6 +19,7 @@ import type {
   CreateSectionRequest,
   GetAllCourseResponse,
   GetCourseDetailResponse,
+  GetEnrollmentResponse,
 } from '../types/course';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -47,6 +48,13 @@ export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
   return await getApi<GetCourseDetailResponse>(`/api/courses/${courseId}`);
+};
+
+/**
+ * 강좌 별 수강 정보 조회
+ */
+export const getEnrollmentByCourseId = async (courseId: string): Promise<GetEnrollmentResponse> => {
+  return await getApi<GetEnrollmentResponse>(`/api/enrollments/course/${courseId}`);
 };
 
 /**
