@@ -3,8 +3,7 @@
 import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-import type { Section, Lecture } from '../types/course';
+import { useParams, useRouter } from 'next/navigation';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -14,8 +13,8 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
-import { User } from '@/domains/user/types/user';
-import { useParams } from 'next/navigation';
+import type { Section, Lecture } from '../types/course';
+import { LEVEL_LABEL } from '../constants/level';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -25,8 +24,9 @@ export type CourseDetailClientPageProps = {
 
 export default function CourseDetailClientPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
 
-  const { user } = useAuthState() as { user: User | null };
+  const { user, setUser } = useAuthState();
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
 
@@ -55,12 +55,27 @@ export default function CourseDetailClientPage() {
       loginModal.open();
       return;
     }
-    applyModal.open();
+    if (course.isFree) {
+      applyModal.open();
+      return;
+    }
+    router.push(isEnrolled ? `/courses/${id}/learn` : `/cart?courseId=${id}`);
   };
 
-  const handleCourseLearn = (videoUrl: string) => {
-    if (!videoUrl) return;
-    window.open(videoUrl, '_blank', 'noopener,noreferrer');
+  const handleAddToCartClick = async () => {
+    if (!user) {
+      loginModal.open();
+      return;
+    }
+    try {
+      setUser({
+        ...user,
+        cart: user.cart.includes(id) ? user.cart : [...user.cart, id],
+      });
+      // toast.success('장바구니에 담았어요');
+    } catch {
+      // toast.error('장바구니 담기에 실패했어요');
+    }
   };
 
   const totalLectures = sections.reduce(
@@ -102,7 +117,7 @@ export default function CourseDetailClientPage() {
               <li className={styles['course-detail__meta-people']}>
                 {course.studentCount ?? 0}명 수강중
               </li>
-              <li>{course.level}</li>
+              <li>{LEVEL_LABEL[course.level]}</li>
             </ul>
 
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
@@ -153,25 +168,6 @@ export default function CourseDetailClientPage() {
                             <span className={styles['course-detail__lecture-title']}>
                               {lec.title} ({lec.duration}분)
                             </span>
-
-                            {!isEnrolled && !isOwner && (
-                              <div className={styles['course-detail__lecture-locked']}>
-                                <span className={styles['course-detail__lecture-lock-icon']}>
-                                  🔒
-                                </span>
-                                <span className={styles['course-detail__lecture-lock-text']}>
-                                  수강 후 열람 가능
-                                </span>
-                              </div>
-                            )}
-                            {lec.videoUrl && (isEnrolled || isOwner) && (
-                              <button
-                                className={styles['course-detail__lecture-play']}
-                                onClick={() => handleCourseLearn(lec.videoUrl)}
-                              >
-                                재생
-                              </button>
-                            )}
                           </div>
                         </li>
                       ))}
@@ -195,6 +191,7 @@ export default function CourseDetailClientPage() {
           isFree={course.isFree}
           isEnrolled={isEnrolled}
           onApply={handleApplyClick}
+          onAddToCart={handleAddToCartClick}
           isOwner={isOwner}
           instructorName={course.instructorName}
           totalLectures={courseInfo.totalLectures}

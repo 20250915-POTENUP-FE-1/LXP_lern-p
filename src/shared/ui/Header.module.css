@@ -102,6 +102,19 @@
   display: inline-flex;
 }
 
+.header__action--icon {
+  padding: var(--space-2);
+  border-radius: var(--radius-full);
+  width: 36px;
+  height: 36px;
+}
+
+.header__icon {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text);
+}
+
 .header__action--link:hover {
   color: var(--color-brand);
   border-color: var(--color-brand);
