@@ -5,9 +5,42 @@ import Link from 'next/link';
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { formatUserDate } from '@/domains/user/utils/formatUserDate';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
+import { useEffect, useState } from 'react';
+import { updateMyProfile } from '../services/userService';
 
 export default function ProfilePage() {
-  const { user, loading } = useAuthState();
+  const { user, setUser, loading } = useAuthState();
+  const [isEditing, setIsEditing] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user.nickname);
+    }
+  }, [user?.nickname]);
+
+  async function handleSave() {
+    if (!nickname.trim() || !user) return;
+
+    try {
+      setIsSaving(true);
+
+      await updateMyProfile({ nickname });
+
+      setUser({
+        ...user,
+        nickname,
+      });
+
+      setIsEditing(false);
+    } catch (e) {
+      console.error('프로필 수정 실패', e);
+      alert('닉네임 수정에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   if (loading || !user) return null;
 
@@ -17,15 +50,6 @@ export default function ProfilePage() {
         <h1 id="mypage-profile-title" className={styles['profile-section__title']}>
           내 정보
         </h1>
-
-        <div className={styles['profile__actions']}>
-          <Link
-            href="/mypage/profile/edit"
-            className={`${styles['profile__btn']} ${styles['profile__btn--edit']}`}
-          >
-            정보 수정
-          </Link>
-        </div>
       </div>
 
       {/* 프로필 헤더 카드 */}
@@ -35,7 +59,27 @@ export default function ProfilePage() {
         </div>
 
         <div className={styles['profile-section__identity']}>
-          <h2 className={styles['profile-section__name']}>{user.nickname}님</h2>
+          <h2 className={styles['profile-section__name']}>
+            {isEditing ? (
+              <input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className={styles['profile-section__input']}
+                autoFocus
+              />
+            ) : (
+              <span>{user.nickname}님</span>
+            )}
+
+            <button
+              type="button"
+              className={`${styles['profile__btn']} ${styles['profile__btn--edit']}`}
+              onClick={isEditing ? handleSave : () => setIsEditing(true)}
+              disabled={isSaving}
+            >
+              {isEditing ? '저장' : '수정'}
+            </button>
+          </h2>
           <p className={styles['profile-section__email']}>{user.email}</p>
           <p className={styles['profile-section__since']}>
             가입일: {formatUserDate(user.createdAt)}
@@ -47,7 +91,7 @@ export default function ProfilePage() {
       <div className={styles['profile-section__card']}>
         <div className={styles['profile-section__row']}>
           <span className={styles['profile-section__label']}>이름</span>
-          <span className={styles['profile-section__value']}>{user.nickname}</span>
+          <span className={styles['profile-section__value']}>{user.nickname}님</span>
         </div>
 
         <div className={styles['profile-section__divider']} />

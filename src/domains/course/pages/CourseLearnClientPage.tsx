@@ -12,7 +12,7 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function CourseLearnClient() {
   const router = useRouter();
