@@ -3,10 +3,8 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDoc,
   getDocs,
   increment,
-  orderBy,
   query,
   runTransaction,
   serverTimestamp,
@@ -14,80 +12,32 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-
 import type { User } from '@/domains/user/types/user';
+import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
-  Course,
-  Section,
-  Lecture,
-  CourseDetailResponse,
   CreateCourseRequest,
   CreateSectionRequest,
+  GetAllCourseResponse,
+  GetCourseDetailResponse,
 } from '../types/course';
 
-export const getAllCourses = async (): Promise<Course[]> => {
-  try {
-    const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
-
-    return snap.docs.map((docSnap) => {
-      const data = docSnap.data() as Omit<Course, 'id'>;
-      return { id: docSnap.id, ...data };
-    });
-  } catch (err) {
-    console.error('getAllCourses 실패:', err);
-    throw new Error('강좌를 불러오지 못했습니다.');
-  }
+/**
+ * 강좌 목록 조회 (무한 스크롤)
+ */
+export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
+  return await getApi<GetAllCourseResponse>(`/api/courses`);
 };
 
-export const getCourse = async (courseId: string): Promise<CourseDetailResponse> => {
-  if (!courseId) {
-    return { course: null, sections: [], lectures: {} };
-  }
-
-  try {
-    const courseRef = doc(db, 'courses', courseId);
-    const courseSnap = await getDoc(courseRef);
-
-    if (!courseSnap.exists()) {
-      return { course: null, sections: [], lectures: {} };
-    }
-
-    const courseData = courseSnap.data() as Omit<Course, 'id'>;
-    const course: Course = { id: courseSnap.id, ...courseData };
-
-    const sectionQuery = query(collection(db, 'sections'), where('courseId', '==', courseId));
-    const sectionSnap = await getDocs(sectionQuery);
-
-    const sections: Section[] = sectionSnap.docs
-      .map((d) => {
-        const data = d.data() as Omit<Section, 'id'>;
-        return { id: d.id, ...data };
-      })
-      .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
-
-    const lectureQuery = query(collection(db, 'lectures'), where('courseId', '==', courseId));
-    const lectureSnap = await getDocs(lectureQuery);
-
-    const lectureList: Lecture[] = lectureSnap.docs.map((d) => {
-      const data = d.data() as Omit<Lecture, 'id'>;
-      return { id: d.id, ...data };
-    });
-
-    const lectureMap: Record<string, Lecture[]> = {};
-    for (const section of sections) {
-      lectureMap[section.id] = lectureList
-        .filter((lec) => lec.sectionId === section.id)
-        .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
-    }
-
-    return { course, sections, lectures: lectureMap };
-  } catch (err) {
-    console.error('getCourse 실패:', err);
-    throw new Error('강좌 정보를 불러오지 못했습니다.');
-  }
+/**
+ * 강좌 상세 조회
+ */
+export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
+  return await getApi<GetCourseDetailResponse>(`/api/courses/${courseId}`);
 };
 
+/**
+ * 강좌 신청
+ */
 export const applyCourse = async (userId: string, courseId: string): Promise<boolean> => {
   if (!userId || !courseId) throw new Error('Invalid params');
 
