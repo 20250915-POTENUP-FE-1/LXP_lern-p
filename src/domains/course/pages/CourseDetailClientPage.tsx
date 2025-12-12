@@ -3,7 +3,7 @@
 import { MouseEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -13,7 +13,6 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
-import { User } from '@/domains/user/types/user';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 
@@ -25,8 +24,9 @@ export type CourseDetailClientPageProps = {
 
 export default function CourseDetailClientPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
 
-  const { user } = useAuthState() as { user: User | null };
+  const { user, setUser } = useAuthState();
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
 
@@ -55,7 +55,27 @@ export default function CourseDetailClientPage() {
       loginModal.open();
       return;
     }
-    applyModal.open();
+    if (course.isFree) {
+      applyModal.open();
+      return;
+    }
+    router.push(`/cart?courseId=${id}`);
+  };
+
+  const handleAddToCartClick = async () => {
+    if (!user) {
+      loginModal.open();
+      return;
+    }
+    try {
+      setUser({
+        ...user,
+        cart: user.cart.includes(id) ? user.cart : [...user.cart, id],
+      });
+      // toast.success('장바구니에 담았어요');
+    } catch {
+      // toast.error('장바구니 담기에 실패했어요');
+    }
   };
 
   const handleCourseLearn = (videoUrl: string) => {
@@ -195,6 +215,7 @@ export default function CourseDetailClientPage() {
           isFree={course.isFree}
           isEnrolled={isEnrolled}
           onApply={handleApplyClick}
+          onAddToCart={handleAddToCartClick}
           isOwner={isOwner}
           instructorName={course.instructorName}
           totalLectures={courseInfo.totalLectures}
