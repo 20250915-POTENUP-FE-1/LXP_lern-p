@@ -2,17 +2,15 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-
-import Link from 'next/link';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { createCourse } from '@/domains/course/services/courseService';
 import type {
   CreateCourseRequest,
   CreateSectionRequest,
   CreateLectureRequest,
+  CourseLevel,
 } from '@/domains/course/types/course';
 import { validateForm } from '@/shared/util/validateForm';
-
 import { LectureUploader } from './LectureUploader';
 import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
@@ -23,7 +21,7 @@ type CourseForm = {
   summary: string;
   description: string;
   category: string[];
-  level: string;
+  level: CourseLevel;
   price: number | ''; // input 제어용
   thumbnailUrl: string;
 };
@@ -66,7 +64,7 @@ export function CourseForm() {
     summary: '',
     description: '',
     category: [],
-    level: '',
+    level: 'BEGINNER',
     price: '',
     thumbnailUrl: '',
   });

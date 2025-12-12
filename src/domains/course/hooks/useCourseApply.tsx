@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { applyCourse, getEnrollmentStatus } from '../services/courseService';
 import { User } from '@/domains/user/types/user';
+import { applyCourse, getEnrollmentByCourseId } from '../services/courseService';
 
 export function useCourseApply(currentUser: User | null, courseId: string) {
   const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
@@ -14,8 +14,8 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
 
     (async () => {
       try {
-        const enrolled = await getEnrollmentStatus(currentUser.id, courseId);
-        setIsEnrolled(enrolled);
+        const enrolled = await getEnrollmentByCourseId(courseId);
+        setIsEnrolled(!!enrolled);
       } catch (err) {
         console.error('수강 상태 확인 실패:', err);
         setIsEnrolled(false);

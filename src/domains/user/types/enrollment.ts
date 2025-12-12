@@ -1,41 +1,47 @@
 export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
 
-/**
- * Enrollment 도메인 모델
- * 사용자가 강좌를 수강한 기록
- */
-export type Enrollment = {
-  id: string;
-  userId: string;
+// 1) 수강 목록 조회 (GET /api/enrollments)
+export type EnrollmentListContent = {
+  enrollmentId: string;
+  courseId: string;
+  courseName: string;
+  status: EnrollmentStatus;
+  progressRate: number;
+  expiredAt: string;
+  categories: string[];
+};
+
+export type EnrollmentListResponse = {
+  content: EnrollmentListContent[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+};
+
+// 2) 수강 단건 조회 (GET /api/enrollments/{enrollmentId})
+export type EnrollmentDetailResponse = {
+  enrollmentId: string;
+  studentId: string;
   courseId: string;
   status: EnrollmentStatus;
+  progressRate: number;
   createdAt: string;
+  expiredAt: string;
 };
 
-/**
- * Enrollment + Course Join 모델
- * 마이페이지, 수강 목록 등에 사용
- */
-export type EnrollmentWithCourse = Enrollment & {
-  course: {
-    id: string;
-    title: string;
-    categories: string[]; // 단일 category는 도메인 상 모순
-    thumbnailUrl: string | null;
-  };
+// 3) 진도 조회 (GET /api/progresses/{enrollmentId})
+export type EnrollmentProgressResponse = {
+  resourceId: string;
+  enrollmentId: string;
+  progressRate: number;
+  lastVideoId: string;
+  lastWatchedDuration: number;
+  updatedAt: string;
 };
 
-export type EnrolledCourse = {
-  id: string;
-  userId: string;
-  courseId: string;
-  progress: number;
-  createdAt: string | null;
-  updatedAt: string | null;
-  course: {
-    id: string;
-    title: string;
-    category: string | string[];
-    thumbnailUrl: string | null;
-  } | null;
+// 4) Learn 페이지 전용 묶음 타입
+export type EnrollmentLearnData = {
+  enrollment: EnrollmentDetailResponse | null;
+  progress: EnrollmentProgressResponse | null;
 };
