@@ -1,6 +1,8 @@
 'use client';
 
 import styles from '@/app/courses/[id]/FloatingCTA.module.css';
+import { LEVEL_LABEL } from '../constants/level';
+import { CourseLevel } from '../types/course';
 
 export type FloatingCTAProps = {
   price: number;
@@ -12,7 +14,7 @@ export type FloatingCTAProps = {
   instructorName: string;
   totalLectures: number;
   totalTime: string;
-  level: string;
+  level: CourseLevel;
 
   onAddToCart?: () => void;
 };
@@ -91,7 +93,7 @@ export const FloatingCTA = ({
 
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>난이도</span>
-            <span className={styles['floating-cta__meta-value']}>{level ?? '초급'}</span>
+            <span className={styles['floating-cta__meta-value']}>{LEVEL_LABEL[level]}</span>
           </li>
         </ul>
       </div>

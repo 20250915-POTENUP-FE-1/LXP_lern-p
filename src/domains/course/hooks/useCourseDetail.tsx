@@ -7,6 +7,7 @@ import type {
   Lecture,
   GetCourseDetailResponse,
 } from '../types/course';
+import { LEVEL_LABEL } from '../constants/level';
 
 export function useCourseDetail(courseId: string) {
   const [courseData, setCourseData] = useState<CourseDetail>({
@@ -41,7 +42,7 @@ export function useCourseDetail(courseId: string) {
           level: courseDetailResponse.level,
           tags: [
             courseDetailResponse.categories[courseDetailResponse.categories.length - 1],
-            courseDetailResponse.level,
+            LEVEL_LABEL[courseDetailResponse.level],
           ],
 
           price: courseDetailResponse.price,

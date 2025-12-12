@@ -9,7 +9,7 @@ export type Course = {
   instructorName: string;
 
   category: string[];
-  level: string;
+  level: CourseLevel;
   tags: string[];
 
   price: number;
@@ -83,7 +83,7 @@ export type CreateCourseRequest = {
   description: string;
   thumbnailUrl: string;
   category: string[];
-  level: string;
+  level: CourseLevel;
   price: number | string;
 };
 

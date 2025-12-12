@@ -15,6 +15,7 @@ import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import { User } from '@/domains/user/types/user';
 import type { Section, Lecture } from '../types/course';
+import { LEVEL_LABEL } from '../constants/level';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -101,7 +102,7 @@ export default function CourseDetailClientPage() {
               <li className={styles['course-detail__meta-people']}>
                 {course.studentCount ?? 0}명 수강중
               </li>
-              <li>{course.level}</li>
+              <li>{LEVEL_LABEL[course.level]}</li>
             </ul>
 
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}

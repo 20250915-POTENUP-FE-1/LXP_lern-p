@@ -7,6 +7,7 @@ import { getAllCourses } from '../services/courseService';
 import type { CourseCardType, GetAllCourseResponse } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import { SortSelect, sortCourses } from '../components/SortSelect';
+import { LEVEL_LABEL } from '../constants/level';
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
@@ -27,7 +28,7 @@ export default function CourseListClientPage() {
           instructorName: item.instructorName,
           category: item.categories,
           level: item.level,
-          tags: [item.categories[item.categories.length - 1], item.level],
+          tags: [item.categories[item.categories.length - 1], LEVEL_LABEL[item.level]],
           price: item.price,
           isFree: item.price === 0,
           studentCount: item.studentCount,
