@@ -31,9 +31,7 @@ export const FloatingCTA = ({
   level,
   onAddToCart,
 }: FloatingCTAProps) => {
-  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기';
-
-  const isPrimaryDisabled = isEnrolled || isOwner;
+  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '학습하기' : '수강신청하기';
 
   return (
     <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
@@ -48,10 +46,10 @@ export const FloatingCTA = ({
           <button
             type="button"
             className={`${styles['floating-cta__button']} ${
-              isPrimaryDisabled ? styles['floating-cta__button--disabled'] : ''
+              isOwner ? styles['floating-cta__button--disabled'] : ''
             }`}
             onClick={onApply}
-            disabled={isPrimaryDisabled}
+            disabled={isOwner}
           >
             {primaryLabel}
           </button>

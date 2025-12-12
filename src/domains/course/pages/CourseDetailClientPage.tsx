@@ -59,7 +59,7 @@ export default function CourseDetailClientPage() {
       applyModal.open();
       return;
     }
-    router.push(`/cart?courseId=${id}`);
+    router.push(isEnrolled ? `/courses/${id}/learn` : `/cart?courseId=${id}`);
   };
 
   const handleAddToCartClick = async () => {
@@ -76,11 +76,6 @@ export default function CourseDetailClientPage() {
     } catch {
       // toast.error('장바구니 담기에 실패했어요');
     }
-  };
-
-  const handleCourseLearn = (videoUrl: string) => {
-    if (!videoUrl) return;
-    window.open(videoUrl, '_blank', 'noopener,noreferrer');
   };
 
   const totalLectures = sections.reduce(
@@ -173,25 +168,6 @@ export default function CourseDetailClientPage() {
                             <span className={styles['course-detail__lecture-title']}>
                               {lec.title} ({lec.duration}분)
                             </span>
-
-                            {!isEnrolled && !isOwner && (
-                              <div className={styles['course-detail__lecture-locked']}>
-                                <span className={styles['course-detail__lecture-lock-icon']}>
-                                  🔒
-                                </span>
-                                <span className={styles['course-detail__lecture-lock-text']}>
-                                  수강 후 열람 가능
-                                </span>
-                              </div>
-                            )}
-                            {lec.resource.fileUrl && (isEnrolled || isOwner) && (
-                              <button
-                                className={styles['course-detail__lecture-play']}
-                                onClick={() => handleCourseLearn(lec.resource.fileUrl)}
-                              >
-                                재생
-                              </button>
-                            )}
                           </div>
                         </li>
                       ))}
