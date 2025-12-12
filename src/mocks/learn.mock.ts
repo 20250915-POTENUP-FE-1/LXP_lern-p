@@ -1,10 +1,10 @@
 import type {
-  LearnCourse,
+  LearnCourseResponse,
   LearnEnrollmentResponse,
   LearnProgressResponse,
 } from '@/domains/course/types/learn';
 
-export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourse> = {
+export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   '2001': {
     courseId: '2001',
     title: '스프링 부트 완벽 가이드',

@@ -5,12 +5,12 @@ import Link from 'next/link';
 
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { getInstructorCourses } from '@/domains/course/services/instructorCourseService';
-import type { InstructorCourse } from '@/domains/course/types/instructor';
+import type { InstructorCourseListItemResponse } from '@/domains/course/types/instructor';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 export default function InstructorCourseClientPage() {
   const { user, loading: userLoading } = useAuthState();
-  const [courses, setCourses] = useState<InstructorCourse[]>([]);
+  const [courses, setCourses] = useState<InstructorCourseListItemResponse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState<boolean>(false);
 
   useEffect(() => {

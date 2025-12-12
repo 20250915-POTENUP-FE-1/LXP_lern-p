@@ -4,30 +4,30 @@
 
 import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
-export type LearnLectureResource = {
+export type LearnLectureResourceResponse = {
   resourceId: string;
   resourceType: 'VIDEO' | 'PDF';
   fileUrl: string;
   isDownloadable: boolean;
 };
 
-export type LearnLecture = {
+export type LearnLectureResponse = {
   lectureId: string;
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  resource: LearnLectureResource;
+  resource: LearnLectureResourceResponse;
 };
 
-export type LearnSection = {
+export type LearnSectionResponse = {
   sectionId: string;
   title: string;
   order: number;
-  lectures: LearnLecture[];
+  lectures: LearnLectureResponse[];
 };
 
-export type LearnCourse = {
+export type LearnCourseResponse = {
   courseId: string;
   title: string;
   summary: string;
@@ -48,7 +48,7 @@ export type LearnCourse = {
   studentCount: number;
   totalDuration: number;
 
-  sections: LearnSection[];
+  sections: LearnSectionResponse[];
 };
 
 export type LearnEnrollmentResponse = {
@@ -72,7 +72,7 @@ export type LearnProgressResponse = {
 };
 
 export type CourseLearn = {
-  course: LearnCourse;
+  course: LearnCourseResponse;
   enrollment: LearnEnrollmentResponse | null;
   progress: LearnProgressResponse | null;
 };

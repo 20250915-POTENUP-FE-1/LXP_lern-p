@@ -1,5 +1,5 @@
 import type {
-  LearnCourse,
+  LearnCourseResponse,
   LearnEnrollmentResponse,
   LearnProgressResponse,
 } from '@/domains/course/types/learn';
@@ -8,8 +8,8 @@ import { getApi } from '@/shared/lib/api/fetchApi';
 /**
  * 강좌 상세 조회
  */
-export async function getCourse(courseId: string): Promise<LearnCourse> {
-  return getApi<LearnCourse>(`/api/courses/${courseId}`, { cache: 'no-store' });
+export async function getCourse(courseId: string): Promise<LearnCourseResponse> {
+  return getApi<LearnCourseResponse>(`/api/courses/${courseId}`, { cache: 'no-store' });
 }
 
 /**

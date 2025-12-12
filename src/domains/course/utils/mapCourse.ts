@@ -1,6 +1,6 @@
 import type {
-  LearnCourse,
-  LearnLecture,
+  LearnCourseResponse,
+  LearnLectureResponse,
   LearnProgressResponse,
   UICourse,
   UISection,
@@ -17,10 +17,13 @@ function formatDuration(seconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-export function mapCourse(course: LearnCourse, progress?: LearnProgressResponse | null): UICourse {
+export function mapCourse(
+  course: LearnCourseResponse,
+  progress?: LearnProgressResponse | null,
+): UICourse {
   const lastVideoId = progress?.lastVideoId ?? null;
 
-  const toUILecture = (lec: LearnLecture): UILecture => ({
+  const toUILecture = (lec: LearnLectureResponse): UILecture => ({
     id: lec.lectureId,
     title: lec.title,
     // 백엔드에서 설명 필드 없으니 일단 비워두기 (나중에 확장 가능)

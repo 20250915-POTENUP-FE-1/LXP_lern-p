@@ -5,10 +5,10 @@ import Link from 'next/link';
 
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
-import type { EnrollmentListItem } from '@/domains/user/types/enrollment';
+import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 
 export default function EnrollmentClientPage() {
-  const [items, setItems] = useState<EnrollmentListItem[]>([]);
+  const [items, setItems] = useState<EnrollmentListContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolledLoading, setEnrolledLoading] = useState<boolean>(false);
 

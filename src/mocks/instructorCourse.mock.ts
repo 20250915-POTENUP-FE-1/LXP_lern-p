@@ -1,6 +1,6 @@
-import type { InstructorCoursePage } from '@/domains/course/types/instructor';
+import type { InstructorCourseListResponse } from '@/domains/course/types/instructor';
 
-export const MOCK_INSTRUCTOR_COURSES: InstructorCoursePage = {
+export const MOCK_INSTRUCTOR_COURSES: InstructorCourseListResponse = {
   content: [
     {
       courseId: '2',

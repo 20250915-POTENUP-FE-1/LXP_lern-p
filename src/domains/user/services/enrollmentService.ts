@@ -1,8 +1,8 @@
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
-  EnrollmentListPage,
-  EnrollmentDetail,
-  EnrollmentProgress,
+  EnrollmentListResponse,
+  EnrollmentDetailResponse,
+  EnrollmentProgressResponse,
 } from '@/domains/user/types/enrollment';
 
 /** ===============================
@@ -13,14 +13,14 @@ export async function getEnrollmentList(params?: {
   status?: string;
   page?: number;
   size?: number;
-}): Promise<EnrollmentListPage> {
+}): Promise<EnrollmentListResponse> {
   const query = new URLSearchParams({
     status: params?.status ?? 'ENROLLED',
     page: String(params?.page ?? 1),
     size: String(params?.size ?? 10),
   });
 
-  return await getApi<EnrollmentListPage>(`/api/enrollments?${query.toString()}`, {
+  return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
     cache: 'no-store',
   });
 }
@@ -29,8 +29,8 @@ export async function getEnrollmentList(params?: {
  * 2) 수강 단건 조회
  * GET /api/enrollments/{enrollmentId}
  * =============================== */
-export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetail> {
-  return await getApi<EnrollmentDetail>(`/api/enrollments/${enrollmentId}`, {
+export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResponse> {
+  return await getApi<EnrollmentDetailResponse>(`/api/enrollments/${enrollmentId}`, {
     cache: 'no-store',
   });
 }
@@ -39,8 +39,8 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
  * 3) 진도 조회
  * GET /api/progresses/{enrollmentId}
  * =============================== */
-export async function getProgress(enrollmentId: string): Promise<EnrollmentProgress> {
-  return await getApi<EnrollmentProgress>(`/api/progresses/${enrollmentId}`, {
+export async function getProgress(enrollmentId: string): Promise<EnrollmentProgressResponse> {
+  return await getApi<EnrollmentProgressResponse>(`/api/progresses/${enrollmentId}`, {
     cache: 'no-store',
   });
 }
