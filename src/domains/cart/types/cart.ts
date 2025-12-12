@@ -1,5 +1,5 @@
 export type PreparePaymentRequest = {
-  items: Array<{ courseId: string }>;
+  items: Array<{ courseId: number }>;
 };
 
 export type PreparePaymentResponse = {
@@ -14,7 +14,7 @@ export type ComfirmPaymentRequest = {
 };
 
 export type CartItem = {
-  id: string;
+  id: number;
   title: string;
   instructor: string;
   price: number;
