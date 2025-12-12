@@ -1,29 +1,33 @@
-import type { EnrollmentStatus } from '@/domains/user/types/enrollment';
+// ------------------------------------------------------
+// Learn 도메인 타입 (백엔드 API Response 그대로 매핑)
+// ------------------------------------------------------
 
-export type LearnLectureResource = {
+import { EnrollmentStatus } from '@/domains/user/types/enrollment';
+
+export type LearnLectureResourceResponse = {
   resourceId: string;
-  resourceType: 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
+  resourceType: 'VIDEO' | 'PDF';
   fileUrl: string;
   isDownloadable: boolean;
 };
 
-export type LearnLecture = {
+export type LearnLectureResponse = {
   lectureId: string;
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  resource: LearnLectureResource;
+  resource: LearnLectureResourceResponse;
 };
 
-export type LearnSection = {
+export type LearnSectionResponse = {
   sectionId: string;
   title: string;
   order: number;
-  lectures: LearnLecture[];
+  lectures: LearnLectureResponse[];
 };
 
-export type LearnCourse = {
+export type LearnCourseResponse = {
   courseId: string;
   title: string;
   summary: string;
@@ -44,7 +48,7 @@ export type LearnCourse = {
   studentCount: number;
   totalDuration: number;
 
-  sections: LearnSection[];
+  sections: LearnSectionResponse[];
 };
 
 export type LearnEnrollmentResponse = {
@@ -68,7 +72,50 @@ export type LearnProgressResponse = {
 };
 
 export type CourseLearn = {
-  course: LearnCourse;
-  enrollment: LearnEnrollmentResponse;
-  progress: LearnProgressResponse;
+  course: LearnCourseResponse;
+  enrollment: LearnEnrollmentResponse | null;
+  progress: LearnProgressResponse | null;
+};
+
+// ------------------------------------------------------
+// UI용 타입
+// ------------------------------------------------------
+
+export type UILecture = {
+  id: string;
+  title: string;
+  description?: string;
+  duration: number;
+  type: 'VIDEO' | 'PDF';
+  videoUrl?: string;
+  pdfUrl?: string;
+  completed: boolean;
+  isCurrent: boolean;
+};
+
+export type UISection = {
+  id: string;
+  title: string;
+  order: number;
+  lectures: UILecture[];
+};
+
+export type UICourse = {
+  courseId: string;
+  title: string;
+  summary: string;
+  description: string;
+  categories: string[];
+  level: string;
+  price: number;
+  status: string;
+  thumbnailUrl: string;
+
+  instructor: {
+    id: string;
+    name: string;
+    profileUrl: string;
+  };
+
+  sections: UISection[];
 };

@@ -50,6 +50,9 @@
 }
 
 .profile-section__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
   font-size: var(--text-xl);
   font-weight: 700;
@@ -77,11 +80,22 @@
   gap: var(--space-2);
 }
 
+.profile-section__input {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
 .profile__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -128,23 +142,23 @@
   color: var(--color-text);
 }
 
-.enrolled-section {
+.enrollment-section {
   display: grid;
   gap: var(--space-4);
 }
 
-.enrolled-section__title {
+.enrollment-section__title {
   margin: 0;
   font-size: var(--text-2xl);
   font-weight: 700;
 }
 
-.enrolled-section__list {
+.enrollment-section__list {
   display: grid;
   gap: var(--space-3);
 }
 
-.enrolled-card {
+.enrollment-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-4);
@@ -154,27 +168,27 @@
   /* box-shadow: var(--shadow-sm); */
 }
 
-.enrolled-card__title {
+.enrollment-card__title {
   margin: 0;
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-text);
 }
 
-.enrolled-card__meta {
+.enrollment-card__meta {
   margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.enrolled__link {
+.enrollment__link {
   display: grid;
   gap: var(--space-1);
   text-decoration: none;
   color: inherit;
 }
 
-.enrolled__title {
+.enrollment__title {
   margin: 0;
   font-size: var(--text-lg);
   font-weight: 600;
@@ -185,7 +199,7 @@
   overflow: hidden;
 }
 
-.enrolled__category {
+.enrollment__category {
   margin: 0;
   font-size: var(--text-xs);
   color: var(--color-text-muted);
@@ -207,7 +221,7 @@
   background: linear-gradient(90deg, var(--color-brand), var(--color-brand-700));
 }
 
-.enrolled-card__percent {
+.enrollment-card__percent {
   font-weight: 600;
   color: var(--color-text);
   font-size: var(--text-sm);
