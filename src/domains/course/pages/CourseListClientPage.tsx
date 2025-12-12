@@ -1,19 +1,15 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-
+import styles from '@/app/CourseListPage.module.css';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
-import styles from '@/app/CourseListPage.module.css';
-
-import type { Course } from '../types/course';
+import type { CourseCardType, GetAllCourseResponse } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
-import { SortSelect, sortCourses, SortableCourse } from '../components/SortSelect';
-
-type CourseWithMeta = Course & SortableCourse;
+import { SortSelect, sortCourses } from '../components/SortSelect';
 
 export default function CourseListClientPage() {
-  const [courses, setCourses] = useState<CourseWithMeta[]>([]);
+  const [courses, setCourses] = useState<CourseCardType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const { sort } = useCourseListQuery();
@@ -21,8 +17,23 @@ export default function CourseListClientPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await getAllCourses();
-        setCourses(data as CourseWithMeta[]);
+        const data: GetAllCourseResponse = await getAllCourses();
+
+        const courseCardData: CourseCardType[] = data.content.map((item) => ({
+          id: item.courseId,
+          title: item.title,
+          summary: item.summary,
+          thumbnailUrl: item.thumbnailUrl,
+          instructorName: item.instructorName,
+          category: item.categories,
+          level: item.level,
+          tags: [item.categories[item.categories.length - 1], item.level],
+          price: item.price,
+          isFree: item.price === 0,
+          studentCount: item.studentCount,
+        }));
+
+        setCourses(courseCardData);
       } catch (error) {
         console.error('강좌 목록 불러오기 실패:', error);
       } finally {
@@ -33,7 +44,7 @@ export default function CourseListClientPage() {
     void fetchCourses();
   }, []);
 
-  const sortedCourses = useMemo(() => sortCourses<CourseWithMeta>(courses, sort), [courses, sort]);
+  const sortedCourses = useMemo(() => sortCourses<CourseCardType>(courses, sort), [courses, sort]);
 
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
