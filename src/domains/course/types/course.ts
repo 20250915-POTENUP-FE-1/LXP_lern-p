@@ -134,6 +134,18 @@ export type GetCourseDetailResponse = {
   sections: SectionDetailResponse[];
 };
 
+export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
+
+export type GetEnrollmentResponse = {
+  enrollmentId: string;
+  studentId: string;
+  courseId: string;
+  status: EnrollmentStatus;
+  progressRate: 45;
+  createdAt: string;
+  expiredAt: string;
+};
+
 export type SectionDetailResponse = {
   sectionId: string;
   title: string;
