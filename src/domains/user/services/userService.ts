@@ -27,12 +27,3 @@ export const updateProfile = async ({
 export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstructorResponse> => {
   return await patchApi<UpdateStudentToInstructorResponse>(`/api/users/me/roles/instructor`);
 };
-
-/**
- * 사용자 프로필 조회
- */
-export const getProfile = async ({
-  nickname,
-}: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
-  return await patchApi<UpdateProfileResponse>('/api/users/me', { nickname });
-};

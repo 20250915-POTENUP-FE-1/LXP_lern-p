@@ -39,11 +39,8 @@ export default function MyPageSidebar() {
             </li>
 
             <li className={styles['mypage-nav__item']}>
-              <Link
-                href="/mypage/cart"
-                className={`${styles['mypage-nav__link']} ${isActive('/mypage/cart')}`}
-              >
-                장바구니
+              <Link href="/mypage/cart" className={`${styles["mypage-nav__link"]} ${isActive("/mypage/cart")}`}>
+                구매 내역
               </Link>
             </li>
           </ul>
@@ -95,11 +92,8 @@ export default function MyPageSidebar() {
                 </li>
 
                 <li className={styles['mypage-nav__item']}>
-                  <Link
-                    href="/mypage/cart"
-                    className={`${styles['mypage-nav__link']} ${isActive('/mypage/cart')}`}
-                  >
-                    장바구니
+                  <Link href="/mypage/cart" className={`${styles["mypage-nav__link"]} ${isActive("/mypage/cart")}`}>
+                    구매 내역
                   </Link>
                 </li>
               </ul>

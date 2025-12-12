@@ -1,6 +1,8 @@
 'use client';
 
 import styles from '@/app/courses/[id]/FloatingCTA.module.css';
+import { LEVEL_LABEL } from '../constants/level';
+import { CourseLevel } from '../types/course';
 
 export type FloatingCTAProps = {
   price: number;
@@ -12,7 +14,7 @@ export type FloatingCTAProps = {
   instructorName: string;
   totalLectures: number;
   totalTime: string;
-  level: string;
+  level: CourseLevel;
 
   onAddToCart?: () => void;
 };
@@ -29,9 +31,7 @@ export const FloatingCTA = ({
   level,
   onAddToCart,
 }: FloatingCTAProps) => {
-  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '수강중' : '수강신청하기';
-
-  const isPrimaryDisabled = isEnrolled || isOwner;
+  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '학습하기' : '수강신청하기';
 
   return (
     <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
@@ -46,10 +46,10 @@ export const FloatingCTA = ({
           <button
             type="button"
             className={`${styles['floating-cta__button']} ${
-              isPrimaryDisabled ? styles['floating-cta__button--disabled'] : ''
+              isOwner ? styles['floating-cta__button--disabled'] : ''
             }`}
             onClick={onApply}
-            disabled={isPrimaryDisabled}
+            disabled={isOwner}
           >
             {primaryLabel}
           </button>
@@ -91,7 +91,7 @@ export const FloatingCTA = ({
 
           <li className={styles['floating-cta__meta-row']}>
             <span className={styles['floating-cta__meta-label']}>난이도</span>
-            <span className={styles['floating-cta__meta-value']}>{level ?? '초급'}</span>
+            <span className={styles['floating-cta__meta-value']}>{LEVEL_LABEL[level]}</span>
           </li>
         </ul>
       </div>

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from '@/domains/course/components/CourseCard.module.css';
-import { Course } from '../types/course';
+import { CourseCardType as Course } from '../types/course';
 
 export type CourseCardProps = {
   course: Course;
