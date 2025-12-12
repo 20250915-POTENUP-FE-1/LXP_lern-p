@@ -1,13 +1,12 @@
-import { collection, getDocs, query, where, DocumentData } from "firebase/firestore";
-import { db } from "@/shared/lib/firebase/firestore";
-import type { EnrolledCourse } from "@/domains/user/types/enrolled";
+import { collection, getDocs, query, where, DocumentData } from 'firebase/firestore';
+import { db } from '@/shared/lib/firebase/firestore';
+import type { EnrolledCourse } from '@/domains/user/types/enrollment';
 
 export async function getEnrolledCourses(userId: string): Promise<EnrolledCourse[]> {
   const enrolledSnap = await getDocs(
-    query(collection(db, "enrollments"), where("userId", "==", userId))
+    query(collection(db, 'enrollments'), where('userId', '==', userId)),
   );
 
-  // 🔥 enrolled 타입 명확히 지정
   const enrolled = enrolledSnap.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as {
@@ -24,7 +23,7 @@ export async function getEnrolledCourses(userId: string): Promise<EnrolledCourse
   const courseIds = enrolled.map((item) => item.courseId);
 
   const courseSnap = await getDocs(
-    query(collection(db, "courses"), where("__name__", "in", courseIds))
+    query(collection(db, 'courses'), where('__name__', 'in', courseIds)),
   );
 
   const courseMap: Record<string, DocumentData> = {};
@@ -42,8 +41,8 @@ export async function getEnrolledCourses(userId: string): Promise<EnrolledCourse
     course: courseMap[item.courseId]
       ? {
           id: item.courseId,
-          title: courseMap[item.courseId].title ?? "제목 없음",
-          category: courseMap[item.courseId].category ?? "카테고리 없음",
+          title: courseMap[item.courseId].title ?? '제목 없음',
+          category: courseMap[item.courseId].category ?? '카테고리 없음',
           thumbnailUrl: courseMap[item.courseId].thumbnailUrl ?? null,
         }
       : null,
