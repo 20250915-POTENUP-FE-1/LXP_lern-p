@@ -11,7 +11,7 @@ import {
 export const preparePayment = async ({
   items,
 }: PreparePaymentRequest): Promise<PreparePaymentResponse> => {
-  return await postApi<PreparePaymentResponse>('/payments/prepare', { items });
+  return await postApi<PreparePaymentResponse>('/api/payments/prepare', { items });
 };
 
 /**
@@ -22,5 +22,5 @@ export const confirmPayment = async ({
   paymentKey,
   amount,
 }: ComfirmPaymentRequest): Promise<null> => {
-  return await postApi<null>('/payments/confirm', { orderId, paymentKey, amount });
+  return await postApi<null>('/api/payments/confirm', { orderId, paymentKey, amount });
 };
