@@ -124,15 +124,14 @@ export const createLecture = async (
     },
   );
 };
-*/
-export const createLecture = async (
+*/ export const createLecture = async (
   courseId: string,
   sectionId: string,
   payload: {
     title: string;
     totalDurationSeconds: number;
     isPreview: boolean;
-    orderIndex: number;
+    orderIndex: number; // 프론트 내부용이면 유지하되 요청에는 안 넣기
     resource?: {
       resourceType: string;
       isDownloadable: boolean;
@@ -145,52 +144,36 @@ export const createLecture = async (
 
   const formData = new FormData();
 
-  // API 명세: resourceType/fileUrl은 요청에 포함하지 않고, resource는 단일 객체 { isDownloadable }
+  // 요청 스펙에 맞춘 최소 JSON
   const requestBody = {
-    ...payload,
-    resource: payload.resource?.[0]
-      ? { isDownloadable: Boolean(payload.resource[0].isDownloadable) }
-      : { isDownloadable: false },
+    title: payload.title,
+    totalDurationSeconds: payload.totalDurationSeconds,
+    isPreview: payload.isPreview,
+    resource: { isDownloadable: Boolean(payload.resource?.[0]?.isDownloadable ?? false) },
   };
 
-  formData.append('request', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
-
+  formData.append('lecture', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
   if (file) {
-    formData.append('file', file);
+    const safe = new File([file], `upload-${Date.now()}.mp4`, { type: file.type || 'video/mp4' });
+    formData.append('multiFile', safe);
   }
 
-  // 백엔드 엔드포인트로 직접 전송 (대용량 업로드 타임아웃 회피 + Next 라우트 경유 제거)
-  const accessToken =
-    typeof document !== 'undefined'
-      ? document.cookie
-          .split('; ')
-          .find((c) => c.startsWith('accessToken='))
-          ?.split('=')[1]
-      : undefined;
+  const res = await fetch(`/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
 
-  console.log(accessToken ? '✅ accessToken 포함' : '❌ accessToken 없음');
-  const res = await fetch(
-    `${BASE_URL}/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
-    {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-    },
-  );
-  console.log('📤 강의 생성 응답:', res);
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`강의 생성 실패: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
   }
 
-  const json = (await res.json()) as ApiEnvelope<CreateLectureResponse>;
-  if (json.code?.startsWith('E')) {
-    throw new Error(json.message || '강의 생성 중 오류가 발생했습니다.');
-  }
-
+  const json = (await res.json()) as { data: CreateLectureResponse; code: string; message: string };
   return json.data;
 };
+
+// 강의 생성 - MULTI 파일 업로드 API
 
 // 강의 수정 API (PUT → PATCH로 바꾸고 싶으면 여기서 조정)
 export const updateLecture = async (

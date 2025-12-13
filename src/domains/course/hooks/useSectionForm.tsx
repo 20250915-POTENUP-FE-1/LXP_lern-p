@@ -286,7 +286,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
   };
 
   // === 최종 싱크 로직 (추가/수정/삭제 한번에) ===
-
   const syncSectionsAndLectures = async (courseId: string) => {
     for (let sIndex = 0; sIndex < sections.length; sIndex++) {
       const sec = sections[sIndex];
@@ -402,7 +401,8 @@ export function useSectionForm(options?: UseSectionFormParams) {
               orderIndex: lIndex + 1,
               resource: resourcePayload,
             },
-            file,
+            undefined,
+            //file,
           );
 
           lectureId = String(created.lectureId);

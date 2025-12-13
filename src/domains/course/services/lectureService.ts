@@ -22,7 +22,7 @@ export const createLecture = async (
 
   const formData = new FormData();
 
-  formData.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+  formData.append('request', new Blob([JSON.stringify(payload)], { type: 'multipart/form-data' }));
 
   if (file) {
     formData.append('file', file);
