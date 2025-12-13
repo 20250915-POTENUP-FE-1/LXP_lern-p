@@ -1,4 +1,4 @@
-import { CartClientPage } from '@/domains/cart/components/CartClientPage';
+import { CartClientPage } from '@/domains/cart/pages/CartClientPage';
 
 export default async function CartPage() {
   return <CartClientPage />;

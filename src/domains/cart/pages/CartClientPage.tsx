@@ -6,18 +6,19 @@ import { useSearchParams } from 'next/navigation';
 import { CartItem as CartItemType } from '@/domains/cart/types/cart';
 import { OrderSummary } from '@/domains/cart/components/OrderSummary';
 import { CartItem } from '@/domains/cart/components/CartItem';
-import { PaymentMethodList, PaymentMethod } from '@/domains/cart/components/PaymentMethodList';
 import { preparePayment } from '@/domains/cart/services/cartService';
 import { getCourseDetail } from '@/domains/course/services/courseService';
 import styles from '@/app/cart/CartPage.module.css';
+import type { PreparePaymentResponse } from '../types/cart';
+import { useTossPayment } from '../hooks/useTossPayment';
 
 export function CartClientPage() {
   const searchParams = useSearchParams();
   const initialCourseId = searchParams.get('courseId');
   const [items, setItems] = useState<CartItemType[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('toss');
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});
   const [isPreparing, setIsPreparing] = useState(false);
+  const [paymentPayload, setPaymentPayload] = useState<PreparePaymentResponse | null>(null);
 
   const selectedItems = useMemo(
     () => items.filter((item) => selectedMap[item.id]),
@@ -56,19 +57,24 @@ export function CartClientPage() {
     });
   };
 
+  const handleCheckoutClick = async () => {
+    if (!canCheckout) return;
+    const firstTitle = selectedItems[0]?.title ?? '강좌';
+    const orderName =
+      selectedItems.length > 1 ? `${firstTitle} 외 ${selectedItems.length - 1}건` : firstTitle;
+    await handlePay(orderName);
+  };
+
   useEffect(() => {
     if (!initialCourseId) return;
 
-    let isMounted = true;
-    const prepare = async () => {
+    (async () => {
       try {
-        setIsPreparing(true);
-        const [detail] = await Promise.all([
+        const [detail, prepared] = await Promise.all([
           getCourseDetail(initialCourseId),
           preparePayment({ items: [{ courseId: Number(initialCourseId) }] }),
         ]);
-
-        if (!detail || !isMounted) return;
+        if (!detail) return;
 
         const mappedItem: CartItemType = {
           id: Number(detail.courseId),
@@ -88,19 +94,18 @@ export function CartClientPage() {
           ...prev,
           [mappedItem.id]: true,
         }));
+
+        setPaymentPayload(prepared);
       } catch (error) {
         console.error('결제 준비 요청에 실패했습니다.', error);
-      } finally {
-        if (isMounted) setIsPreparing(false);
       }
-    };
-
-    prepare();
-
-    return () => {
-      isMounted = false;
-    };
+    })();
   }, [initialCourseId]);
+
+  const { handlePay } = useTossPayment({
+    orderId: paymentPayload?.orderId ?? '',
+    amount: paymentPayload?.amount ?? 0,
+  });
 
   return (
     <main className={`${styles['cart-page']} app-shell`}>
@@ -156,8 +161,12 @@ export function CartClientPage() {
             />
 
             <section className={styles['cart-page__payment']}>
-              <h3 className={styles['cart-page__section-title']}>결제 수단</h3>
-              <PaymentMethodList value={paymentMethod} onChange={setPaymentMethod} />
+              <div className={styles['cart-page__widget']}>
+                <div id="payment-method" />
+                <div id="agreement" />
+              </div>
+              {/* <h3 className={styles['cart-page__section-title']}>결제 수단</h3>
+              <PaymentMethodList value={paymentMethod} onChange={setPaymentMethod} /> */}
             </section>
           </aside>
         </div>
@@ -171,10 +180,12 @@ export function CartClientPage() {
           </strong>
         </div>
         <button
+          id="payment-button"
           className={styles['cart-page__cta-button']}
           type="button"
           disabled={!canSubmit}
           aria-disabled={!canSubmit}
+          onClick={handleCheckoutClick}
         >
           결제하기
         </button>
