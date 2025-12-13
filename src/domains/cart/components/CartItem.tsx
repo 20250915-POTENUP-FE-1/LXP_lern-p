@@ -41,7 +41,7 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
         />
       </label>
       <div className={styles['cart-item__thumb']}>
-        <Image src={item.thumbnailUrl} alt={`${item.title} 썸네일`} />
+        <Image src={item.thumbnailUrl} alt={`${item.title} 썸네일`} fill />
       </div>
       <div className={styles['cart-item__info']}>
         <p className={styles['cart-item__title']}>{item.title}</p>
