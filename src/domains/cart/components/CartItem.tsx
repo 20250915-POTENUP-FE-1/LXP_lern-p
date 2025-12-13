@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { CartItem as CartItemType } from '../types/cart';
 import styles from './CartItem.module.css';
 
@@ -27,10 +28,7 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
         }
       }}
     >
-      <label
-        className={styles['cart-item__select']}
-        onClick={(event) => event.stopPropagation()}
-      >
+      <label className={styles['cart-item__select']} onClick={(event) => event.stopPropagation()}>
         <input
           type="checkbox"
           checked={checked}
@@ -43,7 +41,7 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
         />
       </label>
       <div className={styles['cart-item__thumb']}>
-        <img src={item.thumbnailUrl} alt={`${item.title} 썸네일`} />
+        <Image src={item.thumbnailUrl} alt={`${item.title} 썸네일`} />
       </div>
       <div className={styles['cart-item__info']}>
         <p className={styles['cart-item__title']}>{item.title}</p>
