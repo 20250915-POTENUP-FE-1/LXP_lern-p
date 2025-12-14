@@ -17,7 +17,6 @@ export function CartClientPage() {
   const initialCourseId = searchParams.get('courseId');
   const [items, setItems] = useState<CartItemType[]>([]);
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});
-  const [isPreparing, setIsPreparing] = useState(false);
   const [paymentPayload, setPaymentPayload] = useState<PreparePaymentResponse | null>(null);
 
   const selectedItems = useMemo(
@@ -31,7 +30,7 @@ export function CartClientPage() {
   const canCheckout = selectedItems.length > 0;
   const isAllSelected = items.length > 0 && selectedItems.length === items.length;
   const hasItems = items.length > 0;
-  const canSubmit = canCheckout && !isPreparing;
+  const canSubmit = canCheckout;
 
   const handleSelectChange = (id: number, checked: boolean) => {
     setSelectedMap((prev) => ({
@@ -62,7 +61,10 @@ export function CartClientPage() {
     const firstTitle = selectedItems[0]?.title ?? '강좌';
     const orderName =
       selectedItems.length > 1 ? `${firstTitle} 외 ${selectedItems.length - 1}건` : firstTitle;
-    await handlePay(orderName);
+
+    if (paymentPayload && paymentPayload.amount && handlePay) {
+      await handlePay(paymentPayload.amount, orderName);
+    }
   };
 
   useEffect(() => {
@@ -146,7 +148,7 @@ export function CartClientPage() {
             ) : (
               <div className={styles['cart-page__empty']}>
                 <p className={styles['cart-page__empty-text']}>담긴 강좌가 없습니다.</p>
-                <Link href="/courses" className={styles['cart-page__empty-action']}>
+                <Link href="/" className={styles['cart-page__empty-action']}>
                   강좌 보러가기
                 </Link>
               </div>
