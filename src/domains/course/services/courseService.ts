@@ -8,15 +8,11 @@ import {
   query,
   runTransaction,
   serverTimestamp,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-import type { User } from '@/domains/user/types/user';
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
-  CreateCourseRequest,
-  CreateSectionRequest,
   GetAllCourseResponse,
   GetCourseDetailResponse,
   GetEnrollmentResponse,
@@ -107,78 +103,5 @@ export const getEnrollmentStatus = async (userId: string, courseId: string): Pro
   } catch (err) {
     console.error('getEnrollmentStatus 실패:', err);
     return false;
-  }
-};
-export const createCourse = async (
-  user: User,
-  courseData: CreateCourseRequest,
-  sectionList: CreateSectionRequest[],
-): Promise<string> => {
-  if (!user?.id) throw new Error('로그인이 필요합니다.');
-  try {
-    const courseRef = await addDoc(collection(db, 'courses'), {
-      title: courseData.title,
-      summary: courseData.summary,
-      description: courseData.description,
-      thumbnailUrl: courseData.thumbnailUrl,
-      instructorId: user.id,
-      instructorName: user.nickname,
-      category: courseData.category,
-      level: courseData.level,
-      tags: [courseData.level || '', courseData.category?.[2] || ''],
-      price: Number(courseData.price),
-      isFree: Number(courseData.price) === 0,
-      studentCount: 0,
-      duration:
-        sectionList.reduce(
-          (total, sec) => total + sec.lectures.reduce((sum, lec) => sum + (lec.duration || 0), 0),
-          0,
-        ) || 0,
-      status: 'published',
-      sections: [],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-    const courseId = courseRef.id;
-    const sectionIds: string[] = [];
-    for (let i = 0; i < sectionList.length; i++) {
-      const sectionData = sectionList[i];
-      const sectionRef = await addDoc(collection(db, 'sections'), {
-        courseId,
-        title: sectionData.title,
-        sequence: i + 1,
-        lectures: [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      const sectionId = sectionRef.id;
-      sectionIds.push(sectionId);
-      const lectureIds: string[] = [];
-      for (let j = 0; j < sectionData.lectures.length; j++) {
-        const lecData = sectionData.lectures[j];
-        const lectureRef = await addDoc(collection(db, 'lectures'), {
-          courseId,
-          sectionId,
-          title: lecData.title,
-          videoUrl: lecData.videoUrl || '',
-          duration: lecData.duration,
-          sequence: j + 1,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-        lectureIds.push(lectureRef.id);
-      }
-      await updateDoc(sectionRef, { lectures: lectureIds });
-    }
-    await updateDoc(courseRef, { sections: sectionIds });
-    const userRef = doc(db, 'users', user.id);
-    await updateDoc(userRef, {
-      createdCourses: arrayUnion(courseId),
-      updatedAt: serverTimestamp(),
-    });
-    return courseId;
-  } catch (err) {
-    console.error('createCourse 실패:', err);
-    throw new Error('강좌 등록 중 오류가 발생했습니다.');
   }
 };
