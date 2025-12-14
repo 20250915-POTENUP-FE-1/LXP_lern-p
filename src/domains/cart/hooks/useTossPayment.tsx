@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   loadTossPayments,
   ANONYMOUS,
   TossPaymentsWidgets,
-  clearTossPayments,
+  WidgetPaymentMethodWidget,
 } from '@tosspayments/tosspayments-sdk';
 
 type UseTossPaymentParams = {
@@ -17,88 +17,57 @@ type UseTossPaymentParams = {
 const CLIENT_KEY = process.env.NEXT_PUBLIC_CLIENT_KEY ?? '';
 
 export function useTossPayment({ orderId, amount, courseId }: UseTossPaymentParams) {
-  const widgetsRef = useRef<TossPaymentsWidgets | null>(null);
-
-  const getContainer = useCallback((id: string) => document.getElementById(id), []);
-
-  const autoSelectTossPayment = useCallback(() => {
-    const container = getContainer('payment-method');
-    if (!container) return;
-
-    const selectors = [
-      '[data-element-id="tosspay"]',
-      'button[data-provider-code="TOSSPAY"]',
-      'label[data-provider-code="TOSSPAY"]',
-      '[data-method-code="TOSSPAY"]',
-    ];
-
-    let target: HTMLElement | null = null;
-    for (const selector of selectors) {
-      const element = container.querySelector(selector);
-      if (element instanceof HTMLElement) {
-        target = element;
-        break;
-      }
-    }
-
-    if (!target) {
-      const possible = Array.from(container.querySelectorAll('button, label')).find((element) =>
-        element.textContent?.includes('토스'),
-      );
-      target = possible instanceof HTMLElement ? possible : null;
-    }
-
-    if (target) {
-      target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    }
-  }, [getContainer]);
+  const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
+  const [paymentMethodWidget, setPaymentMethodWidget] = useState<WidgetPaymentMethodWidget | null>(
+    null,
+  );
 
   useEffect(() => {
-    (async () => {
-      if (!orderId) {
-        widgetsRef.current = null;
-        return;
+    async function fetchPaymentWidgets() {
+      try {
+        const tossPayments = await loadTossPayments(CLIENT_KEY); // SDK 초기화
+        const widgets = tossPayments.widgets({ customerKey: ANONYMOUS }); // 결제위젯 객체 생성
+        setWidgets(widgets);
+      } catch (error) {
+        console.error('결제위젯을 불러올 수 없습니다:', error);
       }
-      // 결제위젯 인스턴스 생성
-      const tossPayments = await loadTossPayments(CLIENT_KEY);
-      const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
-      widgetsRef.current = widgets;
+    }
 
-      // 결제 금액 설정
-      await widgets.setAmount({ value: Number(amount ?? 0), currency: 'KRW' });
+    fetchPaymentWidgets();
+  }, [CLIENT_KEY, ANONYMOUS]);
 
-      // 결제 UI 렌더링
-      await widgets.renderPaymentMethods({
-        selector: '#payment-method',
-        variantKey: 'DEFAULT',
-      });
-      autoSelectTossPayment();
+  useEffect(() => {
+    async function renderPaymentWidgets() {
+      if (!widgets) return;
 
-      // 이용약관 UI 렌더링
-      await widgets.renderAgreement({
-        selector: '#agreement',
-        variantKey: 'AGREEMENT',
-      });
-    })();
+      try {
+        await widgets.setAmount({ value: Number(amount), currency: 'KRW' });
+        const paymentMethodWidgetInstance = await widgets.renderPaymentMethods({
+          selector: '#payment-method',
+          variantKey: 'DEFAULT',
+        });
+        setPaymentMethodWidget(paymentMethodWidgetInstance);
+      } catch (error) {
+        console.error('결제위젯을 렌더링할 수 없습니다:', error);
+      }
+    }
+
+    renderPaymentWidgets();
+
+    // 클린업: 결제 UI가 존재하면 제거합니다.
     return () => {
-      widgetsRef.current = null;
-      clearTossPayments();
+      if (paymentMethodWidget) {
+        paymentMethodWidget.destroy();
+        setPaymentMethodWidget(null);
+      }
     };
-  }, [orderId]);
+  }, [widgets]);
 
-  useEffect(() => {
-    if (!orderId) return;
-    const widgets = widgetsRef.current;
-    if (!widgets) return;
-
-    void widgets.setAmount({ value: Number(amount ?? 0), currency: 'KRW' });
-  }, [amount, orderId]);
-
-  const handlePay = async (orderName: string) => {
-    const widgets = widgetsRef.current;
+  const handlePay = async (amount: number, orderName: string) => {
     if (!widgets || !orderId) return;
 
     try {
+      await widgets.setAmount({ value: amount, currency: 'KRW' });
       // 결제 요청
       await widgets.requestPayment({
         orderId,
