@@ -124,7 +124,9 @@ export const createLecture = async (
     },
   );
 };
-*/ export const createLecture = async (
+// */
+
+export const createLecture = async (
   courseId: string,
   sectionId: string,
   payload: {
@@ -144,18 +146,26 @@ export const createLecture = async (
 
   const formData = new FormData();
 
-  // 요청 스펙에 맞춘 최소 JSON
+  const safeOrderIndex = Math.max(1, Number(payload.orderIndex ?? 1));
+
+  // ✅ 요청 스펙에 맞춘 JSON
   const requestBody = {
     title: payload.title,
     totalDurationSeconds: payload.totalDurationSeconds,
-    isPreview: payload.isPreview,
+    isPreview: Boolean(payload.isPreview),
+    orderIndex: safeOrderIndex,
     resource: { isDownloadable: Boolean(payload.resource?.[0]?.isDownloadable ?? false) },
   };
 
-  formData.append('lecture', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
+  // ✅ lecture 파트: filename 포함(권장: File)
+  const lecturePart = new File([JSON.stringify(requestBody)], 'lecture.json', {
+    type: 'application/json',
+  });
+  formData.append('lecture', lecturePart);
+
+  // ✅ 파일 파트
   if (file) {
-    const safe = new File([file], `upload-${Date.now()}.mp4`, { type: file.type || 'video/mp4' });
-    formData.append('multiFile', safe);
+    formData.append('multiFile', file); // mp4 강제변환은 일단 빼는 게 안전
   }
 
   const res = await fetch(`/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`, {
@@ -163,7 +173,6 @@ export const createLecture = async (
     body: formData,
     credentials: 'include',
   });
-
   console.log('📥 ========== 강의 생성 API 응답 정보 ==========');
   console.log('🕐 응답 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
   console.log('📊 응답 상태:', res.status, res.statusText);
@@ -206,7 +215,39 @@ export const updateLecture = async (
 export const deleteLecture = async (courseId: string, lectureId: string): Promise<void> => {
   if (!courseId || !lectureId) throw new Error('Invalid lecture params');
 
-  await deleteApi<void>(`/api/instructor/courses/${courseId}/lectures/${lectureId}`);
+  // 🔍 API 호출 정보 로깅
+  const url = `/api/instructor/courses/${courseId}/lectures/${lectureId}`;
+  const accessToken =
+    typeof document !== 'undefined'
+      ? document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('accessToken='))
+          ?.split('=')[1]
+      : undefined;
+
+  console.log('🗑️ ========== 강의 삭제 API 호출 정보 ==========');
+  console.log('🕐 호출 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
+  console.log('🔗 API URL:', url);
+  console.log('📋 파라미터:', {
+    courseId,
+    lectureId,
+  });
+  console.log('🔐 계정 정보:', {
+    hasAccessToken: !!accessToken,
+    tokenLength: accessToken?.length || 0,
+    tokenPreview: accessToken ? `${accessToken.substring(0, 30)}...` : 'none',
+  });
+  console.log('📤 헤더:', {
+    method: 'DELETE',
+  });
+  console.log('='.repeat(60));
+
+  await deleteApi<void>(url);
+
+  console.log('📥 ========== 강의 삭제 API 응답 정보 ==========');
+  console.log('🕐 응답 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
+  console.log('✅ 강의 삭제 성공');
+  console.log('='.repeat(60));
 };
 
 // 8) 섹션 순서 변경 API
