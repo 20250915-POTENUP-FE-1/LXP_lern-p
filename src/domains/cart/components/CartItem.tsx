@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
 import { CartItem as CartItemType } from '../types/cart';
 import styles from './CartItem.module.css';
 
@@ -41,7 +42,12 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
         />
       </label>
       <div className={styles['cart-item__thumb']}>
-        <Image src={item.thumbnailUrl} alt={`${item.title} 썸네일`} fill />
+        <Image
+          src={formatAbsoluteUrl(item.thumbnailUrl)}
+          alt={`${item.title} 썸네일`}
+          width={80}
+          height={64}
+        />
       </div>
       <div className={styles['cart-item__info']}>
         <p className={styles['cart-item__title']}>{item.title}</p>
