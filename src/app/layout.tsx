@@ -12,7 +12,7 @@ import { AuthProvider } from './_providers/AuthProvider';
 // }
 
 export const metadata: Metadata = {
-  title: 'Learnix',
+  title: 'Lernix',
   description: '역할 전환형 온라인 학습 플랫폼',
 };
 
