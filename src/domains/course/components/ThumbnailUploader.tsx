@@ -1,19 +1,40 @@
 'use client';
 
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {
+  value?: string;
   onUploadComplete?: (url: string) => void;
+  onFileSelect?: (multiFile: File | null) => void;
 };
 
-export function ThumbnailUploader({ onUploadComplete }: ThumbnailUploaderProps) {
+export function ThumbnailUploader({
+  value,
+  onUploadComplete,
+  onFileSelect,
+}: ThumbnailUploaderProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (value) {
+      setThumbnailUrl(value);
+    } else {
+      setThumbnailUrl(null);
+    }
+  }, [value]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    onFileSelect?.(file); // 선택된 파일을 부모 컴포넌트로 전달
+    if (!file) {
+      setThumbnailUrl(null);
+      onUploadComplete?.('');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {

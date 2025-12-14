@@ -37,7 +37,6 @@ async function getMyEnrollmentId(courseId: string): Promise<string | null> {
 export function useCourseLearn() {
   const { id: courseIdParam } = useParams();
   const courseId = String(courseIdParam);
-
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
 
   useEffect(() => {
@@ -93,6 +92,22 @@ export function useCourseLearn() {
   const toggleSection = (id: string) => {
     setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   };
+
+  useEffect(() => {
+    if (!courseData || !currentLecture) return;
+
+    const currentSection = courseData.sections.find((section) =>
+      section.lectures.some((lecture) => lecture.id === currentLecture.id),
+    );
+
+    if (!currentSection) return;
+
+    setOpenSections((prev) => {
+      if (prev.includes(currentSection.id)) return prev;
+      //return [currentSection.id];
+      return courseData.sections.map((s) => s.id);
+    });
+  }, [courseData, currentLecture]);
 
   /** 강의 클릭 */
   const handleLectureClick = (lec: ProcessedLecture) => {

@@ -69,7 +69,7 @@ export function Header() {
           {/* 왼쪽: 로고 */}
           <div className={styles['header__left']}>
             <Link href="/" className={styles['header__logo']} aria-label="홈으로 이동">
-              <span className={styles['header__logo-text']}>LernP</span>
+              <span className={styles['header__logo-text']}>Lernix</span>
             </Link>
           </div>
 
@@ -107,7 +107,7 @@ export function Header() {
 
               {user && isInstructor && (
                 <Link
-                  href="/courses/create"
+                  href="/courses/create?step=1"
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
                 >
                   강좌 등록하기

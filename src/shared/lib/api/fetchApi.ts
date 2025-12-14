@@ -1,16 +1,12 @@
 'use server';
-
 import { cookies } from 'next/headers';
-
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
 export type ApiResponse<T = unknown> = {
   status: string; // HTTP 상태 코드 (예: '200', '400' 등)
   code: string; // 에러 코드 (예: EG001, EU001 등)
   message: string; // 에러 메시지
   data: T; // 응답 데이터
 };
-
 /**
  * 인증 토큰을 포함하여 API 요청을 보냄
  *
@@ -22,7 +18,8 @@ export async function fetchApi<T = unknown>(
   options: RequestInit = {},
 ): Promise<T> {
   try {
-    // 쿠키에서 accessToken 꺼내기
+    if (!BASE_URL) throw new Error('NEXT_PUBLIC_BASE_URL 누락');
+
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
 
@@ -41,11 +38,22 @@ export async function fetchApi<T = unknown>(
       if (!hasContentType) headers.append('Content-Type', 'application/json');
     }
 
-    // API 통신
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    // JSON 요청일 때만 Content-Type 기본 부여
+    if (!isFormData) {
+      const hasContentType = Object.keys(headers).some((k) => k.toLowerCase() === 'content-type');
+      if (!hasContentType) headers['Content-Type'] = 'application/json';
+    } else {
+      // FormData면 Content-Type을 절대 직접 넣지 않음 (boundary 자동 설정 필요)
+      for (const k of Object.keys(headers)) {
+        if (k.toLowerCase() === 'content-type') delete headers[k];
+      }
+    }
+    const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+
+    const response = await fetch(url, {
       method: options.method || 'GET',
-      headers,
       ...options,
+      headers,
     });
 
     // 응답 데이터 파싱
@@ -75,12 +83,9 @@ export async function fetchApi<T = unknown>(
       throw new Error(resJson.message);
     }
 
-    return resJson.data;
+    return resJson.data as T;
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      // 네트워크 오류 또는 기타 API 오류 메시지 처리
-      throw new Error(error.message);
-    }
+    if (error instanceof Error) throw new Error(error.message);
     throw new Error('알 수 없는 오류가 발생했습니다.');
   }
 }
@@ -94,7 +99,6 @@ export async function fetchApi<T = unknown>(
 export async function getApi<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T> {
   return fetchApi<T>(endpoint, { method: 'GET', ...options });
 }
-
 /**
  * POST 요청을 위한 fetchApi wrapper
  *
@@ -112,7 +116,6 @@ export async function postApi<T = unknown>(
     ...options,
   });
 }
-
 /**
  * PUT 요청을 위한 fetchApi wrapper
  *
@@ -130,7 +133,6 @@ export async function putApi<T = unknown>(
     ...options,
   });
 }
-
 /**
  * DELETE 요청을 위한 fetchApi wrapper
  *
@@ -142,7 +144,6 @@ export async function deleteApi<T = unknown>(
 ): Promise<T> {
   return fetchApi<T>(endpoint, { method: 'DELETE', ...options });
 }
-
 /**
  * PATCH 요청을 위한 fetchApi wrapper
  *

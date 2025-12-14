@@ -52,7 +52,7 @@ export default function CourseListClientPage() {
       <div className={styles['bannerContainer']}>
         <div className={styles['bannerContent']}>
           <div className={styles['mainText']}>
-            강사, 학생 둘 다 되는 게 <span className={styles['highlightText']}>런피</span>
+            강사, 학생 둘 다 되는 게 <span className={styles['highlightText']}>런닉스</span>
           </div>
           <div className={styles['subText']}>한 번의 클릭으로 배움과 가르침을 모두 경험하세요</div>
         </div>

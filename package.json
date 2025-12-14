@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mock:api": "json-server --watch src/domains/course/mocks/db.json --port 4000"
   },
   "dependencies": {
     "@tosspayments/tosspayments-sdk": "^2.5.0",
@@ -25,6 +26,7 @@
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.6",
     "eslint-config-prettier": "^10.1.8",
+    "json-server": "^1.0.0-beta.3",
     "msw": "^2.12.4",
     "prettier": "^3.7.3",
     "prettier-plugin-tailwindcss": "^0.7.2",
