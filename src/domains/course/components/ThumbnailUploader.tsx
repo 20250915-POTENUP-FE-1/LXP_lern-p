@@ -7,7 +7,7 @@ import styles from './CourseForm.module.css';
 type ThumbnailUploaderProps = {
   value?: string;
   onUploadComplete?: (url: string) => void;
-  onFileSelect?: (file: File | null) => void;
+  onFileSelect?: (multiFile: File | null) => void;
 };
 
 export function ThumbnailUploader({

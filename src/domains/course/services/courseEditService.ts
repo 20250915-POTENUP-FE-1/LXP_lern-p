@@ -131,7 +131,7 @@ export const createLecture = async (
     title: string;
     totalDurationSeconds: number;
     isPreview: boolean;
-    orderIndex: number; // 프론트 내부용이면 유지하되 요청에는 안 넣기
+    orderIndex: number;
     resource?: {
       resourceType: string;
       isDownloadable: boolean;
@@ -163,6 +163,16 @@ export const createLecture = async (
     body: formData,
     credentials: 'include',
   });
+
+  console.log('📥 ========== 강의 생성 API 응답 정보 ==========');
+  console.log('🕐 응답 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
+  console.log('📊 응답 상태:', res.status, res.statusText);
+  console.log('📋 응답 헤더:', {
+    'content-type': res.headers.get('content-type'),
+    'content-length': res.headers.get('content-length'),
+    authorization: res.headers.get('authorization') ? '토큰 갱신됨' : '없음',
+  });
+  console.log('='.repeat(60));
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');

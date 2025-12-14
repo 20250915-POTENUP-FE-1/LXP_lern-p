@@ -13,7 +13,7 @@ export type UploadResult = {
   isDownloadable: boolean;
   duration?: number | null;
   fileName?: string | undefined;
-  file?: File;
+  multiFile?: File;
 };
 
 type ResourceUploaderProps = {

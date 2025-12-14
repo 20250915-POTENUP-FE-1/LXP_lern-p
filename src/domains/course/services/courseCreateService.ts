@@ -100,11 +100,61 @@ export const createDraftCourse = async (
     formData.append('thumbnail', thumbnailFile);
   }
 
-  return await fetchApi<CreateCourseResponse>('/api/instructor/courses', {
+  // 🔍 API 호출 정보 로깅
+  const url = '/api/instructor/courses';
+  const accessToken =
+    typeof document !== 'undefined'
+      ? document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('accessToken='))
+          ?.split('=')[1]
+      : undefined;
+
+  console.log('📤 ========== 강좌 생성 API 호출 정보 ==========');
+  console.log('🕐 호출 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
+  console.log('🔗 API URL:', url);
+  console.log('📋 파라미터:', {
+    title: requestBody.title,
+    categoryId: requestBody.categoryId,
+    courseLevel: requestBody.courseLevel,
+    price: requestBody.price,
+  });
+  console.log('📁 썸네일 정보:', {
+    hasFile: !!thumbnailFile,
+    fileName: thumbnailFile?.name || 'N/A',
+    fileSize: thumbnailFile?.size
+      ? `${(thumbnailFile.size / 1024).toFixed(2)} KB (${thumbnailFile.size} bytes)`
+      : 'N/A',
+    fileType: thumbnailFile?.type || 'N/A',
+  });
+  console.log('🔐 계정 정보:', {
+    hasAccessToken: !!accessToken,
+    tokenLength: accessToken?.length || 0,
+    tokenPreview: accessToken ? `${accessToken.substring(0, 30)}...` : 'none',
+  });
+  console.log('📤 헤더:', {
+    method: 'POST',
+    'Content-Type': 'multipart/form-data (auto-generated boundary)',
+    credentials: 'include',
+  });
+  console.log('📦 FormData 구성:', {
+    request: '강좌 메타정보 (JSON)',
+    thumbnail: thumbnailFile ? '썸네일 첨부됨' : '썸네일 없음',
+  });
+  console.log('='.repeat(60));
+
+  const response = await fetchApi<CreateCourseResponse>(url, {
     method: 'POST',
     body: formData,
     credentials: 'include',
   });
+
+  console.log('📥 ========== 강좌 생성 API 응답 정보 ==========');
+  console.log('🕐 응답 일시:', new Date().toISOString(), `(${new Date().toLocaleString('ko-KR')})`);
+  console.log('📊 응답 데이터:', response);
+  console.log('='.repeat(60));
+
+  return response;
 };
 
 // 강좌 발행 API 호출

@@ -401,8 +401,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
               orderIndex: lIndex + 1,
               resource: resourcePayload,
             },
-            undefined,
-            //file,
+            file,
           );
 
           lectureId = String(created.lectureId);
