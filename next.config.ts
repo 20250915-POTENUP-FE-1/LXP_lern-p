@@ -4,16 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'images.pexels.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdn.example.com',
+        protocol: 'http',
+        hostname: '3.34.122.45',
+        port: '8080',
+        pathname: '/uploads/**',
       },
     ],
   },

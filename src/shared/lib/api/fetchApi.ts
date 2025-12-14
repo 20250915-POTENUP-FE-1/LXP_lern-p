@@ -25,10 +25,18 @@ export async function fetchApi<T = unknown>(
 
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 
-    const headers: Record<string, string> = {
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...((options.headers as Record<string, string> | undefined) ?? {}),
-    };
+    // 인증 헤더 설정
+    const headers = new Headers(options.headers);
+
+    if (accessToken) {
+      headers.set('Authorization', `Bearer ${accessToken}`); // 인증 토큰 포함
+    }
+
+    // JSON 요청일 때만 Content-Type 기본 부여
+    if (!isFormData) {
+      const hasContentType = headers.get('Content-Type');
+      if (!hasContentType) headers.append('Content-Type', 'application/json');
+    }
 
     // JSON 요청일 때만 Content-Type 기본 부여
     if (!isFormData) {
@@ -48,21 +56,30 @@ export async function fetchApi<T = unknown>(
       headers,
     });
 
+    // 응답 데이터 파싱
+    const resJson = await response.json();
+
+    // 오류 처리
     if (!response.ok) {
-      const text = await response.text().catch(() => '');
-      throw new Error(
-        `API 요청 실패: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`,
-      );
+      // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
+      if (response.status === 401) {
+        cookieStore.delete('accessToken'); // 재로그인
+        throw new Error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
+      }
+
+      throw new Error(`[${response.status} (${resJson.code}) - ${resJson.message}]`);
     }
 
-    const resJson = (await response.json()) as ApiResponse<T>;
-
+    // 응답 헤더에 새로운 액세스 토큰이 있다면 쿠키 갱신
     const newAccessToken = response.headers.get('Authorization');
     if (newAccessToken) {
-      cookieStore.set('accessToken', newAccessToken, { httpOnly: true });
+      cookieStore.set('accessToken', newAccessToken, {
+        httpOnly: true,
+      });
     }
 
-    if (resJson.code?.startsWith('E')) {
+    // 에러 코드 처리
+    if (resJson.code.startsWith('E')) {
       throw new Error(resJson.message);
     }
 

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from '@/domains/course/components/CourseCard.module.css';
 import { CourseCardType as Course } from '../types/course';
+import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
 export type CourseCardProps = {
   course: Course;
@@ -19,7 +20,7 @@ export function CourseCard({ course }: CourseCardProps) {
           width={1200} // 혹은 800
           height={675}
           className={styles['course-card__thumb']}
-          src={course.thumbnailUrl}
+          src={formatAbsoluteUrl(course.thumbnailUrl)}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />

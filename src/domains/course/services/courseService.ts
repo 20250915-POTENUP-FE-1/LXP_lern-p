@@ -53,10 +53,19 @@ export const getCourseDetail = async (courseId: string): Promise<GetCourseDetail
 /**
  * 강좌 별 수강 정보 조회
  */
-export const getEnrollmentByCourseId = async (courseId: string): Promise<GetEnrollmentResponse> => {
-  return await getApi<GetEnrollmentResponse>(`/api/enrollments/course/${courseId}`, {
-    cache: 'no-store',
-  });
+export const getEnrollmentByCourseId = async (
+  courseId: string,
+): Promise<GetEnrollmentResponse | null> => {
+  try {
+    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
+      cache: 'no-store',
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
+      return null;
+    }
+    throw err;
+  }
 };
 /**
  * 강좌 신청

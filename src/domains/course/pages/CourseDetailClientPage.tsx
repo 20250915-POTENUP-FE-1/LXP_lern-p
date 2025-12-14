@@ -15,6 +15,7 @@ import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
+import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -93,7 +94,7 @@ export default function CourseDetailClientPage() {
           width={800}
           height={450}
           className={styles['course-detail__hero']}
-          src={course.thumbnailUrl}
+          src={formatAbsoluteUrl(course.thumbnailUrl)}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />

@@ -39,9 +39,8 @@ async function fetchInitialUser(): Promise<User | null> {
     };
 
     return user;
-  } catch (e) {
+  } catch (err) {
     // 만료/401은 정상 케이스
-    cookieStore.delete('accessToken');
     return null;
   }
 }
