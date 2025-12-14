@@ -10,7 +10,7 @@ export type Course = {
   instructorName: string;
 
   category: string[];
-  level: string;
+  level: CourseLevel;
   tags: string[];
 
   price: number;
@@ -19,10 +19,10 @@ export type Course = {
   studentCount: number;
 
   duration: number;
-  status: 'draft' | 'published' | 'hidden';
+  status: Status;
 
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 
   sections: string[];
 };
@@ -33,8 +33,6 @@ export type Section = {
   title: string;
   sequence: number;
   lectures: string[];
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type Lecture = {
@@ -42,10 +40,9 @@ export type Lecture = {
   sectionId: string;
   courseId: string;
   title: string;
-  videoUrl: string;
+  resource: Resource;
   duration: number;
   isPreview: boolean;
-  resource: LectureResource[];
   sequence: number;
   createdAt: string;
   updatedAt: string;
@@ -107,6 +104,12 @@ export type LectureResource = {
 };
 
 // 강좌 수강 상태
+export type Resource = {
+  resourceType: ResourceType;
+  fileUrl: string;
+  isDownloadable: boolean;
+};
+
 export type Enrollment = {
   id: string;
   userId: string;
@@ -115,14 +118,11 @@ export type Enrollment = {
   enrolledAt: string;
 };
 
-// 강좌 생성/수정 폼 상태
-export type CourseDetailResponse = {
+export type CourseDetail = {
   course: Course | null;
   sections: Section[];
   lectures: Record<string, Lecture[]>;
 };
-
-// ==== 3. API 요청 타입 (프론트 <-> 백엔드)
 
 //강좌 생성/수정 요청
 export type CreateCourseRequest = {
@@ -212,3 +212,91 @@ export type ReorderLecturesRequest = {
     orderIndex: number;
   }[];
 };
+
+export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
+export type CourseLevel = 'BEGINNER' | 'NOVICE' | 'INTERMEDIATE' | 'ADVANCED';
+
+export type GetAllCourseResponse = {
+  content: Array<{
+    courseId: string;
+    title: string;
+    categories: string[];
+    thumbnailUrl: string;
+    status: Status;
+    price: number;
+    studentCount: number;
+    rating: number;
+    lastModifiedAt: string;
+    level: CourseLevel;
+    summary: string;
+    instructorName: string;
+  }>;
+  cureentPage: number;
+  size: number;
+  totalElements: number;
+  totalPages: string;
+  hasNext: boolean;
+};
+
+export type GetCourseDetailResponse = {
+  courseId: string;
+  title: string;
+  categories: string[];
+  thumbnailUrl: string;
+  summary: string;
+  description: string;
+  instructor: {
+    id: string;
+    name: string;
+    profileUrl: string;
+  };
+  isPurchased: boolean;
+  totalDuration: number;
+  status: Status;
+  price: number;
+  level: CourseLevel;
+  studentCount: number;
+  rating: number;
+  sections: SectionDetailResponse[];
+};
+
+export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
+
+export type GetEnrollmentResponse = {
+  enrollmentId: string;
+  studentId: string;
+  courseId: string;
+  status: EnrollmentStatus;
+  progressRate: 45;
+  createdAt: string;
+  expiredAt: string;
+};
+
+export type SectionDetailResponse = {
+  sectionId: string;
+  title: string;
+  order: number;
+  lectures: LectureDetailResponse[];
+};
+
+export type LectureDetailResponse = {
+  lectureId: string;
+  title: string;
+  totalDurationSeconds: number;
+  isPreview: boolean;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+  resource: {
+    resourceType: ResourceType;
+    fileUrl: string;
+    isDownloadable: boolean;
+  };
+};
+
+export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
+
+export type CourseCardType = Omit<
+  Course,
+  'description' | 'sections' | 'duration' | 'status' | 'instructorId'
+>;

@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <footer className={styles['app-shell__footer']} role="contentinfo">
-        <p className={styles['app-shell__footer-text']}>© {new Date().getFullYear()} LernP</p>
+        <p className={styles['app-shell__footer-text']}>© {new Date().getFullYear()} Lernix</p>
       </footer>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './index.css';
+import { cookies } from 'next/headers';
 import { getUserProfile } from '@/domains/user/services/userService';
 import { User } from '@/domains/user/types/user';
 import { MSWProvider } from './_providers/msw-provider';
@@ -11,13 +12,18 @@ import { AuthProvider } from './_providers/AuthProvider';
 // }
 
 export const metadata: Metadata = {
-  title: 'LernP ',
+  title: 'Lernix',
   description: '역할 전환형 온라인 학습 플랫폼',
 };
 
 async function fetchInitialUser(): Promise<User | null> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+
+  if (!accessToken) return null;
+
   try {
-    const userProfile = await getUserProfile(); // 서버 전용: fetchApi 사용
+    const userProfile = await getUserProfile();
 
     if (!userProfile) return null;
 
@@ -34,8 +40,8 @@ async function fetchInitialUser(): Promise<User | null> {
 
     return user;
   } catch (e) {
-    // 로그인 안 되어 있거나 에러 나면 null
-    console.error(e);
+    // 만료/401은 정상 케이스
+    cookieStore.delete('accessToken');
     return null;
   }
 }

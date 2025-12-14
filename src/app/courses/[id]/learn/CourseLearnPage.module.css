@@ -1,5 +1,5 @@
 .course-learn {
-  --accent: rgba(239,104,23,0.08);
+  --accent: rgba(239, 104, 23, 0.08);
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text);
@@ -22,13 +22,13 @@
 .course-learn__header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
 }
 
 .course-learn__back-btn {
   background: transparent;
   border: none;
-  padding: 6px;
+  padding: 6px 0;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -163,6 +163,7 @@
 
 .course-learn__curriculum {
   padding: 12px;
+  padding-right: 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -254,4 +255,3 @@
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
-

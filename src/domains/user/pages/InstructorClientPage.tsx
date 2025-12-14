@@ -2,45 +2,37 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import styles from '@/app/(user)/mypage/MyPageSections.module.css';
-import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { getInstructorCourses } from '@/domains/user/services/instructorService';
-import type { InstructorCourse } from '@/domains/user/types/instructor';
 
-export default function InstructorCoursesPage() {
+import styles from '@/app/(user)/mypage/MyPageSections.module.css';
+import { getInstructorCourses } from '@/domains/course/services/instructorCourseService';
+import type { InstructorCourseListItemResponse } from '@/domains/course/types/instructor';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
+
+export default function InstructorCourseClientPage() {
   const { user, loading: userLoading } = useAuthState();
-  const [courses, setCourses] = useState<InstructorCourse[]>([]);
+  const [courses, setCourses] = useState<InstructorCourseListItemResponse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState<boolean>(false);
 
-  /**
-   * 강의 목록 불러오기
-   */
   useEffect(() => {
-    if (userLoading || !user?.id) return;
-
-    (async () => {
+    async function fetchCourses() {
       setCoursesLoading(true);
       try {
-        const data = await getInstructorCourses(user.id);
-        setCourses(data);
-      } catch (err) {
-        console.error('❌ 강좌 가져오기 실패:', err);
+        const page = await getInstructorCourses();
+        setCourses(page.content);
+      } catch (e) {
+        console.error('강사 강좌 목록 조회 실패', e);
       } finally {
         setCoursesLoading(false);
       }
-    })();
-  }, [userLoading, user?.id]);
+    }
 
-  /**
-   * 로딩 UI
-   */
+    fetchCourses();
+  }, []);
+
   if (userLoading || coursesLoading) {
     return <div style={{ padding: '40px' }}>⏳ 강좌 불러오는 중...</div>;
   }
 
-  /**
-   * 강좌 없을 때 UI
-   */
   if (courses.length === 0) {
     return <div style={{ padding: '40px' }}>🫠 개설한 강의가 아직 없어요.</div>;
   }
@@ -65,29 +57,24 @@ export default function InstructorCoursesPage() {
 
       <div className={styles['authored']}>
         {courses.map((course) => (
-          <div key={course.id} className={styles['authored__item']}>
-            <Link href={`/courses/${course.id}`}>
+          <Link href={`/courses/${course.courseId}`} key={course.courseId}>
+            <div className={styles['authored__item']}>
               <div className={styles['authored__meta']}>
                 <h3 className={styles['authored__title']}>{course.title}</h3>
-                <p className={styles['authored__category']}>
-                  {Array.isArray(course.category)
-                    ? course.category.join(' / ')
-                    : (course.category ?? '카테고리 없음')}
-                </p>
+                <p className={styles['authored__category']}>{course.categories.join(' / ')}</p>
               </div>
-            </Link>
-            <div className={styles['authored__actions']}>
-              {/*<Link href={`/courses/${course.id}/edit?step=1`} className={styles['authored__btn']}>
-                수정
-              </Link>*/}
-              <button
-                type="button"
-                className={`${styles['authored__btn']} ${styles['authored__btn--delete']}`}
-              >
-                삭제
-              </button>
+
+              {/* <div className={styles["authored__actions"]}>
+                <button className={styles["authored__btn"]}>수정</button>
+                <button
+                  type="button"
+                  className={`${styles["authored__btn"]} ${styles["authored__btn--delete"]}`}
+                >
+                  삭제
+                </button>
+               </div>  */}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </article>
