@@ -69,7 +69,7 @@ export function Header() {
           {/* 왼쪽: 로고 */}
           <div className={styles['header__left']}>
             <Link href="/" className={styles['header__logo']} aria-label="홈으로 이동">
-              <span className={styles['header__logo-text']}>LernP</span>
+              <span className={styles['header__logo-text']}>LearNix</span>
             </Link>
           </div>
 
