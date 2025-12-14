@@ -1,4 +1,4 @@
-import { postApi, patchApi, deleteApi, fetchApi } from '@/shared/lib/api/fetchApi';
+import { postApi, patchApi, deleteApi, fetchApi, putApi } from '@/shared/lib/api/fetchApi';
 import { CreateLectureResponse, LectureResource } from '../types/course';
 
 // 강의 생성 API
@@ -54,10 +54,11 @@ export async function updateLecture(
     totalDurationSeconds?: number;
     isPreview: boolean;
     resource: LectureResource;
+    orderIndex?: number;
   },
 ) {
   // 스펙 그대로면 PUT, 백엔드가 PATCH 허용하면 patchApi 유지
-  return patchApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, body);
+  return putApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, body);
 }
 
 // 강의 삭제 API

@@ -206,7 +206,13 @@ export const updateLecture = async (
     resource?: any[];
   },
 ): Promise<void> => {
-  if (!courseId || !lectureId) throw new Error('Invalid lecture params');
+  // ✅ 여기 추가/수정
+  if (!courseId) throw new Error('[updateLecture] missing courseId');
+  if (!lectureId || lectureId === 'undefined') {
+    throw new Error(`[updateLecture] invalid lectureId: ${String(lectureId)}`);
+  }
+
+  console.log('[updateLecture]', { courseId, lectureId, payload }); // ✅ (원하면 유지)
 
   await patchApi<void>(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, payload);
 };

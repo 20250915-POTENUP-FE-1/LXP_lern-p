@@ -404,7 +404,11 @@ export function useSectionForm(options?: UseSectionFormParams) {
             file,
           );
 
-          lectureId = String(created.lectureId);
+          lectureId = String((created as any).lectureId ?? (created as any).id);
+
+          if (!lectureId || lectureId === 'undefined') {
+            throw new Error('[sync] createLecture succeeded but lectureId missing in response');
+          }
         }
 
         // 기존 강의 수정
@@ -420,13 +424,13 @@ export function useSectionForm(options?: UseSectionFormParams) {
                 ]
               : undefined;
 
-          await updateLecture(courseId, lectureId, {
-            title: lec.title,
-            totalDurationSeconds: lec.duration ?? 0,
-            isPreview: lec.isPreview ?? false,
-            orderIndex: lIndex + 1,
-            resource: resourcePayload,
-          });
+          // await updateLecture(courseId, lectureId, {
+          //   title: lec.title,
+          //   totalDurationSeconds: lec.duration ?? 0,
+          //   isPreview: lec.isPreview ?? false,
+          //   orderIndex: lIndex + 1,
+          //   resource: resourcePayload,
+          // });
         }
       }
     }
