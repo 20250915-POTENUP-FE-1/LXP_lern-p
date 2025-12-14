@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className={styles['auth-shell']}>
       <header className={styles['auth-shell__header']} role="banner" aria-label="인증 헤더">
         <Link href="/" className={styles['auth-shell__brand']}>
-          LearNix
+          Learnix
         </Link>
       </header>
 
@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <footer className={styles['auth-shell__footer']} role="contentinfo">
         <p className={styles['auth-shell__footer-text']}>
-          도움이 필요하신가요? support@LearNix.example
+          도움이 필요하신가요? support@learnix.example
         </p>
       </footer>
     </div>
