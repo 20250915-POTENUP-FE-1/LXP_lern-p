@@ -15,6 +15,7 @@
   align-items: center;
   border-radius: 16px;
   margin: 50px auto;
+  margin-bottom: 0px;
   padding: 60px 40px;
   gap: 30px;
 }
@@ -47,7 +48,7 @@
   display: flex;
   justify-content: flex-end;
   padding-right: 4px;
-  margin-top: 32px;
+
   margin-bottom: 32px;
   width: 100%;
   align-self: stretch;

@@ -1,8 +1,8 @@
 'use client';
 
 import { ChangeEvent } from 'react';
-import styles from './SortSelect.module.css';
 import { useCourseListQuery, SortValue } from '../hooks/useCourseListQuery';
+import styles from './SortSelect.module.css';
 
 interface FirestoreTimestamp {
   toDate: () => Date;
@@ -77,9 +77,6 @@ export function SortSelect() {
 
   return (
     <div className={`${styles['sort']} ${styles['sort--compact']}`} role="group" aria-label="정렬">
-      <label htmlFor="course-sort" className={styles['sort__label']}>
-        정렬
-      </label>
       <select
         id="course-sort"
         className={styles['sort__select']}
