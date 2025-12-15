@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from '@/domains/user/components/MyPageSidebar.module.css';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
-import { usePathname } from 'next/navigation';
 
 export default function MyPageSidebar() {
   const { user } = useAuthState(); // 클라이언트 훅 필요 시 -> 분리
@@ -39,7 +39,10 @@ export default function MyPageSidebar() {
             </li>
 
             <li className={styles['mypage-nav__item']}>
-              <Link href="/mypage/cart" className={`${styles["mypage-nav__link"]} ${isActive("/mypage/cart")}`}>
+              <Link
+                href="/mypage/cart"
+                className={`${styles['mypage-nav__link']} ${isActive('/mypage/cart')}`}
+              >
                 구매 내역
               </Link>
             </li>
@@ -84,15 +87,18 @@ export default function MyPageSidebar() {
 
                 <li className={styles['mypage-nav__item']}>
                   <Link
-                    href="/mypage/enrolled"
-                    className={`${styles['mypage-nav__link']} ${isActive('/mypage/enrolled')}`}
+                    href="/mypage/enrollment"
+                    className={`${styles['mypage-nav__link']} ${isActive('/mypage/enrollment')}`}
                   >
                     수강 중인 강좌
                   </Link>
                 </li>
 
                 <li className={styles['mypage-nav__item']}>
-                  <Link href="/mypage/cart" className={`${styles["mypage-nav__link"]} ${isActive("/mypage/cart")}`}>
+                  <Link
+                    href="/mypage/cart"
+                    className={`${styles['mypage-nav__link']} ${isActive('/mypage/cart')}`}
+                  >
                     구매 내역
                   </Link>
                 </li>

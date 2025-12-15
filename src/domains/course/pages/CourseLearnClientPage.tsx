@@ -1,8 +1,5 @@
 'use client';
 
-import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
-import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
-
 import {
   ArrowLeft,
   Play,
@@ -13,7 +10,10 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
+import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
+import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
 export default function CourseLearnClient() {
   const router = useRouter();
@@ -57,7 +57,9 @@ export default function CourseLearnClient() {
         {/* 메인 플레이어 */}
         <main className={styles['course-learn__main']}>
           <div className={styles['course-learn__player-wrap']}>
-            {currentLecture.type === 'VIDEO' && currentLecture.videoUrl ? (
+            {currentLecture.type === 'VIDEO' &&
+            currentLecture.videoUrl &&
+            formatAbsoluteUrl(currentLecture.videoUrl) ? (
               <div className={styles['course-learn__player']}>
                 <video
                   key={currentLecture.id}
@@ -66,7 +68,7 @@ export default function CourseLearnClient() {
                   autoPlay
                 >
                   {currentLecture.videoUrl && (
-                    <source src={currentLecture.videoUrl} type="video/mp4" />
+                    <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
                   )}
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
@@ -81,7 +83,7 @@ export default function CourseLearnClient() {
                   {currentLecture.description}
                 </p>
                 {currentLecture.pdfUrl && (
-                  <a href={currentLecture.pdfUrl} download>
+                  <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
                     <button className={styles['course-learn__brand-btn']}>
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
                     </button>
