@@ -28,7 +28,7 @@ export default function CourseCreateClientPage() {
     >
       <header className={styles['course-create__header']}>
         <h1 id="course-create-title" className={styles['course-create__title']}>
-          '강좌 등록' (Step {currentStep})
+          강좌 등록 (Step {currentStep})
         </h1>
       </header>
       <div className={styles['course-create__body']}>{renderContent()}</div>
