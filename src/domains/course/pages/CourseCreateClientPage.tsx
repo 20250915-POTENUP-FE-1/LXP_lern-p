@@ -9,17 +9,16 @@ export default function CourseCreateClientPage() {
   const searchParams = useSearchParams();
   const { id } = useParams<{ id: string }>();
   const courseId = id;
-  const isEditMode = Boolean(courseId);
   const currentStep = searchParams.get('step') || '1';
 
   const renderContent = () => {
     switch (currentStep) {
       case '1':
-        return <CourseForm mode="create" />;
+        return <CourseForm />;
       case '2':
-        return <SectionForm mode="create" />;
+        return <SectionForm />;
       default:
-        return <CourseForm mode="create" />;
+        return <CourseForm />;
     }
   };
   return (
@@ -29,7 +28,7 @@ export default function CourseCreateClientPage() {
     >
       <header className={styles['course-create__header']}>
         <h1 id="course-create-title" className={styles['course-create__title']}>
-          {isEditMode ? '강좌 수정' : '강좌 등록'} (Step {currentStep})
+          '강좌 등록' (Step {currentStep})
         </h1>
       </header>
       <div className={styles['course-create__body']}>{renderContent()}</div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getCourse } from '../services/courseService';
+import { fetchCourseWithSections } from '../services/courseCreateService';
 
 type BlockedReason = 'published' | 'not-found' | 'error';
 
@@ -43,15 +43,15 @@ export function useCourseEditGuard(courseId: string) {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const { course } = await getCourse(courseId);
+        const { courseDraft } = await fetchCourseWithSections(courseId);
 
-        if (!course) {
+        if (!courseDraft) {
           setBlocked(true);
           setBlockedReason('not-found');
           return;
         }
 
-        if (course.status !== 'draft') {
+        if (courseDraft.status !== 'draft') {
           setBlocked(true);
           setBlockedReason('published');
         }

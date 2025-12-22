@@ -67,6 +67,7 @@ export type CourseDraftForm = {
   level: string;
   price: number | string;
   thumbnail: string;
+  status?: string;
 };
 
 // 섹션 생성 / 수정

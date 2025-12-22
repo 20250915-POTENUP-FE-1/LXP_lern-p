@@ -1,13 +1,8 @@
 import { create } from 'zustand';
-import {
-  CourseDraftForm,
-  SectionDraftForm,
-  LectureDraftForm,
-  LectureResource,
-} from '../types/course';
+import { CourseDraftForm, SectionDraftForm, LectureDraftForm } from '../types/course';
 import { createEmptySection, createEmptyLecture } from '../utils/courseDraft';
-import { createSection, updateSection, deleteSection } from '../services/sectionService';
-import { createLecture, updateLecture, deleteLecture } from '../services/lectureService';
+import { createSection, updateSection, deleteSection } from '../services/sectionCreateService';
+import { createLecture, updateLecture, deleteLecture } from '../services/lectureCreateService';
 
 type CourseDraftStore = {
   courseId?: string;
@@ -131,13 +126,25 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
         }
 
         if (!lecture.id && lecture.title.trim()) {
-          const res = await createLecture(courseId, sectionId, {
-            title: lecture.title,
-            totalDurationSeconds: lecture.duration,
-            isPreview: lecture.isPreview,
-            orderIndex: lectureIndex,
-            resource: lecture.resource?.length ? lecture.resource : undefined,
-          });
+          const res = await createLecture(
+            courseId,
+            sectionId,
+            {
+              title: lecture.title,
+              totalDurationSeconds: lecture.duration,
+              isPreview: lecture.isPreview,
+              orderIndex: lectureIndex,
+              resource: lecture.resource?.length
+                ? lecture.resource.map((r) => ({
+                    resourceType: r.resourceType as 'VIDEO' | 'PDF' | 'DOC' | 'ZIP',
+                    isDownloadable: Boolean(r.isDownloadable), // 불리언 값 보장
+                    fileUrl: r.fileUrl,
+                  }))
+                : undefined,
+            },
+            lecture.file,
+          );
+
           const createdLectureId = res.lectureId;
           set((s) => ({
             sections: s.sections.map((sec) =>
