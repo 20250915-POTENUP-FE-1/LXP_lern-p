@@ -11,7 +11,6 @@ import {
   getLearnProgress,
 } from '@/domains/course/services/learnService';
 
-import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
 import { mapCourse } from '../utils/mapCourse';
 
 /** -------------------------------
@@ -20,50 +19,31 @@ import { mapCourse } from '../utils/mapCourse';
 type ProcessedCourse = ReturnType<typeof mapCourse>;
 type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
 
-/** -------------------------------
- * courseId → 내 enrollmentId 찾기
- * ------------------------------- */
-async function getMyEnrollmentId(courseId: string): Promise<string | null> {
-  const page = await getEnrollmentList({
-    status: 'ENROLLED',
-    page: 0,
-    size: 10,
-  });
-
-  const match = page.content.find((item) => String(item.courseId) === String(courseId));
-  return match ? match.enrollmentId : null;
-}
-
-export function useCourseLearn() {
-  const { id: courseIdParam } = useParams();
-  const courseId = String(courseIdParam);
+export function useCourseLearn(enrollmentId: string) {
+  const params = useParams<{ id: string }>();
+  const courseId = params?.id;
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
 
   useEffect(() => {
-    if (!courseId) return;
+    if (!courseId || !enrollmentId) return;
+    let cancelled = false;
 
     async function fetchAll() {
-      // 1) 강좌 상세
       const course = await getCourse(courseId);
+      if (cancelled) return;
 
-      // 2) 내 enrollmentId 찾기
-      const enrollmentId = await getMyEnrollmentId(courseId);
+      const enrollment = await getLearnEnrollment(enrollmentId);
+      const progress = await getLearnProgress(enrollmentId);
+      if (cancelled) return;
 
-      // 3) Learn 도메인용 enrollment / progress 조회
-      const enrollment = enrollmentId ? await getLearnEnrollment(enrollmentId) : null;
-      const progress = enrollmentId ? await getLearnProgress(enrollmentId) : null;
-
-      const next: CourseLearn = {
-        course,
-        enrollment,
-        progress,
-      };
-
-      setLearnData(next);
+      setLearnData({ course, enrollment, progress });
     }
 
     fetchAll();
-  }, [courseId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId, enrollmentId]);
 
   /** UI용 courseData 가공 */
   const courseData: ProcessedCourse | null = useMemo(() => {

@@ -15,7 +15,11 @@ import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
-export default function CourseLearnClient() {
+type CourseLearnClientProps = {
+  enrollmentId: string;
+};
+
+export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
   const router = useRouter();
 
   const {
@@ -26,7 +30,7 @@ export default function CourseLearnClient() {
     handleLectureClick,
     totalLectures,
     completedLectures,
-  } = useCourseLearn();
+  } = useCourseLearn(enrollmentId);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
