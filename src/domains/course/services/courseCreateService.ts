@@ -168,7 +168,7 @@ export const updateDraftCourse = async (
 };
 
 // 생성된 강좌조회 용 데이터 매핑 함수
-const mapRespoonseToCourseDraft = (data: any) => {
+const mapResponseToCourseDraft = (data: any) => {
   //카테고리
   const category = Array.isArray(data.categoryIds)
     ? data.categoryIds.map((id: unknown) => String(id))
@@ -212,5 +212,5 @@ export async function fetchCourseWithSections(courseId: string): Promise<{
 
   const data = await getApi<any>(`/api/instructor/courses/${courseId}`);
 
-  return mapRespoonseToCourseDraft(data);
+  return mapResponseToCourseDraft(data);
 }

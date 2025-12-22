@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { CourseDraftForm, SectionDraftForm, LectureDraftForm } from '../types/course';
 import { createEmptySection, createEmptyLecture } from '../utils/courseDraft';
-import { createSection, updateSection, deleteSection } from '../services/sectionCreateService';
+import { createSection, updateSection } from '../services/sectionCreateService';
 import { createLecture, updateLecture, deleteLecture } from '../services/lectureCreateService';
 
 type CourseDraftStore = {
