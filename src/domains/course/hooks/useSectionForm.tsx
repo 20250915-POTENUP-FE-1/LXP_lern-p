@@ -144,7 +144,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
     };
 
     load();
-  }, [, courseId, router, initialized]);
+  }, [courseId, router, initialized]);
 
   // === 공통 헬퍼: 섹션/강의 업데이트 ===
   const updateSectionByLocalId = (
