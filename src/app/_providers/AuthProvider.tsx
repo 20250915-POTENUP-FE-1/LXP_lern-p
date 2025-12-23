@@ -22,6 +22,8 @@ const DEV_FAKE_USER: User = {
   updatedAt: new Date(),
 };
 
+sessionStorage.setItem('draftCourseId', 'DEV_COURSE_ID');
+
 export function AuthProvider({ initialUser, children }: AuthProviderProps) {
   const setUser = useUserStore((s) => s.setUser);
   const resetUser = useUserStore((s) => s.clearUser);
