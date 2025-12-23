@@ -155,7 +155,7 @@ export const updateDraftCourse = async (
   try {
     const formData = createCourseFormData(payload);
 
-    await patchApi<void>(`${BASE_URL}/api/instructor/courses/${courseId}`, undefined, {
+    await patchApi<void>(`/api/instructor/courses/${courseId}`, undefined, {
       body: formData,
       credentials: 'include',
     });
