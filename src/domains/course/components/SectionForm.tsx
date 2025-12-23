@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from './CourseForm.module.css';
 import { ResourceUploader } from './ResourceUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
+import { LectureResource, ResourceType } from '../types/course';
 
 export function SectionForm() {
   const router = useRouter();
@@ -79,9 +80,7 @@ export function SectionForm() {
                           initialValue={
                             lecture.resource?.[0]
                               ? {
-                                  resourceType:
-                                    (lecture.resource[0] as any).resourceType ??
-                                    (lecture.resource[0] as any).resourceType,
+                                  resourceType: lecture.resource[0].resourceType as ResourceType,
                                   fileUrl: lecture.resource[0].fileUrl ?? '',
                                   isDownloadable: !!lecture.resource[0].isDownloadable,
                                   duration: lecture.duration,

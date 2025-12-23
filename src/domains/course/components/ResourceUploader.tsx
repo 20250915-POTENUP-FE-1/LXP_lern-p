@@ -109,7 +109,7 @@ export function ResourceUploader({
         duration: videoDuration ?? undefined,
         fileName: file.name,
         file,
-      } as any);
+      } as UploadResult);
     } catch (err) {
       let msg = '파일 처리 중 오류가 발생했습니다.';
 

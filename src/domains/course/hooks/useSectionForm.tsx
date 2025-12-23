@@ -6,6 +6,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 import type {
   CourseDraftForm,
+  CreateLectureResponse,
   LectureDraftForm,
   LectureResource,
   SectionDraftForm,
@@ -15,6 +16,7 @@ import { publishDraftCourse } from '../services/courseCreateService';
 import type { UploadResult } from '../components/ResourceUploader';
 import { deleteLecture, createLecture, updateLecture } from '../services/lectureCreateService';
 import { deleteSection, createSection, updateSection } from '../services/sectionCreateService';
+import router from 'next/router';
 
 type UseSectionFormParams = {
   courseId?: string;
@@ -78,7 +80,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
         const resources = lecture.resource ?? [];
         const primaryResource: LectureResource | undefined = Array.isArray(resources)
           ? resources[0]
-          : (resources as any);
+          : undefined;
 
         const videoUrl = lecture.videoUrl?.trim();
         const resourceType = primaryResource?.resourceType;
@@ -249,7 +251,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
         videoUrl: nextVideoUrl,
         resource: [newResource],
         // 파일이 전달된 경우에만 덮어쓰고, 없으면 기존 값을 유지
-        _file: (result as any).file ?? (lecture as any)._file ?? null,
+        _file: result.multiFile ?? lecture.file ?? null,
       };
     });
   };
@@ -275,7 +277,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
           const primaryResource: LectureResource | undefined = Array.isArray(resources)
             ? resources[0]
-            : (resources as any);
+            : undefined;
 
           const videoUrl = lec.videoUrl?.trim();
 
@@ -326,9 +328,9 @@ export function useSectionForm(options?: UseSectionFormParams) {
         const resources = lec.resource ?? [];
         const primaryResource: LectureResource | undefined = Array.isArray(resources)
           ? resources[0]
-          : (resources as any);
+          : undefined;
 
-        const file = (lec as any)._file ?? undefined;
+        const file = lec.file ?? undefined;
         let lectureId = lec.id ? String(lec.id) : undefined;
         let isJustCreated = false;
 
@@ -344,7 +346,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
               primaryResource && primaryResource.resourceType
                 ? [
                     {
-                      resourceType: primaryResource.resourceType as 'VIDEO' | 'PDF' | 'DOC' | 'ZIP',
+                      resourceType: primaryResource.resourceType,
                       isDownloadable: Boolean(primaryResource.isDownloadable),
                       fileUrl: primaryResource.fileUrl,
                     },
@@ -355,7 +357,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
           const created = await createLecture(courseId, sectionId, createPayload, file);
 
           // 생성 직후 ID 업데이트 및 플래그 설정
-          lectureId = String((created as any).lectureId ?? (created as any).id);
+          lectureId = String(created.lectureId ?? created.lectureId);
           isJustCreated = true;
         }
 
@@ -365,7 +367,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
           const updateResource =
             primaryResource && primaryResource.resourceType
               ? {
-                  resourceType: primaryResource.resourceType as 'VIDEO' | 'PDF' | 'DOC' | 'ZIP',
+                  resourceType: primaryResource.resourceType,
                   isDownloadable: Boolean(primaryResource.isDownloadable),
                   fileUrl: primaryResource.fileUrl,
                 }
