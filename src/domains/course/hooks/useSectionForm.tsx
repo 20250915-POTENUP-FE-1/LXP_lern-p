@@ -413,7 +413,14 @@ export function useSectionForm(options?: UseSectionFormParams) {
       });
 
       console.groupEnd();
-      return; // 🔥 DEV 확인용 종료
+
+      sessionStorage.removeItem('courseDraft_step1');
+      sessionStorage.removeItem('courseDraft_step2');
+      const devCourseId = courseId || 'DEV_COURSE_ID';
+      sessionStorage.setItem('draftCourseId', devCourseId);
+      alert('개발 모드: 강좌가 완료된 것으로 처리합니다.');
+      router.replace(`/courses/${devCourseId}`);
+      return;
     }
 
     if (submitting || drafting) return;
