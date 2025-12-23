@@ -30,13 +30,11 @@ export function SectionForm() {
   // if (!step1Data) {
   //   return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
   // }
-  const savedCourseId =
-    typeof window !== 'undefined' ? sessionStorage.getItem('draftCourseId') : null;
 
-  if (!savedCourseId) {
-    router.replace('/courses/create?step=1');
-    return;
-  }
+  // if (!savedCourseId) {
+  //   router.replace('/courses/create?step=1');
+  //   return;
+  // }
 
   return (
     <form onSubmit={handleFinalSubmit}>

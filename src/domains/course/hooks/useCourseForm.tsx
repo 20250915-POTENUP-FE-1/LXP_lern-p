@@ -15,10 +15,8 @@ export function useCourseForm() {
   const params = useParams<{ id?: string }>();
 
   const paramsId = typeof params.id === 'string' ? params.id : '';
-  const sessionCourseId =
-    typeof window !== 'undefined' ? (sessionStorage.getItem('draftCourseId') ?? '') : '';
 
-  const courseId = paramsId || sessionCourseId;
+  const courseId = paramsId;
 
   const [formData, setFormData] = useState<CourseFormState>({
     title: '',
@@ -95,7 +93,6 @@ export function useCourseForm() {
 
     if (process.env.NODE_ENV === 'development') {
       sessionStorage.setItem('courseDraft_step1', JSON.stringify(draftData));
-      sessionStorage.setItem('draftCourseId', 'DEV_COURSE_ID');
       router.push('/courses/create?step=2');
       return;
     }
@@ -111,10 +108,7 @@ export function useCourseForm() {
       // 2) 서버에 draft 강좌 생성 → courseId 확보
       const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
 
-      // 3) Step2에서 쓸 courseId 저장
-      sessionStorage.setItem('draftCourseId', String(courseId));
-
-      // 4) URL은 create 유지
+      // 3) URL은 create 유지
       router.push('/courses/create?step=2');
       return;
     } catch (err) {

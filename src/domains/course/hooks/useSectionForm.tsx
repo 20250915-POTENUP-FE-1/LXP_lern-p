@@ -56,11 +56,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
       setResolvedCourseId(courseIdProp);
       return;
     }
-
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('draftCourseId');
-      if (saved) setResolvedCourseId(saved);
-    }
   }, [params.id, courseIdProp]);
 
   const courseId = resolvedCourseId;
@@ -417,7 +412,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
       sessionStorage.removeItem('courseDraft_step1');
       sessionStorage.removeItem('courseDraft_step2');
       const devCourseId = courseId || 'DEV_COURSE_ID';
-      sessionStorage.setItem('draftCourseId', devCourseId);
       alert('개발 모드: 강좌가 완료된 것으로 처리합니다.');
       router.replace(`/courses/${devCourseId}`);
       return;
