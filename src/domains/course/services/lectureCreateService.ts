@@ -30,7 +30,7 @@ export const createLecture = async (
 
   return await postApi<CreateLectureResponse>(
     `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
-    undefined,
+    null,
     {
       body: formData,
       credentials: 'include',

@@ -301,3 +301,8 @@ export type CourseCardType = Omit<
   Course,
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
 >;
+
+export type GetDraftCourseResponse = {
+  courseDraft: CourseDraftForm;
+  sectionDrafts: SectionDraftForm[];
+};
