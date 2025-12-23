@@ -15,7 +15,6 @@ import { publishDraftCourse } from '../services/courseCreateService';
 import type { UploadResult } from '../components/ResourceUploader';
 import { deleteLecture, createLecture, updateLecture } from '../services/lectureCreateService';
 import { deleteSection, createSection, updateSection } from '../services/sectionCreateService';
-import { title } from 'process';
 
 type UseSectionFormParams = {
   courseId?: string;
@@ -267,7 +266,30 @@ export function useSectionForm(options?: UseSectionFormParams) {
       }
 
       const activeLectures = getActiveLectures(sec);
-      const hasContent = !!sec.title.trim() && activeLectures.length > 0;
+      const hasContent =
+        !!sec.title.trim() &&
+        activeLectures.some((lec) => {
+          if (!lec.title.trim()) return false;
+
+          const resources = lec.resource ?? [];
+
+          const primaryResource: LectureResource | undefined = Array.isArray(resources)
+            ? resources[0]
+            : (resources as any);
+
+          const videoUrl = lec.videoUrl?.trim();
+
+          const resourceType = primaryResource?.resourceType;
+
+          const fileUrl = primaryResource?.fileUrl?.trim();
+
+          if (resourceType === 'VIDEO') return !!videoUrl;
+
+          if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP')
+            return !!fileUrl;
+
+          return false;
+        });
 
       let sectionId = sec.id ? String(sec.id) : undefined;
 

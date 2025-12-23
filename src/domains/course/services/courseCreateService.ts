@@ -23,7 +23,7 @@ export const createDraftCourse = async (
 
   const formData = createCourseFormData(requestBody, thumbnailFile);
 
-  return await postApi<CreateCourseResponse>('/api/instructor/courses', undefined, {
+  return await postApi<CreateCourseResponse>('/api/instructor/courses', null, {
     body: formData,
     credentials: 'include',
   });
