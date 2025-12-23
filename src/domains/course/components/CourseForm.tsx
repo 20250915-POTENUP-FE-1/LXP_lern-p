@@ -5,14 +5,8 @@ import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { useCourseForm } from '../hooks/useCourseForm';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
-export type CourseFormProps = {
-  mode?: 'create' | 'edit';
-  courseId?: string;
-};
-
-export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
+export function CourseForm() {
   const router = useRouter();
   const {
     formData,

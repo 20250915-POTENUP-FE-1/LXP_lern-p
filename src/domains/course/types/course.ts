@@ -67,6 +67,7 @@ export type CourseDraftForm = {
   level: string;
   price: number | string;
   thumbnail: string;
+  status?: string;
 };
 
 // 섹션 생성 / 수정
@@ -300,3 +301,8 @@ export type CourseCardType = Omit<
   Course,
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
 >;
+
+export type GetDraftCourseResponse = {
+  courseDraft: CourseDraftForm;
+  sectionDrafts: SectionDraftForm[];
+};

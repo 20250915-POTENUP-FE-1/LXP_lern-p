@@ -1,45 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 import type {
   CourseDraftForm,
+  CreateLectureResponse,
   LectureDraftForm,
   LectureResource,
   SectionDraftForm,
 } from '../types/course';
 import { createEmptyLecture, createEmptySection } from '../utils/courseDraft';
-import {
-  updateDraftCourse,
-  createSection,
-  updateSection,
-  deleteSection,
-  createLecture,
-  updateLecture,
-  deleteLecture,
-  fetchCourseWithSections,
-} from '../services/courseEditService';
 import { publishDraftCourse } from '../services/courseCreateService';
 import type { UploadResult } from '../components/ResourceUploader';
-
-type SectionFormMode = 'create' | 'edit';
+import { deleteLecture, createLecture, updateLecture } from '../services/lectureCreateService';
+import { deleteSection, createSection, updateSection } from '../services/sectionCreateService';
+import router from 'next/router';
 
 type UseSectionFormParams = {
-  mode?: SectionFormMode;
   courseId?: string;
 };
 
 export function useSectionForm(options?: UseSectionFormParams) {
-  const { mode: modeProp, courseId: courseIdProp } = options ?? {};
+  const { courseId: courseIdProp } = options ?? {};
   const { user } = useAuthState();
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams<{ id?: string }>();
 
   // URL 우선, props는 fallback
-  const mode: SectionFormMode = pathname?.includes('/edit') ? 'edit' : (modeProp ?? 'create');
 
   const [sections, setSections] = useState<SectionDraftForm[]>([createEmptySection()]);
   const [step1Data, setStep1Data] = useState<CourseDraftForm | null>(null);
@@ -91,7 +80,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
         const resources = lecture.resource ?? [];
         const primaryResource: LectureResource | undefined = Array.isArray(resources)
           ? resources[0]
-          : (resources as any);
+          : undefined;
 
         const videoUrl = lecture.videoUrl?.trim();
         const resourceType = primaryResource?.resourceType;
@@ -120,31 +109,29 @@ export function useSectionForm(options?: UseSectionFormParams) {
     const load = async () => {
       // courseId 없는 create 모드 → 세션에서 복원
       if (!courseId) {
-        if (mode === 'create') {
-          if (typeof window !== 'undefined') {
-            const savedStep1Data = sessionStorage.getItem('courseDraft_step1');
-            if (!savedStep1Data) {
-              alert('강좌 기본 정보가 누락되었습니다. 다시 입력해 주세요.');
-              router.replace('/courses/create?step=1');
-              return;
-            }
-            try {
-              const parsed: CourseDraftForm = JSON.parse(savedStep1Data);
-              setStep1Data(parsed);
-            } catch (err) {
-              console.error('Failed to parse saved step 1 data:', err);
-              router.replace('/courses/create?step=1');
-              return;
-            }
+        if (typeof window !== 'undefined') {
+          const savedStep1Data = sessionStorage.getItem('courseDraft_step1');
+          if (!savedStep1Data) {
+            alert('강좌 기본 정보가 누락되었습니다. 다시 입력해 주세요.');
+            router.replace('/courses/create?step=1');
+            return;
+          }
+          try {
+            const parsed: CourseDraftForm = JSON.parse(savedStep1Data);
+            setStep1Data(parsed);
+          } catch (err) {
+            console.error('Failed to parse saved step 1 data:', err);
+            router.replace('/courses/create?step=1');
+            return;
+          }
 
-            const savedStep2Data = sessionStorage.getItem('courseDraft_step2');
-            if (savedStep2Data) {
-              try {
-                const parsedSections: SectionDraftForm[] = JSON.parse(savedStep2Data);
-                setSections(parsedSections.length > 0 ? parsedSections : [createEmptySection()]);
-              } catch (err) {
-                console.error('Failed to parse saved step 2 data:', err);
-              }
+          const savedStep2Data = sessionStorage.getItem('courseDraft_step2');
+          if (savedStep2Data) {
+            try {
+              const parsedSections: SectionDraftForm[] = JSON.parse(savedStep2Data);
+              setSections(parsedSections.length > 0 ? parsedSections : [createEmptySection()]);
+            } catch (err) {
+              console.error('Failed to parse saved step 2 data:', err);
             }
           }
           setInitialized(true);
@@ -155,26 +142,10 @@ export function useSectionForm(options?: UseSectionFormParams) {
         alert('유효하지 않은 강좌 ID입니다.');
         return;
       }
-
-      // edit 모드 + 유효한 courseId → 백엔드에서 강좌 + 섹션/강의 조회
-      setLoading(true);
-      try {
-        const { courseDraft, sectionDrafts } = await fetchCourseWithSections(courseId);
-        setStep1Data(courseDraft);
-        setSections(sectionDrafts.length > 0 ? sectionDrafts : [createEmptySection()]);
-      } catch (err) {
-        console.error(err);
-        setError(
-          err instanceof Error ? err.message : '강좌 데이터를 불러오는 중 오류가 발생했습니다.',
-        );
-      } finally {
-        setLoading(false);
-        setInitialized(true);
-      }
     };
 
     load();
-  }, [mode, courseId, router, initialized]);
+  }, [courseId, router, initialized]);
 
   // === 공통 헬퍼: 섹션/강의 업데이트 ===
   const updateSectionByLocalId = (
@@ -280,21 +251,19 @@ export function useSectionForm(options?: UseSectionFormParams) {
         videoUrl: nextVideoUrl,
         resource: [newResource],
         // 파일이 전달된 경우에만 덮어쓰고, 없으면 기존 값을 유지
-        _file: (result as any).file ?? (lecture as any)._file ?? null,
+        _file: result.multiFile ?? lecture.file ?? null,
       };
     });
   };
 
-  // === 최종 싱크 로직 (추가/수정/삭제 한번에) ===
+  // 발행하기 버튼 => 섹션 생성 , 섹션 수정, 강의 생성, 강의 수정, 삭제 한번에 처리 ===
   const syncSectionsAndLectures = async (courseId: string) => {
     for (let sIndex = 0; sIndex < sections.length; sIndex++) {
       const sec = sections[sIndex];
 
-      // 1) 삭제된 섹션
+      // 1) 삭제된 섹션 처리
       if (sec._deleted) {
-        if (sec.id) {
-          await deleteSection(courseId, String(sec.id));
-        }
+        if (sec.id) await deleteSection(courseId, String(sec.id));
         continue;
       }
 
@@ -305,15 +274,19 @@ export function useSectionForm(options?: UseSectionFormParams) {
           if (!lec.title.trim()) return false;
 
           const resources = lec.resource ?? [];
+
           const primaryResource: LectureResource | undefined = Array.isArray(resources)
             ? resources[0]
-            : (resources as any);
+            : undefined;
 
           const videoUrl = lec.videoUrl?.trim();
+
           const resourceType = primaryResource?.resourceType;
+
           const fileUrl = primaryResource?.fileUrl?.trim();
 
           if (resourceType === 'VIDEO') return !!videoUrl;
+
           if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP')
             return !!fileUrl;
 
@@ -322,17 +295,16 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
       let sectionId = sec.id ? String(sec.id) : undefined;
 
-      // 2) id 없음 + 내용 있음 → 섹션 생성
+      // 2) 섹션 생성
       if (!sectionId && hasContent) {
         const created = await createSection(courseId, {
           title: sec.title,
           orderIndex: sIndex + 1,
         });
-
         sectionId = String(created.sectionId);
       }
 
-      // 3) id 있고 _dirty → 섹션 수정
+      // 3) 섹션 수정
       if (sectionId && sec._dirty) {
         await updateSection(courseId, sectionId, {
           title: sec.title,
@@ -340,97 +312,75 @@ export function useSectionForm(options?: UseSectionFormParams) {
         });
       }
 
-      if (!sectionId) {
-        // 내용도 없고 생성도 안 된 섹션은 스킵
-        continue;
-      }
+      if (!sectionId) continue;
 
       // === 강의 처리 ===
       for (let lIndex = 0; lIndex < sec.lectures.length; lIndex++) {
         const lec = sec.lectures[lIndex];
 
-        // 삭제된 강의
+        // 4) 강의 삭제 처리
         if (lec._deleted) {
-          if (lec.id) {
-            await deleteLecture(courseId, String(lec.id));
-          }
+          if (lec.id) await deleteLecture(courseId, String(lec.id));
           continue;
         }
 
+        // 데이터 준비 (판독 결과 변수화)
         const resources = lec.resource ?? [];
         const primaryResource: LectureResource | undefined = Array.isArray(resources)
           ? resources[0]
-          : (resources as any);
+          : undefined;
 
-        const hasLectureContent = (() => {
-          if (!lec.title.trim()) return false;
-
-          const videoUrl = lec.videoUrl?.trim();
-          const resourceType = primaryResource?.resourceType;
-          const fileUrl = primaryResource?.fileUrl?.trim();
-
-          if (resourceType === 'VIDEO') return !!videoUrl;
-          if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP')
-            return !!fileUrl;
-
-          return false;
-        })();
-
+        const file = lec.file ?? undefined;
         let lectureId = lec.id ? String(lec.id) : undefined;
-        const file = (lec as any)._file ?? undefined;
-        // 새 강의 생성
-        if (!lectureId && hasLectureContent) {
-          const resourcePayload =
-            primaryResource && primaryResource.resourceType
-              ? [
-                  {
-                    resourceType: primaryResource.resourceType,
-                    isDownloadable: Boolean(primaryResource.isDownloadable),
-                    fileUrl: primaryResource.fileUrl,
-                  },
-                ]
-              : undefined;
+        let isJustCreated = false;
 
-          const created = await createLecture(
-            courseId,
-            sectionId,
-            {
-              title: lec.title,
-              totalDurationSeconds: lec.duration ?? 0,
-              isPreview: lec.isPreview ?? false,
-              orderIndex: lIndex + 1,
-              resource: resourcePayload,
-            },
-            file,
-          );
+        // 5) 새 강의 생성 로직
+        if (!lectureId && lec.title.trim()) {
+          const createPayload = {
+            title: lec.title,
+            totalDurationSeconds: lec.duration ?? 0,
+            isPreview: lec.isPreview ?? false,
+            orderIndex: lIndex + 1,
+            // 생성 시에는 리소스를 [배열]로 전달
+            resource:
+              primaryResource && primaryResource.resourceType
+                ? [
+                    {
+                      resourceType: primaryResource.resourceType,
+                      isDownloadable: Boolean(primaryResource.isDownloadable),
+                      fileUrl: primaryResource.fileUrl,
+                    },
+                  ]
+                : undefined,
+          };
 
-          lectureId = String((created as any).lectureId ?? (created as any).id);
+          const created = await createLecture(courseId, sectionId, createPayload, file);
 
-          if (!lectureId || lectureId === 'undefined') {
-            throw new Error('[sync] createLecture succeeded but lectureId missing in response');
-          }
+          // 생성 직후 ID 업데이트 및 플래그 설정
+          lectureId = String(created.lectureId ?? created.lectureId);
+          isJustCreated = true;
         }
 
-        // 기존 강의 수정
-        if (lectureId && lec._dirty) {
-          const resourcePayload =
+        // 6) 기존 강의 수정 로직 (방금 만든 게 아닐 때만 실행)
+        if (lectureId && lec._dirty && !isJustCreated) {
+          // 수정 시에는 리소스를 {객체}로 전달 (API 명세 준수)
+          const updateResource =
             primaryResource && primaryResource.resourceType
-              ? [
-                  {
-                    resourceType: primaryResource.resourceType,
-                    isDownloadable: Boolean(primaryResource.isDownloadable),
-                    fileUrl: primaryResource.fileUrl,
-                  },
-                ]
+              ? {
+                  resourceType: primaryResource.resourceType,
+                  isDownloadable: Boolean(primaryResource.isDownloadable),
+                  fileUrl: primaryResource.fileUrl,
+                }
               : undefined;
 
-          // await updateLecture(courseId, lectureId, {
-          //   title: lec.title,
-          //   totalDurationSeconds: lec.duration ?? 0,
-          //   isPreview: lec.isPreview ?? false,
-          //   orderIndex: lIndex + 1,
-          //   resource: resourcePayload,
-          // });
+          await updateLecture(courseId, lectureId, {
+            title: lec.title,
+            totalDurationSeconds: lec.duration ?? 0,
+            isPreview: lec.isPreview ?? false,
+            orderIndex: lIndex + 1,
+            // @ts-ignore: API 정의가 단일 객체이므로 가공된 객체 전달
+            resource: updateResource,
+          });
         }
       }
     }
@@ -482,59 +432,20 @@ export function useSectionForm(options?: UseSectionFormParams) {
     }
   };
 
-  // === Step2 임시저장 (초기 설계 유지: Step1/Step2 둘 다 세션 유지) ===
-  const handleDraftSave = async () => {
-    if (submitting) return;
-
-    if (!user) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
-    if (!courseId || !step1Data) {
-      alert('강좌 기본 정보가 누락되었습니다.');
-      return;
-    }
-
-    setError('');
-    setSuccess(false);
-    setDrafting(true);
-    try {
-      await updateDraftCourse(courseId, step1Data);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
-      }
-      alert('임시 저장되었습니다.');
-      setSuccess(true);
-      router.replace('/instructor/courses/');
-    } catch (err) {
-      console.error('데이터 저장 실패:', err);
-      setError(err instanceof Error ? err.message : '임시 저장 중 오류가 발생했습니다.');
-    } finally {
-      setDrafting(false);
-    }
-  };
-
   const handlePrevStep = () => {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
     }
-
-    if (mode === 'edit' && courseId) {
-      router.push(`/courses/${courseId}/edit?step=1`);
-    } else {
-      router.push('/courses/create?step=1&from=section');
-    }
+    router.push('/courses/create?step=1&from=section');
   };
 
   // create 모드에서 자동 세션 저장
   useEffect(() => {
-    if (mode !== 'create') return;
     if (!initialized) return;
     if (typeof window === 'undefined') return;
 
     sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
-  }, [sections, mode, initialized]);
+  }, [sections, initialized]);
 
   return {
     user,
@@ -546,7 +457,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
     error,
     success,
     isInvalid,
-    handleDraftSave,
     handleSectionAdd,
     handleSectionDelete,
     handleLectureAdd,
