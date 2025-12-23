@@ -103,7 +103,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
   // === 초기 로딩 ===
   useEffect(() => {
-    if (!courseId) return;
     if (initialized) return;
 
     const load = async () => {
@@ -389,6 +388,33 @@ export function useSectionForm(options?: UseSectionFormParams) {
   // === 최종 등록 버튼 ===
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (process.env.NODE_ENV === 'development') {
+      console.group('[STEP2] Curriculum Draft');
+
+      sections.forEach((section, sIdx) => {
+        console.group(`Section ${sIdx + 1}: ${section.title}`);
+
+        section.lectures.forEach((lecture, lIdx) => {
+          console.log(`Lecture ${lIdx + 1}`, {
+            title: lecture.title,
+            duration: lecture.duration,
+            videoUrl: lecture.videoUrl,
+            isPreview: lecture.isPreview,
+            resources: lecture.resource.map((res) => ({
+              resourceType: res.resourceType,
+              fileUrl: res.fileUrl,
+              isDownloadable: res.isDownloadable,
+            })),
+          });
+        });
+
+        console.groupEnd();
+      });
+
+      console.groupEnd();
+      return; // 🔥 DEV 확인용 종료
+    }
 
     if (submitting || drafting) return;
 
