@@ -386,39 +386,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (process.env.NODE_ENV === 'development') {
-      console.group('[STEP2] Curriculum Draft');
-
-      sections.forEach((section, sIdx) => {
-        console.group(`Section ${sIdx + 1}: ${section.title}`);
-
-        section.lectures.forEach((lecture, lIdx) => {
-          console.log(`Lecture ${lIdx + 1}`, {
-            title: lecture.title,
-            duration: lecture.duration,
-            videoUrl: lecture.videoUrl,
-            isPreview: lecture.isPreview,
-            resources: lecture.resource.map((res) => ({
-              resourceType: res.resourceType,
-              fileUrl: res.fileUrl,
-              isDownloadable: res.isDownloadable,
-            })),
-          });
-        });
-
-        console.groupEnd();
-      });
-
-      console.groupEnd();
-
-      sessionStorage.removeItem('courseDraft_step1');
-      sessionStorage.removeItem('courseDraft_step2');
-      const devCourseId = courseId || 'DEV_COURSE_ID';
-      alert('개발 모드: 강좌가 완료된 것으로 처리합니다.');
-      router.replace(`/courses/${devCourseId}`);
-      return;
-    }
-
     if (submitting || drafting) return;
 
     if (!user) {

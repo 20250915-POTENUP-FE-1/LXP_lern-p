@@ -10,7 +10,7 @@ export function SectionForm() {
   const router = useRouter();
   const {
     sections,
-    // step1Data,
+    step1Data,
     loading,
     submitting,
     error,
@@ -28,9 +28,9 @@ export function SectionForm() {
     handleCancel,
   } = useSectionForm();
 
-  // if (!step1Data) {
-  //   return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
-  // }
+  if (!step1Data) {
+    return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
+  }
 
   // if (!savedCourseId) {
   //   router.replace('/courses/create?step=1');

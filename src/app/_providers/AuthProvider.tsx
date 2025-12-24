@@ -19,25 +19,8 @@ export function AuthProvider({ initialUser, children }: AuthProviderProps) {
     // 서버에서 받은 initialUser를 zustand에 싱크
     setIsLoading(true);
 
-    const DEV_FAKE_USER: User = {
-      id: 'DEV_USER_ID',
-      email: 'dev-instructor@test.com',
-      nickname: '개발용강사',
-      roles: ['INSTRUCTOR'],
-      cart: [],
-      enrolledCourses: [],
-      createdCourses: [],
-      avatarUrl: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const isDev = process.env.NODE_ENV === 'development';
-
     if (initialUser) {
       setUser(initialUser);
-    } else if (isDev) {
-      setUser(DEV_FAKE_USER);
     } else {
       resetUser();
     }

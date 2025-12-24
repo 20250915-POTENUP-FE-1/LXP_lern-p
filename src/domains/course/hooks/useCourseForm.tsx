@@ -86,19 +86,6 @@ export function useCourseForm() {
 
     const draftData = buildCourseDraft(formData); // CourseDraftForm
 
-    console.log('[COURSE PUBLISH]', {
-      courseId,
-      formData,
-      draftData,
-      thumbnailFile,
-    });
-
-    if (process.env.NODE_ENV === 'development') {
-      sessionStorage.setItem('courseDraft_step1', JSON.stringify(draftData));
-      goStep2();
-      return;
-    }
-
     try {
       try {
         sessionStorage.setItem('courseDraft_step1', JSON.stringify(draftData));
