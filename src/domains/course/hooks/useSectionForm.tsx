@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 import type {
@@ -27,6 +27,8 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const { user } = useAuthState();
   const router = useRouter();
   const params = useParams<{ id?: string }>();
+  const searchParams = useSearchParams();
+  const entry = searchParams.get('entry');
 
   // URL 우선, props는 fallback
 
@@ -463,7 +465,15 @@ export function useSectionForm(options?: UseSectionFormParams) {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
     }
-    router.push('/courses/create?step=1&from=section');
+    const params = new URLSearchParams();
+    params.set('step', '1');
+    if (entry) params.set('entry', entry);
+
+    router.push(`/courses/create?${params.toString()}`);
+  };
+
+  const handleCancel = () => {
+    router.push(entry ? decodeURIComponent(entry) : '/');
   };
 
   // create 모드에서 자동 세션 저장
@@ -493,5 +503,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
     handleLectureUpload,
     handleFinalSubmit,
     handlePrevStep,
+    handleCancel,
   };
 }

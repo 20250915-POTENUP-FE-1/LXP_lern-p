@@ -25,6 +25,7 @@ export function SectionForm() {
     handleLectureUpload,
     handleFinalSubmit,
     handlePrevStep,
+    handleCancel,
   } = useSectionForm();
 
   // if (!step1Data) {
@@ -154,7 +155,7 @@ export function SectionForm() {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={() => router.back()}
+          onClick={() => handleCancel()}
           disabled={loading}
         >
           취소

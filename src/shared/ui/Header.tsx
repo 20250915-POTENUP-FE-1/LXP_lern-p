@@ -10,11 +10,14 @@ import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logoutAction } from '@/domains/auth/actions/logoutAction';
 import styles from './Header.module.css';
+import { useCourseCreateEntry } from '@/domains/course/hooks/useCourseCreateEntry';
 
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const { startCreateCourse } = useCourseCreateEntry();
 
   const { user, loading, clearUser } = useAuthState();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -106,12 +109,12 @@ export function Header() {
               )}
 
               {user && isInstructor && (
-                <Link
-                  href="/courses/create?step=1"
+                <button
+                  onClick={startCreateCourse}
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
                 >
                   강좌 등록하기
-                </Link>
+                </button>
               )}
             </nav>
 
