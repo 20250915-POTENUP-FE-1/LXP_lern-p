@@ -469,7 +469,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
     params.set('step', '1');
     if (entry) params.set('entry', entry);
 
-    router.push(`/courses/create?${params.toString()}`);
+    router.push(`/courses/create?${params.toString()}&from=section`);
   };
 
   const handleCancel = () => {
