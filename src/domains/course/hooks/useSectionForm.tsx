@@ -462,9 +462,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
   };
 
   const handlePrevStep = () => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
-    }
     const params = new URLSearchParams();
     params.set('step', '1');
     if (entry) params.set('entry', entry);
