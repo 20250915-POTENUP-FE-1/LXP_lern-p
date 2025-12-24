@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
@@ -13,12 +13,12 @@ export function useCourseForm() {
   const router = useRouter();
   const { user } = useAuthState();
   const params = useParams<{ id?: string }>();
+  const searchParams = useSearchParams();
+  const entry = searchParams.get('entry');
 
   const paramsId = typeof params.id === 'string' ? params.id : '';
-  const sessionCourseId =
-    typeof window !== 'undefined' ? (sessionStorage.getItem('draftCourseId') ?? '') : '';
 
-  const courseId = paramsId || sessionCourseId;
+  const courseId = paramsId;
 
   const [formData, setFormData] = useState<CourseFormState>({
     title: '',
@@ -97,11 +97,8 @@ export function useCourseForm() {
       // 2) 서버에 draft 강좌 생성 → courseId 확보
       const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
 
-      // 3) Step2에서 쓸 courseId 저장
-      sessionStorage.setItem('draftCourseId', String(courseId));
-
-      // 4) URL은 create 유지
-      router.push('/courses/create?step=2');
+      // 3) URL은 create 유지
+      goStep2();
       return;
     } catch (err) {
       console.error(err);
@@ -109,6 +106,17 @@ export function useCourseForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const goStep2 = () => {
+    const next = new URLSearchParams();
+    next.set('step', '2');
+    if (entry) next.set('entry', entry);
+    router.push(`/courses/create?${next.toString()}`);
+  };
+
+  const handleCancel = () => {
+    router.push(entry ? decodeURIComponent(entry) : '/');
   };
 
   // 카테고리 조회 + 초기 데이터 로드
@@ -173,5 +181,6 @@ export function useCourseForm() {
     handleCategoryChange,
     handleThumbnailUpload,
     handleThumbnailFileSelect,
+    handleCancel,
   };
 }

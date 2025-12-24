@@ -19,6 +19,7 @@ export function CourseForm() {
     handleCategoryChange,
     handleThumbnailUpload,
     handleThumbnailFileSelect,
+    handleCancel,
   } = useCourseForm();
 
   return (
@@ -139,7 +140,7 @@ export function CourseForm() {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={() => router.back()}
+          onClick={() => handleCancel()}
         >
           취소
         </button>

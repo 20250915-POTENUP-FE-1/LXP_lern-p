@@ -56,6 +56,23 @@ export const createCourse = async (
 
 // 카테고리 조회 API
 export const getCategories = async (): Promise<Category[]> => {
+  if (process.env.NODE_ENV === 'development') {
+    return [
+      {
+        categoryId: 1,
+        name: '프로그래밍',
+        children: [
+          { categoryId: 2, name: '프론트엔드' },
+          { categoryId: 3, name: '백엔드' },
+        ],
+      },
+      {
+        categoryId: 4,
+        name: '디자인',
+        children: [{ categoryId: 5, name: 'UI/UX' }],
+      },
+    ];
+  }
   try {
     const categories = await getApi<Category[]>('/api/categories');
     return categories;
