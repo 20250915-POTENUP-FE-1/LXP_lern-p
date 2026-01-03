@@ -1,13 +1,11 @@
 'use client';
 
+import { useCourseForm } from '../hooks/useCourseForm';
 import styles from './CourseForm.module.css';
 import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
-import { useCourseForm } from '../hooks/useCourseForm';
-import { useRouter } from 'next/navigation';
 
 export function CourseForm() {
-  const router = useRouter();
   const {
     formData,
     loading,
