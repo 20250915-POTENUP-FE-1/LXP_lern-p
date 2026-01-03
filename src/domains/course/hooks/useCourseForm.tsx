@@ -1,13 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
-
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
 import { createDraftCourse } from '../services/courseCreateService';
-import { getCategories } from '../services/courseCreateService';
-import type { Category, CourseDraftForm } from '../types/course';
+import type { CourseDraftForm } from '../types/course';
+
+const COURSE_DRAFT_ID_KEY = 'courseDraftId';
 
 export function useCourseForm() {
   const router = useRouter();
@@ -29,9 +28,6 @@ export function useCourseForm() {
     price: '',
     thumbnailUrl: '',
   });
-
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -68,6 +64,16 @@ export function useCourseForm() {
     }));
   };
 
+  const ensureDraftCreated = async (draftData: CourseDraftForm) => {
+    const savedId = sessionStorage.getItem(COURSE_DRAFT_ID_KEY);
+    if (savedId) return savedId;
+
+    // 서버에 draft 강좌 생성 → courseId 확보
+    const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
+    sessionStorage.setItem(COURSE_DRAFT_ID_KEY, courseId);
+    return courseId;
+  };
+
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -94,10 +100,11 @@ export function useCourseForm() {
         alert('임시 저장 중 오류가 발생했습니다. 브라우저 설정을 확인해주세요.');
         return;
       }
-      // 2) 서버에 draft 강좌 생성 → courseId 확보
-      const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
 
-      // 3) URL은 create 유지
+      // 최초 1회만 임시 강좌 생성
+      await ensureDraftCreated(draftData);
+
+      // URL은 create 유지
       goStep2();
       return;
     } catch (err) {
@@ -122,21 +129,6 @@ export function useCourseForm() {
   // 카테고리 조회 + 초기 데이터 로드
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    // 카테고리 로드
-    const loadCategories = async () => {
-      setCategoriesLoading(true);
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error('카테고리 조회 실패:', err);
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-
-    loadCategories();
 
     // create 모드일 때 기존 draft 복원 로직 (기존 유지)
     const params = new URLSearchParams(window.location.search);
@@ -165,13 +157,12 @@ export function useCourseForm() {
     } else {
       sessionStorage.removeItem('courseDraft_step1');
       sessionStorage.removeItem('courseDraft_step2');
+      sessionStorage.removeItem(COURSE_DRAFT_ID_KEY);
     }
   }, [courseId]);
 
   return {
     formData,
-    categories,
-    categoriesLoading,
     loading,
     error,
     success,
