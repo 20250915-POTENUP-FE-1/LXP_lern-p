@@ -362,21 +362,24 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
         // 6) 기존 강의 수정
         if (lectureId && lec._dirty && !isJustCreated) {
-          const updateResource =
-            primaryResource && primaryResource.resourceType
-              ? {
-                  resourceType: primaryResource.resourceType,
-                  isDownloadable: Boolean(primaryResource.isDownloadable),
-                  fileUrl: primaryResource.fileUrl,
-                }
-              : undefined;
+          // resource 필수 계약이면 여기서 보장/가드
+          if (!primaryResource?.resourceType) {
+            // 여기로 오면 데이터가 깨진 상태라 실패시키는 게 맞음
+            throw new Error('강의 리소스가 누락되어 업데이트할 수 없습니다.');
+          }
+
+          const updateResource: LectureResource = {
+            resourceType: primaryResource.resourceType,
+            isDownloadable: Boolean(primaryResource.isDownloadable),
+            fileUrl: primaryResource.fileUrl,
+          };
 
           await updateLecture(courseId, lectureId, {
             title: lec.title,
             totalDurationSeconds: lec.duration ?? 0,
             isPreview: lec.isPreview ?? false,
             orderIndex: lIndex + 1,
-            resource: updateResource as LectureResource,
+            resource: updateResource,
           });
         }
       }
