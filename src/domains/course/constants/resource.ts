@@ -22,7 +22,7 @@ export const RESOURCE_CONFIG = {
     label: '문서 파일',
     accept: '.doc',
     maxSizeMB: SIZE_MB.DOC,
-    hint: `DOC 파일을 업로드하세요 (최대 ${SIZE_MB.DOC}MB)`,
+    hint: `DOC(.doc) 파일을 업로드하세요 (최대 ${SIZE_MB.DOC}MB)`,
   },
   ZIP: {
     label: '압축 파일',
