@@ -67,7 +67,6 @@ export function ResourceUploader({
   const [draftFileName, setDraftFileName] = useState<string>('');
   const [draftDuration, setDraftDuration] = useState<number | null>(null);
   const [draftIsDownloadable, setDraftIsDownloadable] = useState<boolean | null>(null);
-  const [draftFile, setDraftFile] = useState<File | null>(null);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const blobUrlRef = useRef<string | null>(null);
@@ -112,7 +111,6 @@ export function ResourceUploader({
     setDraftPreviewUrl('');
     setDraftFileName('');
     setDraftDuration(null);
-    setDraftFile(null);
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -151,7 +149,6 @@ export function ResourceUploader({
 
     setUploading(true);
     setDraftFileName(file.name);
-    setDraftFile(file);
 
     // 이전 blob 정리 후 새 blob 생성
     revokeBlobIfAny();
