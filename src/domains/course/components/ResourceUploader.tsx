@@ -111,6 +111,7 @@ export function ResourceUploader({
     setDraftPreviewUrl('');
     setDraftFileName('');
     setDraftDuration(null);
+    setDraftIsDownloadable(null);
     if (inputRef.current) inputRef.current.value = '';
   };
 
