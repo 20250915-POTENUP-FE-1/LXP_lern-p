@@ -57,7 +57,7 @@ export async function fetchApi<T = unknown>(
       // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
       if (response.status === 401) {
         cookieStore.delete('accessToken'); // 제로그인
-        cookieStore.delete('refreshToken'); //
+        cookieStore.delete('refreshToken');
         console.error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
       }
 
