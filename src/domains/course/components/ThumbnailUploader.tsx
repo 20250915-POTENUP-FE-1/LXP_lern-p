@@ -41,6 +41,7 @@ export function ThumbnailUploader({
       e.currentTarget.value = '';
       setLocalPreview('');
       onFileSelect?.(null);
+      onUploadComplete?.(''); // 부모의 썸네일 상태도 비움
       return;
     }
 
