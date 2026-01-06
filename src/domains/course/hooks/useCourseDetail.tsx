@@ -82,6 +82,7 @@ export function useCourseDetail(courseId: string) {
             courseId: course.id,
             title: lecture.title,
             resource: lecture.resource,
+            isPreview: lecture.isPreview,
             duration: lecture.totalDurationSeconds,
             sequence: lecture.orderIndex,
             createdAt: lecture.createdAt,

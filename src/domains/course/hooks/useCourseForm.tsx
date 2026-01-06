@@ -1,29 +1,24 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
 
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
-import { fetchCourseData, updateDraftCourse } from '../services/courseEditService';
 import { createDraftCourse } from '../services/courseCreateService';
 import { getCategories } from '../services/courseCreateService';
 import type { Category, CourseDraftForm } from '../types/course';
 
-type CourseFormMode = 'create' | 'edit';
-
 export function useCourseForm() {
   const router = useRouter();
-  const pathname = usePathname();
   const { user } = useAuthState();
   const params = useParams<{ id?: string }>();
+  const searchParams = useSearchParams();
+  const entry = searchParams.get('entry');
 
   const paramsId = typeof params.id === 'string' ? params.id : '';
-  const sessionCourseId =
-    typeof window !== 'undefined' ? (sessionStorage.getItem('draftCourseId') ?? '') : '';
 
-  const courseId = paramsId || sessionCourseId;
-  const mode: CourseFormMode = pathname?.includes('/edit') ? 'edit' : 'create';
+  const courseId = paramsId;
 
   const [formData, setFormData] = useState<CourseFormState>({
     title: '',
@@ -92,44 +87,36 @@ export function useCourseForm() {
     const draftData = buildCourseDraft(formData); // CourseDraftForm
 
     try {
-      if (mode === 'create') {
-        // 1) 로컬 draft 유지 (기존 동작 유지)
-        try {
-          sessionStorage.setItem('courseDraft_step1', JSON.stringify(draftData));
-        } catch (err) {
-          console.error('세션 저장 실패:', err);
-          alert('임시 저장 중 오류가 발생했습니다. 브라우저 설정을 확인해주세요.');
-          return;
-        }
-        // 2) 서버에 draft 강좌 생성 → courseId 확보
-        const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
-
-        // 3) Step2에서 쓸 courseId 저장
-        sessionStorage.setItem('draftCourseId', String(courseId));
-
-        // 4) URL은 create 유지
-        router.push('/courses/create?step=2');
+      try {
+        sessionStorage.setItem('courseDraft_step1', JSON.stringify(draftData));
+      } catch (err) {
+        console.error('세션 저장 실패:', err);
+        alert('임시 저장 중 오류가 발생했습니다. 브라우저 설정을 확인해주세요.');
         return;
-      } else {
-        // mode === 'edit'
-        if (!courseId) {
-          throw new Error('유효하지 않은 강좌 ID입니다.');
-        }
-
-        // 1) 서버에 강좌 기본 정보 수정 (강좌 수정 API)
-        await updateDraftCourse(courseId, draftData);
-
-        setSuccess(true);
-
-        // 2) 섹션/강의 편집 step2로 이동
-        router.push(`/courses/${courseId}/edit?step=2`);
       }
+      // 2) 서버에 draft 강좌 생성 → courseId 확보
+      const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
+
+      // 3) URL은 create 유지
+      goStep2();
+      return;
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : '강좌 저장 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const goStep2 = () => {
+    const next = new URLSearchParams();
+    next.set('step', '2');
+    if (entry) next.set('entry', entry);
+    router.push(`/courses/create?${next.toString()}`);
+  };
+
+  const handleCancel = () => {
+    router.push(entry ? decodeURIComponent(entry) : '/');
   };
 
   // 카테고리 조회 + 초기 데이터 로드
@@ -151,66 +138,35 @@ export function useCourseForm() {
 
     loadCategories();
 
-    // edit 모드일 때 기존 강좌 불러오기
-    if (mode === 'edit' && courseId) {
-      const loadCourseData = async () => {
-        setLoading(true);
+    // create 모드일 때 기존 draft 복원 로직 (기존 유지)
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from');
+    if (from === 'section') {
+      const draft = sessionStorage.getItem('courseDraft_step1');
+      if (draft) {
         try {
-          const data = await fetchCourseData(courseId);
+          const raw = JSON.parse(draft) as Partial<CourseDraftForm>;
 
           const nextForm: CourseFormState = {
-            title: data.title ?? '',
-            summary: data.summary ?? '',
-            description: data.description ?? '',
-            category: data.category ?? [],
-            level: data.level ?? '',
-            price: data.price == null ? '' : String(data.price),
-            thumbnailUrl: data.thumbnail ?? '',
+            title: raw.title ?? '',
+            summary: raw.summary ?? '',
+            description: raw.description ?? '',
+            category: raw.category ?? [],
+            level: raw.level ?? '',
+            price: raw.price == null ? '' : String(raw.price),
+            thumbnailUrl: raw.thumbnail ?? '',
           };
 
           setFormData(nextForm);
         } catch (err) {
-          setError('강좌 정보를 불러오는데 실패했습니다.');
-          console.error('Edit Mode 로드 실패:', err);
-        } finally {
-          setLoading(false);
+          console.error('임시 저장된 강좌 기본 정보 파싱 실패:', err);
         }
-      };
-      loadCourseData();
-      return;
-    }
-
-    // create 모드일 때 기존 draft 복원 로직 (기존 유지)
-    if (mode === 'create') {
-      const params = new URLSearchParams(window.location.search);
-      const from = params.get('from');
-      if (from === 'section') {
-        const draft = sessionStorage.getItem('courseDraft_step1');
-        if (draft) {
-          try {
-            const raw = JSON.parse(draft) as Partial<CourseDraftForm>;
-
-            const nextForm: CourseFormState = {
-              title: raw.title ?? '',
-              summary: raw.summary ?? '',
-              description: raw.description ?? '',
-              category: raw.category ?? [],
-              level: raw.level ?? '',
-              price: raw.price == null ? '' : String(raw.price),
-              thumbnailUrl: raw.thumbnail ?? '',
-            };
-
-            setFormData(nextForm);
-          } catch (err) {
-            console.error('임시 저장된 강좌 기본 정보 파싱 실패:', err);
-          }
-        }
-      } else {
-        sessionStorage.removeItem('courseDraft_step1');
-        sessionStorage.removeItem('courseDraft_step2');
       }
+    } else {
+      sessionStorage.removeItem('courseDraft_step1');
+      sessionStorage.removeItem('courseDraft_step2');
     }
-  }, [mode, courseId]);
+  }, [courseId]);
 
   return {
     formData,
@@ -225,5 +181,6 @@ export function useCourseForm() {
     handleCategoryChange,
     handleThumbnailUpload,
     handleThumbnailFileSelect,
+    handleCancel,
   };
 }

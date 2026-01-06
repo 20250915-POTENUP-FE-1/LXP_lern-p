@@ -5,14 +5,8 @@ import { SelectCategory } from './SelectCategory';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { useCourseForm } from '../hooks/useCourseForm';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
-export type CourseFormProps = {
-  mode?: 'create' | 'edit';
-  courseId?: string;
-};
-
-export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
+export function CourseForm() {
   const router = useRouter();
   const {
     formData,
@@ -25,6 +19,7 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
     handleCategoryChange,
     handleThumbnailUpload,
     handleThumbnailFileSelect,
+    handleCancel,
   } = useCourseForm();
 
   return (
@@ -145,7 +140,7 @@ export function CourseForm({ mode, courseId }: CourseFormProps = {}) {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={() => router.back()}
+          onClick={() => handleCancel()}
         >
           취소
         </button>

@@ -1,4 +1,4 @@
-import { postApi, patchApi, deleteApi, fetchApi, putApi } from '@/shared/lib/api/fetchApi';
+import { postApi, deleteApi, putApi } from '@/shared/lib/api/fetchApi';
 import { CreateLectureResponse, LectureResource } from '../types/course';
 
 // 강의 생성 API
@@ -28,17 +28,10 @@ export const createLecture = async (
     formData.append('file', file);
   }
 
-  console.log('📤 강의 생성 요청:', {
-    courseId,
-    sectionId,
-    payload,
-    hasFile: !!file,
-  });
-
-  return await fetchApi<CreateLectureResponse>(
+  return await postApi<CreateLectureResponse>(
     `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
+    null,
     {
-      method: 'POST',
       body: formData,
       credentials: 'include',
     },
@@ -57,7 +50,6 @@ export async function updateLecture(
     orderIndex?: number;
   },
 ) {
-  // 스펙 그대로면 PUT, 백엔드가 PATCH 허용하면 patchApi 유지
   return putApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, body);
 }
 

@@ -1,5 +1,3 @@
-import CourseEditClientPage from '@/domains/course/pages/CourseEditClientPage';
-
 export default function CourseCreatePage() {
-  return <CourseEditClientPage />;
+  return <p>강의 수정하기는 지원하지 않습니다.</p>;
 }

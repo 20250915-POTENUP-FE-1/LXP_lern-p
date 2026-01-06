@@ -4,26 +4,18 @@ import { useRouter } from 'next/navigation';
 import styles from './CourseForm.module.css';
 import { ResourceUploader } from './ResourceUploader';
 import { useSectionForm } from '../hooks/useSectionForm';
-import { useState } from 'react';
+import { LectureResource, ResourceType } from '../types/course';
 
-export type SectionFormProps = {
-  mode?: 'create' | 'edit';
-  courseId?: string;
-};
-
-export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
+export function SectionForm() {
   const router = useRouter();
-  const [resolvedCourseId, setResolvedCourseId] = useState<string>('');
   const {
     sections,
     step1Data,
     loading,
     submitting,
-    drafting,
     error,
     success,
     isInvalid,
-    handleDraftSave,
     handleSectionAdd,
     handleSectionDelete,
     handleLectureAdd,
@@ -33,18 +25,17 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
     handleLectureUpload,
     handleFinalSubmit,
     handlePrevStep,
+    handleCancel,
   } = useSectionForm();
 
   if (!step1Data) {
     return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
   }
-  const savedCourseId =
-    typeof window !== 'undefined' ? sessionStorage.getItem('draftCourseId') : null;
 
-  if (!savedCourseId) {
-    router.replace('/courses/create?step=1');
-    return;
-  }
+  // if (!savedCourseId) {
+  //   router.replace('/courses/create?step=1');
+  //   return;
+  // }
 
   return (
     <form onSubmit={handleFinalSubmit}>
@@ -88,9 +79,7 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
                           initialValue={
                             lecture.resource?.[0]
                               ? {
-                                  resourceType:
-                                    (lecture.resource[0] as any).resourceType ??
-                                    (lecture.resource[0] as any).resourceType,
+                                  resourceType: lecture.resource[0].resourceType as ResourceType,
                                   fileUrl: lecture.resource[0].fileUrl ?? '',
                                   isDownloadable: !!lecture.resource[0].isDownloadable,
                                   duration: lecture.duration,
@@ -166,19 +155,11 @@ export function SectionForm({ mode, courseId }: SectionFormProps = {}) {
         <button
           type="button"
           className={`${styles['btn']} ${styles['btn--ghost']}`}
-          onClick={() => router.back()}
+          onClick={() => handleCancel()}
           disabled={loading}
         >
           취소
         </button>
-        {/*<button //임시저장 버튼 숨기기
-          type="button"
-          onClick={handleDraftSave} // 새로 만든 핸들러 연결
-          disabled={loading || drafting}
-          className={`${styles['btn']} ${styles['btn--ghost']} ${styles['color-gray']}`}
-        >
-          {drafting ? '임시 저장 중...' : '임시 저장'}
-        </button>*/}
 
         <button
           type="submit"
