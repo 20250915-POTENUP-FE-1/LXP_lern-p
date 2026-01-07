@@ -1,3 +1,4 @@
+import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
 import type {
   CourseDraftForm,
   SectionDraftForm,
@@ -6,7 +7,6 @@ import type {
   GetDraftCourseResponse,
 } from '../types/course';
 
-import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
 import {
   applySectionDraftsForNewCourse,
   createCourseFormData,
@@ -14,7 +14,7 @@ import {
   mapResponseToCourseDraft,
 } from '../utils/courseCreate';
 
-// 강좌생성 API 호출
+// 강좌 임시 생성 API
 export const createDraftCourse = async (
   draftData: CourseDraftForm,
   thumbnailFile?: File,
@@ -29,7 +29,7 @@ export const createDraftCourse = async (
   });
 };
 
-// 강좌 발행 API 호출
+// 강좌 발행 API
 export const publishDraftCourse = async (courseId: string): Promise<void> => {
   return await patchApi<void>(`/api/instructor/courses/${courseId}/publish`);
 };
@@ -56,6 +56,7 @@ export const createCourse = async (
 
 // 카테고리 조회 API
 export const getCategories = async (): Promise<Category[]> => {
+  // TODO: 임시 목업 데이터, 카테고리 조회 API 완성되면 제거
   if (process.env.NODE_ENV === 'development') {
     return [
       {
@@ -96,15 +97,13 @@ export const updateDraftCourse = async (
       body: formData,
       credentials: 'include',
     });
-
-    // 보통 수정 API는 body가 없거나 {status, code, message} 정도만 반환하므로 따로 파싱 안 해도 됨
   } catch (err) {
     console.error('updateDraftCourse 실패:', err);
     throw err instanceof Error ? err : new Error('강좌 수정 중 오류가 발생했습니다.');
   }
 };
 
-// 임시 생성된 강좌 조회API
+// 임시 생성된 강좌 조회 API
 export async function getDraftCourse(courseId: string): Promise<{
   courseDraft: CourseDraftForm;
   sectionDrafts: SectionDraftForm[];
