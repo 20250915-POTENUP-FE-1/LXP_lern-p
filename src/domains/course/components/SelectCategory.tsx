@@ -1,13 +1,12 @@
-// src/domains/course/components/SelectCategory.tsx
 'use client';
 
 import { useEffect, useState, ChangeEvent } from 'react';
-import styles from './CourseForm.module.css';
 import { getCategories } from '../services/courseCreateService';
 import type { Category } from '../types/course';
+import styles from './CourseForm.module.css';
 
 type SelectCategoryProps = {
-  value?: string[]; // [firstId, secondId] (문자열)
+  value?: string[];
   onChange?: (value: string[]) => void;
   id?: string;
 };
@@ -17,10 +16,10 @@ export function SelectCategory({ value = [], onChange, id }: SelectCategoryProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const firstId = value[0] ?? ''; // 1차 categoryId (string)
-  const secondId = value[1] ?? ''; // 2차 categoryId (string)
+  const firstId = value[0] ?? '';
+  const secondId = value[1] ?? '';
 
-  // 1) 카테고리 조회
+  // 카테고리 조회
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -39,15 +38,12 @@ export function SelectCategory({ value = [], onChange, id }: SelectCategoryProps
     load();
   }, []);
 
-  // 2) 1차 / 2차 리스트 계산
-  const firstCategories = categories; // 최상위 카테고리들
-
+  const firstCategories = categories;
   const secondCategories =
     firstId && categories.length > 0
       ? (categories.find((cat) => String(cat.categoryId) === firstId)?.children ?? [])
       : [];
 
-  // 3) 핸들러
   const handleFirstChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const nextFirstId = e.target.value;
     // 1차만 선택된 상태로 리셋
@@ -59,12 +55,10 @@ export function SelectCategory({ value = [], onChange, id }: SelectCategoryProps
     onChange?.([firstId, nextSecondId]);
   };
 
-  // 4) 표시용 텍스트
   const firstName =
     firstId && categories.length > 0
       ? (categories.find((c) => String(c.categoryId) === firstId)?.name ?? '')
       : '';
-
   const secondName =
     secondId && secondCategories.length > 0
       ? (secondCategories.find((c) => String(c.categoryId) === secondId)?.name ?? '')

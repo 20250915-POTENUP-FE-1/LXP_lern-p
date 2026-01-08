@@ -1,4 +1,5 @@
 'use server';
+
 import { cookies } from 'next/headers';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export type ApiResponse<T = unknown> = {
@@ -35,18 +36,10 @@ export async function fetchApi<T = unknown>(
     // JSON 요청일 때만 Content-Type 기본 부여
     if (!isFormData) {
       const hasContentType = headers.get('Content-Type');
-      if (!hasContentType) headers.append('Content-Type', 'application/json');
-    }
-
-    // JSON 요청일 때만 Content-Type 기본 부여
-    if (!isFormData) {
-      const hasContentType = Object.keys(headers).some((k) => k.toLowerCase() === 'content-type');
-      if (!hasContentType) headers['Content-Type'] = 'application/json';
+      if (!hasContentType) headers.set('Content-Type', 'application/json');
     } else {
       // FormData면 Content-Type을 절대 직접 넣지 않음 (boundary 자동 설정 필요)
-      for (const k of Object.keys(headers)) {
-        if (k.toLowerCase() === 'content-type') delete headers[k];
-      }
+      headers.delete('Content-Type');
     }
     const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
 
@@ -64,7 +57,8 @@ export async function fetchApi<T = unknown>(
       // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
       if (response.status === 401) {
         cookieStore.delete('accessToken'); // 재로그인
-        throw new Error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
+        cookieStore.delete('refreshToken');
+        console.error('리프레시 토큰이 만료되었습니다. 다시 로그인이 필요합니다.');
       }
 
       throw new Error(`[${response.status} (${resJson.code}) - ${resJson.message}]`);
@@ -99,6 +93,7 @@ export async function fetchApi<T = unknown>(
 export async function getApi<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T> {
   return fetchApi<T>(endpoint, { method: 'GET', ...options });
 }
+
 /**
  * POST 요청을 위한 fetchApi wrapper
  *
@@ -116,6 +111,7 @@ export async function postApi<T = unknown>(
     ...options,
   });
 }
+
 /**
  * PUT 요청을 위한 fetchApi wrapper
  *
@@ -133,6 +129,7 @@ export async function putApi<T = unknown>(
     ...options,
   });
 }
+
 /**
  * DELETE 요청을 위한 fetchApi wrapper
  *
@@ -144,6 +141,7 @@ export async function deleteApi<T = unknown>(
 ): Promise<T> {
   return fetchApi<T>(endpoint, { method: 'DELETE', ...options });
 }
+
 /**
  * PATCH 요청을 위한 fetchApi wrapper
  *

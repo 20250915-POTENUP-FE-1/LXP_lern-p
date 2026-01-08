@@ -1,13 +1,12 @@
 'use client';
-import { useRouter } from 'next/navigation';
-
+import { useMemo, useState } from 'react';
+import { useSectionForm } from '../hooks/useSectionForm';
+import { ResourceType } from '../types/course';
 import styles from './CourseForm.module.css';
 import { ResourceUploader } from './ResourceUploader';
-import { useSectionForm } from '../hooks/useSectionForm';
-import { LectureResource, ResourceType } from '../types/course';
 
 export function SectionForm() {
-  const router = useRouter();
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const {
     sections,
     step1Data,
@@ -23,24 +22,39 @@ export function SectionForm() {
     handleSectionTitleChange,
     handleLectureTitleChange,
     handleLectureUpload,
+    handleLectureRemoveResource,
     handleFinalSubmit,
     handlePrevStep,
     handleCancel,
   } = useSectionForm();
 
+  const toggleSection = (sectionId: string) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) {
+        next.delete(sectionId);
+      } else {
+        next.add(sectionId);
+      }
+      return next;
+    });
+  };
+
+  const lectureCounts = useMemo(
+    () =>
+      sections.reduce<Record<string, number>>((acc, section) => {
+        acc[section.localId] = section.lectures.filter((lecture) => !lecture._deleted).length;
+        return acc;
+      }, {}),
+    [sections],
+  );
+
   if (!step1Data) {
     return <p>강좌 기본 정보를 불러오는 중입니다. 잠시만 기다려주세요...</p>;
   }
 
-  // if (!savedCourseId) {
-  //   router.replace('/courses/create?step=1');
-  //   return;
-  // }
-
   return (
     <form onSubmit={handleFinalSubmit}>
-      <h1>강좌 섹션 및 강의 </h1>
-
       <div className={styles['course-form__field']}>
         <label htmlFor="lecture" className={styles['form__label']}>
           섹션 <span className={styles['course-form__req']}>*</span>
@@ -62,6 +76,14 @@ export function SectionForm() {
                   <button
                     type="button"
                     className={styles['section-list__action']}
+                    onClick={() => toggleSection(section.localId)}
+                  >
+                    {collapsedSections.has(section.localId) ? '섹션 펼치기' : '섹션 접기'} (
+                    {lectureCounts[section.localId] ?? 0})
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles['section-list__action']} ${styles['section-list__action--danger']}`}
                     onClick={() => handleSectionDelete(section.localId)}
                   >
                     섹션 삭제
@@ -69,62 +91,79 @@ export function SectionForm() {
                 </div>
               </header>
 
-              <ul className={styles['lecture-list']}>
-                {section.lectures
-                  .filter((lecture) => !lecture._deleted) // 삭제된 강의 제외
-                  .map((lecture) => (
-                    <li key={lecture.localId} className={styles['lecture-list__item']}>
-                      <div className={styles['lecture-list__edit-group']}>
-                        <ResourceUploader
-                          initialValue={
-                            lecture.resource?.[0]
-                              ? {
-                                  resourceType: lecture.resource[0].resourceType as ResourceType,
-                                  fileUrl: lecture.resource[0].fileUrl ?? '',
-                                  isDownloadable: !!lecture.resource[0].isDownloadable,
-                                  duration: lecture.duration,
-                                  fileName: undefined,
+              {!collapsedSections.has(section.localId) && (
+                <>
+                  <ul className={styles['lecture-list']}>
+                    {section.lectures
+                      .filter((lecture) => !lecture._deleted) // 삭제된 강의 제외
+                      .map((lecture) => (
+                        <li key={lecture.localId} className={styles['lecture-list__item']}>
+                          <div className={styles['lecture-list__edit-group']}>
+                            <label htmlFor="lecture" className={styles['form__label']}>
+                              강의 <span className={styles['course-form__req']}>*</span>
+                            </label>
+                            <div className={styles['lecture-list__title-row']}>
+                              <input
+                                type="text"
+                                value={lecture.title}
+                                onChange={(e) =>
+                                  handleLectureTitleChange(
+                                    section.localId,
+                                    lecture.localId,
+                                    e.target.value,
+                                  )
                                 }
-                              : undefined
-                          }
-                          onUploadComplete={(result) =>
-                            handleLectureUpload(section.localId, lecture.localId, result)
-                          }
-                        />
+                                className={styles['course-form__input']}
+                                placeholder="강의 제목 입력"
+                              />
+                              <button
+                                type="button"
+                                className={`${styles['lecture-list__action']} ${styles['lecture-list__action--danger']}`}
+                                onClick={() =>
+                                  handleLectureDelete(section.localId, lecture.localId)
+                                }
+                              >
+                                강의 삭제
+                              </button>
+                            </div>
+                            <ResourceUploader
+                              key={lecture.localId}
+                              initialValue={
+                                lecture.resource?.[0]
+                                  ? {
+                                      resourceType: lecture.resource[0]
+                                        .resourceType as ResourceType,
+                                      fileUrl:
+                                        lecture.resource[0].resourceType === 'VIDEO'
+                                          ? (lecture.videoUrl ?? lecture.resource[0].fileUrl ?? '')
+                                          : (lecture.resource[0].fileUrl ?? ''),
+                                      isDownloadable: !!lecture.resource[0].isDownloadable,
+                                      duration: lecture.duration,
+                                      fileName: undefined,
+                                    }
+                                  : undefined
+                              }
+                              onUploadComplete={(result) =>
+                                handleLectureUpload(section.localId, lecture.localId, result)
+                              }
+                              onRemove={() =>
+                                handleLectureRemoveResource(section.localId, lecture.localId)
+                              }
+                            />
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
 
-                        <input
-                          type="text"
-                          value={lecture.title}
-                          onChange={(e) =>
-                            handleLectureTitleChange(
-                              section.localId,
-                              lecture.localId,
-                              e.target.value,
-                            )
-                          }
-                          className={styles['course-form__input']}
-                          placeholder="강의 제목 입력"
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        className={`${styles['lecture-list__action']} ${styles['lecture-list__action--danger']}`}
-                        onClick={() => handleLectureDelete(section.localId, lecture.localId)}
-                      >
-                        강의 삭제
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-
-              <button
-                type="button"
-                className={styles['section-list__action']}
-                onClick={() => handleLectureAdd(section.localId)}
-              >
-                + 강의 추가
-              </button>
+                  <button
+                    type="button"
+                    className={styles['section-list__action']}
+                    onClick={() => handleLectureAdd(section.localId)}
+                  >
+                    + 강의 추가
+                  </button>
+                </>
+              )}
             </div>
           ))}
 
