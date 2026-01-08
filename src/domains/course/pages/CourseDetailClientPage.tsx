@@ -16,6 +16,7 @@ import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
+import CoursePreviewModal from '../components/CoursePreviewModal';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -36,6 +37,11 @@ export default function CourseDetailClientPage() {
 
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [initialSelectedLectureId, setInitialSelectedLectureId] = useState<string | undefined>(
+    undefined,
+  );
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -78,6 +84,10 @@ export default function CourseDetailClientPage() {
       // toast.error('장바구니 담기에 실패했어요');
     }
   };
+
+  const previewLectures = sections
+    .flatMap((sec) => lectures[sec.id] ?? [])
+    .filter((lec) => lec.isPreview && lec.resource?.resourceType === 'VIDEO');
 
   const totalLectures = sections.reduce(
     (sum: number, sec: Section) => sum + (lectures[sec.id]?.length || 0),
@@ -163,15 +173,34 @@ export default function CourseDetailClientPage() {
                   <details key={sec.id} open>
                     <summary>{sec.title}</summary>
                     <ul>
-                      {lectures[sec.id]?.map((lec: Lecture) => (
-                        <li key={lec.id}>
-                          <div className={styles['course-detail__lecture']}>
-                            <span className={styles['course-detail__lecture-title']}>
-                              {lec.title} ({lec.duration}분)
-                            </span>
-                          </div>
-                        </li>
-                      ))}
+                      {lectures[sec.id]?.map((lec: Lecture) => {
+                        const canPreview = lec.isPreview && lec.resource?.resourceType === 'VIDEO';
+
+                        return (
+                          <li key={lec.id}>
+                            <div className={styles['course-detail__lecture']}>
+                              <span className={styles['course-detail__lecture-title']}>
+                                {lec.title} ({lec.duration}분)
+                              </span>
+
+                              {canPreview ? (
+                                <button
+                                  type="button"
+                                  className={styles['course-form__button']}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setInitialSelectedLectureId(lec.id);
+                                    setIsPreviewOpen(true);
+                                  }}
+                                >
+                                  미리보기
+                                </button>
+                              ) : null}
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </details>
                 ))
@@ -210,6 +239,12 @@ export default function CourseDetailClientPage() {
         isEnrolled={isEnrolled}
         applying={applying}
         onApply={handleApply}
+      />
+      <CoursePreviewModal
+        isOpen={isPreviewOpen}
+        lectures={previewLectures}
+        initialSelectedLectureId={initialSelectedLectureId}
+        onClose={() => setIsPreviewOpen(false)}
       />
     </main>
   );

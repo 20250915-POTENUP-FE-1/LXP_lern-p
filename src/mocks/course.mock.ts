@@ -88,7 +88,7 @@ export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
           updatedAt: '2026-01-06T10:40:00Z',
           resource: {
             resourceType: 'VIDEO',
-            fileUrl: 'https://example.com/videos/lecture_002.mp4',
+            fileUrl: 'https://example.com/videos/lecture_001.mp4',
             isDownloadable: false,
           },
         },
