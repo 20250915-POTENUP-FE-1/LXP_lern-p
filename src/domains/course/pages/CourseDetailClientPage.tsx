@@ -170,30 +170,30 @@ export default function CourseDetailClientPage() {
                 <p>커리큘럼이 없습니다</p>
               ) : (
                 sections.map((sec: Section) => (
-                  <details key={sec.id} open className={styles['course-detail__sectionGroup']}>
-                    <summary className={styles['course-detail__sectionSummary']}>
+                  <details key={sec.id} open className={styles['course-detail__section-group']}>
+                    <summary className={styles['course-detail__section-summary']}>
                       {sec.title}
                     </summary>
-                    <ul className={styles['course-detail__lectureList']}>
+                    <ul className={styles['course-detail__lecture-list']}>
                       {lectures[sec.id]?.map((lec: Lecture) => {
                         const canPreview = lec.isPreview && lec.resource?.resourceType === 'VIDEO';
 
                         return (
                           <li key={lec.id}>
-                            <div className={styles['course-detail__lectureItem']}>
-                              <div className={styles['course-detail__lectureRow']}>
-                                <div className={styles['course-detail__lectureText']}>
-                                  <span className={styles['course-detail__lectureTitle']}>
+                            <div className={styles['course-detail__lecture-item']}>
+                              <div className={styles['course-detail__lecture-row']}>
+                                <div className={styles['course-detail__lecture-text']}>
+                                  <span className={styles['course-detail__lecture-title']}>
                                     {lec.title}
                                   </span>
-                                  <span className={styles['course-detail__lectureMeta']}>
+                                  <span className={styles['course-detail__lecture-meta']}>
                                     {lec.duration}분
                                   </span>
                                 </div>
                                 {canPreview ? (
                                   <button
                                     type="button"
-                                    className={styles['course-detail__previewBtn']}
+                                    className={styles['course-detail__preview-btn']}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
@@ -204,7 +204,7 @@ export default function CourseDetailClientPage() {
                                     미리보기
                                   </button>
                                 ) : (
-                                  <span className={styles['course-detail__lockedPill']}>잠김</span>
+                                  <span className={styles['course-detail__locked-pill']}>잠김</span>
                                 )}
                               </div>
                             </div>

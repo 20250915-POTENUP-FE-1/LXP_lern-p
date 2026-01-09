@@ -1,7 +1,9 @@
 'use client';
+
 import { Modal } from '@/shared/ui/Modal';
 import { Lecture } from '../types/course';
 import { useEffect, useRef, useState } from 'react';
+import styles from './CoursePreviewModal.module.css';
 
 export type CoursePreviewModalProps = {
   isOpen: boolean;
@@ -65,61 +67,26 @@ export default function CoursePreviewModal({
 
       <div className="modal__body" aria-labelledby="course-preview-modal-title">
         {/* 플레이어 */}
-        <section
-          aria-label="미리보기 영상"
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 2,
-            background: 'var(--color-elevated)',
-            paddingBottom: 'var(--space-3)',
-          }}
-        >
+        <section aria-label="미리보기 영상" className={styles['course-preview__video-sticky']}>
           {selectedLecture && src ? (
-            <div
-              style={{
-                width: '100%',
-                aspectRatio: '16 / 9',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border)',
-                background: '#000',
-                overflow: 'hidden',
-              }}
-            >
+            <div className={styles['course-preview__video-wrap']}>
               <video
                 ref={videoRef}
                 src={src}
                 controls
                 preload="metadata"
                 playsInline
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'block',
-                  objectFit: 'contain',
-                  background: '#000',
-                }}
+                className={styles['course-preview__video']}
               />
             </div>
           ) : (
-            <div
-              style={{
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                padding: 'var(--space-6)',
-                color: 'var(--color-text-muted)',
-                textAlign: 'center',
-              }}
-            >
-              미리보기 영상이 없습니다
-            </div>
+            <div className={styles['course-preview__video-empty']}>미리보기 영상이 없습니다</div>
           )}
         </section>
 
         {/* 리스트 */}
-        <section aria-label="미리보기 강의 목록" style={{ marginTop: 'var(--space-5)' }}>
-          <div className="modal__label" style={{ marginBottom: 'var(--space-2)' }}>
+        <section aria-label="미리보기 강의 목록" className={styles['course-preview__list-section']}>
+          <div className={`modal__label ${styles['course-preview__list-label']}`}>
             미리보기 가능한 강의
           </div>
 
@@ -128,16 +95,7 @@ export default function CoursePreviewModal({
               표시할 강의가 없습니다
             </p>
           ) : (
-            <ul
-              role="list"
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0,
-                display: 'grid',
-                gap: 'var(--space-2)',
-              }}
-            >
+            <ul role="list" className={styles['course-preview__list']}>
               {lectures.map((lec) => {
                 const isActive = lec.id === selectedLectureId;
 
@@ -147,20 +105,17 @@ export default function CoursePreviewModal({
                       type="button"
                       onClick={() => setSelectedLectureID(lec.id)}
                       aria-current={isActive ? 'true' : undefined}
-                      className="modal__button modal__button--ghost"
-                      style={{
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        padding: 'var(--space-3) var(--space-4)',
-                        borderColor: isActive ? 'var(--color-brand)' : 'var(--color-border)',
-                        color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)',
-                        background: isActive ? 'rgba(239, 104, 23, 0.08)' : 'transparent',
-                      }}
+                      className={[
+                        'modal__button',
+                        'modal__button--ghost',
+                        styles['course-preview__item-button'],
+                        isActive
+                          ? styles['course-preview__item-button--active']
+                          : styles['course-preview__item-button--inactive'],
+                      ].join(' ')}
                     >
-                      <span style={{ fontSize: 'var(--text-sm)', lineHeight: 1.3 }}>
-                        {lec.title}
-                      </span>
-                      <span style={{ fontSize: 'var(--text-xs)' }}>
+                      <span className={styles['course-preview__item-title']}>{lec.title}</span>
+                      <span className={styles['course-preview__item-state']}>
                         {isActive ? '재생 중' : '선택'}
                       </span>
                     </button>
