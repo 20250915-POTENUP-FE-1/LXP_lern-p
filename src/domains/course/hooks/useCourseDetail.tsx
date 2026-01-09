@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 import { getCourseDetail } from '../services/courseService';
 import type {
   CourseDetail,
@@ -25,7 +26,11 @@ export function useCourseDetail(courseId: string) {
       try {
         setLoading(true);
 
-        const courseDetailResponse: GetCourseDetailResponse = await getCourseDetail(courseId);
+        // TODO: API 정상화 후 제거 또는 MSW로 전환
+        const courseDetailResponse: GetCourseDetailResponse =
+          process.env.NODE_ENV === 'development'
+            ? MOCK_GET_COURSE_DETAIL
+            : await getCourseDetail(courseId);
 
         // 1) CourseDetail.course 매핑 (API 응답 → Course 도메인)
         const course: Course = {
