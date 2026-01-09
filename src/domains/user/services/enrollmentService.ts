@@ -4,41 +4,45 @@ import type {
   EnrollmentDetailResponse,
   EnrollmentProgressResponse,
 } from '@/domains/user/types/enrollment';
-import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
+import type { GetEnrollmentResponse } from '@/domains/course/types/course';
 
-/**
- * 1) 수강 목록 조회
- **/
+export const getEnrollmentByCourseId = async (
+  courseId: string,
+): Promise<GetEnrollmentResponse | null> => {
+  try {
+    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
+      cache: 'no-store',
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
+      return null;
+    }
+    throw err;
+  }
+};
+
 export async function getEnrollmentList(params?: {
   status?: string;
   page?: number;
   size?: number;
 }): Promise<EnrollmentListResponse> {
-  return MOCK_ENROLLMENT_LIST;
+  const query = new URLSearchParams({
+    status: params?.status ?? 'ENROLLED',
+    page: String(params?.page ?? 1),
+    size: String(params?.size ?? 10),
+  });
 
-  // const query = new URLSearchParams({
-  //   status: params?.status ?? 'ENROLLED',
-  //   page: String(params?.page ?? 1),
-  //   size: String(params?.size ?? 10),
-  // });
-
-  // return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
-  //   cache: 'no-store',
-  // });
+  return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
+    cache: 'no-store',
+  });
 }
 
-/**
- * 2) 수강 단건 조회
- **/
 export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResponse> {
   return await getApi<EnrollmentDetailResponse>(`/api/enrollments/${enrollmentId}`, {
     cache: 'no-store',
   });
 }
 
-/**
- * 3) 진도 조회
- **/
 export async function getProgress(enrollmentId: string): Promise<EnrollmentProgressResponse> {
   return await getApi<EnrollmentProgressResponse>(`/api/progresses/${enrollmentId}`, {
     cache: 'no-store',

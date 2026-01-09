@@ -2,20 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-
 import type { CourseLearn } from '@/domains/course/types/learn';
-
 import {
   getCourse,
   getLearnEnrollment,
   getLearnProgress,
 } from '@/domains/course/services/learnService';
-
 import { mapCourse } from '../utils/mapCourse';
 
-/** -------------------------------
- * 타입 유추용 별칭
- * ------------------------------- */
 type ProcessedCourse = ReturnType<typeof mapCourse>;
 type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
 
@@ -45,14 +39,12 @@ export function useCourseLearn(enrollmentId: string) {
     };
   }, [courseId, enrollmentId]);
 
-  /** UI용 courseData 가공 */
   const courseData: ProcessedCourse | null = useMemo(() => {
     if (!learnData) return null;
     const mapped = mapCourse(learnData.course, learnData.progress || undefined);
     return mapped;
   }, [learnData]);
 
-  /** 현재 강의 */
   const [currentLecture, setCurrentLecture] = useState<ProcessedLecture | null>(null);
 
   useEffect(() => {
@@ -66,7 +58,6 @@ export function useCourseLearn(enrollmentId: string) {
     setCurrentLecture(firstLecture);
   }, [courseData]);
 
-  /** 펼침 섹션 */
   const [openSections, setOpenSections] = useState<string[]>([]);
 
   const toggleSection = (id: string) => {
@@ -84,17 +75,14 @@ export function useCourseLearn(enrollmentId: string) {
 
     setOpenSections((prev) => {
       if (prev.includes(currentSection.id)) return prev;
-      //return [currentSection.id];
       return courseData.sections.map((s) => s.id);
     });
   }, [courseData, currentLecture]);
 
-  /** 강의 클릭 */
   const handleLectureClick = (lec: ProcessedLecture) => {
     setCurrentLecture(lec);
   };
 
-  /** 총 강의 / 완료 강의 수 */
   const totalLectures = useMemo(() => {
     return courseData ? courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0) : 0;
   }, [courseData]);

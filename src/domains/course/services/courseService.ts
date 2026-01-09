@@ -18,63 +18,42 @@ import type {
   GetEnrollmentResponse,
 } from '../types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-import { MOCK_GET_ALL_COURSE, MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
 export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
-  return MOCK_GET_ALL_COURSE;
+  const response = await fetch(`${BASE_URL}/api/courses`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
+  }
+  const resJson = await response.json();
 
-  // const response = await fetch(`${BASE_URL}/api/courses`, {
-  //   method: 'GET',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-  // if (!response.ok) {
-  //   throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
-  // }
-  // const resJson = await response.json();
-
-  //return resJson.data;
+  return resJson.data;
 };
 /**
  * 강좌 상세 조회
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
-  return MOCK_GET_COURSE_DETAIL;
-
-  // const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
-  //   method: 'GET',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-  // if (!response.ok) {
-  //   throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);
-  // }
-  // const resJson = await response.json();
-
-  // return resJson.data;
-};
-/**
- * 강좌 별 수강 정보 조회
- */
-export const getEnrollmentByCourseId = async (
-  courseId: string,
-): Promise<GetEnrollmentResponse | null> => {
-  try {
-    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
-      cache: 'no-store',
-    });
-  } catch (err) {
-    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
-      return null;
-    }
-    throw err;
+  const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);
   }
+  const resJson = await response.json();
+
+  return resJson.data;
 };
+
 /**
  * 강좌 신청
  */
