@@ -117,7 +117,7 @@ export default function CoursePreviewModal({
                 padding: 0,
                 display: 'grid',
                 gap: 'var(--space-2)',
-                maxHeight: 240,
+                maxHeight: 200,
                 overflow: 'auto',
               }}
             >

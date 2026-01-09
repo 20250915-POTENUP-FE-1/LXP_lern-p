@@ -171,7 +171,7 @@ export default function CourseDetailClientPage() {
               ) : (
                 sections.map((sec: Section) => (
                   <details key={sec.id} open>
-                    <summary>{sec.title}</summary>
+                    <summary className={'font-bold'}>{sec.title}</summary>
                     <ul>
                       {lectures[sec.id]?.map((lec: Lecture) => {
                         const canPreview = lec.isPreview && lec.resource?.resourceType === 'VIDEO';
@@ -186,7 +186,7 @@ export default function CourseDetailClientPage() {
                               {canPreview ? (
                                 <button
                                   type="button"
-                                  className={styles['course-form__button']}
+                                  className={styles['course-detail__tag']}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
