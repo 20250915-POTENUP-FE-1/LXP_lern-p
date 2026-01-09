@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
-// TODO : 임시 목업 데이터
+// TODO: 임시 목업 데이터
 import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
@@ -18,7 +18,7 @@ export default function EnrollmentClientPage() {
     async function fetchEnrollments() {
       setEnrolledLoading(true);
       try {
-        // TODO : 임시 목업 데이터
+        // TODO: 임시 목업 데이터
         // const page = await getEnrollmentList({
         //   status: 'ENROLLED',
         //   page: 0,
