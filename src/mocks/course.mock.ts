@@ -3,7 +3,7 @@ import { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/course/
 export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
     {
-      courseId: 'course_001',
+      courseId: '1',
       title: 'Next.js App Router로 LXP 만들기',
       categories: ['프론트엔드', 'Next.js'],
       thumbnailUrl: 'https://example.com/thumbnails/course_001.png',
@@ -17,7 +17,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       instructorName: '이재희',
     },
     {
-      courseId: 'course_002',
+      courseId: '2',
       title: 'TypeScript로 API 응답 타입 설계하기',
       categories: ['프론트엔드', 'TypeScript'],
       thumbnailUrl: 'https://example.com/thumbnails/course_002.png',
@@ -39,7 +39,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
 };
 
 export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
-  courseId: 'course_001',
+  courseId: '1',
   title: 'Next.js App Router로 LXP 만들기',
   categories: ['프론트엔드', 'Next.js'],
   thumbnailUrl: 'https://example.com/thumbnails/course_001.png',
@@ -60,12 +60,12 @@ export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
   rating: 4.6,
   sections: [
     {
-      sectionId: 'section_001',
+      sectionId: '1',
       title: '프로젝트 구조 이해',
       order: 1,
       lectures: [
         {
-          lectureId: 'lecture_001',
+          lectureId: '1',
           title: 'LXP 서비스 개요',
           totalDurationSeconds: 600,
           isPreview: true,
@@ -79,10 +79,10 @@ export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
           },
         },
         {
-          lectureId: 'lecture_002',
+          lectureId: '2',
           title: 'App Router 렌더링 흐름',
           totalDurationSeconds: 900,
-          isPreview: false,
+          isPreview: true,
           orderIndex: 2,
           createdAt: '2026-01-01T09:30:00Z',
           updatedAt: '2026-01-06T10:40:00Z',
@@ -92,15 +92,86 @@ export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
             isDownloadable: false,
           },
         },
+        {
+          lectureId: '3',
+          title: 'App Router',
+          totalDurationSeconds: 900,
+          isPreview: true,
+          orderIndex: 3,
+          createdAt: '2026-01-01T09:30:00Z',
+          updatedAt: '2026-01-06T10:40:00Z',
+          resource: {
+            resourceType: 'VIDEO',
+            fileUrl: 'https://example.com/videos/lecture_003.mp4',
+            isDownloadable: false,
+          },
+        },
+        {
+          lectureId: '4',
+          title: '렌더링 흐름',
+          totalDurationSeconds: 900,
+          isPreview: true,
+          orderIndex: 4,
+          createdAt: '2026-01-01T09:30:00Z',
+          updatedAt: '2026-01-06T10:40:00Z',
+          resource: {
+            resourceType: 'VIDEO',
+            fileUrl: 'https://example.com/videos/lecture_004.mp4',
+            isDownloadable: false,
+          },
+        },
+        {
+          lectureId: '5',
+          title: 'Router',
+          totalDurationSeconds: 900,
+          isPreview: true,
+          orderIndex: 5,
+          createdAt: '2026-01-01T09:30:00Z',
+          updatedAt: '2026-01-06T10:40:00Z',
+          resource: {
+            resourceType: 'VIDEO',
+            fileUrl: 'https://example.com/videos/lecture_005.mp4',
+            isDownloadable: false,
+          },
+        },
       ],
     },
     {
-      sectionId: 'section_002',
+      sectionId: '2',
       title: '강좌 도메인 구현',
       order: 2,
       lectures: [
         {
-          lectureId: 'lecture_003',
+          lectureId: '6',
+          title: '모델링',
+          totalDurationSeconds: 100,
+          isPreview: true,
+          orderIndex: 1,
+          createdAt: '2026-01-02T11:00:00Z',
+          updatedAt: '2026-01-06T10:55:00Z',
+          resource: {
+            resourceType: 'VIDEO',
+            fileUrl: 'https://example.com/videos/lecture_001.mp4',
+            isDownloadable: true,
+          },
+        },
+        {
+          lectureId: '7',
+          title: '비밀파일이래요',
+          totalDurationSeconds: 800,
+          isPreview: false,
+          orderIndex: 1,
+          createdAt: '2026-01-02T11:00:00Z',
+          updatedAt: '2026-01-06T10:55:00Z',
+          resource: {
+            resourceType: 'PDF',
+            fileUrl: 'https://example.com/files/lecture_002.pdf',
+            isDownloadable: true,
+          },
+        },
+
+        {
+          lectureId: '8',
           title: '강좌 상세 데이터 모델링',
           totalDurationSeconds: 1200,
           isPreview: false,
