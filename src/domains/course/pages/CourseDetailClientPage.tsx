@@ -170,33 +170,43 @@ export default function CourseDetailClientPage() {
                 <p>커리큘럼이 없습니다</p>
               ) : (
                 sections.map((sec: Section) => (
-                  <details key={sec.id} open>
-                    <summary className={'font-bold'}>{sec.title}</summary>
-                    <ul>
+                  <details key={sec.id} open className={styles['course-detail__sectionGroup']}>
+                    <summary className={styles['course-detail__sectionSummary']}>
+                      {sec.title}
+                    </summary>
+                    <ul className={styles['course-detail__lectureList']}>
                       {lectures[sec.id]?.map((lec: Lecture) => {
                         const canPreview = lec.isPreview && lec.resource?.resourceType === 'VIDEO';
 
                         return (
                           <li key={lec.id}>
-                            <div className={styles['course-detail__lecture']}>
-                              <span className={styles['course-detail__lecture-title']}>
-                                {lec.title} ({lec.duration}분)
-                              </span>
-
-                              {canPreview ? (
-                                <button
-                                  type="button"
-                                  className={styles['course-detail__tag']}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setInitialSelectedLectureId(lec.id);
-                                    setIsPreviewOpen(true);
-                                  }}
-                                >
-                                  미리보기
-                                </button>
-                              ) : null}
+                            <div className={styles['course-detail__lectureItem']}>
+                              <div className={styles['course-detail__lectureRow']}>
+                                <div className={styles['course-detail__lectureText']}>
+                                  <span className={styles['course-detail__lectureTitle']}>
+                                    {lec.title}
+                                  </span>
+                                  <span className={styles['course-detail__lectureMeta']}>
+                                    {lec.duration}분
+                                  </span>
+                                </div>
+                                {canPreview ? (
+                                  <button
+                                    type="button"
+                                    className={styles['course-detail__previewBtn']}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setInitialSelectedLectureId(lec.id);
+                                      setIsPreviewOpen(true);
+                                    }}
+                                  >
+                                    미리보기
+                                  </button>
+                                ) : (
+                                  <span className={styles['course-detail__lockedPill']}>잠김</span>
+                                )}
+                              </div>
                             </div>
                           </li>
                         );

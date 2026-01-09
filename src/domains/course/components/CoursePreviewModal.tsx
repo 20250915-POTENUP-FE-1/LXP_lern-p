@@ -48,7 +48,7 @@ export default function CoursePreviewModal({
     v.load();
 
     void v.play().catch(() => {});
-  }, [isOpen]);
+  }, [isOpen, src]);
 
   if (!isOpen) return null;
   return (
@@ -67,21 +67,32 @@ export default function CoursePreviewModal({
         {/* 플레이어 */}
         <section aria-label="미리보기 영상">
           {selectedLecture && src ? (
-            <video
-              ref={videoRef}
-              src={src}
-              controls
-              preload="metadata"
-              playsInline
+            <div
               style={{
                 width: '100%',
-                display: 'block',
+                aspectRatio: '16 / 9',
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                aspectRatio: '16 / 9',
+                background: '#000',
+                overflow: 'hidden',
+                maxHeight: '210px',
               }}
-            />
+            >
+              <video
+                ref={videoRef}
+                src={src}
+                controls
+                preload="metadata"
+                playsInline
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'block',
+                  objectFit: 'contain',
+                  background: '#000',
+                }}
+              />
+            </div>
           ) : (
             <div
               style={{
@@ -117,8 +128,6 @@ export default function CoursePreviewModal({
                 padding: 0,
                 display: 'grid',
                 gap: 'var(--space-2)',
-                maxHeight: 200,
-                overflow: 'auto',
               }}
             >
               {lectures.map((lec) => {

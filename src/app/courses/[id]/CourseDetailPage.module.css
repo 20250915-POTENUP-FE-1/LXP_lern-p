@@ -120,7 +120,7 @@
 
 .course-tabs__link:hover,
 .course-tabs__link:focus-visible {
-  color: var(--color-brand-);
+  color: var(--color-brand);
 }
 
 .course-tabs__link[aria-current='page'] {
@@ -250,58 +250,129 @@
   background: var(--color-border);
 }
 
-.course-detail__lecture {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-2) 0;
-  padding-left: 20px;
-  gap: var(--space-3);
+.course-detail__sectionGroup {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface);
 }
 
-.course-detail__lecture-title {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  font-size: var(--text-base);
-}
-
-/* 🔒 잠금 상태 */
-.course-detail__lecture-locked {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  background: var(--color-gray-100);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-}
-
-.course-detail__lecture-lock-icon {
-  font-size: 14px;
-}
-
-.course-detail__lecture-lock-text {
-  white-space: nowrap;
-}
-
-/* ▶ 재생 버튼 */
-.course-detail__lecture-play {
-  background: var(--color-brand);
-  color: white;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  border: none;
+.course-detail__sectionSummary {
+  list-style: none;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s ease;
+  padding: var(--space-4) var(--space-4);
+  font-weight: 700;
+  background: var(--color-elevated);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.course-detail__lecture-play:hover {
-  background: var(--color-brand-700);
+/* summary 기본 마커 정리 (브라우저별 차이 줄이기) */
+.course-detail__sectionSummary::-webkit-details-marker {
+  display: none;
+}
+.course-detail__sectionSummary::before {
+  content: '▾';
+  display: inline-block;
+  margin-right: var(--space-2);
+  color: var(--color-text-muted);
+  transform: translateY(-1px);
+}
+
+.course-detail__lectureList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.course-detail__lectureItem + .course-detail__lectureItem {
+  border-top: 1px solid var(--color-border);
+}
+
+/* 한 줄(row) 자체 */
+.course-detail__lectureRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  position: relative;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+/* 왼쪽 텍스트 영역 */
+.course-detail__lectureText {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  min-width: 0;
+}
+
+.course-detail__lectureTitle {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-detail__lectureMeta {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* 오른쪽 버튼/상태 pill */
+.course-detail__previewBtn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-brand);
+  background: transparent;
+  color: var(--color-brand-700);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.course-detail__previewBtn:hover {
+  background: rgba(239, 104, 23, 0.08);
+  transform: translateY(-1px);
+}
+
+.course-detail__lockedPill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-elevated);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.course-detail__lectureRow:hover {
+  background: var(--color-elevated);
+}
+
+.course-detail__lectureRow:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 104, 23, 0.12);
+}
+
+.course-detail__lectureRow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.course-detail__lectureRow:hover::before {
+  background: rgba(239, 104, 23, 0.35);
 }
 
 @media (min-width: 768px) {
@@ -320,15 +391,15 @@
     align-self: start;
   }
 
-  .course-detail__lecture {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: var(--space-2);
+  .course-detail__lectureText {
+    gap: var(--space-3);
   }
 
-  .course-detail__lecture-play,
-  .course-detail__lecture-locked {
-    align-self: flex-end;
+  .course-detail__lectureMeta {
+    font-size: var(--text-xs);
+  }
+  .course-detail__lectureRow:hover::before {
+    background: rgba(239, 104, 23, 0.5);
   }
 }
 
