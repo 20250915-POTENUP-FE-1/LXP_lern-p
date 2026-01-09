@@ -3,7 +3,7 @@ import { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/course/
 export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
     {
-      courseId: 'course_001',
+      courseId: '2001',
       title: 'Next.js App Router로 LXP 만들기',
       categories: ['프론트엔드', 'Next.js'],
       thumbnailUrl: 'https://example.com/thumbnails/course_001.png',
@@ -17,7 +17,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       instructorName: '이재희',
     },
     {
-      courseId: 'course_002',
+      courseId: '2002',
       title: 'TypeScript로 API 응답 타입 설계하기',
       categories: ['프론트엔드', 'TypeScript'],
       thumbnailUrl: 'https://example.com/thumbnails/course_002.png',
@@ -39,7 +39,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
 };
 
 export const MOCK_GET_COURSE_DETAIL: GetCourseDetailResponse = {
-  courseId: 'course_001',
+  courseId: '2001',
   title: 'Next.js App Router로 LXP 만들기',
   categories: ['프론트엔드', 'Next.js'],
   thumbnailUrl: 'https://example.com/thumbnails/course_001.png',
