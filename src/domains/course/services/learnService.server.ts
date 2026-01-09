@@ -1,4 +1,3 @@
-import 'server-only';
 import { cookies } from 'next/headers';
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type { LearnEnrollmentResponse } from '@/domains/course/types/learn';
