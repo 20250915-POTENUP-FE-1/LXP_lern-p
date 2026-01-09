@@ -65,7 +65,16 @@ export default function CoursePreviewModal({
 
       <div className="modal__body" aria-labelledby="course-preview-modal-title">
         {/* 플레이어 */}
-        <section aria-label="미리보기 영상">
+        <section
+          aria-label="미리보기 영상"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 2,
+            background: 'var(--color-elevated)',
+            paddingBottom: 'var(--space-3)',
+          }}
+        >
           {selectedLecture && src ? (
             <div
               style={{
@@ -75,7 +84,6 @@ export default function CoursePreviewModal({
                 border: '1px solid var(--color-border)',
                 background: '#000',
                 overflow: 'hidden',
-                maxHeight: '210px',
               }}
             >
               <video
