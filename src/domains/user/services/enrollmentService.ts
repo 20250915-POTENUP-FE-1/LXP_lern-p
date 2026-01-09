@@ -4,6 +4,7 @@ import type {
   EnrollmentDetailResponse,
   EnrollmentProgressResponse,
 } from '@/domains/user/types/enrollment';
+import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 
 /**
  * 1) 수강 목록 조회
@@ -13,15 +14,17 @@ export async function getEnrollmentList(params?: {
   page?: number;
   size?: number;
 }): Promise<EnrollmentListResponse> {
-  const query = new URLSearchParams({
-    status: params?.status ?? 'ENROLLED',
-    page: String(params?.page ?? 1),
-    size: String(params?.size ?? 10),
-  });
+  return MOCK_ENROLLMENT_LIST;
 
-  return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
-    cache: 'no-store',
-  });
+  // const query = new URLSearchParams({
+  //   status: params?.status ?? 'ENROLLED',
+  //   page: String(params?.page ?? 1),
+  //   size: String(params?.size ?? 10),
+  // });
+
+  // return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
+  //   cache: 'no-store',
+  // });
 }
 
 /**
