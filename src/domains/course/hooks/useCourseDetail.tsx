@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 import { getCourseDetail } from '../services/courseService';
 import type {
   CourseDetail,

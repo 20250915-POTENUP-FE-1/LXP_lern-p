@@ -31,6 +31,7 @@ export default function CourseDetailClientPage() {
   const { user, setUser } = useAuthState();
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
+  const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
   const applyModal = useModal(false);
@@ -38,10 +39,14 @@ export default function CourseDetailClientPage() {
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
 
+
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [initialSelectedLectureId, setInitialSelectedLectureId] = useState<string | undefined>(
     undefined,
   );
+
+  const isInCart = !!user?.cart?.includes(id);
+
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -74,14 +79,29 @@ export default function CourseDetailClientPage() {
       loginModal.open();
       return;
     }
+    if (cartPending) return;
+
+    if (isInCart) {
+      const go = confirm('이미 장바구니에 담긴 강좌예요. 장바구니로 이동할까요?');
+      if (go) router.push(`/cart?courseId=${id}`);
+      return;
+    }
+
+    setCartPending(true);
     try {
+      // TODO: 장바구니 담기 API 연동 - await addToCart(...) 호출
       setUser({
         ...user,
-        cart: user.cart.includes(id) ? user.cart : [...user.cart, id],
+        cart: [...(user.cart ?? []), id],
       });
       // toast.success('장바구니에 담았어요');
+      const go = confirm('장바구니에 담았어요. 장바구니로 이동할까요?');
+      if (go) router.push(`/cart?courseId=${id}`);
     } catch {
       // toast.error('장바구니 담기에 실패했어요');
+      alert('장바구니 담기에 실패했어요');
+    } finally {
+      setCartPending(false);
     }
   };
 
@@ -230,6 +250,8 @@ export default function CourseDetailClientPage() {
           price={course.price}
           isFree={course.isFree}
           isEnrolled={isEnrolled}
+          isInCart={isInCart}
+          cartPending={cartPending}
           onApply={handleApplyClick}
           onAddToCart={handleAddToCartClick}
           isOwner={isOwner}
