@@ -8,7 +8,7 @@ import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 export type GuardLearnResult = {
   enrollmentId: string;
 };
-export async function guardLearnAccess(courseId: string): Promise<GuardLearnResult> {
+export async function requireLearn(courseId: string): Promise<GuardLearnResult> {
   const user = MOCK_USER;
 
   const enrollment = MOCK_ENROLLMENT_LIST.content.find(
