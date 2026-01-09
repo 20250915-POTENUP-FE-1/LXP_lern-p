@@ -8,6 +8,7 @@ import type {
   GetCourseDetailResponse,
 } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
+import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 
 export function useCourseDetail(courseId: string) {
   const [courseData, setCourseData] = useState<CourseDetail>({
@@ -25,7 +26,9 @@ export function useCourseDetail(courseId: string) {
       try {
         setLoading(true);
 
-        const courseDetailResponse: GetCourseDetailResponse = await getCourseDetail(courseId);
+        // TODO : 임시 목업 데이터
+        //const courseDetailResponse: GetCourseDetailResponse = await getCourseDetail(courseId);
+        const courseDetailResponse: GetCourseDetailResponse = MOCK_GET_COURSE_DETAIL;
 
         // 1) CourseDetail.course 매핑 (API 응답 → Course 도메인)
         const course: Course = {
