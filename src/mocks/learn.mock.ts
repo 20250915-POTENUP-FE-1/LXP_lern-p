@@ -41,8 +41,21 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             resource: {
               resourceId: '5001',
               resourceType: 'VIDEO',
-              fileUrl: 'https://example-video-url.mp4',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: true,
+            },
+          },
+          {
+            lectureId: '4002',
+            title: '엔티티 매핑',
+            totalDurationSeconds: 10,
+            isPreview: false,
+            orderIndex: 2,
+            resource: {
+              resourceId: '5002',
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
             },
           },
         ],
