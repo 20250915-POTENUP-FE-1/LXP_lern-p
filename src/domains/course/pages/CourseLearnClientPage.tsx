@@ -28,8 +28,10 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     openSections,
     toggleSection,
     handleLectureClick,
+    handleVideoEnded,
     totalLectures,
     completedLectures,
+    progressRate,
   } = useCourseLearn(enrollmentId);
 
   if (!courseData || !currentLecture) {
@@ -52,6 +54,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
           </div>
           <div className={styles['course-learn__progress']}>
             진도율: {completedLectures}/{totalLectures} 완료
+            {/* 진도율: {progressRate}% */}
           </div>
         </div>
       </header>
@@ -68,6 +71,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                   className={styles['course-learn__video']}
                   controls
                   autoPlay
+                  onEnded={handleVideoEnded}
                 >
                   {currentLecture.videoUrl && (
                     <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
