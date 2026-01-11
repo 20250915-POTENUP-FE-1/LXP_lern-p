@@ -55,7 +55,10 @@ export default function EnrollmentClientPage() {
       <div className={styles['enrollment-section__list']}>
         {items.map((item) => (
           <div key={item.enrollmentId} className={styles['enrollment-card']}>
-            <Link href={`/courses/${item.courseId}/learn`} className={styles['enrollment__link']}>
+            <Link
+              href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
+              className={styles['enrollment__link']}
+            >
               <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
               <p className={styles['enrollment__category']}>
                 {item.categories?.join(' / ') ?? '카테고리 없음'}
