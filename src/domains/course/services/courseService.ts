@@ -18,6 +18,7 @@ import type {
   GetEnrollmentResponse,
 } from '../types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
@@ -32,6 +33,7 @@ export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
     throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
   }
   const resJson = await response.json();
+
   return resJson.data;
 };
 /**
@@ -48,25 +50,10 @@ export const getCourseDetail = async (courseId: string): Promise<GetCourseDetail
     throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);
   }
   const resJson = await response.json();
+
   return resJson.data;
 };
-/**
- * 강좌 별 수강 정보 조회
- */
-export const getEnrollmentByCourseId = async (
-  courseId: string,
-): Promise<GetEnrollmentResponse | null> => {
-  try {
-    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
-      cache: 'no-store',
-    });
-  } catch (err) {
-    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
-      return null;
-    }
-    throw err;
-  }
-};
+
 /**
  * 강좌 신청
  */

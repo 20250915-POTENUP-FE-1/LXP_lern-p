@@ -16,6 +16,7 @@ import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
+import CoursePreviewModal from '../components/CoursePreviewModal';
 
 type TabKey = 'intro' | 'curriculum' | 'instructor';
 
@@ -30,12 +31,22 @@ export default function CourseDetailClientPage() {
   const { user, setUser } = useAuthState();
 
   const [activeTab, setActiveTab] = useState<TabKey>('intro');
+  const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
   const applyModal = useModal(false);
 
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
+
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [initialSelectedLectureId, setInitialSelectedLectureId] = useState<string | undefined>(
+    undefined,
+  );
+
+  const isInCart = !!user?.cart?.includes(id);
+
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -68,16 +79,35 @@ export default function CourseDetailClientPage() {
       loginModal.open();
       return;
     }
+    if (cartPending) return;
+
+    if (isInCart) {
+      const go = confirm('이미 장바구니에 담긴 강좌예요. 장바구니로 이동할까요?');
+      if (go) router.push(`/cart?courseId=${id}`);
+      return;
+    }
+
+    setCartPending(true);
     try {
+      // TODO: 장바구니 담기 API 연동 - await addToCart(...) 호출
       setUser({
         ...user,
-        cart: user.cart.includes(id) ? user.cart : [...user.cart, id],
+        cart: [...(user.cart ?? []), id],
       });
       // toast.success('장바구니에 담았어요');
+      const go = confirm('장바구니에 담았어요. 장바구니로 이동할까요?');
+      if (go) router.push(`/cart?courseId=${id}`);
     } catch {
       // toast.error('장바구니 담기에 실패했어요');
+      alert('장바구니 담기에 실패했어요');
+    } finally {
+      setCartPending(false);
     }
   };
+
+  const previewLectures = sections
+    .flatMap((sec) => lectures[sec.id] ?? [])
+    .filter((lec) => lec.isPreview && lec.resource?.resourceType === 'VIDEO');
 
   const totalLectures = sections.reduce(
     (sum: number, sec: Section) => sum + (lectures[sec.id]?.length || 0),
@@ -160,18 +190,47 @@ export default function CourseDetailClientPage() {
                 <p>커리큘럼이 없습니다</p>
               ) : (
                 sections.map((sec: Section) => (
-                  <details key={sec.id} open>
-                    <summary>{sec.title}</summary>
-                    <ul>
-                      {lectures[sec.id]?.map((lec: Lecture) => (
-                        <li key={lec.id}>
-                          <div className={styles['course-detail__lecture']}>
-                            <span className={styles['course-detail__lecture-title']}>
-                              {lec.title} ({lec.duration}분)
-                            </span>
-                          </div>
-                        </li>
-                      ))}
+                  <details key={sec.id} open className={styles['course-detail__section-group']}>
+                    <summary className={styles['course-detail__section-summary']}>
+                      {sec.title}
+                    </summary>
+                    <ul className={styles['course-detail__lecture-list']}>
+                      {lectures[sec.id]?.map((lec: Lecture) => {
+                        const canPreview = lec.isPreview && lec.resource?.resourceType === 'VIDEO';
+
+                        return (
+                          <li key={lec.id}>
+                            <div className={styles['course-detail__lecture-item']}>
+                              <div className={styles['course-detail__lecture-row']}>
+                                <div className={styles['course-detail__lecture-text']}>
+                                  <span className={styles['course-detail__lecture-title']}>
+                                    {lec.title}
+                                  </span>
+                                  <span className={styles['course-detail__lecture-meta']}>
+                                    {lec.duration}분
+                                  </span>
+                                </div>
+                                {canPreview ? (
+                                  <button
+                                    type="button"
+                                    className={styles['course-detail__preview-btn']}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setInitialSelectedLectureId(lec.id);
+                                      setIsPreviewOpen(true);
+                                    }}
+                                  >
+                                    미리보기
+                                  </button>
+                                ) : (
+                                  <span className={styles['course-detail__locked-pill']}>잠김</span>
+                                )}
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </details>
                 ))
@@ -191,6 +250,8 @@ export default function CourseDetailClientPage() {
           price={course.price}
           isFree={course.isFree}
           isEnrolled={isEnrolled}
+          isInCart={isInCart}
+          cartPending={cartPending}
           onApply={handleApplyClick}
           onAddToCart={handleAddToCartClick}
           isOwner={isOwner}
@@ -210,6 +271,12 @@ export default function CourseDetailClientPage() {
         isEnrolled={isEnrolled}
         applying={applying}
         onApply={handleApply}
+      />
+      <CoursePreviewModal
+        isOpen={isPreviewOpen}
+        lectures={previewLectures}
+        initialSelectedLectureId={initialSelectedLectureId}
+        onClose={() => setIsPreviewOpen(false)}
       />
     </main>
   );

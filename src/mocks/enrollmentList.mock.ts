@@ -3,8 +3,9 @@ import type { EnrollmentListResponse } from '@/domains/user/types/enrollment';
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
   content: [
     {
+      userId: 'user_001',
       enrollmentId: '5001',
-      courseId: '2001',
+      courseId: '2002',
       courseName: 'Spring Boot 완벽 가이드',
       status: 'ENROLLED',
       progressRate: 45,
@@ -12,8 +13,9 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       categories: ['백엔드', 'Spring'],
     },
     {
+      userId: 'user_001',
       enrollmentId: '5002',
-      courseId: '2002',
+      courseId: '2003',
       courseName: 'React & Next.js 완전 정복',
       status: 'ENROLLED',
       progressRate: 70,
@@ -21,8 +23,9 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       categories: ['프론트엔드', 'React'],
     },
     {
+      userId: 'user_001',
       enrollmentId: '5003',
-      courseId: '2003',
+      courseId: '2004',
       courseName: '데이터베이스 기초',
       status: 'ENROLLED',
       progressRate: 20,

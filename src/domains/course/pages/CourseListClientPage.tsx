@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
+import { MOCK_GET_ALL_COURSE } from '@/mocks/course.mock';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
 import type { CourseCardType, GetAllCourseResponse } from '../types/course';
@@ -18,7 +19,9 @@ export default function CourseListClientPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data: GetAllCourseResponse = await getAllCourses();
+        // TODO: API 정상화 후 제거 또는 MSW로 전환
+        const data: GetAllCourseResponse =
+          process.env.NODE_ENV === 'development' ? MOCK_GET_ALL_COURSE : await getAllCourses();
 
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
           id: item.courseId,

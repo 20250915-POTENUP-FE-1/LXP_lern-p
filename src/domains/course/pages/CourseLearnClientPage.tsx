@@ -15,7 +15,11 @@ import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
-export default function CourseLearnClient() {
+type CourseLearnClientProps = {
+  enrollmentId: string;
+};
+
+export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
   const router = useRouter();
 
   const {
@@ -26,7 +30,7 @@ export default function CourseLearnClient() {
     handleLectureClick,
     totalLectures,
     completedLectures,
-  } = useCourseLearn();
+  } = useCourseLearn(enrollmentId);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
@@ -34,7 +38,6 @@ export default function CourseLearnClient() {
 
   return (
     <div className={styles['course-learn']}>
-      {/* 헤더 */}
       <header className={styles['course-learn__header']}>
         <div className={styles['course-learn__header-inner']}>
           <div className={styles['course-learn__header-left']}>
@@ -54,7 +57,6 @@ export default function CourseLearnClient() {
       </header>
 
       <div className={styles['course-learn__layout']}>
-        {/* 메인 플레이어 */}
         <main className={styles['course-learn__main']}>
           <div className={styles['course-learn__player-wrap']}>
             {currentLecture.type === 'VIDEO' &&
@@ -93,7 +95,6 @@ export default function CourseLearnClient() {
             )}
           </div>
 
-          {/* 현재 강의 정보 */}
           <div className={styles['course-learn__info-card']}>
             <div className={styles['course-learn__info-row']}>
               {currentLecture.type === 'VIDEO' ? (
@@ -113,7 +114,6 @@ export default function CourseLearnClient() {
           </div>
         </main>
 
-        {/* 사이드바 - 커리큘럼 */}
         <aside className={styles['course-learn__aside']}>
           <div className={styles['course-learn__curriculum']}>
             <h3 className={styles['course-learn__curriculum__title']}>커리큘럼</h3>

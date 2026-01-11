@@ -8,30 +8,37 @@ export type FloatingCTAProps = {
   price: number;
   isFree: boolean;
   isEnrolled: boolean;
-  onApply: () => void;
   isOwner: boolean;
+
+  isInCart?: boolean;
+  cartPending?: boolean;
+
+  onApply: () => void;
+  onAddToCart?: () => void;
 
   instructorName: string;
   totalLectures: number;
   totalTime: string;
   level: CourseLevel;
-
-  onAddToCart?: () => void;
 };
 
 export const FloatingCTA = ({
   price,
   isFree,
   isEnrolled,
-  onApply,
   isOwner,
+  isInCart = false,
+  cartPending = false,
+  onApply,
+  onAddToCart,
   instructorName,
   totalLectures,
   totalTime,
   level,
-  onAddToCart,
 }: FloatingCTAProps) => {
   const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '학습하기' : '수강신청하기';
+
+  const showAddToCartButton = !isFree && !isEnrolled && !isOwner && !isInCart && !!onAddToCart;
 
   return (
     <aside className={styles['floating-cta']} aria-label="강좌 신청 플로팅 영역">
@@ -54,11 +61,13 @@ export const FloatingCTA = ({
             {primaryLabel}
           </button>
 
-          {!isFree && !isEnrolled && !isOwner && onAddToCart && (
+          {showAddToCartButton && (
             <button
               type="button"
               className={styles['floating-cta__secondary']}
               onClick={onAddToCart}
+              disabled={cartPending}
+              aria-disabled={cartPending}
             >
               장바구니 담기
             </button>

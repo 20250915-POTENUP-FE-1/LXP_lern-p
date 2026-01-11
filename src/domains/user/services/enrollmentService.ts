@@ -4,10 +4,23 @@ import type {
   EnrollmentDetailResponse,
   EnrollmentProgressResponse,
 } from '@/domains/user/types/enrollment';
+import type { GetEnrollmentResponse } from '@/domains/course/types/course';
 
-/**
- * 1) 수강 목록 조회
- **/
+export const getEnrollmentByCourseId = async (
+  courseId: string,
+): Promise<GetEnrollmentResponse | null> => {
+  try {
+    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
+      cache: 'no-store',
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
+      return null;
+    }
+    throw err;
+  }
+};
+
 export async function getEnrollmentList(params?: {
   status?: string;
   page?: number;
@@ -24,18 +37,12 @@ export async function getEnrollmentList(params?: {
   });
 }
 
-/**
- * 2) 수강 단건 조회
- **/
 export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResponse> {
   return await getApi<EnrollmentDetailResponse>(`/api/enrollments/${enrollmentId}`, {
     cache: 'no-store',
   });
 }
 
-/**
- * 3) 진도 조회
- **/
 export async function getProgress(enrollmentId: string): Promise<EnrollmentProgressResponse> {
   return await getApi<EnrollmentProgressResponse>(`/api/progresses/${enrollmentId}`, {
     cache: 'no-store',
