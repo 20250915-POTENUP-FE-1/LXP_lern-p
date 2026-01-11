@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import type { CourseLearn } from '@/domains/course/types/learn';
 import {
   getCourse,
   getLearnEnrollment,
   getLearnProgress,
+  patchLearnProgress,
 } from '@/domains/course/services/learnService';
 import {
   MOCK_LEARN_COURSE_MAP,
@@ -21,15 +22,25 @@ type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
 export function useCourseLearn(enrollmentId: string) {
   const params = useParams<{ id: string }>();
   const courseId = params?.id;
+
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
-  const [completedLectureIds, setCompletedLectureIds] = useState<Set<string>>(() => new Set());
+  const [completedLectureIds, setCompletedLectureIds] = useState<Set<string>>(new Set());
+
+  const [manualLecture, setManualLecture] = useState<ProcessedLecture | null>(null);
+
+  const lastSavedRef = useRef<number>(0);
+  const lastWatchedSecondsRef = useRef<number>(0);
+  const prevLectureRef = useRef<ProcessedLecture | null>(null);
+
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
+  const SAVE_INTERVAL = 5;
 
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
     let cancelled = false;
 
     async function fetchAll() {
-      // TODO: 임시 목업 데이터
       if (process.env.NODE_ENV === 'development') {
         const course = MOCK_LEARN_COURSE_MAP[courseId];
         if (!course) return;
@@ -60,20 +71,16 @@ export function useCourseLearn(enrollmentId: string) {
 
   const courseData = useMemo(() => {
     if (!learnData) return null;
-
-    return mapCourse(learnData.course, learnData.progress || undefined, completedLectureIds);
+    return mapCourse(learnData.course, learnData.progress ?? undefined, completedLectureIds);
   }, [learnData, completedLectureIds]);
 
-  const [currentLecture, setCurrentLecture] = useState<ProcessedLecture | null>(null);
-
-  const initialLecture = useMemo<ProcessedLecture | null>(() => {
+  const autoLecture = useMemo<ProcessedLecture | null>(() => {
     if (!courseData) return null;
 
     const lastLectureId = learnData?.progress?.lastVideoId;
-
     if (lastLectureId) {
       for (const section of courseData.sections) {
-        const found = section.lectures.find((lecture) => lecture.id === lastLectureId);
+        const found = section.lectures.find((l) => l.id === lastLectureId);
         if (found) return found;
       }
     }
@@ -81,96 +88,131 @@ export function useCourseLearn(enrollmentId: string) {
     return courseData.sections[0]?.lectures[0] ?? null;
   }, [courseData, learnData]);
 
+  const currentLecture = manualLecture ?? autoLecture;
+  const currentLectureId = currentLecture?.id ?? null;
+
+  const currentSectionId = useMemo(() => {
+    if (!courseData || !currentLectureId) return null;
+
+    const section = courseData.sections.find((s) =>
+      s.lectures.some((l) => l.id === currentLectureId),
+    );
+
+    return section?.id ?? null;
+  }, [courseData, currentLectureId]);
+
   useEffect(() => {
-    if (!initialLecture) return;
+    if (!currentSectionId) return;
 
-    setCurrentLecture((prev) => (prev ? prev : initialLecture));
-  }, [initialLecture]);
-
-  const [openSections, setOpenSections] = useState<string[]>([]);
+    setOpenSections((prev) => {
+      if (prev.includes(currentSectionId)) return prev;
+      return [...prev, currentSectionId];
+    });
+  }, [currentSectionId]);
 
   const toggleSection = (id: string) => {
     setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   };
 
+  const totalLectures = courseData
+    ? courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0)
+    : 0;
+
+  const completedCount = completedLectureIds.size;
+
+  const progressRate = totalLectures === 0 ? 0 : Math.floor((completedCount / totalLectures) * 100);
+
+  const lastWatchedDuration = learnData?.progress?.lastWatchedDuration ?? 0;
+
+  const saveProgress = async (lecture: ProcessedLecture) => {
+    try {
+      const res = await patchLearnProgress({
+        enrollmentId,
+        lectureId: lecture.id,
+        lastWatchedDuration,
+        progressRate,
+      });
+
+      setLearnData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          progress: res,
+        };
+      });
+    } catch (e) {
+      console.error('[saveProgress failed]', e);
+    }
+  };
+
   useEffect(() => {
-    if (!courseData || !currentLecture) return;
+    const prevLecture = prevLectureRef.current;
 
-    const currentSection = courseData.sections.find((section) =>
-      section.lectures.some((lecture) => lecture.id === currentLecture.id),
-    );
+    if (prevLecture && prevLecture.id !== currentLecture?.id) {
+      patchLearnProgress({
+        enrollmentId,
+        lectureId: prevLecture.id,
+        lastWatchedDuration: lastWatchedSecondsRef.current,
+        progressRate,
+      }).catch(() => {});
+    }
 
-    if (!currentSection) return;
-
-    setOpenSections((prev) => {
-      if (prev.includes(currentSection.id)) return prev;
-      return courseData.sections.map((s) => s.id);
-    });
-  }, [courseData, currentLecture]);
+    prevLectureRef.current = currentLecture;
+  }, [currentLecture]);
 
   const findNextLecture = (
     currentId: string,
     courseData: ProcessedCourse,
   ): ProcessedLecture | null => {
-    const flatLectures = courseData.sections.flatMap((section) => section.lectures);
-
-    const currentIndex = flatLectures.findIndex((lec) => lec.id === currentId);
-
-    if (currentIndex === -1) return null;
-
-    return flatLectures[currentIndex + 1] ?? null;
+    const flatLectures = courseData.sections.flatMap((s) => s.lectures);
+    const index = flatLectures.findIndex((l) => l.id === currentId);
+    return index === -1 ? null : (flatLectures[index + 1] ?? null);
   };
 
-  const handleLectureClick = (lec: ProcessedLecture) => {
-    setCurrentLecture(lec);
+  const handleLectureClick = (lecture: ProcessedLecture) => {
+    setManualLecture(lecture);
   };
 
-  const handleVideoEnded = () => {
-    if (!courseData || !currentLecture) return;
+  const handleVideoEnded = async () => {
+    if (!currentLecture || !courseData) return;
 
-    setCompletedLectureIds((prev) => {
-      const next = new Set(prev);
-      next.add(currentLecture.id);
-      return next;
-    });
+    await saveProgress(currentLecture);
 
-    const nextLecture = findNextLecture(currentLecture.id, courseData);
-    if (nextLecture) {
-      setCurrentLecture(nextLecture);
+    const next = findNextLecture(currentLecture.id, courseData);
+    if (next) {
+      setManualLecture(next);
+      lastWatchedSecondsRef.current = 0;
     }
   };
 
-  const totalLectures = useMemo(() => {
-    return courseData ? courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0) : 0;
-  }, [courseData]);
+  const handleVideoTimeUpdate = (currentTime: number) => {
+    if (!currentLecture) return;
 
-  const completedLectures = useMemo(() => {
-    return courseData
-      ? courseData.sections.reduce(
-          (acc, s) => acc + s.lectures.filter((l) => l.completed).length,
-          0,
-        )
-      : 0;
-  }, [courseData]);
+    if (currentTime - lastSavedRef.current < 5) return;
 
-  const completedCount = useMemo(() => {
-    return completedLectureIds.size;
-  }, [completedLectureIds]);
+    lastSavedRef.current = currentTime;
+    lastWatchedSecondsRef.current = Math.floor(currentTime);
 
-  const progressRate = useMemo(() => {
-    if (totalLectures === 0) return 0;
-    return Math.floor((completedCount / totalLectures) * 100);
-  }, [completedCount, totalLectures]);
+    patchLearnProgress({
+      enrollmentId,
+      lectureId: currentLecture.id,
+      lastWatchedDuration: lastWatchedSecondsRef.current,
+      progressRate,
+    }).catch(() => {});
+  };
 
   return {
     courseData,
     currentLecture,
     openSections,
-    toggleSection,
     handleLectureClick,
     handleVideoEnded,
+    handleVideoTimeUpdate,
+    toggleSection,
     totalLectures,
     completedLectures: completedCount,
     progressRate,
+    lastWatchedDuration,
   };
 }

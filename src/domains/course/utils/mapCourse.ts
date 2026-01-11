@@ -25,14 +25,15 @@ export function mapCourse(
   return {
     ...course,
     sections: course.sections.map((section) => ({
-      ...section,
+      id: section.sectionId,
+      title: section.title,
+      order: section.order,
       lectures: section.lectures.map((lecture) => {
         const isVideo = lecture.resource.resourceType === 'VIDEO';
 
         return {
           id: lecture.lectureId,
           title: lecture.title,
-          // TODO: API 호출시 확인
           // description: lecture.description ?? '',
 
           type: lecture.resource.resourceType,
@@ -41,7 +42,6 @@ export function mapCourse(
           videoUrl: isVideo ? lecture.resource.fileUrl : undefined,
           pdfUrl: !isVideo ? lecture.resource.fileUrl : undefined,
 
-          // TODO: completed 기준을 서버 상태 기준으로 통합 예정
           completed:
             completedLectureIds.has(lecture.lectureId) ||
             lecture.lectureId === progress?.lastVideoId,

@@ -3,7 +3,7 @@ import type {
   LearnEnrollmentResponse,
   LearnProgressResponse,
 } from '@/domains/course/types/learn';
-import { getApi } from '@/shared/lib/api/fetchApi';
+import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
 
 /**
  * 강좌 상세 조회
@@ -24,4 +24,21 @@ export async function getLearnEnrollment(enrollmentId: string): Promise<LearnEnr
  */
 export async function getLearnProgress(enrollmentId: string): Promise<LearnProgressResponse> {
   return getApi(`/api/progresses/${enrollmentId}`, { cache: 'no-store' });
+}
+
+type PatchLearnProgressPayload = {
+  enrollmentId: string;
+  lectureId: string;
+  lastWatchedDuration?: number;
+  progressRate: number;
+};
+
+export async function patchLearnProgress(
+  payload: PatchLearnProgressPayload,
+): Promise<LearnProgressResponse> {
+  const { enrollmentId, ...data } = payload;
+
+  return patchApi<LearnProgressResponse>(`/api/progress/${enrollmentId}`, data, {
+    cache: 'no-store',
+  });
 }

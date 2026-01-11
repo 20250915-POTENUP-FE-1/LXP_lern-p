@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
+import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
@@ -21,18 +22,48 @@ type CourseLearnClientProps = {
 
 export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hasSeekedRef = useRef(false);
 
   const {
     courseData,
     currentLecture,
     openSections,
-    toggleSection,
     handleLectureClick,
     handleVideoEnded,
+    handleVideoTimeUpdate,
+    toggleSection,
     totalLectures,
     completedLectures,
     progressRate,
+    lastWatchedDuration,
   } = useCourseLearn(enrollmentId);
+
+  useEffect(() => {
+    if (!currentLecture) return;
+    hasSeekedRef.current = false;
+  }, [currentLecture?.id]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!currentLecture) return;
+    if (!lastWatchedDuration) return;
+    if (hasSeekedRef.current) return;
+
+    const handleLoadedMetadata = () => {
+      if (lastWatchedDuration < video.duration) {
+        video.currentTime = lastWatchedDuration;
+      }
+      hasSeekedRef.current = true;
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [currentLecture?.id, lastWatchedDuration]);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
@@ -67,15 +98,15 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
             formatAbsoluteUrl(currentLecture.videoUrl) ? (
               <div className={styles['course-learn__player']}>
                 <video
-                  key={currentLecture.id}
                   className={styles['course-learn__video']}
+                  ref={videoRef}
+                  key={currentLecture.id}
                   controls
                   autoPlay
                   onEnded={handleVideoEnded}
+                  onTimeUpdate={(e) => handleVideoTimeUpdate(e.currentTarget.currentTime)}
                 >
-                  {currentLecture.videoUrl && (
-                    <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
-                  )}
+                  <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
