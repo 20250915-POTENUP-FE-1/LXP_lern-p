@@ -22,6 +22,7 @@ export function useCourseLearn(enrollmentId: string) {
   const params = useParams<{ id: string }>();
   const courseId = params?.id;
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
+  const [completedLectureIds, setCompletedLectureIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
@@ -57,24 +58,34 @@ export function useCourseLearn(enrollmentId: string) {
     };
   }, [courseId, enrollmentId]);
 
-  const courseData: ProcessedCourse | null = useMemo(() => {
+  const courseData = useMemo(() => {
     if (!learnData) return null;
-    const mapped = mapCourse(learnData.course, learnData.progress || undefined);
-    return mapped;
-  }, [learnData]);
+
+    return mapCourse(learnData.course, learnData.progress || undefined, completedLectureIds);
+  }, [learnData, completedLectureIds]);
 
   const [currentLecture, setCurrentLecture] = useState<ProcessedLecture | null>(null);
 
-  useEffect(() => {
-    if (!courseData) {
-      setCurrentLecture(null);
-      return;
+  const initialLecture = useMemo<ProcessedLecture | null>(() => {
+    if (!courseData) return null;
+
+    const lastLectureId = learnData?.progress?.lastVideoId;
+
+    if (lastLectureId) {
+      for (const section of courseData.sections) {
+        const found = section.lectures.find((lecture) => lecture.id === lastLectureId);
+        if (found) return found;
+      }
     }
 
-    const firstLecture = courseData.sections[0]?.lectures[0] ?? null;
+    return courseData.sections[0]?.lectures[0] ?? null;
+  }, [courseData, learnData]);
 
-    setCurrentLecture(firstLecture);
-  }, [courseData]);
+  useEffect(() => {
+    if (!initialLecture) return;
+
+    setCurrentLecture((prev) => (prev ? prev : initialLecture));
+  }, [initialLecture]);
 
   const [openSections, setOpenSections] = useState<string[]>([]);
 
@@ -97,8 +108,36 @@ export function useCourseLearn(enrollmentId: string) {
     });
   }, [courseData, currentLecture]);
 
+  const findNextLecture = (
+    currentId: string,
+    courseData: ProcessedCourse,
+  ): ProcessedLecture | null => {
+    const flatLectures = courseData.sections.flatMap((section) => section.lectures);
+
+    const currentIndex = flatLectures.findIndex((lec) => lec.id === currentId);
+
+    if (currentIndex === -1) return null;
+
+    return flatLectures[currentIndex + 1] ?? null;
+  };
+
   const handleLectureClick = (lec: ProcessedLecture) => {
     setCurrentLecture(lec);
+  };
+
+  const handleVideoEnded = () => {
+    if (!courseData || !currentLecture) return;
+
+    setCompletedLectureIds((prev) => {
+      const next = new Set(prev);
+      next.add(currentLecture.id);
+      return next;
+    });
+
+    const nextLecture = findNextLecture(currentLecture.id, courseData);
+    if (nextLecture) {
+      setCurrentLecture(nextLecture);
+    }
   };
 
   const totalLectures = useMemo(() => {
@@ -114,13 +153,24 @@ export function useCourseLearn(enrollmentId: string) {
       : 0;
   }, [courseData]);
 
+  const completedCount = useMemo(() => {
+    return completedLectureIds.size;
+  }, [completedLectureIds]);
+
+  const progressRate = useMemo(() => {
+    if (totalLectures === 0) return 0;
+    return Math.floor((completedCount / totalLectures) * 100);
+  }, [completedCount, totalLectures]);
+
   return {
     courseData,
     currentLecture,
     openSections,
     toggleSection,
     handleLectureClick,
+    handleVideoEnded,
     totalLectures,
-    completedLectures,
+    completedLectures: completedCount,
+    progressRate,
   };
 }
