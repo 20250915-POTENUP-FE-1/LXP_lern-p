@@ -19,43 +19,34 @@ function formatDuration(seconds: number): string {
 
 export function mapCourse(
   course: LearnCourseResponse,
-  progress?: LearnProgressResponse | null,
-): UICourse {
-  const lastVideoId = progress?.lastVideoId ?? null;
+  progress?: LearnProgressResponse,
+  completedLectureIds: Set<string> = new Set(),
+) {
+  return {
+    ...course,
+    sections: course.sections.map((section) => ({
+      ...section,
+      lectures: section.lectures.map((lecture) => {
+        const isVideo = lecture.resource.resourceType === 'VIDEO';
 
-  const toUILecture = (lec: LearnLectureResponse): UILecture => ({
-    id: lec.lectureId,
-    title: lec.title,
-    // 백엔드에서 설명 필드 없으니 일단 비워두기 (나중에 확장 가능)
-    description: '',
-    duration: lec.totalDurationSeconds,
-    type: lec.resource.resourceType,
-    videoUrl: lec.resource.resourceType === 'VIDEO' ? lec.resource.fileUrl : undefined,
-    pdfUrl: lec.resource.resourceType === 'PDF' ? lec.resource.fileUrl : undefined,
-    completed: lastVideoId ? lec.lectureId < lastVideoId : false,
-    isCurrent: lastVideoId ? lec.lectureId === lastVideoId : false,
-  });
+        return {
+          id: lecture.lectureId,
+          title: lecture.title,
+          // TODO: API 호출시 확인
+          // description: lecture.description ?? '',
 
-  const sections: UISection[] = course.sections.map((section) => ({
-    id: section.sectionId,
-    title: section.title,
-    order: section.order,
-    lectures: section.lectures.map(toUILecture),
-  }));
+          type: lecture.resource.resourceType,
+          duration: lecture.totalDurationSeconds,
 
-  const mapped: UICourse = {
-    courseId: course.courseId,
-    title: course.title,
-    summary: course.summary,
-    description: course.description,
-    categories: course.categories,
-    level: course.level,
-    price: course.price,
-    status: course.status,
-    thumbnailUrl: course.thumbnailUrl,
-    instructor: course.instructor,
-    sections,
+          videoUrl: isVideo ? lecture.resource.fileUrl : undefined,
+          pdfUrl: !isVideo ? lecture.resource.fileUrl : undefined,
+
+          // TODO: completed 기준을 서버 상태 기준으로 통합 예정
+          completed:
+            completedLectureIds.has(lecture.lectureId) ||
+            lecture.lectureId === progress?.lastVideoId,
+        };
+      }),
+    })),
   };
-
-  return mapped;
 }
