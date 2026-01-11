@@ -5,7 +5,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
     {
       userId: 'user_001',
       enrollmentId: '5001',
-      courseId: '2002',
+      courseId: '2001',
       courseName: 'Spring Boot 완벽 가이드',
       status: 'ENROLLED',
       progressRate: 45,
@@ -15,7 +15,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
     {
       userId: 'user_001',
       enrollmentId: '5002',
-      courseId: '2003',
+      courseId: '2002',
       courseName: 'React & Next.js 완전 정복',
       status: 'ENROLLED',
       progressRate: 70,
@@ -25,7 +25,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
     {
       userId: 'user_001',
       enrollmentId: '5003',
-      courseId: '2004',
+      courseId: '2003',
       courseName: '데이터베이스 기초',
       status: 'ENROLLED',
       progressRate: 20,
