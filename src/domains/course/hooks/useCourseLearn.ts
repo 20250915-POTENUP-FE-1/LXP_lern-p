@@ -8,6 +8,11 @@ import {
   getLearnEnrollment,
   getLearnProgress,
 } from '@/domains/course/services/learnService';
+import {
+  MOCK_LEARN_COURSE_MAP,
+  MOCK_LEARN_ENROLLMENT,
+  MOCK_LEARN_PROGRESS,
+} from '@/mocks/learn.mock';
 import { mapCourse } from '../utils/mapCourse';
 
 type ProcessedCourse = ReturnType<typeof mapCourse>;
@@ -23,6 +28,19 @@ export function useCourseLearn(enrollmentId: string) {
     let cancelled = false;
 
     async function fetchAll() {
+      // TODO: 임시 목업 데이터
+      if (process.env.NODE_ENV === 'development') {
+        const course = MOCK_LEARN_COURSE_MAP[courseId];
+        if (!course) return;
+
+        setLearnData({
+          course,
+          enrollment: MOCK_LEARN_ENROLLMENT,
+          progress: MOCK_LEARN_PROGRESS,
+        });
+        return;
+      }
+
       const course = await getCourse(courseId);
       if (cancelled) return;
 
