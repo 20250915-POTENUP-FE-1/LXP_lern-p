@@ -10,7 +10,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
@@ -24,6 +24,8 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
+  const searchParams = useSearchParams();
+  const start = searchParams.get('start');
 
   const {
     courseData,
@@ -33,6 +35,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     handleVideoEnded,
     handleVideoTimeUpdate,
     toggleSection,
+    setManualLecture,
     totalLectures,
     completedLectures,
     progressRate,
@@ -64,6 +67,15 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
   }, [currentLecture?.id, lastWatchedDuration]);
+
+  useEffect(() => {
+    if (!courseData) return;
+
+    if (start === 'first') {
+      const first = courseData.sections[0]?.lectures[0];
+      if (first) setManualLecture(first);
+    }
+  }, [start, courseData]);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;

@@ -202,6 +202,7 @@ export function useCourseLearn(enrollmentId: string) {
     handleVideoEnded,
     handleVideoTimeUpdate,
     toggleSection,
+    setManualLecture,
     totalLectures,
     completedLectures: completedCount,
     progressRate,

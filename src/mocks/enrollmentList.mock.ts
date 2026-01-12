@@ -8,7 +8,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       courseId: '2001',
       courseName: 'Spring Boot 완벽 가이드',
       status: 'ENROLLED',
-      progressRate: 45,
+      progressRate: 0,
       expiredAt: '2026-01-01T09:00:00',
       categories: ['백엔드', 'Spring'],
     },
