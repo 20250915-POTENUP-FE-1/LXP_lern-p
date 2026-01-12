@@ -1,7 +1,3 @@
-// ------------------------------------------------------
-// Learn 도메인 타입 (백엔드 API Response 그대로 매핑)
-// ------------------------------------------------------
-
 import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 export type LearnLectureResourceResponse = {
@@ -62,26 +58,38 @@ export type LearnEnrollmentResponse = {
   expiredAt: string;
 };
 
+export type LearnLectureProgressResponse = {
+  resourceId: string;
+  title: string;
+  currentProgressRate: number; // 0~100
+  watchedDuration: number; // 초
+  totalDurationSeconds: number;
+  isCompleted: boolean;
+  lastWatchedAt: string | null;
+};
+
 export type LearnProgressResponse = {
   enrollmentId: string;
-  lastVideoId: string;
-  lastWatchedDuration: number;
-  completedLectureIds: string[];
-  completedCount: number;
-  totalLectures: number;
   progressRate: number;
+
+  lastVideoId: string | null;
+  lastWatchedDuration: number;
+  lastWatchedAt: string | null;
+
+  lectureProgresses: LearnLectureProgressResponse[];
   updatedAt: string;
+};
+
+export type PatchLearnProgressPayload = {
+  resourceId: string;
+  watchedDuration: number;
 };
 
 export type CourseLearn = {
   course: LearnCourseResponse;
-  enrollment: LearnEnrollmentResponse | null;
-  progress: LearnProgressResponse | null;
+  enrollment: LearnEnrollmentResponse;
+  progress: LearnProgressResponse;
 };
-
-// ------------------------------------------------------
-// UI용 타입
-// ------------------------------------------------------
 
 export type UILecture = {
   id: string;
