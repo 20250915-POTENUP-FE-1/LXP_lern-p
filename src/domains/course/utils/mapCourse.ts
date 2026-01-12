@@ -5,10 +5,7 @@ import type {
   UICourse,
 } from '@/domains/course/types/learn';
 
-export function mapCourse(
-  course: LearnCourseResponse,
-  completedLectureIds: Set<string>, // ✅ Set 기반
-): UICourse {
+export function mapCourse(course: LearnCourseResponse, completedLectureIds: Set<string>): UICourse {
   return {
     courseId: course.courseId,
     title: course.title,
@@ -39,8 +36,8 @@ export function mapCourse(
           videoUrl: isVideo ? lecture.resource.fileUrl : undefined,
           pdfUrl: !isVideo ? lecture.resource.fileUrl : undefined,
 
-          completed: completedLectureIds.has(lecture.lectureId), // ✅ 핵심
-          isCurrent: false, // UI에서 별도 처리
+          completed: completedLectureIds.has(lecture.lectureId),
+          isCurrent: false,
         };
       }),
     })),

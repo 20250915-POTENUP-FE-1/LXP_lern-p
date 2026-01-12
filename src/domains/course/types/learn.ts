@@ -33,17 +33,14 @@ export type LearnCourseResponse = {
   price: number;
   status: string;
   thumbnailUrl: string;
-
   instructor: {
     id: string;
     name: string;
     profileUrl: string;
   };
-
   isPurchased: boolean;
   studentCount: number;
   totalDuration: number;
-
   sections: LearnSectionResponse[];
 };
 
@@ -61,8 +58,8 @@ export type LearnEnrollmentResponse = {
 export type LearnLectureProgressResponse = {
   resourceId: string;
   title: string;
-  currentProgressRate: number; // 0~100
-  watchedDuration: number; // 초
+  currentProgressRate: number;
+  watchedDuration: number;
   totalDurationSeconds: number;
   isCompleted: boolean;
   lastWatchedAt: string | null;
@@ -71,16 +68,14 @@ export type LearnLectureProgressResponse = {
 export type LearnProgressResponse = {
   enrollmentId: string;
   progressRate: number;
-
   lastVideoId: string | null;
   lastWatchedDuration: number;
   lastWatchedAt: string | null;
-
   lectureProgresses: LearnLectureProgressResponse[];
   updatedAt: string;
 };
 
-export type PatchLearnProgressPayload = {
+export type PatchLearnProgressRequest = {
   resourceId: string;
   watchedDuration: number;
 };
@@ -120,12 +115,10 @@ export type UICourse = {
   price: number;
   status: string;
   thumbnailUrl: string;
-
   instructor: {
     id: string;
     name: string;
     profileUrl: string;
   };
-
   sections: UISection[];
 };

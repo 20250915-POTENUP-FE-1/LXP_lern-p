@@ -21,21 +21,13 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
   const params = useParams<{ id: string }>();
   const courseId = params?.id;
 
-  /* ------------------------------------------------------------------
-   * 기본 상태
-   * ------------------------------------------------------------------ */
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
   const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
   const [openSections, setOpenSections] = useState<string[]>([]);
 
-  /* ------------------------------------------------------------------
-   * TODO: UI 검증용 완료 상태 (서버 progress 대신 사용)
-   * ------------------------------------------------------------------ */
+  // TODO: UI 검증용 완료 상태 (서버 progress 대신 사용)
   const [uiCompletedLectureIds, setUiCompletedLectureIds] = useState<Set<string>>(() => new Set());
 
-  /* ------------------------------------------------------------------
-   * 데이터 로드 (mock 전용)
-   * ------------------------------------------------------------------ */
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
 
@@ -64,16 +56,11 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   }, [courseId, enrollmentId]);
 
-  /* ------------------------------------------------------------------
-   * TODO: UI 완료 상태 기준으로 courseData 생성
-   * ------------------------------------------------------------------ */
+  // TODO: UI 완료 상태 기준으로 courseData 생성
   const courseData = useMemo(() => {
     if (!learnData) return null;
 
-    return mapCourse(
-      learnData.course,
-      uiCompletedLectureIds, // ✅ 서버 progress 대신 UI 상태
-    );
+    return mapCourse(learnData.course, uiCompletedLectureIds);
 
     /**
      * TODO: 서버 기준 원본 코드
@@ -86,9 +73,6 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   }, [learnData, uiCompletedLectureIds]);
 
-  /* ------------------------------------------------------------------
-   * 최초 강의 선택
-   * ------------------------------------------------------------------ */
   useEffect(() => {
     if (!courseData) return;
     if (currentLecture) return;
@@ -114,9 +98,6 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   }, [courseData, currentLecture, options?.start]);
 
-  /* ------------------------------------------------------------------
-   * 섹션 자동 오픈
-   * ------------------------------------------------------------------ */
   const currentSectionId = useMemo(() => {
     if (!courseData || !currentLecture) return null;
 
@@ -134,16 +115,11 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     );
   }, [currentSectionId]);
 
-  /* ------------------------------------------------------------------
-   * 강의 클릭
-   * ------------------------------------------------------------------ */
   const handleLectureClick = (lecture: UILecture) => {
     setCurrentLecture(lecture);
   };
 
-  /* ------------------------------------------------------------------
-   * TODO: 영상 종료 → UI 완료 처리
-   * ------------------------------------------------------------------ */
+  // TODO: 영상 종료 → UI 완료 처리
   const handleVideoEnded = () => {
     if (!currentLecture) return;
 
@@ -163,9 +139,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   };
 
-  /* ------------------------------------------------------------------
-   * TODO: 영상 시청 중 (UI 검증 단계에서는 아무 것도 안 함)
-   * ------------------------------------------------------------------ */
+  // TODO: 영상 시청 중 (UI 검증 단계에서는 아무 것도 안 함)
   const handleVideoTimeUpdate = () => {
     /**
      * TODO: 서버 기준 원본
@@ -177,9 +151,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   };
 
-  /* ------------------------------------------------------------------
-   * TODO: PDF 완료 처리 (다운로드 시)
-   * ------------------------------------------------------------------ */
+  // TODO: PDF 완료 처리 (다운로드 시)
   const markPdfCompleted = (lecture: UILecture) => {
     setUiCompletedLectureIds((prev) => {
       const next = new Set(prev);
@@ -197,9 +169,6 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
      */
   };
 
-  /* ------------------------------------------------------------------
-   * 통계
-   * ------------------------------------------------------------------ */
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;
     return courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0);
@@ -218,10 +187,9 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
       setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id])),
     markPdfCompleted,
 
-    // UI용
     learnData,
     totalLectures,
     completedLectures,
-    lastWatchedDuration: 0, // UI 검증 단계에서는 미사용
+    lastWatchedDuration: 0,
   };
 }
