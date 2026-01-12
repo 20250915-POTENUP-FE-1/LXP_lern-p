@@ -18,8 +18,8 @@ export type CreateReviewRequest = {
 };
 
 export type UpdateReviewRequest = {
-  rating?: number | null;
-  content?: string | null;
+  rating: number;
+  content: string;
 };
 
 export type CreateReviewResponse = {

@@ -1,19 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Review } from '@/domains/course/types/review';
+import type {
+  CreateReviewRequest,
+  Review,
+  UpdateReviewRequest,
+} from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { getAllReviews } from '../services/reviewService';
-
-type CreateReviewRequest = {
-  rating: number;
-  content: string;
-};
-
-type UpdateReviewRequest = {
-  rating: number;
-  content: string;
-};
 
 type UseCourseReviewsProps = {
   nickname?: string; // 로그인 유저 닉네임 (항상 있어야 함)
@@ -68,8 +62,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
   const createReview = useCallback(
     //TODO: 리뷰 생성 서버 연동 시 수정 필요
-    // async (payload: CreateReviewRequest) => {
-    (payload: CreateReviewRequest) => {
+    async (payload: CreateReviewRequest) => {
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
       }
@@ -98,10 +91,9 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
   const updateReview = useCallback(
     //TODO: 리뷰 수정 서버 연동 시 수정 필요
-    //async (reviewId: string, payload: UpdateReviewRequest) => {
-    //await updateReviewApi(courseId, reviewId, payload); //
 
-    (reviewId: string, payload: UpdateReviewRequest) => {
+    async (reviewId: string, payload: UpdateReviewRequest) => {
+      //await updateReviewApi(courseId, reviewId, payload); //
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
       }
@@ -131,9 +123,8 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
   );
 
   const deleteReview = useCallback(
-    (reviewId: string) => {
+    async (reviewId: string) => {
       //TODO: 리뷰 삭제 서버 연동 시 수정 필요
-      // async (reviewId: string) => {
       //await deleteReviewApi(courseId, reviewId);
       setReviews((prev) => prev.filter((review) => review.id !== reviewId));
     },

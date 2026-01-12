@@ -485,11 +485,6 @@
   gap: var(--space-3);
 }
 
-.course-detail__review-card--mine {
-  border-color: var(--color-brand);
-  background: var(--color-brand-50);
-}
-
 .course-detail__review-card__nickname,
 .course-detail__review-card__date {
   display: inline-flex;
@@ -577,11 +572,6 @@
   font-size: var(--text-base);
 }
 
-.course-detail__review-card--mine {
-  border-color: var(--color-brand);
-  background: var(--color-brand-50);
-}
-
 .course-detail__review-card__btn-group {
   margin-left: auto;
   display: inline-flex;
@@ -629,7 +619,6 @@
 }
 .course-detail__review-card--mine {
   border-color: var(--color-brand);
-  background: var(--color-brand-50);
 }
 
 @media (min-width: 768px) {
