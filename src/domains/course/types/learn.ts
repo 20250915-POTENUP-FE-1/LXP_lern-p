@@ -63,11 +63,13 @@ export type LearnEnrollmentResponse = {
 };
 
 export type LearnProgressResponse = {
-  learningRecordId: string;
   enrollmentId: string;
-  progressRate: number;
   lastVideoId: string;
   lastWatchedDuration: number;
+  completedLectureIds: string[];
+  completedCount: number;
+  totalLectures: number;
+  progressRate: number;
   updatedAt: string;
 };
 

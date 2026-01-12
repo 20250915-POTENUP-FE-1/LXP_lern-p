@@ -30,7 +30,6 @@ export function useCourseLearn(enrollmentId: string) {
 
   const lastSavedRef = useRef<number>(0);
   const lastWatchedSecondsRef = useRef<number>(0);
-  const prevLectureRef = useRef<ProcessedLecture | null>(null);
 
   const [openSections, setOpenSections] = useState<string[]>([]);
 
@@ -71,8 +70,13 @@ export function useCourseLearn(enrollmentId: string) {
 
   const courseData = useMemo(() => {
     if (!learnData) return null;
-    return mapCourse(learnData.course, learnData.progress ?? undefined, completedLectureIds);
-  }, [learnData, completedLectureIds]);
+
+    return mapCourse(
+      learnData.course,
+      learnData.progress ?? undefined,
+      new Set(learnData.progress?.completedLectureIds ?? []),
+    );
+  }, [learnData]);
 
   const autoLecture = useMemo<ProcessedLecture | null>(() => {
     if (!courseData) return null;
@@ -129,37 +133,23 @@ export function useCourseLearn(enrollmentId: string) {
       const res = await patchLearnProgress({
         enrollmentId,
         lectureId: lecture.id,
-        lastWatchedDuration,
-        progressRate,
+        lastWatchedDuration: lastWatchedSecondsRef.current,
       });
 
       setLearnData((prev) => {
         if (!prev) return prev;
-
         return {
           ...prev,
           progress: res,
         };
       });
+
+      // 서버 기준 완료 목록으로 동기화
+      setCompletedLectureIds(new Set(res.completedLectureIds));
     } catch (e) {
       console.error('[saveProgress failed]', e);
     }
   };
-
-  useEffect(() => {
-    const prevLecture = prevLectureRef.current;
-
-    if (prevLecture && prevLecture.id !== currentLecture?.id) {
-      patchLearnProgress({
-        enrollmentId,
-        lectureId: prevLecture.id,
-        lastWatchedDuration: lastWatchedSecondsRef.current,
-        progressRate,
-      }).catch(() => {});
-    }
-
-    prevLectureRef.current = currentLecture;
-  }, [currentLecture]);
 
   const findNextLecture = (
     currentId: string,
@@ -188,8 +178,7 @@ export function useCourseLearn(enrollmentId: string) {
 
   const handleVideoTimeUpdate = (currentTime: number) => {
     if (!currentLecture) return;
-
-    if (currentTime - lastSavedRef.current < 5) return;
+    if (currentTime - lastSavedRef.current < SAVE_INTERVAL) return;
 
     lastSavedRef.current = currentTime;
     lastWatchedSecondsRef.current = Math.floor(currentTime);
@@ -198,8 +187,11 @@ export function useCourseLearn(enrollmentId: string) {
       enrollmentId,
       lectureId: currentLecture.id,
       lastWatchedDuration: lastWatchedSecondsRef.current,
-      progressRate,
-    }).catch(() => {});
+    })
+      .then((res) => {
+        setLearnData((prev) => (prev ? { ...prev, progress: res } : prev));
+      })
+      .catch(() => {});
   };
 
   return {

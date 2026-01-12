@@ -30,7 +30,6 @@ type PatchLearnProgressPayload = {
   enrollmentId: string;
   lectureId: string;
   lastWatchedDuration?: number;
-  progressRate: number;
 };
 
 export async function patchLearnProgress(
