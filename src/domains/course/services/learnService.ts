@@ -2,7 +2,7 @@ import type {
   LearnCourseResponse,
   LearnEnrollmentResponse,
   LearnProgressResponse,
-  PatchLearnProgressRequest,
+  LearnProgressRequest,
 } from '@/domains/course/types/learn';
 import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
 
@@ -22,8 +22,8 @@ export async function getLearnProgress(enrollmentId: string): Promise<LearnProgr
 }
 
 // 진도율 갱신
-export async function patchLearnProgress(
-  payload: PatchLearnProgressRequest,
+export async function updateLearnProgress(
+  payload: LearnProgressRequest,
 ): Promise<LearnProgressResponse> {
   return patchApi<LearnProgressResponse>(`/api/progresses/${payload.resourceId}`, payload);
 }

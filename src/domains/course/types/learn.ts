@@ -75,7 +75,7 @@ export type LearnProgressResponse = {
   updatedAt: string;
 };
 
-export type PatchLearnProgressRequest = {
+export type LearnProgressRequest = {
   resourceId: string;
   watchedDuration: number;
 };

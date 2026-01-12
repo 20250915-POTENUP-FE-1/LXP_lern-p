@@ -132,7 +132,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     /**
      * TODO: 서버 기준 원본
      *
-     * await patchLearnProgress({
+     * await updateLearnProgress({
      *   resourceId: currentLecture.id,
      *   watchedDuration: currentLecture.duration,
      * });
@@ -144,7 +144,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     /**
      * TODO: 서버 기준 원본
      *
-     * await patchLearnProgress({
+     * await updateLearnProgress({
      *   resourceId: currentLecture.id,
      *   watchedDuration,
      * });
@@ -162,7 +162,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     /**
      * TODO: 서버 기준 원본
      *
-     * await patchLearnProgress({
+     * await updateLearnProgress({
      *   resourceId: lecture.id,
      *   watchedDuration: 0,
      * });
