@@ -119,7 +119,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
       return updated;
     },
-    [],
+    [nickname],
   );
 
   const deleteReview = useCallback(
