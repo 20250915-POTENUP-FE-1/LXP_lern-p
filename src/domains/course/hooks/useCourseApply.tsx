@@ -22,9 +22,6 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
                 (e) => e.courseId === String(courseId) && e.status === 'ENROLLED',
               )
             : Boolean(await getEnrollmentByCourseId(courseId));
-        // TODO: API 정상화 후 제거 또는 MSW로 전환
-        // try {
-        //   const enrolled = await getEnrollmentByCourseId(courseId);
 
         setIsEnrolled(!!enrolled);
       } catch (err) {

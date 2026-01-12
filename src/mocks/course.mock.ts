@@ -1,8 +1,7 @@
-import { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/course/types/course';
+import type { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/course/types/course';
 
 export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
-    // 기존: 수강 중
     {
       courseId: '2002',
       title: 'Spring Boot 완벽 가이드',
@@ -45,8 +44,6 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       summary: '관계형 데이터베이스 개념과 SQL 기초를 학습합니다.',
       instructorName: '박디비',
     },
-
-    // 추가: 미구독 강좌
     {
       courseId: '3001',
       title: 'Node.js 백엔드 실전',
@@ -84,7 +81,6 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
 };
 
 export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
-  // 기존: 수강 중
   '2002': {
     courseId: '2002',
     title: 'Spring Boot 완벽 가이드',
@@ -93,7 +89,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: 'Spring Boot 기반 실무 백엔드 완성 로드맵',
     description: 'Spring Boot 프로젝트 구조, REST API 설계, JPA 연동까지 실무 중심으로 다룹니다.',
     instructor: {
-      id: 'instructor_2002',
+      id: '2002',
       name: '김백엔드',
       profileUrl: 'https://example.com/profiles/instructor_2002.png',
     },
@@ -104,7 +100,106 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     level: 'INTERMEDIATE',
     studentCount: 412,
     rating: 4.7,
-    sections: [],
+    sections: [
+      {
+        sectionId: '1',
+        title: '프로젝트 구조 이해',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '1',
+            title: 'Spring Boot 프로젝트 개요',
+            totalDurationSeconds: 600,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-06T10:30:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2002_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2',
+            title: '레이어드 아키텍처 빠르게 잡기',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:30:00Z',
+            updatedAt: '2026-01-06T10:40:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2002_lecture_002.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '3',
+            title: '설정(application.yml)과 프로파일',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-01T10:00:00Z',
+            updatedAt: '2026-01-06T10:50:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2002_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2',
+        title: '강좌 도메인 구현',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '4',
+            title: 'DTO/Entity 분리 기준',
+            totalDurationSeconds: 100,
+            isPreview: true,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-06T10:55:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2002_lecture_004.mp4',
+              isDownloadable: true,
+            },
+          },
+          {
+            lectureId: '5',
+            title: '보안 체크리스트(내부 문서)',
+            totalDurationSeconds: 800,
+            isPreview: false,
+            orderIndex: 5,
+            createdAt: '2026-01-02T11:10:00Z',
+            updatedAt: '2026-01-06T11:05:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2002_lecture_005.pdf',
+              isDownloadable: true,
+            },
+          },
+          {
+            lectureId: '6',
+            title: 'JPA 연관관계 설계 실수 방지',
+            totalDurationSeconds: 1200,
+            isPreview: false,
+            orderIndex: 6,
+            createdAt: '2026-01-02T11:20:00Z',
+            updatedAt: '2026-01-06T11:15:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2002_lecture_006.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+    ],
   },
 
   '2003': {
@@ -115,7 +210,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: 'React와 Next.js App Router를 함께 학습합니다.',
     description: '컴포넌트 설계부터 App Router 렌더링 흐름까지 연결합니다.',
     instructor: {
-      id: 'instructor_2003',
+      id: '2003',
       name: '이프론트',
       profileUrl: 'https://example.com/profiles/instructor_2003.png',
     },
@@ -126,7 +221,106 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     level: 'INTERMEDIATE',
     studentCount: 356,
     rating: 4.6,
-    sections: [],
+    sections: [
+      {
+        sectionId: '1',
+        title: 'App Router 렌더링 이해',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '1',
+            title: 'App Router 서비스 개요',
+            totalDurationSeconds: 540,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-06T10:30:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2003_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2',
+            title: 'RSC / CSR 경계 감각',
+            totalDurationSeconds: 780,
+            isPreview: true,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:20:00Z',
+            updatedAt: '2026-01-06T10:40:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2003_lecture_002.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '3',
+            title: 'fetch 캐싱과 revalidate',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-01T09:40:00Z',
+            updatedAt: '2026-01-06T10:50:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2003_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2',
+        title: '실전 패턴',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '4',
+            title: '서버 액션 폼 처리',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-06T10:55:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2003_lecture_004.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '5',
+            title: 'route handler로 API 프록시',
+            totalDurationSeconds: 800,
+            isPreview: false,
+            orderIndex: 5,
+            createdAt: '2026-01-02T11:10:00Z',
+            updatedAt: '2026-01-06T11:05:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2003_lecture_005.pdf',
+              isDownloadable: true,
+            },
+          },
+          {
+            lectureId: '6',
+            title: '에러 핸들링/토스트 UX',
+            totalDurationSeconds: 1100,
+            isPreview: false,
+            orderIndex: 6,
+            createdAt: '2026-01-02T11:20:00Z',
+            updatedAt: '2026-01-06T11:15:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2003_lecture_006.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+    ],
   },
 
   '2004': {
@@ -137,7 +331,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: '데이터베이스 기본 개념과 SQL 기초',
     description: '테이블, 관계, 정규화 개념과 SQL 기본 문법을 학습합니다.',
     instructor: {
-      id: 'instructor_2004',
+      id: '2004',
       name: '박디비',
       profileUrl: 'https://example.com/profiles/instructor_2004.png',
     },
@@ -148,10 +342,80 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     level: 'BEGINNER',
     studentCount: 215,
     rating: 4.2,
-    sections: [],
+    sections: [
+      {
+        sectionId: '1',
+        title: 'DB 기본기',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '1',
+            title: '테이블/행/열 개념',
+            totalDurationSeconds: 600,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-06T10:30:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2004_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2',
+            title: '키와 인덱스 기초',
+            totalDurationSeconds: 780,
+            isPreview: false,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:20:00Z',
+            updatedAt: '2026-01-06T10:40:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2004_lecture_002.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2',
+        title: 'SQL 입문',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '3',
+            title: 'SELECT / WHERE',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-06T10:55:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2004_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '4',
+            title: 'GROUP BY 감각',
+            totalDurationSeconds: 1000,
+            isPreview: false,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:10:00Z',
+            updatedAt: '2026-01-06T11:05:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2004_lecture_004.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+    ],
   },
 
-  // 추가: 미구독
   '3001': {
     courseId: '3001',
     title: 'Node.js 백엔드 실전',
@@ -160,7 +424,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: 'Node.js 기반 서버 개발 실전 과정',
     description: 'Express 기반 API 설계, 인증, 에러 처리, 배포까지 백엔드 전 과정을 다룹니다.',
     instructor: {
-      id: 'instructor_3001',
+      id: '3001',
       name: '정노드',
       profileUrl: 'https://example.com/profiles/instructor_3001.png',
     },
@@ -171,7 +435,78 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     level: 'INTERMEDIATE',
     studentCount: 182,
     rating: 4.5,
-    sections: [],
+    sections: [
+      {
+        sectionId: '1',
+        title: '런타임 감각',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '1',
+            title: '이벤트 루프 이해',
+            totalDurationSeconds: 720,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-06T10:30:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3001_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2',
+            title: '비동기 패턴 정리',
+            totalDurationSeconds: 840,
+            isPreview: false,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:20:00Z',
+            updatedAt: '2026-01-06T10:40:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/3001_lecture_002.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2',
+        title: 'API 실전',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '3',
+            title: '라우팅/미들웨어 설계',
+            totalDurationSeconds: 960,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-06T10:55:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3001_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '4',
+            title: '인증/인가 기본',
+            totalDurationSeconds: 1100,
+            isPreview: false,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:10:00Z',
+            updatedAt: '2026-01-06T11:05:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3001_lecture_004.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+    ],
   },
 
   '3002': {
@@ -182,7 +517,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: '프론트엔드 테스트 입문',
     description: 'Jest, Testing Library를 활용해 안정적인 프론트엔드 테스트를 작성합니다.',
     instructor: {
-      id: 'instructor_3002',
+      id: '3002',
       name: '최테스트',
       profileUrl: 'https://example.com/profiles/instructor_3002.png',
     },
@@ -193,6 +528,77 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     level: 'BEGINNER',
     studentCount: 96,
     rating: 4.3,
-    sections: [],
+    sections: [
+      {
+        sectionId: '1',
+        title: '테스트 시작',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '1',
+            title: '테스트 범위 잡기',
+            totalDurationSeconds: 600,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-06T10:30:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3002_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2',
+            title: 'Jest 기본 문법',
+            totalDurationSeconds: 780,
+            isPreview: false,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:20:00Z',
+            updatedAt: '2026-01-06T10:40:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/3002_lecture_002.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2',
+        title: '실전 테스트',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '3',
+            title: 'Testing Library 쿼리',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-06T10:55:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3002_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '4',
+            title: '비동기 테스트 패턴',
+            totalDurationSeconds: 1050,
+            isPreview: false,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:10:00Z',
+            updatedAt: '2026-01-06T11:05:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/3002_lecture_004.mp4',
+              isDownloadable: false,
+            },
+          },
+        ],
+      },
+    ],
   },
 };

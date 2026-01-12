@@ -170,6 +170,35 @@
   display: contents;
 }
 
+.course-tabs__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+
+  margin-left: 8px;
+
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1;
+
+  border-radius: 999px;
+
+  background-color: var(--color-elevated);
+  color: var(--color-text-muted);
+
+  border: 1px solid var(--color-border);
+}
+
+.course-tabs__count--active {
+  background-color: var(--color-brand-50);
+  color: var(--color-brand);
+  border-color: transparent;
+}
+
 /* sidebar (별도 블록 유지) */
 .sidebar {
   display: grid;
@@ -373,7 +402,6 @@
   white-space: nowrap;
 }
 
-/*리뷰*/
 .course-detail__section-head {
   display: flex;
   align-items: center;
@@ -381,6 +409,7 @@
   gap: 12px;
 }
 
+/* 리뷰 */
 .course-detail__review-btn {
   height: 40px;
   padding: 0 12px;
@@ -391,6 +420,19 @@
   font-weight: 800;
   cursor: pointer;
 }
+.course-detail__review-btn--enroll-required {
+  background-color: var(--color-elevated);
+  color: var(--color-text-muted);
+
+  border: 1px dashed var(--color-border);
+
+  cursor: not-allowed;
+}
+
+.course-detail__review-btn--enroll-required:hover {
+  background-color: var(--color-border);
+}
+
 .course-detail__review-btn--disabled {
   background: var(--color-elevated);
   border: 1px solid var(--color-border);
@@ -429,38 +471,20 @@
   margin: 0;
   line-height: 1.6;
 }
-.stars {
-  display: flex;
-  gap: 4px;
-}
 
-.star {
-  font-size: 18px; /* 22px → 18px */
-  cursor: pointer;
-  transition: color 120ms ease;
-}
-
-.starInactive {
-  color: #d1d5db;
-}
-
-.starActive {
-  color: #f5c518;
-}
-
-.review-list {
+.course-detail__review-list {
   display: grid;
   gap: var(--space-4);
 }
 
-.review-card {
+.course-detail__review-card {
   padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
 }
 
-.review-card__header {
+.course-detail__review-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -468,57 +492,75 @@
   margin-bottom: var(--space-2);
 }
 
-.review-card__nickname {
+.course-detail__review-card__nickname {
   font-weight: 700;
   color: var(--color-text);
 }
 
-.review-card__rating {
+.course-detail__review-card__rating {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.review-card__score {
+.course-detail__review-card__score {
   font-size: 12px;
   color: var(--color-text-muted);
   white-space: nowrap;
 }
 
-.review-card__content {
+.course-detail__review-card__content {
   margin: 0;
   line-height: 1.6;
   color: var(--color-text);
   word-break: break-word;
 }
 
-.star-rating {
-  display: inline-flex;
-  gap: 2px;
-  line-height: 1;
-}
-
-.star {
-  font-size: 14px;
-}
-
-.star--inactive {
-  color: var(--color-border);
-}
-
-.star--active {
-  color: #f5b301;
-}
-
-.review-card__author {
+.course-detail__review-card__author {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.review-card__date {
+.course-detail__review-card__date {
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+.course-detail__review-summary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.course-detail__review-summary__inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.course-detail__review-summary__score {
+  font-size: clamp(32px, 1vw, 48px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.course-detail__review-summary__stars {
+  display: flex;
+  justify-content: center;
+}
+
+.course-detail__review-summary__meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+}
+
+.course-detail__review-card--mine {
+  border-color: var(--color-brand);
+  background: var(--color-brand-50);
 }
 
 @media (min-width: 768px) {
@@ -554,81 +596,4 @@
   .course-detail__hero {
     min-height: 300px;
   }
-}
-
-.review-summary {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
-  margin-bottom: var(--space-6);
-}
-
-.review-summary__inner {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-3);
-  text-align: center;
-}
-
-.review-summary__score {
-  font-size: clamp(32px, 1vw, 48px);
-  font-weight: 700;
-  line-height: 1;
-}
-
-.review-summary__stars {
-  display: flex;
-  justify-content: center;
-}
-
-.review-summary__meta {
-  color: var(--color-text-muted);
-  font-size: var(--text-base);
-}
-
-.course-tabs__count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-
-  margin-left: 8px;
-
-  font-size: var(--text-xs);
-  font-weight: 500;
-  line-height: 1;
-
-  border-radius: 999px;
-
-  background-color: var(--color-elevated);
-  color: var(--color-text-muted);
-
-  border: 1px solid var(--color-border);
-}
-
-.course-tabs__count--active {
-  background-color: var(--color-brand-50);
-  color: var(--color-brand);
-  border-color: transparent;
-}
-
-.review-card--mine {
-  border-color: var(--color-brand);
-  background: var(--color-brand-50);
-}
-.course-detail__review-btn--enroll-required {
-  background-color: var(--color-elevated);
-  color: var(--color-text-muted);
-
-  border: 1px dashed var(--color-border);
-
-  cursor: not-allowed;
-}
-
-.course-detail__review-btn--enroll-required:hover {
-  background-color: var(--color-border);
 }

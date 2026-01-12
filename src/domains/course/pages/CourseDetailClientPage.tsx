@@ -13,38 +13,16 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
-import type { Section, Lecture, Review } from '../types/course';
+import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 import CoursePreviewModal from '../components/CoursePreviewModal';
 import CourseReviewModal from '../components/CourseReviewModal';
 import { useCourseReviews } from '../hooks/useCourseReview';
+import { StarRating } from '../components/StarRating';
+import { formatReviewDate } from '../utils/formatReviewDate';
 
-type StarRatingProps = {
-  value: number; // 1~5
-};
-
-function StarRating({ value }: StarRatingProps) {
-  const filled = Math.round(value); // rating이 4.8 같은 값이어도 처리 가능
-  return (
-    <div className={styles['star-rating']} aria-label={`별점 ${value}점`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={[
-            styles['star'],
-            i < filled ? styles['star--active'] : styles['star--inactive'],
-          ].join(' ')}
-          aria-hidden="true"
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
-}
-
-type TabKey = 'intro' | 'curriculum' | 'instructor' | 'reviews';
+type TabKey = 'intro' | 'curriculum' | 'reviews';
 
 export type CourseDetailClientPageProps = {
   courseId: string;
@@ -56,7 +34,7 @@ export default function CourseDetailClientPage() {
 
   const { user, setUser } = useAuthState();
 
-  const [activeTab, setActiveTab] = useState<TabKey>('intro');
+  const [activeTab, setActiveTab] = useState<TabKey>('curriculum');
   const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
@@ -71,7 +49,7 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, addReview, myReviewStatus, canWriteReview } = useCourseReviews(id, {
+  const { reviews, createReview, myReviewStatus, canWriteReview } = useCourseReviews(id, {
     nickname: user?.nickname,
   });
 
@@ -82,14 +60,6 @@ export default function CourseDetailClientPage() {
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
   }, [reviews, reviewCount]);
-
-  function formatReviewDate(iso: string) {
-    const d = new Date(iso);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}. ${m}. ${day}.`;
-  }
 
   const isInCart = !!user?.cart?.includes(id);
 
@@ -214,9 +184,8 @@ export default function CourseDetailClientPage() {
           <nav className={styles['course-tabs']}>
             <ul className={styles['course-tabs__list']}>
               {[
-                { key: 'intro' as TabKey, label: '강좌 소개' },
                 { key: 'curriculum' as TabKey, label: '커리큘럼' },
-                { key: 'instructor' as TabKey, label: '강사 정보' },
+                { key: 'intro' as TabKey, label: '강좌 소개' },
                 { key: 'reviews' as TabKey, label: `수강평` },
               ].map(({ key, label }) => {
                 const isActive = activeTab === key;
@@ -246,13 +215,6 @@ export default function CourseDetailClientPage() {
               })}
             </ul>
           </nav>
-
-          {activeTab === 'intro' && (
-            <section className={styles['course-detail__section']}>
-              <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
-              <p>{course.description || '강좌 개요는 추후 업데이트 예정입니다.'}</p>
-            </section>
-          )}
 
           {activeTab === 'curriculum' && (
             <section className={styles['course-detail__section']}>
@@ -309,10 +271,10 @@ export default function CourseDetailClientPage() {
             </section>
           )}
 
-          {activeTab === 'instructor' && (
+          {activeTab === 'intro' && (
             <section className={styles['course-detail__section']}>
-              <h2 className={styles['course-detail__section-title']}>강사 정보</h2>
-              <p>강사 소개는 추후 업데이트 예정입니다.</p>
+              <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
+              <p>{course.description || '강좌 개요는 추후 업데이트 예정입니다.'}</p>
             </section>
           )}
           {activeTab === 'reviews' && (
@@ -344,15 +306,19 @@ export default function CourseDetailClientPage() {
               </div>
 
               {reviewCount > 0 && (
-                <div className={styles['review-summary']}>
-                  <div className={styles['review-summary__inner']}>
-                    <div className={styles['review-summary__score']}>{avgRating.toFixed(1)}</div>
+                <div className={styles['course-detail__review-summary']}>
+                  <div className={styles['course-detail__review-summary__inner']}>
+                    <div className={styles['course-detail__review-summary__score']}>
+                      {avgRating.toFixed(1)}
+                    </div>
 
-                    <div className={styles['review-summary__stars']}>
+                    <div className={styles['course-detail__review-summary__stars']}>
                       <StarRating value={avgRating} />
                     </div>
 
-                    <div className={styles['review-summary__meta']}>{reviewCount}개의 수강평</div>
+                    <div className={styles['course-detail__review-summary__meta']}>
+                      {reviewCount}개의 수강평
+                    </div>
                   </div>
                 </div>
               )}
@@ -360,30 +326,34 @@ export default function CourseDetailClientPage() {
               {reviews.length === 0 ? (
                 <p>아직 리뷰가 없습니다.</p>
               ) : (
-                <ul className={styles['review-list']}>
+                <ul className={styles['course-detail__review-list']}>
                   {reviews.map((r) => (
                     <li
                       key={r.id}
                       className={[
-                        styles['review-card'],
-                        r.isMine ? styles['review-card--mine'] : '',
+                        styles['course-detail__review-card'],
+                        r.isMine ? styles['course-detail__review-card--mine'] : '',
                       ].join(' ')}
                     >
-                      <div className={styles['review-card__header']}>
-                        <div className={styles['review-card__author']}>
-                          <span className={styles['review-card__nickname']}>{r.user.nickname}</span>
-                          <span className={styles['review-card__date']}>
+                      <div className={styles['course-detail__review-card__header']}>
+                        <div className={styles['course-detail__review-card__author']}>
+                          <span className={styles['course-detail__review-card__nickname']}>
+                            {r.user.nickname}
+                          </span>
+                          <span className={styles['course-detail__review-card__date']}>
                             {formatReviewDate(r.createdAt)}
                           </span>
                         </div>
 
-                        <div className={styles['review-card__rating']}>
+                        <div className={styles['course-detail__review-card__rating']}>
                           <StarRating value={r.rating} />
-                          <span className={styles['review-card__score']}>{r.rating} / 5</span>
+                          <span className={styles['course-detail__review-card__score']}>
+                            {r.rating} / 5
+                          </span>
                         </div>
                       </div>
 
-                      <p className={styles['review-card__content']}>{r.content}</p>
+                      <p className={styles['course-detail__review-card__content']}>{r.content}</p>
                     </li>
                   ))}
                 </ul>
@@ -413,7 +383,7 @@ export default function CourseDetailClientPage() {
         onClose={() => setIsReviewOpen(false)}
         nickname={user?.nickname ?? ''}
         onSubmit={async ({ rating, content }) => {
-          await addReview({ rating, content });
+          await createReview({ rating, content });
         }}
       />
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />

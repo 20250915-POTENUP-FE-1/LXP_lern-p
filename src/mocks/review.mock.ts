@@ -1,6 +1,6 @@
-import type { Review } from '@/domains/course/types/course';
+import type { Review } from '@/domains/course/types/review';
 
-export const MOCK_REVIEWS_BY_COURSE: Record<string, Review[]> = {
+export const MOCK_GET_COURSE_REVIEWS: Record<string, Review[]> = {
   '2002': [
     {
       id: 'rev_2002_001',

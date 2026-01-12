@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Review } from '@/domains/course/types/course';
-import { getCourseReviews } from '@/domains/course/services/reviewService';
+import type { Review } from '@/domains/course/types/review';
+import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
+import { getCourseReviews } from '../services/reviewService';
 
 type CreateReviewPayload = {
   rating: number;
@@ -25,7 +26,12 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
 
     (async () => {
       try {
-        const list = await getCourseReviews(courseId);
+        const list =
+          // TODO: 나중에 API 생기면 여기서 분기
+          process.env.NODE_ENV === 'development'
+            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
+            : await getCourseReviews(courseId);
+
         setReviews(list);
       } catch (err) {
         // 실패하면 빈 배열로 (UI 안전)
@@ -44,7 +50,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
 
   const canWriteReview = myReviewStatus.status === 'none';
 
-  const addReviewMock = useCallback(
+  const createReview = useCallback(
     (payload: CreateReviewPayload) => {
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
@@ -76,19 +82,19 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
         throw new Error('ALREADY_REVIEWED');
       }
 
-      // ✅ 현재는 mock만. 나중에 API 생기면 여기서 분기해서 호출하면 됨.
+      // TODO: 나중에 API 생기면 여기서 분기해서 호출하면 됨.
       // if (process.env.NODE_ENV !== 'development') await createReviewApi(courseId, payload);
 
-      return addReviewMock(payload);
+      return createReview(payload);
     },
-    [addReviewMock, myReviewStatus.status],
+    [createReview, myReviewStatus.status],
   );
 
   return {
     reviews,
     myReviewStatus,
     canWriteReview,
-    addReview,
+    createReview,
     // setReviews는 이제 외부에서 안 만지는 게 안정적이라 제거 추천
   };
 }
