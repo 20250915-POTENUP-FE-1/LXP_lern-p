@@ -91,7 +91,7 @@ export function CartClientPage() {
         // TODO: 장바구니 담기 API 연동 (추가/수정/삭제가 같은 API일 수도 있음)
 
         // TODO: 장바구니 조회 API 연동 후 교체 및 refetchCart() 호출
-        const detail = MOCK_GET_COURSE_DETAIL;
+        const detail = MOCK_GET_COURSE_DETAIL[Number(initialCourseId)];
 
         if (detail) {
           const mapped: CartItemType = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -17,8 +17,12 @@ import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 import CoursePreviewModal from '../components/CoursePreviewModal';
+import CourseReviewModal from '../components/CourseReviewModal';
+import { useCourseReviews } from '../hooks/useCourseReview';
+import { StarRating } from '../components/StarRating';
+import { formatReviewDate } from '../utils/formatReviewDate';
 
-type TabKey = 'intro' | 'curriculum' | 'instructor';
+type TabKey = 'intro' | 'curriculum' | 'reviews';
 
 export type CourseDetailClientPageProps = {
   courseId: string;
@@ -30,7 +34,7 @@ export default function CourseDetailClientPage() {
 
   const { user, setUser } = useAuthState();
 
-  const [activeTab, setActiveTab] = useState<TabKey>('intro');
+  const [activeTab, setActiveTab] = useState<TabKey>('curriculum');
   const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
@@ -39,14 +43,38 @@ export default function CourseDetailClientPage() {
   const { course, sections, lectures, loading } = useCourseDetail(id);
   const { isEnrolled, applying, handleApply } = useCourseApply(user, id);
 
-
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [initialSelectedLectureId, setInitialSelectedLectureId] = useState<string | undefined>(
     undefined,
   );
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+  const { reviews, createReview, updateReview, deleteReview, myReviewStatus, canWriteReview } =
+    useCourseReviews(id, {
+      nickname: user?.nickname,
+    });
+
+  const reviewCount = reviews.length;
+
+  const avgRating = useMemo(() => {
+    if (reviewCount === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
+  }, [reviews, reviewCount]);
 
   const isInCart = !!user?.cart?.includes(id);
 
+  const hasMyReview = myReviewStatus.status === 'exists';
+
+  const canOpenReviewModal = !user ? true : isEnrolled && !hasMyReview;
+
+  const reviewButtonLabel = !user
+    ? '리뷰 등록하기'
+    : !isEnrolled
+      ? '수강 후 작성 가능'
+      : hasMyReview
+        ? '리뷰 등록 완료'
+        : '리뷰 등록하기';
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -154,34 +182,36 @@ export default function CourseDetailClientPage() {
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
           </header>
 
-          <nav className={styles['course-tabs']}>
-            <ul className={styles['course-tabs__list']}>
+          <nav className={styles['course-detail__course-tabs']}>
+            <ul className={styles['course-detail__course-tabs__list']}>
               {[
-                { key: 'intro' as TabKey, label: '강좌 소개' },
                 { key: 'curriculum' as TabKey, label: '커리큘럼' },
-                { key: 'instructor' as TabKey, label: '강사 정보' },
-              ].map(({ key, label }) => (
-                <li key={key}>
-                  <Link
-                    href={`#${key}`}
-                    className={`${styles['course-tabs__link']} ${
-                      activeTab === key ? styles['active'] : ''
-                    }`}
-                    onClick={(e) => handleTabClick(e, key)}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+                { key: 'intro' as TabKey, label: '강좌 소개' },
+                { key: 'reviews' as TabKey, label: `수강평` },
+              ].map(({ key, label }) => {
+                const isActive = activeTab === key;
+                const shouldShowCount = key === 'reviews' && reviewCount > 0;
+
+                return (
+                  <li key={key}>
+                    <Link
+                      href={`#${key}`}
+                      className={`${styles['course-detail__course-tabs__link']} ${isActive ? styles['active'] : ''}`}
+                      onClick={(e) => handleTabClick(e, key)}
+                    >
+                      <span className={styles['course-detail__course-tabs__label']}>{label}</span>
+
+                      {shouldShowCount && (
+                        <span className={`${styles['course-detail__course-tabs__count']} `}>
+                          {reviewCount}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
-
-          {activeTab === 'intro' && (
-            <section className={styles['course-detail__section']}>
-              <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
-              <p>{course.description || '강좌 개요는 추후 업데이트 예정입니다.'}</p>
-            </section>
-          )}
 
           {activeTab === 'curriculum' && (
             <section className={styles['course-detail__section']}>
@@ -238,10 +268,114 @@ export default function CourseDetailClientPage() {
             </section>
           )}
 
-          {activeTab === 'instructor' && (
+          {activeTab === 'intro' && (
             <section className={styles['course-detail__section']}>
-              <h2 className={styles['course-detail__section-title']}>강사 정보</h2>
-              <p>강사 소개는 추후 업데이트 예정입니다.</p>
+              <h2 className={styles['course-detail__section-title']}>강좌 개요</h2>
+              <p>{course.description || '강좌 개요는 추후 업데이트 예정입니다.'}</p>
+            </section>
+          )}
+          {activeTab === 'reviews' && (
+            <section className={styles['course-detail__section']}>
+              <div className={styles['course-detail__section-head']}>
+                <h2 className={styles['course-detail__section-title']}>수강평</h2>
+
+                <button
+                  type="button"
+                  className={[
+                    styles['course-detail__review-btn'],
+                    !canOpenReviewModal ? styles['course-detail__review-btn--disabled'] : '',
+                    !isEnrolled && user ? styles['course-detail__review-btn--enroll-required'] : '',
+                  ].join(' ')}
+                  disabled={!canOpenReviewModal}
+                  onClick={() => {
+                    if (!user) {
+                      loginModal.open();
+                      return;
+                    }
+                    if (!isEnrolled) return;
+                    if (hasMyReview) return;
+
+                    setIsReviewOpen(true);
+                  }}
+                >
+                  {reviewButtonLabel}
+                </button>
+              </div>
+
+              {reviewCount > 0 && (
+                <div className={styles['course-detail__review-summary']}>
+                  <div className={styles['course-detail__review-summary__inner']}>
+                    <div className={styles['course-detail__review-summary__score']}>
+                      {avgRating.toFixed(1)}
+                    </div>
+
+                    <div className={styles['course-detail__review-summary__stars']}>
+                      <StarRating value={avgRating} />
+                    </div>
+
+                    <div className={styles['course-detail__review-summary__meta']}>
+                      {reviewCount}개의 수강평
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {reviews.length === 0 ? (
+                <p>아직 리뷰가 없습니다.</p>
+              ) : (
+                <ul className={styles['course-detail__review-list']}>
+                  {reviews.map((r) => (
+                    <li
+                      key={r.id}
+                      className={[
+                        styles['course-detail__review-card'],
+                        r.isMine ? styles['course-detail__review-card--mine'] : '',
+                      ].join(' ')}
+                    >
+                      <div className={styles['course-detail__review-card__author']}>
+                        <span className={styles['course-detail__review-card__nickname']}>
+                          {r.user.nickname}
+                        </span>
+                        <span className={styles['course-detail__review-card__date']}>
+                          {formatReviewDate(r.createdAt)}
+                        </span>
+                        {r.isMine ? (
+                          <div className={styles['course-detail__review-card__btn-group']}>
+                            <button
+                              type="button"
+                              className={styles['course-detail__review-card__edit-btn']}
+                              onClick={() => {
+                                setIsReviewOpen(true);
+                              }}
+                            >
+                              수정
+                            </button>
+                            <button
+                              type="button"
+                              className={styles['course-detail__review-card__delete-btn']}
+                              onClick={async () => {
+                                if (myReviewStatus.status !== 'exists') return;
+                                if (!confirm('정말 삭제할까요?')) return;
+                                await deleteReview(myReviewStatus.reviewId);
+                              }}
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className={styles['course-detail__review-card__header']}>
+                        <div className={styles['course-detail__review-card__rating']}>
+                          <StarRating value={r.rating} />
+                        </div>
+
+                        <p className={styles['course-detail__review-card__content']}>{r.content}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
         </article>
@@ -261,7 +395,21 @@ export default function CourseDetailClientPage() {
           level={course.level}
         />
       </div>
-
+      {/* 모달들 */}
+      <CourseReviewModal
+        isOpen={isReviewOpen}
+        onClose={() => setIsReviewOpen(false)}
+        isMine={hasMyReview}
+        initialReview={hasMyReview ? reviews.find((r) => r.isMine) : undefined}
+        nickname={user?.nickname ?? ''}
+        onSubmit={async ({ rating, content }) => {
+          if (myReviewStatus.status === 'exists') {
+            await updateReview(myReviewStatus.reviewId, { rating, content });
+          } else {
+            await createReview({ rating, content });
+          }
+        }}
+      />
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
       <CourseApplyModal
         isOpen={applyModal.isOpen}

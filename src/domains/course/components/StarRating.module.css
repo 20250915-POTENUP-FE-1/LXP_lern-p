@@ -1,0 +1,23 @@
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  font-size: 18px; /* 22px → 18px */
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+  line-height: 1;
+}
+
+.star--inactive {
+  color: var(--color-border);
+}
+
+.star--active {
+  color: #f5b301;
+}

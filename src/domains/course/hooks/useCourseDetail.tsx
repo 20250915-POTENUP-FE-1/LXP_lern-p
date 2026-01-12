@@ -29,7 +29,7 @@ export function useCourseDetail(courseId: string) {
         // TODO: API 정상화 후 제거 또는 MSW로 전환
         const courseDetailResponse: GetCourseDetailResponse =
           process.env.NODE_ENV === 'development'
-            ? MOCK_GET_COURSE_DETAIL
+            ? MOCK_GET_COURSE_DETAIL[courseId]
             : await getCourseDetail(courseId);
 
         // 1) CourseDetail.course 매핑 (API 응답 → Course 도메인)

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { User } from '@/domains/user/types/user';
 import { applyCourse } from '../services/courseService';
 import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
+import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 
 export function useCourseApply(currentUser: User | null, courseId: string) {
   const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
@@ -15,7 +16,14 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
 
     (async () => {
       try {
-        const enrolled = await getEnrollmentByCourseId(courseId);
+        // TODO: API 정상화 후 제거 또는 MSW로 전환
+        const enrolled =
+          process.env.NODE_ENV === 'development'
+            ? MOCK_ENROLLMENT_LIST.content.some(
+                (e) => e.courseId === String(courseId) && e.status === 'ENROLLED',
+              )
+            : Boolean(await getEnrollmentByCourseId(courseId));
+
         setIsEnrolled(!!enrolled);
       } catch (err) {
         console.error('수강 상태 확인 실패:', err);
