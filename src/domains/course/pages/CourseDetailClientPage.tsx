@@ -49,9 +49,10 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, createReview, myReviewStatus, canWriteReview } = useCourseReviews(id, {
-    nickname: user?.nickname,
-  });
+  const { reviews, createReview, updateReview, deleteReview, myReviewStatus, canWriteReview } =
+    useCourseReviews(id, {
+      nickname: user?.nickname,
+    });
 
   const reviewCount = reviews.length;
 
@@ -181,8 +182,8 @@ export default function CourseDetailClientPage() {
             {course.summary && <p className={styles['course-detail__summary']}>{course.summary}</p>}
           </header>
 
-          <nav className={styles['course-tabs']}>
-            <ul className={styles['course-tabs__list']}>
+          <nav className={styles['course-detail__course-tabs']}>
+            <ul className={styles['course-detail__course-tabs__list']}>
               {[
                 { key: 'curriculum' as TabKey, label: '커리큘럼' },
                 { key: 'intro' as TabKey, label: '강좌 소개' },
@@ -195,17 +196,13 @@ export default function CourseDetailClientPage() {
                   <li key={key}>
                     <Link
                       href={`#${key}`}
-                      className={`${styles['course-tabs__link']} ${isActive ? styles['active'] : ''}`}
+                      className={`${styles['course-detail__course-tabs__link']} ${isActive ? styles['active'] : ''}`}
                       onClick={(e) => handleTabClick(e, key)}
                     >
-                      <span className={styles['course-tabs__label']}>{label}</span>
+                      <span className={styles['course-detail__course-tabs__label']}>{label}</span>
 
                       {shouldShowCount && (
-                        <span
-                          className={`${styles['course-tabs__count']} ${
-                            isActive ? styles['course-tabs__count--active'] : ''
-                          }`}
-                        >
+                        <span className={`${styles['course-detail__course-tabs__count']} `}>
                           {reviewCount}
                         </span>
                       )}
@@ -335,25 +332,46 @@ export default function CourseDetailClientPage() {
                         r.isMine ? styles['course-detail__review-card--mine'] : '',
                       ].join(' ')}
                     >
-                      <div className={styles['course-detail__review-card__header']}>
-                        <div className={styles['course-detail__review-card__author']}>
-                          <span className={styles['course-detail__review-card__nickname']}>
-                            {r.user.nickname}
-                          </span>
-                          <span className={styles['course-detail__review-card__date']}>
-                            {formatReviewDate(r.createdAt)}
-                          </span>
-                        </div>
-
-                        <div className={styles['course-detail__review-card__rating']}>
-                          <StarRating value={r.rating} />
-                          <span className={styles['course-detail__review-card__score']}>
-                            {r.rating} / 5
-                          </span>
-                        </div>
+                      <div className={styles['course-detail__review-card__author']}>
+                        <span className={styles['course-detail__review-card__nickname']}>
+                          {r.user.nickname}
+                        </span>
+                        <span className={styles['course-detail__review-card__date']}>
+                          {formatReviewDate(r.createdAt)}
+                        </span>
+                        {r.isMine ? (
+                          <div className={styles['course-detail__review-card__btn-group']}>
+                            <button
+                              type="button"
+                              className={styles['course-detail__review-card__edit-btn']}
+                              onClick={() => {
+                                setIsReviewOpen(true);
+                              }}
+                            >
+                              수정
+                            </button>
+                            <button
+                              type="button"
+                              className={styles['course-detail__review-card__delete-btn']}
+                              onClick={async () => {
+                                if (myReviewStatus.status !== 'exists') return;
+                                if (!confirm('정말 삭제할까요?')) return;
+                                await deleteReview(myReviewStatus.reviewId);
+                              }}
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        ) : null}
                       </div>
 
-                      <p className={styles['course-detail__review-card__content']}>{r.content}</p>
+                      <div className={styles['course-detail__review-card__header']}>
+                        <div className={styles['course-detail__review-card__rating']}>
+                          <StarRating value={r.rating} />
+                        </div>
+
+                        <p className={styles['course-detail__review-card__content']}>{r.content}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -381,9 +399,15 @@ export default function CourseDetailClientPage() {
       <CourseReviewModal
         isOpen={isReviewOpen}
         onClose={() => setIsReviewOpen(false)}
+        isMine={hasMyReview}
+        initialReview={hasMyReview ? reviews.find((r) => r.isMine) : undefined}
         nickname={user?.nickname ?? ''}
         onSubmit={async ({ rating, content }) => {
-          await createReview({ rating, content });
+          if (myReviewStatus.status === 'exists') {
+            await updateReview(myReviewStatus.reviewId, { rating, content });
+          } else {
+            await createReview({ rating, content });
+          }
         }}
       />
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />

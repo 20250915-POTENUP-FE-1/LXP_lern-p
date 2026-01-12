@@ -3,22 +3,28 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Review } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
-import { getCourseReviews } from '../services/reviewService';
+import { getAllReviews } from '../services/reviewService';
+import { get } from 'http';
 
-type CreateReviewPayload = {
+type CreateReviewRequest = {
   rating: number;
   content: string;
 };
 
-type UseCourseReviewsOptions = {
+type UpdateReviewRequest = {
+  rating: number;
+  content: string;
+};
+
+type UseCourseReviewsProps = {
   nickname?: string; // 로그인 유저 닉네임 (항상 있어야 함)
 };
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
-export function useCourseReviews(courseId: string, options?: UseCourseReviewsOptions) {
+export function useCourseReviews(courseId: string, options?: UseCourseReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const nickname = options?.nickname; // fallback 없음
+  const nickname = options?.nickname;
 
   // 1) courseId 바뀔 때마다 리뷰 로드 (dev면 mock, 아니면 api)
   useEffect(() => {
@@ -30,9 +36,9 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
           // TODO: 나중에 API 생기면 여기서 분기
           process.env.NODE_ENV === 'development'
             ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-            : await getCourseReviews(courseId);
+            : await getAllReviews;
 
-        setReviews(list);
+        setReviews;
       } catch (err) {
         // 실패하면 빈 배열로 (UI 안전)
         console.error('리뷰 불러오기 실패:', err);
@@ -51,15 +57,19 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
   const canWriteReview = myReviewStatus.status === 'none';
 
   const createReview = useCallback(
-    (payload: CreateReviewPayload) => {
+    //TODO: 리뷰 생성 서버 연동 시 수정 필요
+    // async (payload: CreateReviewRequest) => {
+    (payload: CreateReviewRequest) => {
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
       }
 
+      //const data = await createReviewApi(courseId, payload);
+
       const now = new Date().toISOString();
 
       const newReview: Review = {
-        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
+        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`, // String(data.reviewId),
         courseId,
         rating: payload.rating,
         content: payload.content,
@@ -76,18 +86,48 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
     [courseId, nickname],
   );
 
-  const addReview = useCallback(
-    async (payload: CreateReviewPayload) => {
-      if (myReviewStatus.status === 'exists') {
-        throw new Error('ALREADY_REVIEWED');
+  const updateReview = useCallback(
+    //TODO: 리뷰 수정 서버 연동 시 수정 필요
+    //async (reviewId: string, payload: UpdateReviewRequest) => {
+    //await updateReviewApi(courseId, reviewId, payload); //
+
+    (reviewId: string, payload: UpdateReviewRequest) => {
+      if (!nickname) {
+        throw new Error('MISSING_NICKNAME');
       }
 
-      // TODO: 나중에 API 생기면 여기서 분기해서 호출하면 됨.
-      // if (process.env.NODE_ENV !== 'development') await createReviewApi(courseId, payload);
+      const now = new Date().toISOString();
 
-      return createReview(payload);
+      let updated: Review | null = null;
+
+      setReviews((prev) =>
+        prev.map((review) => {
+          if (!review.isMine) return review;
+
+          updated = {
+            ...review,
+            rating: payload.rating,
+            content: payload.content,
+            updatedAt: now,
+          };
+
+          return updated;
+        }),
+      );
+
+      return updated;
     },
-    [createReview, myReviewStatus.status],
+    [],
+  );
+
+  const deleteReview = useCallback(
+    (reviewId: string) => {
+      //TODO: 리뷰 삭제 서버 연동 시 수정 필요
+      // async (reviewId: string) => {
+      //await deleteReviewApi(courseId, reviewId);
+      setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+    },
+    [courseId],
   );
 
   return {
@@ -95,6 +135,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
     myReviewStatus,
     canWriteReview,
     createReview,
-    // setReviews는 이제 외부에서 안 만지는 게 안정적이라 제거 추천
+    updateReview,
+    deleteReview,
   };
 }

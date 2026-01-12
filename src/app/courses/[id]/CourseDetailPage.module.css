@@ -92,12 +92,12 @@
   line-height: 1.6;
 }
 
-/* course-tabs (별도 블록 유지) */
-.course-tabs {
+/* course-detail__course-tabs (별도 블록 유지) */
+.course-detail__course-tabs {
   border-bottom: 1px solid var(--color-border);
 }
 
-.course-tabs__list {
+.course-detail__course-tabs__list {
   display: flex;
   gap: var(--space-4);
   list-style: none;
@@ -107,7 +107,7 @@
   scrollbar-width: thin;
 }
 
-.course-tabs__link {
+.course-detail__course-tabs__link {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -118,20 +118,20 @@
   transition: color 0.2s ease;
 }
 
-.course-tabs__link:hover,
-.course-tabs__link:focus-visible {
+.course-detail__course-tabs__link:hover,
+.course-detail__course-tabs__link:focus-visible {
   color: var(--color-brand);
 }
 
-.course-tabs__link[aria-current='page'] {
+.course-detail__course-tabs__link[aria-current='page'] {
   color: var(--color-brand);
 }
 
-.course-tabs__link.active {
+.course-detail__course-tabs__link.active {
   color: var(--color-brand);
 }
 
-.course-tabs__link[aria-current='page']::after {
+.course-detail__course-tabs__link[aria-current='page']::after {
   content: '';
   position: absolute;
   left: 0;
@@ -170,7 +170,7 @@
   display: contents;
 }
 
-.course-tabs__count {
+.course-detail__course-tabs__count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -191,12 +191,6 @@
   color: var(--color-text-muted);
 
   border: 1px solid var(--color-border);
-}
-
-.course-tabs__count--active {
-  background-color: var(--color-brand-50);
-  color: var(--color-brand);
-  border-color: transparent;
 }
 
 /* sidebar (별도 블록 유지) */
@@ -473,6 +467,10 @@
 }
 
 .course-detail__review-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
   display: grid;
   gap: var(--space-4);
 }
@@ -482,19 +480,35 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+
+  display: grid;
+  gap: var(--space-3);
 }
 
-.course-detail__review-card__header {
-  display: flex;
+.course-detail__review-card--mine {
+  border-color: var(--color-brand);
+  background: var(--color-brand-50);
+}
+
+.course-detail__review-card__nickname,
+.course-detail__review-card__date {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-2);
 }
 
 .course-detail__review-card__nickname {
   font-weight: 700;
   color: var(--color-text);
+  min-width: 0;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.course-detail__review-card__date {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .course-detail__review-card__rating {
@@ -520,11 +534,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
 }
-
 .course-detail__review-card__date {
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+.course-detail__review-card__header {
+  display: grid;
+  gap: var(--space-2);
 }
 
 .course-detail__review-summary {
@@ -558,6 +577,56 @@
   font-size: var(--text-base);
 }
 
+.course-detail__review-card--mine {
+  border-color: var(--color-brand);
+  background: var(--color-brand-50);
+}
+
+.course-detail__review-card__btn-group {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.course-detail__review-card__edit-btn,
+.course-detail__review-card__delete-btn {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.course-detail__review-card__edit-btn:hover,
+.course-detail__review-card__delete-btn:hover {
+  background: var(--color-elevated);
+  transform: translateY(-1px);
+}
+
+.course-detail__review-card__edit-btn:active,
+.course-detail__review-card__delete-btn:active {
+  transform: translateY(0);
+}
+
+.course-detail__review-card__delete-btn {
+  border-color: rgba(239, 104, 23, 0.25);
+}
+
+.course-detail__review-card__delete-btn:hover {
+  background: rgba(239, 104, 23, 0.08);
+}
 .course-detail__review-card--mine {
   border-color: var(--color-brand);
   background: var(--color-brand-50);

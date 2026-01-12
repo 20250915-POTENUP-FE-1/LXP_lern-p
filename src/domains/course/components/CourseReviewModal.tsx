@@ -7,6 +7,9 @@ import styles from './CourseReviewModal.module.css';
 export type CourseReviewModalProps = {
   isOpen: boolean;
   nickname: string;
+  isMine?: boolean;
+  initialReview?: { rating: number; content: string };
+
   onClose: () => void;
   onSubmit: (payload: { rating: number; content: string }) => void;
 };
@@ -14,6 +17,8 @@ export type CourseReviewModalProps = {
 export default function CourseReviewModal({
   isOpen,
   nickname,
+  isMine,
+  initialReview,
   onClose,
   onSubmit,
 }: CourseReviewModalProps) {
@@ -32,11 +37,17 @@ export default function CourseReviewModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    setRating(0);
-    setContent('');
+    if (isMine && initialReview) {
+      setRating(initialReview.rating);
+      setContent(initialReview.content);
+    } else {
+      setRating(0);
+      setContent('');
+    }
+
     setFocused(false);
     setSubmitted(false);
-  }, [isOpen]);
+  }, [isOpen, isMine, initialReview]);
 
   const handleSubmit = () => {
     if (!isValid) return;
@@ -50,7 +61,7 @@ export default function CourseReviewModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <header className="modal__header">
-        <h2 className="modal__title">힘이 되는 수강평을 남겨주세요!</h2>
+        <h2 className="modal__title">{isMine ? '수강평 수정하기' : '수강평 등록하기'}</h2>
 
         <button className="modal__close" onClick={onClose} aria-label="닫기">
           ×
@@ -123,7 +134,7 @@ export default function CourseReviewModal({
           disabled={!isValid}
           onClick={handleSubmit}
         >
-          등록
+          {isMine ? '수정' : '등록'}
         </button>
       </footer>
     </Modal>

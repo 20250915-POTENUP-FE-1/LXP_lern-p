@@ -1,4 +1,3 @@
-// 리뷰 관련 타입
 export type ReviewStatus = 'DISPLAY' | 'BLINDED' | 'DELETED' | 'ARCHIVED';
 
 export type Review = {
@@ -6,13 +5,43 @@ export type Review = {
   courseId: string;
   rating: number; // 1 ~ 5
   content: string;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
-  user: {
-    nickname: string;
-  };
+  createdAt: string;
+  updatedAt: string;
+  user: { nickname: string };
   isMine: boolean;
   status: ReviewStatus;
 };
 
-export type GetCourseReviewResponse = Review; // TODO: API 명세 확정 후, 수정
+export type CreateReviewRequest = {
+  rating: number;
+  content: string;
+};
+
+export type UpdateReviewRequest = {
+  rating?: number | null;
+  content?: string | null;
+};
+
+export type CreateReviewResponse = {
+  reviewId: string;
+};
+
+export type UpdateReviewResponse = {
+  reviewId: string;
+};
+
+export type DeleteReviewResponse = object;
+
+export type GetAllReviewsItem = {
+  id: string;
+  userId: string;
+  courseId: string;
+  rating: number;
+  content: string;
+  status: 'DISPLAY' | 'BLIND';
+  reported: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type GetAllReviewsResponse = GetAllReviewsItem[];

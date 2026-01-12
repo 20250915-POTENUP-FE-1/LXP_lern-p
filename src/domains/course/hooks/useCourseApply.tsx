@@ -16,6 +16,7 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
 
     (async () => {
       try {
+        // TODO: API 정상화 후 제거 또는 MSW로 전환
         const enrolled =
           process.env.NODE_ENV === 'development'
             ? MOCK_ENROLLMENT_LIST.content.some(
