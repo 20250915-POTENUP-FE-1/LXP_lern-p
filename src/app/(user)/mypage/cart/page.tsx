@@ -35,62 +35,80 @@ export default async function PurchaseHistoryPage() {
         </>
       ) : (
         <div className={styles['order-list']} aria-label="구매 내역 목록">
-          {orders.map((order) => (
-            <article key={order.orderId} className={styles['order-card']}>
-              <div className={styles['order-card__top']}>
-                <div className={styles['order-card__meta']}>
-                  <p className={styles['order-card__date']}>{formatDate(order.paidAt)}</p>
-                  <p className={styles['order-card__order']}>
-                    주문번호 <span>{order.orderId}</span>
-                  </p>
+          {orders.map((order) => {
+            const firstCourse = order.courses[0];
+            const remainingCount = Math.max(order.courses.length - 1, 0);
+
+            return (
+              <article key={order.orderId} className={styles['order-card']}>
+                <div className={styles['order-card__top']}>
+                  <div className={styles['order-card__meta']}>
+                    <p className={styles['order-card__date']}>{formatDate(order.paidAt)}</p>
+                    <p className={styles['order-card__order']}>
+                      주문번호 <span>{order.orderId}</span>
+                    </p>
+                  </div>
+
+                  <div className={styles['order-card__right']}>
+                    <span className={styles['order-card__badge']} data-status={order.status}>
+                      {getOrderStatusLabel(order.status)}
+                    </span>
+                  </div>
                 </div>
 
-                <div className={styles['order-card__right']}>
-                  <span className={styles['order-card__badge']} data-status={order.status}>
-                    {getOrderStatusLabel(order.status)}
-                  </span>
-                  <p className={styles['order-card__price']}>
-                    {order.totalAmount.toLocaleString()}원
-                  </p>
+                <div className={styles['order-card__items']} aria-label="구매 강좌 목록">
+                  {firstCourse ? (
+                    remainingCount > 0 ? (
+                      <details className={styles['order-item__details']}>
+                        <summary className={styles['order-item__summary-toggle']}>
+                          <span className={styles['order-item__summary-title']}>
+                            {firstCourse.title}
+                          </span>
+                          <span className={styles['order-item__summary-count']}>
+                            외 {remainingCount}건
+                          </span>
+                        </summary>
+                        <ul className={styles['order-item__more']}>
+                          {order.courses.map((course) => (
+                            <li
+                              key={`${order.orderId}-${course.courseId}`}
+                              className={styles['order-item']}
+                            >
+                              <div className={styles['order-item__main']}>
+                                <p className={styles['order-item__title']}>{course.title}</p>
+                              </div>
+
+                              <div className={styles['order-item__price']}>
+                                {course.price.toLocaleString()}원
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    ) : (
+                      <div className={styles['order-item__single']}>
+                        <span className={styles['order-item__summary-title']}>
+                          {firstCourse.title}
+                        </span>
+                      </div>
+                    )
+                  ) : null}
                 </div>
-              </div>
 
-              <ul className={styles['order-card__items']} aria-label="구매 강좌 목록">
-                {order.courses.map((course) => (
-                  <li key={`${order.orderId}-${course.courseId}`} className={styles['order-item']}>
-                    <div className={styles['order-item__main']}>
-                      <p className={styles['order-item__title']}>{course.title}</p>
-                    </div>
-
-                    <div className={styles['order-item__price']}>
-                      {course.price.toLocaleString()}원
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <div className={styles['order-card__actions']}>
-                <Link className={styles['order-card__link']} href={`/orders/${order.orderId}`}>
-                  상세 보기
-                </Link>
-
-                {order.courses[0]?.courseId ? (
-                  <Link
-                    className={styles['order-card__link']}
-                    href={`/courses/${order.courses[0].courseId}`}
-                  >
-                    강좌로 이동
-                  </Link>
-                ) : null}
-              </div>
-            </article>
-          ))}
+                <div className={styles['order-card__total']}>
+                  <span>합계</span>
+                  <strong>{order.totalAmount.toLocaleString()}원</strong>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
   );
 }
 
+// TODO: OrderStatus 변경 시 동기화 필요
 const getOrderStatusLabel = (status: OrderStatus) => {
   switch (status) {
     case 'COMPLETED':
