@@ -10,7 +10,7 @@ import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { getAllReviews } from '../services/reviewService';
 
 type UseCourseReviewsProps = {
-  nickname?: string; // 로그인 유저 닉네임 (항상 있어야 함)
+  nickname?: string;
 };
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
@@ -19,7 +19,6 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
   const [reviews, setReviews] = useState<Review[]>([]);
   const nickname = options?.nickname;
 
-  // 1) courseId 바뀔 때마다 리뷰 로드 (dev면 mock, 아니면 api)
   useEffect(() => {
     if (!courseId) return;
     (async () => {
@@ -28,7 +27,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
           if (process.env.NODE_ENV === 'development') {
             return MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
           }
-          return await getAllReviews(courseId); // GetAllReviewsItem[]
+          return await getAllReviews(courseId);
         })();
 
         const mapped: Review[] = items.map((it) => ({
@@ -61,13 +60,13 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
   const canWriteReview = myReviewStatus.status === 'none';
 
   const createReview = useCallback(
-    //TODO: 리뷰 생성 서버 연동 시 수정 필요
     async (payload: CreateReviewRequest) => {
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
       }
 
-      //const data = await createReviewApi(courseId, payload);
+      // TODO: 리뷰 생성 서버 연동 시 수정 필요
+      // const data = await createReviewApi(courseId, payload);
 
       const now = new Date().toISOString();
 
@@ -90,10 +89,9 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
   );
 
   const updateReview = useCallback(
-    //TODO: 리뷰 수정 서버 연동 시 수정 필요
-
     async (reviewId: string, payload: UpdateReviewRequest) => {
-      //await updateReviewApi(courseId, reviewId, payload); //
+      // TODO: 리뷰 수정 서버 연동 시 수정 필요
+      // await updateReviewApi(courseId, reviewId, payload);
       if (!nickname) {
         throw new Error('MISSING_NICKNAME');
       }
@@ -124,8 +122,8 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
   const deleteReview = useCallback(
     async (reviewId: string) => {
-      //TODO: 리뷰 삭제 서버 연동 시 수정 필요
-      //await deleteReviewApi(courseId, reviewId);
+      // TODO: 리뷰 삭제 서버 연동 시 수정 필요
+      // await deleteReviewApi(courseId, reviewId);
       setReviews((prev) => prev.filter((review) => review.id !== reviewId));
     },
     [courseId],
