@@ -1,198 +1,211 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-import type { CourseLearn } from '@/domains/course/types/learn';
-import {
-  getCourse,
-  getLearnEnrollment,
-  getLearnProgress,
-  patchLearnProgress,
-} from '@/domains/course/services/learnService';
+
+import type { CourseLearn, UILecture } from '@/domains/course/types/learn';
+import { getCourse } from '@/domains/course/services/learnService';
+import { mapCourse } from '@/domains/course/utils/mapCourse';
+
 import {
   MOCK_LEARN_COURSE_MAP,
   MOCK_LEARN_ENROLLMENT,
   MOCK_LEARN_PROGRESS,
 } from '@/mocks/learn.mock';
-import { mapCourse } from '../utils/mapCourse';
 
-type ProcessedCourse = ReturnType<typeof mapCourse>;
-type ProcessedLecture = ProcessedCourse['sections'][number]['lectures'][number];
+type UseCourseLearnOptions = {
+  start?: 'first';
+};
 
-export function useCourseLearn(enrollmentId: string) {
+export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOptions) {
   const params = useParams<{ id: string }>();
   const courseId = params?.id;
 
+  /* ------------------------------------------------------------------
+   * 기본 상태
+   * ------------------------------------------------------------------ */
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
-  const [completedLectureIds, setCompletedLectureIds] = useState<Set<string>>(new Set());
-
-  const [manualLecture, setManualLecture] = useState<ProcessedLecture | null>(null);
-
-  const lastSavedRef = useRef<number>(0);
-  const lastWatchedSecondsRef = useRef<number>(0);
-
+  const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
   const [openSections, setOpenSections] = useState<string[]>([]);
 
-  const SAVE_INTERVAL = 5;
+  /* ------------------------------------------------------------------
+   * TODO: UI 검증용 완료 상태 (서버 progress 대신 사용)
+   * ------------------------------------------------------------------ */
+  const [uiCompletedLectureIds, setUiCompletedLectureIds] = useState<Set<string>>(() => new Set());
 
+  /* ------------------------------------------------------------------
+   * 데이터 로드 (mock 전용)
+   * ------------------------------------------------------------------ */
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
-    let cancelled = false;
 
-    async function fetchAll() {
-      if (process.env.NODE_ENV === 'development') {
-        const course = MOCK_LEARN_COURSE_MAP[courseId];
-        if (!course) return;
+    // TODO: UI 검증용 mock 데이터 세팅
+    const course = MOCK_LEARN_COURSE_MAP[courseId];
+    if (!course) return;
 
-        setLearnData({
-          course,
-          enrollment: MOCK_LEARN_ENROLLMENT,
-          progress: MOCK_LEARN_PROGRESS,
-        });
-        return;
-      }
+    setLearnData({
+      course,
+      enrollment: MOCK_LEARN_ENROLLMENT,
+      progress: MOCK_LEARN_PROGRESS,
+    });
 
-      const course = await getCourse(courseId);
-      if (cancelled) return;
-
-      const enrollment = await getLearnEnrollment(enrollmentId);
-      const progress = await getLearnProgress(enrollmentId);
-      if (cancelled) return;
-
-      setLearnData({ course, enrollment, progress });
-    }
-
-    fetchAll();
-    return () => {
-      cancelled = true;
-    };
+    /**
+     * TODO: 서버 연동 원본 코드 (복구용)
+     *
+     * async function fetchAll() {
+     *   const course = await getCourse(courseId);
+     *   const enrollment = await getLearnEnrollment(enrollmentId);
+     *   const progress = await getLearnProgress(enrollmentId);
+     *
+     *   setLearnData({ course, enrollment, progress });
+     * }
+     *
+     * fetchAll();
+     */
   }, [courseId, enrollmentId]);
 
+  /* ------------------------------------------------------------------
+   * TODO: UI 완료 상태 기준으로 courseData 생성
+   * ------------------------------------------------------------------ */
   const courseData = useMemo(() => {
     if (!learnData) return null;
 
     return mapCourse(
       learnData.course,
-      learnData.progress ?? undefined,
-      new Set(learnData.progress?.completedLectureIds ?? []),
+      uiCompletedLectureIds, // ✅ 서버 progress 대신 UI 상태
     );
-  }, [learnData]);
 
-  const autoLecture = useMemo<ProcessedLecture | null>(() => {
-    if (!courseData) return null;
+    /**
+     * TODO: 서버 기준 원본 코드
+     *
+     * const completedIds = new Set(
+     *   learnData.progress?.completedLectureIds ?? [],
+     * );
+     *
+     * return mapCourse(learnData.course, completedIds);
+     */
+  }, [learnData, uiCompletedLectureIds]);
 
-    const lastLectureId = learnData?.progress?.lastVideoId;
-    if (lastLectureId) {
-      for (const section of courseData.sections) {
-        const found = section.lectures.find((l) => l.id === lastLectureId);
-        if (found) return found;
-      }
+  /* ------------------------------------------------------------------
+   * 최초 강의 선택
+   * ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!courseData) return;
+    if (currentLecture) return;
+
+    if (options?.start === 'first') {
+      setCurrentLecture(courseData.sections[0]?.lectures[0] ?? null);
+      return;
     }
 
-    return courseData.sections[0]?.lectures[0] ?? null;
-  }, [courseData, learnData]);
+    setCurrentLecture(courseData.sections[0]?.lectures[0] ?? null);
 
-  const currentLecture = manualLecture ?? autoLecture;
-  const currentLectureId = currentLecture?.id ?? null;
+    /**
+     * TODO: 서버 기준 원본 (이어보기)
+     *
+     * const lastId = learnData?.progress?.lastVideoId;
+     * const found = lastId
+     *   ? courseData.sections
+     *       .flatMap((s) => s.lectures)
+     *       .find((l) => l.id === lastId)
+     *   : null;
+     *
+     * setCurrentLecture(found ?? courseData.sections[0]?.lectures[0] ?? null);
+     */
+  }, [courseData, currentLecture, options?.start]);
 
+  /* ------------------------------------------------------------------
+   * 섹션 자동 오픈
+   * ------------------------------------------------------------------ */
   const currentSectionId = useMemo(() => {
-    if (!courseData || !currentLectureId) return null;
+    if (!courseData || !currentLecture) return null;
 
     const section = courseData.sections.find((s) =>
-      s.lectures.some((l) => l.id === currentLectureId),
+      s.lectures.some((l) => l.id === currentLecture.id),
     );
-
     return section?.id ?? null;
-  }, [courseData, currentLectureId]);
+  }, [courseData, currentLecture]);
 
   useEffect(() => {
     if (!currentSectionId) return;
 
-    setOpenSections((prev) => {
-      if (prev.includes(currentSectionId)) return prev;
-      return [...prev, currentSectionId];
-    });
+    setOpenSections((prev) =>
+      prev.includes(currentSectionId) ? prev : [...prev, currentSectionId],
+    );
   }, [currentSectionId]);
 
-  const toggleSection = (id: string) => {
-    setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
+  /* ------------------------------------------------------------------
+   * 강의 클릭
+   * ------------------------------------------------------------------ */
+  const handleLectureClick = (lecture: UILecture) => {
+    setCurrentLecture(lecture);
   };
 
-  const totalLectures = courseData
-    ? courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0)
-    : 0;
-
-  const completedCount = completedLectureIds.size;
-
-  const progressRate = totalLectures === 0 ? 0 : Math.floor((completedCount / totalLectures) * 100);
-
-  const lastWatchedDuration = learnData?.progress?.lastWatchedDuration ?? 0;
-
-  const saveProgress = async (lecture: ProcessedLecture) => {
-    try {
-      const res = await patchLearnProgress({
-        enrollmentId,
-        lectureId: lecture.id,
-        lastWatchedDuration: lastWatchedSecondsRef.current,
-      });
-
-      setLearnData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          progress: res,
-        };
-      });
-
-      // 서버 기준 완료 목록으로 동기화
-      setCompletedLectureIds(new Set(res.completedLectureIds));
-    } catch (e) {
-      console.error('[saveProgress failed]', e);
-    }
-  };
-
-  const findNextLecture = (
-    currentId: string,
-    courseData: ProcessedCourse,
-  ): ProcessedLecture | null => {
-    const flatLectures = courseData.sections.flatMap((s) => s.lectures);
-    const index = flatLectures.findIndex((l) => l.id === currentId);
-    return index === -1 ? null : (flatLectures[index + 1] ?? null);
-  };
-
-  const handleLectureClick = (lecture: ProcessedLecture) => {
-    setManualLecture(lecture);
-  };
-
-  const handleVideoEnded = async () => {
-    if (!currentLecture || !courseData) return;
-
-    await saveProgress(currentLecture);
-
-    const next = findNextLecture(currentLecture.id, courseData);
-    if (next) {
-      setManualLecture(next);
-      lastWatchedSecondsRef.current = 0;
-    }
-  };
-
-  const handleVideoTimeUpdate = (currentTime: number) => {
+  /* ------------------------------------------------------------------
+   * TODO: 영상 종료 → UI 완료 처리
+   * ------------------------------------------------------------------ */
+  const handleVideoEnded = () => {
     if (!currentLecture) return;
-    if (currentTime - lastSavedRef.current < SAVE_INTERVAL) return;
 
-    lastSavedRef.current = currentTime;
-    lastWatchedSecondsRef.current = Math.floor(currentTime);
+    setUiCompletedLectureIds((prev) => {
+      const next = new Set(prev);
+      next.add(currentLecture.id);
+      return next;
+    });
 
-    patchLearnProgress({
-      enrollmentId,
-      lectureId: currentLecture.id,
-      lastWatchedDuration: lastWatchedSecondsRef.current,
-    })
-      .then((res) => {
-        setLearnData((prev) => (prev ? { ...prev, progress: res } : prev));
-      })
-      .catch(() => {});
+    /**
+     * TODO: 서버 기준 원본
+     *
+     * await patchLearnProgress({
+     *   resourceId: currentLecture.id,
+     *   watchedDuration: currentLecture.duration,
+     * });
+     */
   };
+
+  /* ------------------------------------------------------------------
+   * TODO: 영상 시청 중 (UI 검증 단계에서는 아무 것도 안 함)
+   * ------------------------------------------------------------------ */
+  const handleVideoTimeUpdate = () => {
+    /**
+     * TODO: 서버 기준 원본
+     *
+     * await patchLearnProgress({
+     *   resourceId: currentLecture.id,
+     *   watchedDuration,
+     * });
+     */
+  };
+
+  /* ------------------------------------------------------------------
+   * TODO: PDF 완료 처리 (다운로드 시)
+   * ------------------------------------------------------------------ */
+  const markPdfCompleted = (lecture: UILecture) => {
+    setUiCompletedLectureIds((prev) => {
+      const next = new Set(prev);
+      next.add(lecture.id);
+      return next;
+    });
+
+    /**
+     * TODO: 서버 기준 원본
+     *
+     * await patchLearnProgress({
+     *   resourceId: lecture.id,
+     *   watchedDuration: 0,
+     * });
+     */
+  };
+
+  /* ------------------------------------------------------------------
+   * 통계
+   * ------------------------------------------------------------------ */
+  const totalLectures = useMemo(() => {
+    if (!courseData) return 0;
+    return courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0);
+  }, [courseData]);
+
+  const completedLectures = uiCompletedLectureIds.size;
 
   return {
     courseData,
@@ -201,11 +214,14 @@ export function useCourseLearn(enrollmentId: string) {
     handleLectureClick,
     handleVideoEnded,
     handleVideoTimeUpdate,
-    toggleSection,
-    setManualLecture,
+    toggleSection: (id: string) =>
+      setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id])),
+    markPdfCompleted,
+
+    // UI용
+    learnData,
     totalLectures,
-    completedLectures: completedCount,
-    progressRate,
-    lastWatchedDuration,
+    completedLectures,
+    lastWatchedDuration: 0, // UI 검증 단계에서는 미사용
   };
 }
