@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Review } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { getAllReviews } from '../services/reviewService';
-import { get } from 'http';
 
 type CreateReviewRequest = {
   rating: number;
@@ -29,18 +28,29 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
   // 1) courseId 바뀔 때마다 리뷰 로드 (dev면 mock, 아니면 api)
   useEffect(() => {
     if (!courseId) return;
-
     (async () => {
       try {
-        const list =
-          // TODO: 나중에 API 생기면 여기서 분기
-          process.env.NODE_ENV === 'development'
-            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-            : await getAllReviews;
+        const items = await (async () => {
+          if (process.env.NODE_ENV === 'development') {
+            return MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+          }
+          return await getAllReviews(courseId); // GetAllReviewsItem[]
+        })();
 
-        setReviews;
+        const mapped: Review[] = items.map((it) => ({
+          id: String(it.id),
+          courseId: String(it.courseId),
+          rating: it.rating,
+          content: it.content,
+          createdAt: it.createdAt,
+          updatedAt: it.updatedAt,
+          user: { nickname: '익명' },
+          isMine: false,
+          status: it.status === 'BLIND' ? 'BLINDED' : 'DISPLAY',
+        }));
+
+        setReviews(mapped);
       } catch (err) {
-        // 실패하면 빈 배열로 (UI 안전)
         console.error('리뷰 불러오기 실패:', err);
         setReviews([]);
       }
