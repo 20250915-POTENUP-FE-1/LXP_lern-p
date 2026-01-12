@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Review } from '@/domains/course/types/course';
+import { getCourseReviews } from '@/domains/course/services/reviewService';
 
 type CreateReviewPayload = {
   rating: number;
@@ -9,15 +10,30 @@ type CreateReviewPayload = {
 };
 
 type UseCourseReviewsOptions = {
-  initialReviews?: Review[];
   nickname?: string; // 로그인 유저 닉네임 (항상 있어야 함)
 };
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
 export function useCourseReviews(courseId: string, options?: UseCourseReviewsOptions) {
-  const [reviews, setReviews] = useState<Review[]>(options?.initialReviews ?? []);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const nickname = options?.nickname; // fallback 없음
+
+  // 1) courseId 바뀔 때마다 리뷰 로드 (dev면 mock, 아니면 api)
+  useEffect(() => {
+    if (!courseId) return;
+
+    (async () => {
+      try {
+        const list = await getCourseReviews(courseId);
+        setReviews(list);
+      } catch (err) {
+        // 실패하면 빈 배열로 (UI 안전)
+        console.error('리뷰 불러오기 실패:', err);
+        setReviews([]);
+      }
+    })();
+  }, [courseId]);
 
   const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
 
@@ -59,6 +75,10 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
       if (myReviewStatus.status === 'exists') {
         throw new Error('ALREADY_REVIEWED');
       }
+
+      // ✅ 현재는 mock만. 나중에 API 생기면 여기서 분기해서 호출하면 됨.
+      // if (process.env.NODE_ENV !== 'development') await createReviewApi(courseId, payload);
+
       return addReviewMock(payload);
     },
     [addReviewMock, myReviewStatus.status],
@@ -69,6 +89,6 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
     myReviewStatus,
     canWriteReview,
     addReview,
-    setReviews, // 필요 없으면 제거
+    // setReviews는 이제 외부에서 안 만지는 게 안정적이라 제거 추천
   };
 }

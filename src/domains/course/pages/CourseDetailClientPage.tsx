@@ -71,27 +71,18 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const initialReviews = useMemo<Review[]>(
-    () => [
-      {
-        id: 'rev_001',
-        courseId: id,
-        rating: 5,
-        content: '좋아요! React 기초가 깔끔하게 정리되어 있어서 따라가기 쉬웠어요.',
-        createdAt: '2025-01-03T00:00:00Z',
-        updatedAt: '2025-01-03T00:00:00Z',
-        user: { nickname: '홍길동' },
-        isMine: false,
-        status: 'DISPLAY',
-      },
-    ],
-    [id],
-  );
-
   const { reviews, addReview, myReviewStatus, canWriteReview } = useCourseReviews(id, {
     nickname: user?.nickname,
-    initialReviews,
   });
+
+  const reviewCount = reviews.length;
+
+  const avgRating = useMemo(() => {
+    if (reviewCount === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
+  }, [reviews, reviewCount]);
+
   function formatReviewDate(iso: string) {
     const d = new Date(iso);
     const y = d.getFullYear();
@@ -101,6 +92,18 @@ export default function CourseDetailClientPage() {
   }
 
   const isInCart = !!user?.cart?.includes(id);
+
+  const hasMyReview = myReviewStatus.status === 'exists';
+
+  const canOpenReviewModal = !user ? true : isEnrolled && !hasMyReview;
+
+  const reviewButtonLabel = !user
+    ? '리뷰 등록하기'
+    : !isEnrolled
+      ? '수강 후 작성 가능'
+      : hasMyReview
+        ? '리뷰 등록 완료'
+        : '리뷰 등록하기';
 
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -214,20 +217,33 @@ export default function CourseDetailClientPage() {
                 { key: 'intro' as TabKey, label: '강좌 소개' },
                 { key: 'curriculum' as TabKey, label: '커리큘럼' },
                 { key: 'instructor' as TabKey, label: '강사 정보' },
-                { key: 'reviews' as TabKey, label: '수강 후기' },
-              ].map(({ key, label }) => (
-                <li key={key}>
-                  <Link
-                    href={`#${key}`}
-                    className={`${styles['course-tabs__link']} ${
-                      activeTab === key ? styles['active'] : ''
-                    }`}
-                    onClick={(e) => handleTabClick(e, key)}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+                { key: 'reviews' as TabKey, label: `수강평` },
+              ].map(({ key, label }) => {
+                const isActive = activeTab === key;
+                const shouldShowCount = key === 'reviews' && reviewCount > 0;
+
+                return (
+                  <li key={key}>
+                    <Link
+                      href={`#${key}`}
+                      className={`${styles['course-tabs__link']} ${isActive ? styles['active'] : ''}`}
+                      onClick={(e) => handleTabClick(e, key)}
+                    >
+                      <span className={styles['course-tabs__label']}>{label}</span>
+
+                      {shouldShowCount && (
+                        <span
+                          className={`${styles['course-tabs__count']} ${
+                            isActive ? styles['course-tabs__count--active'] : ''
+                          }`}
+                        >
+                          {reviewCount}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -302,34 +318,57 @@ export default function CourseDetailClientPage() {
           {activeTab === 'reviews' && (
             <section className={styles['course-detail__section']}>
               <div className={styles['course-detail__section-head']}>
-                <h2 className={styles['course-detail__section-title']}>수강 후기</h2>
+                <h2 className={styles['course-detail__section-title']}>수강평</h2>
 
                 <button
                   type="button"
                   className={[
                     styles['course-detail__review-btn'],
-                    !canWriteReview ? styles['course-detail__review-btn--disabled'] : '',
+                    !canOpenReviewModal ? styles['course-detail__review-btn--disabled'] : '',
+                    !isEnrolled && user ? styles['course-detail__review-btn--enroll-required'] : '',
                   ].join(' ')}
-                  disabled={!canWriteReview}
+                  disabled={!canOpenReviewModal}
                   onClick={() => {
                     if (!user) {
                       loginModal.open();
                       return;
                     }
-                    if (!canWriteReview) return;
+                    if (!isEnrolled) return;
+                    if (hasMyReview) return;
+
                     setIsReviewOpen(true);
                   }}
                 >
-                  {canWriteReview ? '리뷰 등록하기' : '리뷰 등록 완료'}
+                  {reviewButtonLabel}
                 </button>
               </div>
+
+              {reviewCount > 0 && (
+                <div className={styles['review-summary']}>
+                  <div className={styles['review-summary__inner']}>
+                    <div className={styles['review-summary__score']}>{avgRating.toFixed(1)}</div>
+
+                    <div className={styles['review-summary__stars']}>
+                      <StarRating value={avgRating} />
+                    </div>
+
+                    <div className={styles['review-summary__meta']}>{reviewCount}개의 수강평</div>
+                  </div>
+                </div>
+              )}
 
               {reviews.length === 0 ? (
                 <p>아직 리뷰가 없습니다.</p>
               ) : (
                 <ul className={styles['review-list']}>
                   {reviews.map((r) => (
-                    <li key={r.id} className={styles['review-card']}>
+                    <li
+                      key={r.id}
+                      className={[
+                        styles['review-card'],
+                        r.isMine ? styles['review-card--mine'] : '',
+                      ].join(' ')}
+                    >
                       <div className={styles['review-card__header']}>
                         <div className={styles['review-card__author']}>
                           <span className={styles['review-card__nickname']}>{r.user.nickname}</span>

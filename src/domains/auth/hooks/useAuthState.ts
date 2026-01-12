@@ -14,7 +14,7 @@ export const useAuthState = () => {
 
   return {
     // TODO : 임시 목업 데이터
-    user: MOCK_USER,
+    user,
     setUser,
     clearUser,
     loading: !isLoaded || isLoading,

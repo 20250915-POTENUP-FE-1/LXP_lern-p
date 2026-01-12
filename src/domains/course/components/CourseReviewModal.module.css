@@ -60,7 +60,7 @@
 }
 
 .review-modal__textarea:focus-visible {
-  border-color: rgba(239, 104, 23, 0.7); /* 완전 brand 말고 살짝 죽이기 */
+  border-color: rgba(239, 104, 23, 0.7);
   box-shadow: 0 0 0 2px rgba(239, 104, 23, 0.12);
 }
 
@@ -89,7 +89,6 @@
   gap: var(--space-3);
   margin-top: var(--space-6);
   padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
 }
 
 .review-modal__button--cancel {
@@ -111,7 +110,6 @@
   transition: background 0.15s ease;
 }
 
-/* hover에서만 존재감 */
 .review-modal__button--cancel:hover,
 .review-modal__button--cancel:focus-visible {
   background: #eef0f3;
@@ -130,7 +128,6 @@
   border: none;
 }
 
-/* 조건 미충족: “살아있지만 약하게” */
 .review-modal__button--submit--idle {
   background: rgba(239, 104, 23, 0.55);
 }
@@ -140,7 +137,6 @@
   background: rgba(239, 104, 23, 0.65);
 }
 
-/* 조건 충족: 완전한 primary */
 .review-modal__button--submit--ready {
   background: var(--color-brand);
 }
@@ -148,4 +144,14 @@
 .review-modal__button--submit--ready:hover,
 .review-modal__button--submit--ready:focus-visible {
   background: var(--color-brand-700);
+}
+
+.review-modal__hint {
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.review-modal__count-float {
+  color: var(--color-text-muted);
 }

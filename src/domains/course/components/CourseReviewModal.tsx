@@ -25,6 +25,11 @@ export default function CourseReviewModal({
   const maxLength = 500;
   const minLength = 10;
 
+  const isValid =
+    rating > 0 && content.trim().length >= minLength && content.trim().length <= maxLength;
+
+  const showLengthHint = focused && content.trim().length > 0 && content.trim().length < minLength;
+
   useEffect(() => {
     if (!isOpen) return;
     setRating(0);
@@ -33,14 +38,8 @@ export default function CourseReviewModal({
     setSubmitted(false);
   }, [isOpen]);
 
-  const ratingError = submitted && rating === 0;
-  const contentError =
-    submitted && (content.trim().length < minLength || content.trim().length > maxLength);
-
   const handleSubmit = () => {
-    setSubmitted(true);
-    if (rating === 0) return;
-    if (content.trim().length < minLength) return;
+    if (!isValid) return;
 
     onSubmit({ rating, content: content.trim() });
     onClose();
@@ -81,8 +80,6 @@ export default function CourseReviewModal({
             ))}
           </div>
 
-          {ratingError && <p className="modal__error-text">별점을 선택해주세요.</p>}
-
           <div
             className={[
               styles['review-modal__field'],
@@ -91,11 +88,8 @@ export default function CourseReviewModal({
           >
             <div className={styles['review-modal__textarea-wrap']}>
               <textarea
-                className={[
-                  styles['review-modal__textarea'],
-                  contentError ? styles['review-modal__textarea--invalid'] : '',
-                ].join(' ')}
-                placeholder="수강평을 작성해보세요!"
+                className={styles['review-modal__textarea']}
+                placeholder={`수강평을 작성해보세요! (최소 ${minLength}자 이상)`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onFocus={() => setFocused(true)}
@@ -106,11 +100,10 @@ export default function CourseReviewModal({
                 {content.length} / {maxLength}
               </div>
             </div>
+            {showLengthHint && (
+              <p className={styles['review-modal__hint']}>최소 {minLength}자 이상 입력해주세요.</p>
+            )}
           </div>
-
-          {contentError && (
-            <p className="modal__error-text">최소 {minLength}자 이상 작성해주세요.</p>
-          )}
         </section>
       </div>
 
@@ -123,10 +116,11 @@ export default function CourseReviewModal({
           type="button"
           className={[
             styles['review-modal__button--submit'],
-            contentError || rating === 0
-              ? styles['review-modal__button--submit--idle']
-              : styles['review-modal__button--submit--ready'],
+            isValid
+              ? styles['review-modal__button--submit--ready']
+              : styles['review-modal__button--submit--idle'],
           ].join(' ')}
+          disabled={!isValid}
           onClick={handleSubmit}
         >
           등록
