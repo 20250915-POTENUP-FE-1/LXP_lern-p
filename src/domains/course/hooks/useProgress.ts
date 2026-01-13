@@ -154,7 +154,7 @@ export function useProgress(enrollmentId: string) {
   };
 
   // 영상 종료 시 최종 진도 저장
-  const endedProgress = (resourceId: string, watchedDuration: number) => {
+  const saveFinalProgressOnEnd = (resourceId: string, watchedDuration: number) => {
     if (pendingRef.current) return;
     saveProgress(resourceId, watchedDuration);
   };
@@ -198,7 +198,7 @@ export function useProgress(enrollmentId: string) {
     overallProgressRate: progress?.overallProgressRate ?? 0,
     saveProgress,
     saveProgressThrottled,
-    endedProgress,
+    saveFinalProgressOnEnd,
     isLoading,
     error,
   };

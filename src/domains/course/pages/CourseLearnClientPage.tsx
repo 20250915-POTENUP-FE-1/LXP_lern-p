@@ -38,7 +38,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     handleLectureClick,
     moveToNextLecture,
   } = useCourseLearn(enrollmentId, { start });
-  const { progressInfo, saveProgressThrottled, endedProgress, lectureProgressMap } =
+  const { progressInfo, saveProgressThrottled, saveFinalProgressOnEnd, lectureProgressMap } =
     useProgress(enrollmentId);
 
   const totalLectures = useMemo(() => {
@@ -123,7 +123,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                   autoPlay
                   onEnded={() => {
                     if (!currentLecture.duration) return;
-                    endedProgress(currentLecture.resourceId, currentLecture.duration);
+                    saveFinalProgressOnEnd(currentLecture.resourceId, currentLecture.duration);
                     moveToNextLecture();
                   }}
                   onTimeUpdate={(e) => {
@@ -149,7 +149,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                 {currentLecture.pdfUrl && (
                   <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
                     <button
-                      onClick={() => endedProgress(currentLecture.id, 0)}
+                      onClick={() => saveFinalProgressOnEnd(currentLecture.id, 0)}
                       className={styles['course-learn__brand-btn']}
                     >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
