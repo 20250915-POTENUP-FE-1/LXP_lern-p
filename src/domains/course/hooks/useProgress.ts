@@ -62,7 +62,7 @@ export function useProgress(enrollmentId: string) {
     );
   }, [progressData]);
 
-  const resumeInfo = useMemo<ProgressInfo | null>(() => {
+  const progressInfo = useMemo<ProgressInfo | null>(() => {
     if (!progressData?.lastVideoId) return null;
 
     return {
@@ -77,10 +77,10 @@ export function useProgress(enrollmentId: string) {
     return {
       enrollmentId: progressData.enrollmentId,
       overallProgressRate: progressData.progressRate,
-      resumeInfo,
+      progressInfo,
       lectureProgressMap,
     };
-  }, [progressData, resumeInfo, lectureProgressMap]);
+  }, [progressData, progressInfo, lectureProgressMap]);
 
   const lastSavedAtRef = useRef<number>(0); // 마지막 저장 시각 (throttle 용)
   const lastSavedDurationRef = useRef<number>(0); // 마지막으로 저장된 재생 위치 (delta 비교용)
@@ -194,7 +194,7 @@ export function useProgress(enrollmentId: string) {
   return {
     progress,
     lectureProgressMap,
-    resumeInfo,
+    progressInfo,
     overallProgressRate: progress?.overallProgressRate ?? 0,
     saveProgress,
     saveProgressThrottled,

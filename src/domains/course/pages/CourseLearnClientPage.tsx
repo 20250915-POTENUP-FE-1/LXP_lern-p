@@ -38,7 +38,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     handleLectureClick,
     moveToNextLecture,
   } = useCourseLearn(enrollmentId, { start });
-  const { resumeInfo, saveProgressThrottled, endedProgress, lectureProgressMap } =
+  const { progressInfo, saveProgressThrottled, endedProgress, lectureProgressMap } =
     useProgress(enrollmentId);
 
   const totalLectures = useMemo(() => {
@@ -66,14 +66,14 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     const video = videoRef.current;
     if (!video) return;
     if (!currentLecture) return;
-    if (!resumeInfo) return;
+    if (!progressInfo) return;
     if (hasSeekedRef.current) return;
 
-    if (resumeInfo.lectureId !== currentLecture.id) return;
+    if (progressInfo.lectureId !== currentLecture.id) return;
 
     const handleLoadedMetadata = () => {
-      if (resumeInfo.resumeAt < video.duration) {
-        video.currentTime = resumeInfo.resumeAt;
+      if (progressInfo.resumeAt < video.duration) {
+        video.currentTime = progressInfo.resumeAt;
       }
       hasSeekedRef.current = true;
     };
@@ -82,7 +82,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [currentLecture?.id, resumeInfo]);
+  }, [currentLecture?.id, progressInfo]);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;

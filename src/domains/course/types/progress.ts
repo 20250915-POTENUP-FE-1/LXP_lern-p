@@ -43,7 +43,7 @@ export type LectureProgressMapValue = {
 export type CourseLearnProgress = {
   enrollmentId: string;
   overallProgressRate: number;
-  resumeInfo: ProgressInfo | null;
+  progressInfo: ProgressInfo | null;
   lectureProgressMap: Map<string, LectureProgressMapValue>;
 };
 

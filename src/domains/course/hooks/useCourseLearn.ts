@@ -19,7 +19,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
   const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
   const [openSections, setOpenSections] = useState<string[]>([]);
-  const { resumeInfo, lectureProgressMap } = useProgress(enrollmentId);
+  const { progressInfo, lectureProgressMap } = useProgress(enrollmentId);
 
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
@@ -100,10 +100,10 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
       return;
     }
 
-    if (resumeInfo?.lectureId) {
+    if (progressInfo?.lectureId) {
       const found = courseData.sections
         .flatMap((s) => s.lectures)
-        .find((l) => l.id === resumeInfo.lectureId);
+        .find((l) => l.id === progressInfo.lectureId);
 
       if (found) {
         setCurrentLecture(found);
@@ -113,7 +113,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
 
     const first = courseData.sections[0]?.lectures[0] ?? null;
     setCurrentLecture(first);
-  }, [courseData, options?.start, resumeInfo?.lectureId]);
+  }, [courseData, options?.start, progressInfo?.lectureId]);
 
   const handleLectureClick = (lecture: UILecture) => {
     setCurrentLecture(lecture);
@@ -136,16 +136,16 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
 
   function resolveStartLecture(
     lectures: UILecture[],
-    resumeInfo: ProgressInfo | null,
+    progressInfo: ProgressInfo | null,
     lectureProgressMap: Map<string, LectureProgressMapValue>,
   ): UILecture {
-    if (!resumeInfo) return lectures[0];
+    if (!progressInfo) return lectures[0];
 
-    const idx = lectures.findIndex((l) => l.id === resumeInfo.lectureId);
+    const idx = lectures.findIndex((l) => l.id === progressInfo.lectureId);
 
     if (idx === -1) return lectures[0];
 
-    const progress = lectureProgressMap.get(resumeInfo.lectureId);
+    const progress = lectureProgressMap.get(progressInfo.lectureId);
 
     if (progress?.completed) {
       return lectures[idx + 1] ?? lectures[idx];
