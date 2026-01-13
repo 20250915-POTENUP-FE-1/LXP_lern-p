@@ -186,42 +186,61 @@ export default function EnrollmentClientPage() {
       </h1>
 
       <div className={styles['enrollment-section__list']}>
-        {items.map((item) => (
-          <div key={item.enrollmentId} className={styles['enrollment-card']}>
-            <Link href={`/courses/${item.courseId}/learn`} className={styles['enrollment__link']}>
-              <div className={styles['enrollment__header']}>
-                <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openReviewModal(item);
-                  }}
-                  disabled={!nickname || userLoading}
-                >
-                  {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
-                </button>
+        {items.map((item) => {
+          const hasProgress = (item.progressRate ?? 0) > 0;
+          return (
+            <div key={item.enrollmentId} className={styles['enrollment-card']}>
+              <div className={styles['enrollment__link']}>
+                <div className={styles['enrollment__text']}>
+                  <div className={styles['enrollment__header']}>
+                    <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openReviewModal(item);
+                      }}
+                      disabled={!nickname || userLoading}
+                    >
+                      {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
+                    </button>
+                  </div>
+                  <p className={styles['enrollment__category']}>
+                    {item.categories?.join(' / ') ?? '카테고리 없음'}
+                  </p>
+                </div>
+                <div className={styles['enrollment-card__actions']}>
+                  <Link
+                    href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}&start=first`}
+                    className={styles['btn-secondary']}
+                  >
+                    처음부터
+                  </Link>
+                  {hasProgress && (
+                    <Link
+                      href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
+                      className={styles['btn-primary']}
+                    >
+                      이어보기
+                    </Link>
+                  )}
+                </div>
               </div>
 
-              <p className={styles['enrollment__category']}>
-                {item.categories?.join(' / ') ?? '카테고리 없음'}
-              </p>
-            </Link>
+              <div className={styles['progress']} aria-label={`${item.progressRate ?? 0}%`}>
+                <div
+                  className={styles['progress__bar']}
+                  style={{ width: `${item.progressRate ?? 0}%` }}
+                />
+              </div>
 
-            <div className={styles['progress']} aria-label={`${item.progressRate ?? 0}%`}>
-              <div
-                className={styles['progress__bar']}
-                style={{ width: `${item.progressRate ?? 0}%` }}
-              />
+              <span
+                className={styles['enrollment-card__percent']}
+              >{`${item.progressRate ?? 0}%`}</span>
             </div>
-
-            <span
-              className={styles['enrollment-card__percent']}
-            >{`${item.progressRate ?? 0}%`}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <CourseReviewModal
         isOpen={isReviewOpen}
