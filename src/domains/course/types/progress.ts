@@ -1,4 +1,3 @@
-// API: GET /api/progresses/{enrollmentId}
 export type GetProgressResponse = {
   resourceId: string;
   title: string;
@@ -19,7 +18,6 @@ export type UpdateProgressResponse = {
   updatedAt: string;
 };
 
-// API: PATCH /api/progresses
 export type UpdateProgressRequest = {
   resourceId: string;
   watchedDuration: number;
@@ -47,6 +45,7 @@ export type CourseLearnProgress = {
   lectureProgressMap: Map<string, LectureProgressMapValue>;
 };
 
+// 진도율 갱신 보류
 export type PendingProgress = {
   resourceId: string;
   watchedDuration: number;
