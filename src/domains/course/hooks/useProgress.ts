@@ -15,7 +15,7 @@ import type {
 
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
-export function useCourseLearnProgress(enrollmentId: string) {
+export function useProgress(enrollmentId: string) {
   const [progressData, setProgressData] = useState<LearnProgressResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -23,27 +23,27 @@ export function useCourseLearnProgress(enrollmentId: string) {
   useEffect(() => {
     if (!enrollmentId) return;
 
-    /**
-     * TODO: 서버 연동 원본 코드 (복구용)
-     * async function fetchProgress() {
-     *   try {
-     *     setIsLoading(true);
-     *     const response = await getLearnProgress(enrollmentId);
-     *     setProgressData(response);
-     *   } catch (e) {
-     *     setError(e as Error);
-     *   } finally {
-     *     setIsLoading(false);
-     *   }
-     * }
-     *
-     * fetchProgress();
-     */
+    const fetchProgress = async () => {
+      try {
+        setIsLoading(true);
 
-    // TODO: UI 검증용 mock 데이터
-    setIsLoading(true);
-    setProgressData(MOCK_LEARN_PROGRESS);
-    setIsLoading(false);
+        if (process.env.NODE_ENV === 'development') {
+          // UI 검증용 mock
+          setProgressData(MOCK_LEARN_PROGRESS);
+          return;
+        }
+
+        // TODO: 실제 서버 연동
+        // const response = await getLearnProgress(enrollmentId);
+        // setProgressData(response);
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProgress();
   }, [enrollmentId]);
 
   const lectureProgressMap = useMemo<Map<string, LectureProgressMapValue>>(() => {
@@ -82,15 +82,16 @@ export function useCourseLearnProgress(enrollmentId: string) {
     };
   }, [progressData, resumeInfo, lectureProgressMap]);
 
-  const lastSavedAtRef = useRef<number>(0);
-  const lastSavedDurationRef = useRef<number>(0);
+  const lastSavedAtRef = useRef<number>(0); // 마지막 저장 시각 (throttle 용)
+  const lastSavedDurationRef = useRef<number>(0); // 마지막으로 저장된 재생 위치 (delta 비교용)
 
-  const pendingRef = useRef<PendingProgress | null>(null);
+  const pendingRef = useRef<PendingProgress | null>(null); // 저장 실패 시 재시도 대상
 
-  const THROTTLE_INTERVAL = 10;
-  const MIN_SAVE_DELTA = 3;
-  const RETRY_DELAYS = [2000, 5000, 15000];
+  const THROTTLE_INTERVAL = 10; // 저장 최소 호출 간격 (ms)
+  const MIN_SAVE_DELTA = 3; // 저장할 최소 재생 시간 변화량 (초)
+  const RETRY_DELAYS = [2000, 5000, 15000]; // 저장 실패 시 재시도 간격 (ms)
 
+  // 저장 실패한 진도를 재시도
   const retryPending = () => {
     const pending = pendingRef.current;
     if (!pending) return;
@@ -119,6 +120,7 @@ export function useCourseLearnProgress(enrollmentId: string) {
     }, delay);
   };
 
+  // 진도 즉시 저장
   const saveProgress = async (resourceId: string, watchedDuration: number) => {
     try {
       /**
@@ -140,6 +142,7 @@ export function useCourseLearnProgress(enrollmentId: string) {
     }
   };
 
+  // 재생 중 주기적 진도 저장
   const saveProgressThrottled = (resourceId: string, watchedDuration: number) => {
     const now = Date.now();
 
@@ -150,11 +153,13 @@ export function useCourseLearnProgress(enrollmentId: string) {
     saveProgress(resourceId, watchedDuration);
   };
 
+  // 영상 종료 시 최종 진도 저장
   const endedProgress = (resourceId: string, watchedDuration: number) => {
     if (pendingRef.current) return;
     saveProgress(resourceId, watchedDuration);
   };
 
+  // 프론트에서 진도 상태를 계산/반영
   function applyProgressUpdate(
     prev: LearnProgressResponse,
     resourceId: string,

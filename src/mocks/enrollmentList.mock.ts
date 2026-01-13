@@ -1,5 +1,4 @@
 import type { EnrollmentListResponse } from '@/domains/user/types/enrollment';
-import { mockLearnProgress } from './learn.mock';
 
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
   content: [

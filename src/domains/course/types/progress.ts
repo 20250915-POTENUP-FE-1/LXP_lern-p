@@ -39,7 +39,7 @@ export type LectureProgressMapValue = {
   completed: boolean;
 };
 
-// useCourseLearnProgress 반환 타입
+// useProgress 반환 타입
 export type CourseLearnProgress = {
   enrollmentId: string;
   overallProgressRate: number;

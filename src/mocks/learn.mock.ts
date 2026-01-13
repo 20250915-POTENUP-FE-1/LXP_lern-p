@@ -1,4 +1,5 @@
 import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
+import { LearnProgressResponse } from '@/domains/course/types/progress';
 
 export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   '2002': {
@@ -103,7 +104,7 @@ export const MOCK_LEARN_ENROLLMENT: LearnEnrollmentResponse = {
   expiredAt: '2026-01-01T09:00:00',
 };
 
-export const MOCK_LEARN_PROGRESS = {
+export const MOCK_LEARN_PROGRESS: LearnProgressResponse = {
   enrollmentId: '5001',
   progressRate: 5,
 
@@ -114,6 +115,7 @@ export const MOCK_LEARN_PROGRESS = {
   lectureProgresses: [
     {
       resourceId: '3001',
+      title: 'JPA란?',
       currentProgressRate: 50,
       watchedDuration: 5,
       totalDurationSeconds: 10,
@@ -122,6 +124,7 @@ export const MOCK_LEARN_PROGRESS = {
     },
     {
       resourceId: '3002',
+      title: '엔티티 매핑',
       currentProgressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
@@ -130,19 +133,21 @@ export const MOCK_LEARN_PROGRESS = {
     },
     {
       resourceId: '3003',
+      title: '엔티티 매핑',
       currentProgressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
       isCompleted: false,
-      lastWatchedAt: null,
+      lastWatchedAt: '2025-12-02T09:40:00',
     },
     {
       resourceId: '3004',
+      title: '엔티티 매핑',
       currentProgressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
       isCompleted: false,
-      lastWatchedAt: null,
+      lastWatchedAt: '2025-12-02T09:40:00',
     },
   ],
 

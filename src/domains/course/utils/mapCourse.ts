@@ -1,11 +1,5 @@
-import type {
-  LearnCourseResponse,
-  UILecture,
-  UISection,
-  UICourse,
-} from '@/domains/course/types/learn';
+import type { LearnCourseResponse, UICourse } from '@/domains/course/types/learn';
 import type { LectureProgressMapValue } from '@/domains/course/types/progress';
-import { useCourseLearnProgress } from '@/domains/course/hooks/useCourseLearnProgress';
 
 export function mapCourse(
   course: LearnCourseResponse,

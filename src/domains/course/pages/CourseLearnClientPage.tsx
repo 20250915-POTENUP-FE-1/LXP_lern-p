@@ -12,7 +12,7 @@ import {
 import { useRef, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
-import { useCourseLearnProgress } from '@/domains/course/hooks/useCourseLearnProgress';
+import { useProgress } from '@/domains/course/hooks/useProgress';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
@@ -39,7 +39,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     moveToNextLecture,
   } = useCourseLearn(enrollmentId, { start });
   const { resumeInfo, saveProgressThrottled, endedProgress, lectureProgressMap } =
-    useCourseLearnProgress(enrollmentId);
+    useProgress(enrollmentId);
 
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;

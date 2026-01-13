@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/learn';
 import { getCourse } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
-import { useCourseLearnProgress } from '@/domains/course/hooks/useCourseLearnProgress';
+import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
 import { LectureProgressMapValue, ResumeInfo } from '../types/progress';
 
@@ -19,7 +19,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
   const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
   const [openSections, setOpenSections] = useState<string[]>([]);
-  const { resumeInfo, lectureProgressMap } = useCourseLearnProgress(enrollmentId);
+  const { resumeInfo, lectureProgressMap } = useProgress(enrollmentId);
 
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
