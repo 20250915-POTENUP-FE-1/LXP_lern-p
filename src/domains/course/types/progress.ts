@@ -1,5 +1,5 @@
 // API: GET /api/progresses/{enrollmentId}
-export type GetGetLearnLectureProgressResponse = {
+export type GetProgressResponse = {
   resourceId: string;
   title: string;
   currentProgressRate: number;
@@ -9,18 +9,18 @@ export type GetGetLearnLectureProgressResponse = {
   lastWatchedAt: string | null;
 };
 
-export type GetLearnLectureProgressResponse = {
+export type GetLearnProgressResponse = {
   enrollmentId: string;
   progressRate: number;
   lastVideoId: string | null;
   lastWatchedDuration: number;
   lastWatchedAt: string | null;
-  lectureProgresses: GetGetLearnLectureProgressResponse[];
+  lectureProgresses: GetProgressResponse[];
   updatedAt: string;
 };
 
 // API: PATCH /api/progresses
-export type UpdateLearnProgressRequest = {
+export type UpdateProgressRequest = {
   resourceId: string;
   watchedDuration: number;
 };
