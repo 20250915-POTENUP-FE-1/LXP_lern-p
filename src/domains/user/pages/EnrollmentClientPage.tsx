@@ -196,6 +196,7 @@ export default function EnrollmentClientPage() {
                     <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
                     <button
                       type="button"
+                      className={styles['enrollment__review-btn']}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();

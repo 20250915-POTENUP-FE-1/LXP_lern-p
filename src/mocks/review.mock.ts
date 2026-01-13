@@ -18,8 +18,8 @@ export const MOCK_GET_COURSE_REVIEWS: Record<string, GetReviewResponse[]> = {
   '2003': [
     {
       id: '2',
-      userId: 'user_002',
-      nickname: '고양이',
+      userId: 'user_001',
+      nickname: 'front',
       courseId: '2003',
       rating: 5,
       content: 'App Router 흐름을 이제야 제대로 이해했어요.',

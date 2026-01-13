@@ -4,16 +4,15 @@ import { mockLearnProgress } from './learn.mock';
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
   content: [
     {
+      userId: 'user_001',
       enrollmentId: 'mock-enrollment-1',
-      userId: 'u-001',
-      courseId: '2001',
+      courseId: '2002',
       courseName: '스프링 부트 완벽 가이드',
       status: 'ENROLLED',
       progressRate: 0,
-      categories: ['백엔드'],
       expiredAt: '2026-01-01T09:00:00',
       categories: ['백엔드', 'Spring'],
-      isReviewed: true,
+      isReviewed: false,
     },
     {
       userId: 'user_001',
@@ -24,7 +23,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 70,
       expiredAt: '2025-12-31T09:00:00',
       categories: ['프론트엔드', 'React'],
-      isReviewed: false,
+      isReviewed: true,
     },
     {
       userId: 'user_001',

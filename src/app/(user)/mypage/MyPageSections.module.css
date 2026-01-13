@@ -830,6 +830,64 @@
   color: var(--color-brand);
 }
 
+.enrollment__review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 36px;
+  padding: 0 12px;
+
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-elevated);
+  color: var(--color-text);
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  flex-shrink: 0;
+
+  position: relative;
+  z-index: 2;
+
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.enrollment__review-btn:hover {
+  background: var(--color-bg);
+  border-color: var(--color-text-muted);
+}
+
+.enrollment__review-btn:active {
+  transform: translateY(1px);
+}
+
+.enrollment__review-btn:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+.enrollment__review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 링크/오버레이에 덮여 클릭이 안 되는 경우 대비 */
+.enrollment__header {
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 479px) {
   .order-card__actions {
     gap: var(--space-1);
