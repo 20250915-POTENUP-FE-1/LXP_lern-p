@@ -1,5 +1,8 @@
 import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
-import type { LearnProgressResponse, LearnProgressRequest } from '@/domains/course/types/progress';
+import type {
+  GetLearnLectureProgressResponse,
+  UpdateLearnProgressRequest,
+} from '@/domains/course/types/progress';
 import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
 
 // 강좌 정보 조회
@@ -13,13 +16,18 @@ export async function getLearnEnrollment(enrollmentId: string): Promise<LearnEnr
 }
 
 // 학습 이력 조회
-export async function getLearnProgress(enrollmentId: string): Promise<LearnProgressResponse> {
+export async function getLearnProgress(
+  enrollmentId: string,
+): Promise<GetLearnLectureProgressResponse> {
   return getApi(`/api/progresses/${enrollmentId}`, { cache: 'no-store' });
 }
 
 // 진도율 갱신
 export async function updateLearnProgress(
-  payload: LearnProgressRequest,
-): Promise<LearnProgressResponse> {
-  return patchApi<LearnProgressResponse>(`/api/progresses/${payload.resourceId}`, payload);
+  payload: UpdateLearnProgressRequest,
+): Promise<GetLearnLectureProgressResponse> {
+  return patchApi<GetLearnLectureProgressResponse>(
+    `/api/progresses/${payload.resourceId}`,
+    payload,
+  );
 }
