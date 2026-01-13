@@ -1,9 +1,5 @@
-import type {
-  LearnCourseResponse,
-  LearnEnrollmentResponse,
-  LearnProgressResponse,
-  LearnProgressRequest,
-} from '@/domains/course/types/learn';
+import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
+import type { LearnProgressResponse, LearnProgressRequest } from '@/domains/course/types/progress';
 import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
 
 // 강좌 정보 조회
