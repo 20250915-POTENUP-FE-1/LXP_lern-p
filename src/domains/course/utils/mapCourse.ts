@@ -4,8 +4,13 @@ import type {
   UISection,
   UICourse,
 } from '@/domains/course/types/learn';
+import type { LectureProgressMapValue } from '@/domains/course/types/progress';
+import { useCourseLearnProgress } from '@/domains/course/hooks/useCourseLearnProgress';
 
-export function mapCourse(course: LearnCourseResponse, completedLectureIds: Set<string>): UICourse {
+export function mapCourse(
+  course: LearnCourseResponse,
+  lectureProgressMap: Map<string, LectureProgressMapValue>,
+): UICourse {
   return {
     courseId: course.courseId,
     title: course.title,
@@ -16,30 +21,36 @@ export function mapCourse(course: LearnCourseResponse, completedLectureIds: Set<
     price: course.price,
     status: course.status,
     thumbnailUrl: course.thumbnailUrl,
-
     instructor: course.instructor,
 
-    sections: course.sections.map<UISection>((section) => ({
-      id: section.sectionId,
-      title: section.title,
-      order: section.order,
+    sections: course.sections
+      .slice()
+      .sort((a, b) => a.order - b.order)
+      .map((section) => ({
+        id: section.sectionId,
+        title: section.title,
+        order: section.order,
 
-      lectures: section.lectures.map<UILecture>((lecture) => {
-        const isVideo = lecture.resource.resourceType === 'VIDEO';
+        lectures: section.lectures
+          .slice()
+          .sort((a, b) => a.orderIndex - b.orderIndex)
+          .map((lecture) => {
+            const progress = lectureProgressMap.get(lecture.resource.resourceId);
 
-        return {
-          id: lecture.lectureId,
-          title: lecture.title,
-          duration: lecture.totalDurationSeconds,
-          type: lecture.resource.resourceType,
-
-          videoUrl: isVideo ? lecture.resource.fileUrl : undefined,
-          pdfUrl: !isVideo ? lecture.resource.fileUrl : undefined,
-
-          completed: completedLectureIds.has(lecture.lectureId),
-          isCurrent: false,
-        };
-      }),
-    })),
+            return {
+              id: lecture.lectureId,
+              resourceId: lecture.resource.resourceId,
+              title: lecture.title,
+              duration: lecture.totalDurationSeconds,
+              type: lecture.resource.resourceType,
+              videoUrl:
+                lecture.resource.resourceType === 'VIDEO' ? lecture.resource.fileUrl : undefined,
+              pdfUrl:
+                lecture.resource.resourceType === 'PDF' ? lecture.resource.fileUrl : undefined,
+              completed: progress?.completed ?? false,
+              isCurrent: false,
+            };
+          }),
+      })),
   };
 }
