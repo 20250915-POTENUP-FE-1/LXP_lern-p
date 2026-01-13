@@ -9,7 +9,8 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRef, useEffect, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
@@ -21,16 +22,68 @@ type CourseLearnClientProps = {
 
 export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hasSeekedRef = useRef(false);
+
+  const searchParams = useSearchParams();
+  const rawStart = searchParams.get('start');
+  const start = rawStart === 'first' ? 'first' : undefined;
 
   const {
     courseData,
     currentLecture,
     openSections,
     toggleSection,
+    handleVideoEnded,
+    handleVideoTimeUpdate,
     handleLectureClick,
-    totalLectures,
-    completedLectures,
-  } = useCourseLearn(enrollmentId);
+    markPdfCompleted,
+    learnData,
+  } = useCourseLearn(enrollmentId, { start });
+
+  const lastVideoId = learnData?.progress?.lastVideoId ?? null;
+  const lastWatchedDuration = learnData?.progress?.lastWatchedDuration ?? 0;
+
+  const totalLectures = useMemo(() => {
+    if (!courseData) return 0;
+    return courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0);
+  }, [courseData]);
+
+  const completedLectures = useMemo(() => {
+    if (!courseData) return 0;
+    return courseData.sections.flatMap((s) => s.lectures).filter((l) => l.completed).length;
+  }, [courseData]);
+
+  useEffect(() => {
+    if (!currentLecture) return;
+    hasSeekedRef.current = false;
+  }, [currentLecture?.id]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!currentLecture) return;
+    if (!lastWatchedDuration) return;
+    if (hasSeekedRef.current) return;
+
+    if (lastVideoId !== currentLecture.id) return;
+
+    const handleLoadedMetadata = () => {
+      if (lastWatchedDuration < video.duration) {
+        video.currentTime = lastWatchedDuration;
+      }
+      hasSeekedRef.current = true;
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [currentLecture?.id, lastWatchedDuration, lastVideoId]);
+
+  if (!courseData || !currentLecture) {
+    return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
+  }
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
@@ -64,14 +117,15 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
             formatAbsoluteUrl(currentLecture.videoUrl) ? (
               <div className={styles['course-learn__player']}>
                 <video
-                  key={currentLecture.id}
                   className={styles['course-learn__video']}
+                  ref={videoRef}
+                  key={currentLecture.id}
                   controls
                   autoPlay
+                  onEnded={handleVideoEnded}
+                  onTimeUpdate={(e) => handleVideoTimeUpdate(e.currentTarget.currentTime)}
                 >
-                  {currentLecture.videoUrl && (
-                    <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
-                  )}
+                  <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
@@ -86,7 +140,10 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                 </p>
                 {currentLecture.pdfUrl && (
                   <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
-                    <button className={styles['course-learn__brand-btn']}>
+                    <button
+                      onClick={() => markPdfCompleted(currentLecture)}
+                      className={styles['course-learn__brand-btn']}
+                    >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
                     </button>
                   </a>
@@ -121,6 +178,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
               {totalLectures}개 강의 · {completedLectures}개 완료
             </p>
           </div>
+
           <div className={styles['course-learn__curriculum__list']}>
             {courseData.sections.map((section) => (
               <div key={section.id}>
@@ -140,6 +198,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                     <ChevronRight className={styles['course-learn__icon']} />
                   )}
                 </button>
+
                 {openSections.includes(section.id) && (
                   <div className={styles['course-learn__section-content']}>
                     {section.lectures.map((lecture) => (

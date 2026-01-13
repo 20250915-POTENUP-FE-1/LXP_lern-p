@@ -1,7 +1,3 @@
-// ------------------------------------------------------
-// Learn 도메인 타입 (백엔드 API Response 그대로 매핑)
-// ------------------------------------------------------
-
 import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 export type LearnLectureResourceResponse = {
@@ -37,17 +33,14 @@ export type LearnCourseResponse = {
   price: number;
   status: string;
   thumbnailUrl: string;
-
   instructor: {
     id: string;
     name: string;
     profileUrl: string;
   };
-
   isPurchased: boolean;
   studentCount: number;
   totalDuration: number;
-
   sections: LearnSectionResponse[];
 };
 
@@ -62,24 +55,36 @@ export type LearnEnrollmentResponse = {
   expiredAt: string;
 };
 
+export type LearnLectureProgressResponse = {
+  resourceId: string;
+  title: string;
+  currentProgressRate: number;
+  watchedDuration: number;
+  totalDurationSeconds: number;
+  isCompleted: boolean;
+  lastWatchedAt: string | null;
+};
+
 export type LearnProgressResponse = {
-  learningRecordId: string;
   enrollmentId: string;
   progressRate: number;
-  lastVideoId: string;
+  lastVideoId: string | null;
   lastWatchedDuration: number;
+  lastWatchedAt: string | null;
+  lectureProgresses: LearnLectureProgressResponse[];
   updatedAt: string;
+};
+
+export type LearnProgressRequest = {
+  resourceId: string;
+  watchedDuration: number;
 };
 
 export type CourseLearn = {
   course: LearnCourseResponse;
-  enrollment: LearnEnrollmentResponse | null;
-  progress: LearnProgressResponse | null;
+  enrollment: LearnEnrollmentResponse;
+  progress: LearnProgressResponse;
 };
-
-// ------------------------------------------------------
-// UI용 타입
-// ------------------------------------------------------
 
 export type UILecture = {
   id: string;
@@ -110,12 +115,10 @@ export type UICourse = {
   price: number;
   status: string;
   thumbnailUrl: string;
-
   instructor: {
     id: string;
     name: string;
     profileUrl: string;
   };
-
   sections: UISection[];
 };
