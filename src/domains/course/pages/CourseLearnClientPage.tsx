@@ -12,6 +12,7 @@ import {
 import { useRef, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
+import { useCourseLearnProgress } from '@/domains/course/hooks/useCourseLearnProgress';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
@@ -34,15 +35,11 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     currentLecture,
     openSections,
     toggleSection,
-    handleVideoEnded,
-    handleVideoTimeUpdate,
     handleLectureClick,
-    markPdfCompleted,
-    learnData,
+    moveToNextLecture,
   } = useCourseLearn(enrollmentId, { start });
-
-  const lastVideoId = learnData?.progress?.lastVideoId ?? null;
-  const lastWatchedDuration = learnData?.progress?.lastWatchedDuration ?? 0;
+  const { resumeInfo, saveProgressThrottled, endedProgress, lectureProgressMap } =
+    useCourseLearnProgress(enrollmentId);
 
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;
@@ -51,8 +48,14 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
 
   const completedLectures = useMemo(() => {
     if (!courseData) return 0;
-    return courseData.sections.flatMap((s) => s.lectures).filter((l) => l.completed).length;
-  }, [courseData]);
+
+    return courseData.sections
+      .flatMap((s) => s.lectures)
+      .filter((lecture) => {
+        const progress = lectureProgressMap.get(lecture.resourceId);
+        return progress?.completed === true;
+      }).length;
+  }, [courseData, lectureProgressMap]);
 
   useEffect(() => {
     if (!currentLecture) return;
@@ -63,14 +66,14 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     const video = videoRef.current;
     if (!video) return;
     if (!currentLecture) return;
-    if (!lastWatchedDuration) return;
+    if (!resumeInfo) return;
     if (hasSeekedRef.current) return;
 
-    if (lastVideoId !== currentLecture.id) return;
+    if (resumeInfo.lectureId !== currentLecture.id) return;
 
     const handleLoadedMetadata = () => {
-      if (lastWatchedDuration < video.duration) {
-        video.currentTime = lastWatchedDuration;
+      if (resumeInfo.resumeAt < video.duration) {
+        video.currentTime = resumeInfo.resumeAt;
       }
       hasSeekedRef.current = true;
     };
@@ -79,11 +82,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [currentLecture?.id, lastWatchedDuration, lastVideoId]);
-
-  if (!courseData || !currentLecture) {
-    return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
-  }
+  }, [currentLecture?.id, resumeInfo]);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
@@ -122,8 +121,17 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                   key={currentLecture.id}
                   controls
                   autoPlay
-                  onEnded={handleVideoEnded}
-                  onTimeUpdate={(e) => handleVideoTimeUpdate(e.currentTarget.currentTime)}
+                  onEnded={() => {
+                    if (!currentLecture.duration) return;
+                    endedProgress(currentLecture.resourceId, currentLecture.duration);
+                    moveToNextLecture();
+                  }}
+                  onTimeUpdate={(e) => {
+                    saveProgressThrottled(
+                      currentLecture.resourceId,
+                      Math.floor(e.currentTarget.currentTime),
+                    );
+                  }}
                 >
                   <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
                   브라우저가 비디오를 지원하지 않습니다.
@@ -141,7 +149,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                 {currentLecture.pdfUrl && (
                   <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
                     <button
-                      onClick={() => markPdfCompleted(currentLecture)}
+                      onClick={() => endedProgress(currentLecture.id, 0)}
                       className={styles['course-learn__brand-btn']}
                     >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
@@ -201,35 +209,41 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
 
                 {openSections.includes(section.id) && (
                   <div className={styles['course-learn__section-content']}>
-                    {section.lectures.map((lecture) => (
-                      <button
-                        key={lecture.id}
-                        onClick={() => handleLectureClick(lecture)}
-                        className={`${styles['course-learn__lecture-btn']} ${
-                          currentLecture.id === lecture.id
-                            ? styles['course-learn__lecture-btn--active']
-                            : ''
-                        }`}
-                      >
-                        <div className={styles['course-learn__lecture-icon']}>
-                          {lecture.completed ? (
-                            <CheckCircle className={styles['course-learn__icon']} />
-                          ) : lecture.type === 'VIDEO' ? (
-                            <Play className={styles['course-learn__icon']} />
-                          ) : (
-                            <FileText className={styles['course-learn__icon']} />
-                          )}
-                        </div>
-                        <div className={styles['course-learn__lecture-text']}>
-                          <p className={styles['course-learn__lecture-title']}>{lecture.title}</p>
-                          <p className={styles['course-learn__lecture-meta']}>
-                            {lecture.type === 'VIDEO'
-                              ? formatLectureDuration(lecture.duration)
-                              : 'PDF'}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
+                    {section.lectures.map((lecture) => {
+                      const progress = lectureProgressMap.get(lecture.resourceId);
+                      const completed = progress?.completed === true;
+
+                      return (
+                        <button
+                          key={lecture.id}
+                          onClick={() => handleLectureClick(lecture)}
+                          className={`${styles['course-learn__lecture-btn']} ${
+                            currentLecture.id === lecture.id
+                              ? styles['course-learn__lecture-btn--active']
+                              : ''
+                          }`}
+                        >
+                          <div className={styles['course-learn__lecture-icon']}>
+                            {completed ? (
+                              <CheckCircle className={styles['course-learn__icon']} />
+                            ) : lecture.type === 'VIDEO' ? (
+                              <Play className={styles['course-learn__icon']} />
+                            ) : (
+                              <FileText className={styles['course-learn__icon']} />
+                            )}
+                          </div>
+
+                          <div className={styles['course-learn__lecture-text']}>
+                            <p className={styles['course-learn__lecture-title']}>{lecture.title}</p>
+                            <p className={styles['course-learn__lecture-meta']}>
+                              {lecture.type === 'VIDEO'
+                                ? formatLectureDuration(lecture.duration)
+                                : 'PDF'}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
