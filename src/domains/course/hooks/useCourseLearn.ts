@@ -134,7 +134,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     setCurrentLecture(nextLecture);
   };
 
-  function resolveStartLecture(
+  function selectLectureToWatch(
     lectures: UILecture[],
     progressInfo: ProgressInfo | null,
     lectureProgressMap: Map<string, LectureProgressMapValue>,
