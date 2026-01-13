@@ -1,15 +1,14 @@
 import type { EnrollmentListResponse } from '@/domains/user/types/enrollment';
-import { mockLearnProgress } from './learn.mock';
 
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
   content: [
     {
-      enrollmentId: 'mock-enrollment-1',
-      userId: 'u-001',
-      courseId: '2001',
+      enrollmentId: '5001',
+      userId: 'user_001',
+      courseId: '2002',
       courseName: '스프링 부트 완벽 가이드',
       status: 'ENROLLED',
-      progressRate: 0,
+      progressRate: 5,
       categories: ['백엔드'],
       expiredAt: '2026-01-01T09:00:00',
     },
