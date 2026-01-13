@@ -7,7 +7,7 @@ import { getCourse } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
-import { LectureProgressMapValue, ResumeInfo } from '../types/progress';
+import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
 
 type UseCourseLearnOptions = {
   start?: 'first';
@@ -136,7 +136,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
 
   function resolveStartLecture(
     lectures: UILecture[],
-    resumeInfo: ResumeInfo | null,
+    resumeInfo: ProgressInfo | null,
     lectureProgressMap: Map<string, LectureProgressMapValue>,
   ): UILecture {
     if (!resumeInfo) return lectures[0];

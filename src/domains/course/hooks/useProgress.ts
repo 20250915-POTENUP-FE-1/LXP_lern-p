@@ -6,7 +6,7 @@ import type {
   CourseLearnProgress,
   UpdateProgressResponse,
   LectureProgressMapValue,
-  ResumeInfo,
+  ProgressInfo,
   PendingProgress,
 } from '@/domains/course/types/progress';
 
@@ -62,7 +62,7 @@ export function useProgress(enrollmentId: string) {
     );
   }, [progressData]);
 
-  const resumeInfo = useMemo<ResumeInfo | null>(() => {
+  const resumeInfo = useMemo<ProgressInfo | null>(() => {
     if (!progressData?.lastVideoId) return null;
 
     return {
