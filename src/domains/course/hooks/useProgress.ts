@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   CourseLearnProgress,
-  GetLearnProgressResponse,
+  UpdateProgressResponse,
   LectureProgressMapValue,
   ResumeInfo,
   PendingProgress,
@@ -16,7 +16,7 @@ import type {
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(enrollmentId: string) {
-  const [progressData, setProgressData] = useState<GetLearnProgressResponse | null>(null);
+  const [progressData, setProgressData] = useState<UpdateProgressResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -161,10 +161,10 @@ export function useProgress(enrollmentId: string) {
 
   // 프론트에서 진도 상태를 계산/반영
   function applyProgressUpdate(
-    prev: GetLearnProgressResponse,
+    prev: UpdateProgressResponse,
     resourceId: string,
     watchedDuration: number,
-  ): GetLearnProgressResponse {
+  ): UpdateProgressResponse {
     const lectureProgresses = prev.lectureProgresses.map((p) => {
       if (p.resourceId !== resourceId) return p;
 

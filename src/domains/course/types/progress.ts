@@ -9,7 +9,7 @@ export type GetProgressResponse = {
   lastWatchedAt: string | null;
 };
 
-export type GetLearnProgressResponse = {
+export type UpdateProgressResponse = {
   enrollmentId: string;
   progressRate: number;
   lastVideoId: string | null;

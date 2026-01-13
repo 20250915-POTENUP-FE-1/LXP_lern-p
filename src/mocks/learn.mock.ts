@@ -1,5 +1,5 @@
 import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
-import { GetLearnProgressResponse } from '@/domains/course/types/progress';
+import { UpdateProgressResponse } from '@/domains/course/types/progress';
 
 export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   '2002': {
@@ -104,7 +104,7 @@ export const MOCK_LEARN_ENROLLMENT: LearnEnrollmentResponse = {
   expiredAt: '2026-01-01T09:00:00',
 };
 
-export const MOCK_LEARN_PROGRESS: GetLearnProgressResponse = {
+export const MOCK_LEARN_PROGRESS: UpdateProgressResponse = {
   enrollmentId: '5001',
   progressRate: 5,
 
