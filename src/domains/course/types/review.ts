@@ -14,8 +14,8 @@ export type Review = {
 };
 
 export type CreateReviewRequest = {
-  rating?: number | null;
-  content?: string | null;
+  rating?: number;
+  content?: string;
 };
 
 export type UpdateReviewRequest = {
