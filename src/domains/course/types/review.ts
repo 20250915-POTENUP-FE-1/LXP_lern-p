@@ -3,7 +3,8 @@ export type ReviewStatus = 'DISPLAY' | 'BLINDED' | 'DELETED' | 'ARCHIVED';
 export type Review = {
   id: string;
   courseId: string;
-  rating: number; // 1 ~ 5
+  nickname: string;
+  rating: number;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -13,8 +14,8 @@ export type Review = {
 };
 
 export type CreateReviewRequest = {
-  rating: number;
-  content: string;
+  rating?: number | null;
+  content?: string | null;
 };
 
 export type UpdateReviewRequest = {
@@ -32,9 +33,10 @@ export type UpdateReviewResponse = {
 
 export type DeleteReviewResponse = object;
 
-export type GetAllReviewsItem = {
+export type GetReviewResponse = {
   id: string;
   userId: string;
+  nickname: string;
   courseId: string;
   rating: number;
   content: string;
@@ -44,4 +46,4 @@ export type GetAllReviewsItem = {
   updatedAt: string;
 };
 
-export type GetAllReviewsResponse = GetAllReviewsItem[];
+export type GetAllReviewsResponse = GetReviewResponse[];

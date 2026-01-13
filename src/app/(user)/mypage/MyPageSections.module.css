@@ -199,6 +199,12 @@
   overflow: hidden;
 }
 
+.enrollment__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .enrollment__category {
   margin: 0;
   font-size: var(--text-xs);

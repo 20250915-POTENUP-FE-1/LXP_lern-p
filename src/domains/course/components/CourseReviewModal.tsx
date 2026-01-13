@@ -11,13 +11,13 @@ export type CourseReviewModalProps = {
   initialReview?: { rating: number; content: string };
 
   onClose: () => void;
-  onSubmit: (payload: { rating: number; content: string }) => void;
+  onSubmit: (payload: { rating: number; content: string }) => void | Promise<void>;
 };
 
 export default function CourseReviewModal({
   isOpen,
-  nickname,
   isMine,
+  nickname,
   initialReview,
   onClose,
   onSubmit,
@@ -25,7 +25,7 @@ export default function CourseReviewModal({
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState('');
   const [focused, setFocused] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const maxLength = 500;
   const minLength = 10;
@@ -37,6 +37,7 @@ export default function CourseReviewModal({
 
   useEffect(() => {
     if (!isOpen) return;
+
     if (isMine && initialReview) {
       setRating(initialReview.rating);
       setContent(initialReview.content);
@@ -46,14 +47,18 @@ export default function CourseReviewModal({
     }
 
     setFocused(false);
-    setSubmitted(false);
+    setSaving(false);
   }, [isOpen, isMine, initialReview]);
 
-  const handleSubmit = () => {
-    if (!isValid) return;
+  const handleSubmit = async () => {
+    if (!isValid || saving) return;
 
-    onSubmit({ rating, content: content.trim() });
-    onClose();
+    try {
+      setSaving(true);
+      await onSubmit({ rating, content: content.trim() });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -85,6 +90,7 @@ export default function CourseReviewModal({
                   setRating((prev) => (prev === v ? 0 : v));
                 }}
                 aria-label={`${v}점`}
+                disabled={saving}
               >
                 ★
               </button>
@@ -106,6 +112,7 @@ export default function CourseReviewModal({
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 maxLength={maxLength}
+                disabled={saving}
               />
               <div className={styles['review-modal__count-float']}>
                 {content.length} / {maxLength}
@@ -119,7 +126,12 @@ export default function CourseReviewModal({
       </div>
 
       <footer className={styles['review-modal__footer']}>
-        <button type="button" className={styles['review-modal__button--cancel']} onClick={onClose}>
+        <button
+          type="button"
+          className={styles['review-modal__button--cancel']}
+          onClick={onClose}
+          disabled={saving}
+        >
           취소
         </button>
 
@@ -131,7 +143,7 @@ export default function CourseReviewModal({
               ? styles['review-modal__button--submit--ready']
               : styles['review-modal__button--submit--idle'],
           ].join(' ')}
-          disabled={!isValid}
+          disabled={!isValid || saving}
           onClick={handleSubmit}
         >
           {isMine ? '수정' : '등록'}

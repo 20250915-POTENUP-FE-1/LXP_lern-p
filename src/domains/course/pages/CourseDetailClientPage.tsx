@@ -3,7 +3,7 @@
 import { MouseEvent, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -34,7 +34,9 @@ export default function CourseDetailClientPage() {
 
   const { user, setUser } = useAuthState();
 
-  const [activeTab, setActiveTab] = useState<TabKey>('curriculum');
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') === 'review' ? 'reviews' : 'curriculum') as TabKey;
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
@@ -67,6 +69,8 @@ export default function CourseDetailClientPage() {
   const hasMyReview = myReviewStatus.status === 'exists';
 
   const canOpenReviewModal = !user ? true : isEnrolled && !hasMyReview;
+
+  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
 
   const reviewButtonLabel = !user
     ? '리뷰 등록하기'
@@ -398,10 +402,12 @@ export default function CourseDetailClientPage() {
       {/* 모달들 */}
       <CourseReviewModal
         isOpen={isReviewOpen}
-        onClose={() => setIsReviewOpen(false)}
-        isMine={hasMyReview}
-        initialReview={hasMyReview ? reviews.find((r) => r.isMine) : undefined}
         nickname={user?.nickname ?? ''}
+        isMine={hasMyReview}
+        onClose={() => setIsReviewOpen(false)}
+        initialReview={
+          myReview ? { rating: myReview.rating, content: myReview.content } : undefined
+        }
         onSubmit={async ({ rating, content }) => {
           if (myReviewStatus.status === 'exists') {
             await updateReview(myReviewStatus.reviewId, { rating, content });

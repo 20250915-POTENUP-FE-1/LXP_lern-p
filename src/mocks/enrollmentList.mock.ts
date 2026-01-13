@@ -11,6 +11,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 45,
       expiredAt: '2026-01-01T09:00:00',
       categories: ['백엔드', 'Spring'],
+      isReviewed: true,
     },
     {
       userId: 'user_001',
@@ -21,6 +22,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 70,
       expiredAt: '2025-12-31T09:00:00',
       categories: ['프론트엔드', 'React'],
+      isReviewed: false,
     },
     {
       userId: 'user_001',
@@ -31,6 +33,7 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 20,
       expiredAt: '2026-03-10T09:00:00',
       categories: ['데이터베이스'],
+      isReviewed: false,
     },
   ],
   totalElements: 3,

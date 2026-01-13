@@ -6,17 +6,151 @@ import Link from 'next/link';
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 // TODO: 임시 목업 데이터
 import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
+import { createReview, getMyReview, updateReview } from '@/domains/course/services/reviewService';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
+import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
+import { getUserProfile } from '../services/userService';
+import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
+import { useRouter } from 'next/navigation';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [enrolledLoading, setEnrolledLoading] = useState<boolean>(false);
+
+  const [reviewTarget, setReviewTarget] = useState<EnrollmentListContent | null>(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [initialReview, setInitialReview] = useState<
+    { rating: number; content: string } | undefined
+  >(undefined);
+  const [modalIsMine, setModalIsMine] = useState(false);
+
+  const [nickname, setNickname] = useState<string>('');
+  const [userLoading, setUserLoading] = useState(true);
+  const router = useRouter();
+
+  const openReviewModal = async (item: EnrollmentListContent) => {
+    setReviewTarget(item);
+    setIsReviewOpen(true);
+
+    if (!item.isReviewed) {
+      setModalIsMine(false);
+      setInitialReview(undefined);
+      return;
+    }
+
+    setModalIsMine(true);
+    try {
+      const courseId = item.courseId;
+      const list = MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+      const mine = list.find((r) => r.nickname === nickname);
+      if (!mine) {
+        throw new Error('내 리뷰가 없음');
+      }
+
+      setInitialReview({ rating: mine.rating, content: mine.content });
+    } catch (e) {
+      console.error('내 리뷰 조회 실패:', e);
+      setModalIsMine(false);
+      setInitialReview(undefined);
+    } finally {
+    }
+  };
+
+  const submitReview = async (payload: { rating: number; content: string }) => {
+    const closeReviewModal = () => {
+      setIsReviewOpen(false);
+      setInitialReview(undefined);
+      setReviewTarget(null);
+      setModalIsMine(false);
+    };
+
+    if (!reviewTarget) return;
+    const courseId = String(reviewTarget.courseId);
+    const now = new Date().toISOString();
+
+    try {
+      const list = (MOCK_GET_COURSE_REVIEWS[courseId] ??= []);
+
+      const idx = list.findIndex((r) => r.nickname === nickname);
+
+      const upsertMyReview = () => {
+        const idx = list.findIndex((r) => r.nickname === nickname);
+
+        if (idx >= 0) {
+          list[idx] = {
+            ...list[idx],
+            rating: payload.rating,
+            content: payload.content,
+            updatedAt: now,
+          };
+          // TODO: updatedReview API 연동
+          /*
+           * await updateReview(courseId, {
+           *   rating: payload.rating,
+           *   content: payload.content,
+           * });
+           */
+          return;
+        }
+
+        list.unshift({
+          id: String(Date.now()),
+          userId: 'me',
+          nickname,
+          courseId,
+          rating: payload.rating,
+          content: payload.content,
+          status: 'DISPLAY',
+          reported: 0,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        setItems((prev) =>
+          prev.map((it) => (String(it.courseId) === courseId ? { ...it, isReviewed: true } : it)),
+        );
+
+        // TODO: createReview API 연동
+        /*
+         * await createReview(courseId, {
+         *   rating: payload.rating,
+         *   content: payload.content,
+         * });
+         * setItems((prev) =>
+         *   prev.map((it) =>
+         *     String(it.courseId) === courseId ? { ...it, isReviewed: true } : it,
+         *   ),
+         * );
+         */
+      };
+
+      upsertMyReview();
+      router.push(`/courses/${courseId}?tab=review`);
+      closeReviewModal();
+    } catch (e) {
+      console.error('리뷰 제출 실패:', e);
+    }
+  };
+
+  useEffect(() => {
+    async function fetchUserProfile() {
+      try {
+        const user = await getUserProfile();
+        setNickname(user.nickname);
+      } catch (e) {
+        console.error('유저 정보 조회 실패:', e);
+        setNickname('');
+      } finally {
+        setUserLoading(false);
+      }
+    }
+
+    fetchUserProfile();
+  }, []);
 
   useEffect(() => {
     async function fetchEnrollments() {
-      setEnrolledLoading(true);
       try {
         // TODO: 임시 목업 데이터
         // const page = await getEnrollmentList({
@@ -31,7 +165,6 @@ export default function EnrollmentClientPage() {
         console.error('수강 목록 조회 실패:', e);
       } finally {
         setLoading(false);
-        setEnrolledLoading(false);
       }
     }
 
@@ -56,7 +189,22 @@ export default function EnrollmentClientPage() {
         {items.map((item) => (
           <div key={item.enrollmentId} className={styles['enrollment-card']}>
             <Link href={`/courses/${item.courseId}/learn`} className={styles['enrollment__link']}>
-              <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+              <div className={styles['enrollment__header']}>
+                <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openReviewModal(item);
+                  }}
+                  disabled={!nickname || userLoading}
+                >
+                  {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
+                </button>
+              </div>
+
               <p className={styles['enrollment__category']}>
                 {item.categories?.join(' / ') ?? '카테고리 없음'}
               </p>
@@ -75,6 +223,19 @@ export default function EnrollmentClientPage() {
           </div>
         ))}
       </div>
+      <CourseReviewModal
+        isOpen={isReviewOpen}
+        isMine={modalIsMine}
+        nickname={nickname}
+        initialReview={initialReview}
+        onClose={() => {
+          setIsReviewOpen(false);
+          setReviewTarget(null);
+          setInitialReview(undefined);
+          setModalIsMine(false);
+        }}
+        onSubmit={submitReview}
+      />
     </article>
   );
 }

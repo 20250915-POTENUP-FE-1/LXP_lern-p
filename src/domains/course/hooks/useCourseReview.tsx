@@ -33,12 +33,13 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
         const mapped: Review[] = items.map((it) => ({
           id: String(it.id),
           courseId: String(it.courseId),
+          nickname: it.nickname,
           rating: it.rating,
           content: it.content,
           createdAt: it.createdAt,
           updatedAt: it.updatedAt,
-          user: { nickname: '익명' },
-          isMine: false,
+          user: { nickname: it.nickname },
+          isMine: nickname ? it.nickname === nickname : false,
           status: it.status === 'BLIND' ? 'BLINDED' : 'DISPLAY',
         }));
 
@@ -73,8 +74,9 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
       const newReview: Review = {
         id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`, // String(data.reviewId),
         courseId,
-        rating: payload.rating,
-        content: payload.content,
+        nickname,
+        rating: payload.rating ?? 0,
+        content: payload.content?.trim() ?? '',
         createdAt: now,
         updatedAt: now,
         user: { nickname },
@@ -102,12 +104,12 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
       setReviews((prev) =>
         prev.map((review) => {
-          if (!review.isMine) return review;
+          if (review.id !== reviewId) return review;
 
           updated = {
             ...review,
-            rating: payload.rating,
-            content: payload.content,
+            rating: payload.rating ?? review.rating,
+            content: payload.content?.trim() ?? review.content,
             updatedAt: now,
           };
 
