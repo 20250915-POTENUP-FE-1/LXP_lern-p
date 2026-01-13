@@ -65,10 +65,12 @@ export default function EnrollmentClientPage() {
             <div key={item.enrollmentId} className={styles['enrollment-card']}>
               <div className={styles['enrollment__link']}>
                 <div className={styles['enrollment__text']}>
-                  <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
-                  <p className={styles['enrollment__category']}>
-                    {item.categories?.join(' / ') ?? '카테고리 없음'}
-                  </p>
+                  <Link href={`/courses/${item.courseId}`}>
+                    <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+                    <p className={styles['enrollment__category']}>
+                      {item.categories?.join(' / ') ?? '카테고리 없음'}
+                    </p>
+                  </Link>
                 </div>
 
                 <div className={styles['enrollment-card__actions']}>
