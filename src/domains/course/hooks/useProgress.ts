@@ -143,7 +143,7 @@ export function useProgress(enrollmentId: string) {
   };
 
   // 재생 중 주기적 진도 저장
-  const saveProgressThrottled = (resourceId: string, watchedDuration: number) => {
+  const autoSaveProgress = (resourceId: string, watchedDuration: number) => {
     const now = Date.now();
 
     if (now - lastSavedAtRef.current < THROTTLE_INTERVAL) return;
@@ -197,7 +197,7 @@ export function useProgress(enrollmentId: string) {
     progressInfo,
     overallProgressRate: progress?.overallProgressRate ?? 0,
     saveProgress,
-    saveProgressThrottled,
+    autoSaveProgress,
     saveFinalProgressOnEnd,
     isLoading,
     error,

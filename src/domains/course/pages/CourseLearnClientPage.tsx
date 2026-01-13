@@ -38,7 +38,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     handleLectureClick,
     moveToNextLecture,
   } = useCourseLearn(enrollmentId, { start });
-  const { progressInfo, saveProgressThrottled, saveFinalProgressOnEnd, lectureProgressMap } =
+  const { progressInfo, autoSaveProgress, saveFinalProgressOnEnd, lectureProgressMap } =
     useProgress(enrollmentId);
 
   const totalLectures = useMemo(() => {
@@ -127,7 +127,7 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
                     moveToNextLecture();
                   }}
                   onTimeUpdate={(e) => {
-                    saveProgressThrottled(
+                    autoSaveProgress(
                       currentLecture.resourceId,
                       Math.floor(e.currentTarget.currentTime),
                     );
