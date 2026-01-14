@@ -13,12 +13,12 @@ import { getAllReviews } from '../services/reviewService';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
-type UseCourseReviewsArgs = {
+type UseCourseReviewsProps = {
   courseId: string;
   mode?: 'list' | 'mine';
 };
 
-export function useCourseReviews({ courseId, mode = 'list' }: UseCourseReviewsArgs) {
+export function useCourseReviews({ courseId, mode = 'list' }: UseCourseReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
@@ -54,10 +54,7 @@ export function useCourseReviews({ courseId, mode = 'list' }: UseCourseReviewsAr
             return [];
           }
 
-          /**
-           * TODO: 리뷰 다중조회 API
-           * GET /api/courses/{courseId}/reviews
-           */
+          // TODO: 리뷰 다중조회 API
           return await getAllReviews(courseId);
         })();
 

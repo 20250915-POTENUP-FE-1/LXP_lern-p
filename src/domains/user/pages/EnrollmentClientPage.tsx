@@ -11,6 +11,8 @@ import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
+import { getIsReviewed } from '@/domains/course/services/reviewService';
+import { getEnrollmentList } from '../services/enrollmentService';
 // import { getIsReviewed } from '@/domains/course/services/reviewService';
 
 export default function EnrollmentClientPage() {
@@ -20,13 +22,15 @@ export default function EnrollmentClientPage() {
   const [reviewTarget, setReviewTarget] = useState<EnrollmentListContent | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
+  const [enrolledLoading, setEnrolledLoading] = useState<boolean>(false);
+
   const selectedCourseId = useMemo(
     () => (reviewTarget ? String(reviewTarget.courseId) : ''),
     [reviewTarget],
   );
 
   const { myReview, myReviewStatus, canWriteReview, createReview, updateReview } = useCourseReviews(
-    { courseId: selectedCourseId, mode: 'mine' } as any,
+    { courseId: selectedCourseId, mode: 'mine' },
   );
 
   const modalIsMine = myReviewStatus.status === 'exists';
@@ -77,14 +81,13 @@ export default function EnrollmentClientPage() {
 
   useEffect(() => {
     async function fetchEnrollments() {
+      setEnrolledLoading(true);
       try {
-        const page = MOCK_ENROLLMENT_LIST; // TODO: getEnrollmentList로 교체
+        const page =
+          process.env.NODE_ENV === 'development' ? MOCK_ENROLLMENT_LIST : await getEnrollmentList(); // TODO: getEnrollmentList로 교체
         const content = page.content;
 
         /**
-         * ===============================
-         * DEV: mock 리뷰 기준 isReviewed 계산 (isMine 사용)
-         * ===============================
          */
         const merged = content.map((it) => {
           const courseId = String(it.courseId);
@@ -101,11 +104,6 @@ export default function EnrollmentClientPage() {
         setItems(merged);
 
         /**
-         * ===============================
-         * PROD: API 기준 isReviewed 계산
-         * (연동 시 위 mock 로직 제거)
-         * ===============================
-         */
         /*
         const courseIds = Array.from(
           new Set(
@@ -169,17 +167,6 @@ export default function EnrollmentClientPage() {
                 <div className={styles['enrollment__text']}>
                   <div className={styles['enrollment__header']}>
                     <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
-                    <button
-                      type="button"
-                      className={styles['enrollment__review-btn']}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openReviewModal(item);
-                      }}
-                    >
-                      {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
-                    </button>
                   </div>
 
                   <p className={styles['enrollment__category']}>
@@ -188,19 +175,32 @@ export default function EnrollmentClientPage() {
                 </div>
 
                 <div className={styles['enrollment-card__actions']}>
-                  <Link
+                  <button
+                    type="button"
+                    className={styles['enrollment__review-btn']}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openReviewModal(item);
+                    }}
+                  >
+                    {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
+                  </button>
+                  {/*<Link
                     href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}&start=first`}
                     className={styles['btn-secondary']}
                   >
                     처음부터
                   </Link>
+                  */}
 
                   {hasProgress && (
                     <Link
                       href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
                       className={styles['btn-primary']}
+                      aria-label="이어보기"
                     >
-                      이어보기
+                      <span className={styles['play-icon']} />
                     </Link>
                   )}
                 </div>

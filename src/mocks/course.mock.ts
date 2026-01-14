@@ -1,22 +1,30 @@
 import type { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/course/types/course';
 
+/**
+ * 기준 정리
+ * - 수강(Enrollment) 목록에 있는 courseId: 2001~2004 => isPurchased: true
+ * - 그 외 3001, 3002 => isPurchased: false
+ * - 리뷰(Mock) 있는 courseId: 2002, 2003, 3001
+ *   -> rating을 5.0으로 맞춤(단일 리뷰 기준)
+ * - 2001 코스 정보는 LearnCourseResponse(MOCK_LEARN_COURSE_MAP['2001'])를 기준으로 재구성
+ */
+
 export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
     {
       courseId: '2001',
-      title: '종덕재희수연힘내자',
-      categories: ['프런트', '팀A'],
+      title: '스프링 부트 완벽 가이드',
+      categories: ['백엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
       status: 'PUBLISHED',
-      price: 0,
-      studentCount: 12,
-      rating: 5.0,
+      price: 55000,
+      studentCount: 10,
+      rating: 4.6,
       lastModifiedAt: '2026-01-07T12:00:00Z',
       level: 'BEGINNER',
-      summary: '팀A 프런트 프로젝트 진행을 위한 단기 집중 코스입니다.',
-      instructorName: '팀A',
+      summary: '스프링 부트의 모든 것',
+      instructorName: '김영한',
     },
-
     {
       courseId: '2002',
       title: '스프링 부트 완벽 가이드',
@@ -25,7 +33,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       status: 'PUBLISHED',
       price: 99000,
       studentCount: 412,
-      rating: 4.7,
+      rating: 5.0,
       lastModifiedAt: '2026-01-07T14:30:00Z',
       level: 'INTERMEDIATE',
       summary: 'Spring Boot로 실무 백엔드 API를 설계하고 구현합니다.',
@@ -39,13 +47,12 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       status: 'PUBLISHED',
       price: 89000,
       studentCount: 356,
-      rating: 4.6,
+      rating: 5.0,
       lastModifiedAt: '2026-01-05T09:12:00Z',
       level: 'INTERMEDIATE',
       summary: 'React 핵심부터 Next.js App Router까지 정리합니다.',
       instructorName: '이프론트',
     },
-
     {
       courseId: '2004',
       title: '데이터베이스 기초',
@@ -60,7 +67,6 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       summary: '관계형 DB 개념과 SQL 기초를 학습합니다.',
       instructorName: '박디비',
     },
-
     {
       courseId: '3001',
       title: 'Node.js 백엔드 실전',
@@ -69,13 +75,12 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       status: 'PUBLISHED',
       price: 99000,
       studentCount: 182,
-      rating: 4.5,
+      rating: 5.0,
       lastModifiedAt: '2026-01-03T10:00:00Z',
       level: 'INTERMEDIATE',
       summary: 'Node.js 기반 서버 개발 실전 과정',
       instructorName: '정노드',
     },
-
     {
       courseId: '3002',
       title: '프론트엔드 테스트 전략',
@@ -101,91 +106,90 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
 export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2001': {
     courseId: '2001',
-    title: '종덕재희수연힘내자',
-    categories: ['프런트', '팀A'],
+    title: '스프링 부트 완벽 가이드',
+    categories: ['백엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
-    summary: '팀A 프런트 단기 집중 코스',
-    description:
-      '팀A 협업 규칙, 컴포넌트 구조, 코드리뷰 기준을 빠르게 맞추기 위한 내부 코스입니다.',
+    summary: '스프링 부트의 모든 것',
+    description: '기초부터 실전까지',
     instructor: {
-      id: 'inst-2001',
-      name: '팀A',
-      profileUrl: 'https://example.com/profiles/instructor_2001.png',
+      id: '9001',
+      name: '김영한',
+      profileUrl: '',
     },
     isPurchased: true,
-    totalDuration: 3600,
+    totalDuration: 120,
     status: 'PUBLISHED',
-    price: 0,
+    price: 55000,
     level: 'BEGINNER',
-    studentCount: 12,
-    rating: 5.0,
+    studentCount: 10,
+    rating: 4.6,
     sections: [
       {
-        sectionId: '2001-sec-1',
-        title: '협업 기본기',
+        sectionId: '3001',
+        title: '1. JPA 시작하기',
         order: 1,
         lectures: [
           {
-            lectureId: '2001-lec-1',
-            title: '브랜치/PR 룰 빠르게 맞추기',
-            totalDurationSeconds: 600,
-            isPreview: true,
+            lectureId: '4001',
+            title: 'JPA란?',
+            totalDurationSeconds: 10,
+            isPreview: false,
             orderIndex: 1,
-            createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-07T09:00:00Z',
+            createdAt: '2025-12-02T09:00:00Z',
+            updatedAt: '2026-01-07T12:00:00Z',
             resource: {
               resourceType: 'VIDEO',
-              fileUrl: 'https://example.com/videos/2001_lecture_001.mp4',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
             },
           },
           {
-            lectureId: '2001-lec-2',
-            title: '코드리뷰 체크리스트',
-            totalDurationSeconds: 900,
+            lectureId: '4002',
+            title: '엔티티 매핑',
+            totalDurationSeconds: 10,
             isPreview: false,
             orderIndex: 2,
-            createdAt: '2026-01-01T09:20:00Z',
-            updatedAt: '2026-01-07T09:10:00Z',
+            createdAt: '2025-12-02T09:00:00Z',
+            updatedAt: '2026-01-07T12:00:00Z',
             resource: {
-              resourceType: 'PDF',
-              fileUrl: 'https://example.com/files/2001_lecture_002.pdf',
-              isDownloadable: true,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
             },
           },
         ],
       },
       {
-        sectionId: '2001-sec-2',
-        title: 'UI 구조',
+        sectionId: '3002',
+        title: '2. 연관관계',
         order: 2,
         lectures: [
           {
-            lectureId: '2001-lec-3',
-            title: '레이아웃/라우팅 구조',
-            totalDurationSeconds: 900,
-            isPreview: true,
-            orderIndex: 3,
-            createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-07T09:20:00Z',
+            lectureId: '4003',
+            title: '연관관계 기본',
+            totalDurationSeconds: 10,
+            isPreview: false,
+            orderIndex: 1,
+            createdAt: '2025-12-02T09:00:00Z',
+            updatedAt: '2026-01-07T12:00:00Z',
             resource: {
               resourceType: 'VIDEO',
-              fileUrl: 'https://example.com/videos/2001_lecture_003.mp4',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
             },
           },
           {
-            lectureId: '2001-lec-4',
-            title: '상태관리/데이터 패칭 기준',
-            totalDurationSeconds: 1200,
+            lectureId: '4004',
+            title: '양방향 매핑',
+            totalDurationSeconds: 10,
             isPreview: false,
-            orderIndex: 4,
-            createdAt: '2026-01-02T11:20:00Z',
-            updatedAt: '2026-01-07T09:30:00Z',
+            orderIndex: 2,
+            createdAt: '2025-12-02T09:00:00Z',
+            updatedAt: '2026-01-07T12:00:00Z',
             resource: {
-              resourceType: 'PDF',
-              fileUrl: 'https://example.com/files/2001_lecture_004.pdf',
-              isDownloadable: true,
+              resourceType: 'VIDEO',
+              fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+              isDownloadable: false,
             },
           },
         ],
@@ -211,7 +215,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 99000,
     level: 'INTERMEDIATE',
     studentCount: 412,
-    rating: 4.7,
+    rating: 5.0,
     sections: [
       {
         sectionId: '2002-sec-1',
@@ -225,7 +229,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 1,
             createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-06T10:30:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2002_lecture_001.mp4',
@@ -239,7 +243,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 2,
             createdAt: '2026-01-01T09:30:00Z',
-            updatedAt: '2026-01-06T10:40:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2002_lecture_002.mp4',
@@ -253,7 +257,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 3,
             createdAt: '2026-01-01T10:00:00Z',
-            updatedAt: '2026-01-06T10:50:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2002_lecture_003.mp4',
@@ -274,7 +278,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 4,
             createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-06T10:55:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2002_lecture_004.mp4',
@@ -288,7 +292,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 5,
             createdAt: '2026-01-02T11:10:00Z',
-            updatedAt: '2026-01-06T11:05:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/2002_lecture_005.pdf',
@@ -302,7 +306,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 6,
             createdAt: '2026-01-02T11:20:00Z',
-            updatedAt: '2026-01-06T11:15:00Z',
+            updatedAt: '2026-01-07T14:30:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/2002_lecture_006.pdf',
@@ -332,7 +336,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 89000,
     level: 'INTERMEDIATE',
     studentCount: 356,
-    rating: 4.6,
+    rating: 5.0,
     sections: [
       {
         sectionId: '2003-sec-1',
@@ -346,7 +350,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 1,
             createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-06T10:30:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2003_lecture_001.mp4',
@@ -360,7 +364,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 2,
             createdAt: '2026-01-01T09:20:00Z',
-            updatedAt: '2026-01-06T10:40:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2003_lecture_002.mp4',
@@ -374,7 +378,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 3,
             createdAt: '2026-01-01T09:40:00Z',
-            updatedAt: '2026-01-06T10:50:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2003_lecture_003.mp4',
@@ -395,7 +399,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 4,
             createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-06T10:55:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2003_lecture_004.mp4',
@@ -409,7 +413,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 5,
             createdAt: '2026-01-02T11:10:00Z',
-            updatedAt: '2026-01-06T11:05:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/2003_lecture_005.pdf',
@@ -423,7 +427,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 6,
             createdAt: '2026-01-02T11:20:00Z',
-            updatedAt: '2026-01-06T11:15:00Z',
+            updatedAt: '2026-01-05T09:12:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/2003_lecture_006.pdf',
@@ -467,7 +471,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 1,
             createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-06T10:30:00Z',
+            updatedAt: '2025-12-28T11:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2004_lecture_001.mp4',
@@ -481,7 +485,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 2,
             createdAt: '2026-01-01T09:20:00Z',
-            updatedAt: '2026-01-06T10:40:00Z',
+            updatedAt: '2025-12-28T11:00:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/2004_lecture_002.pdf',
@@ -502,7 +506,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 3,
             createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-06T10:55:00Z',
+            updatedAt: '2025-12-28T11:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2004_lecture_003.mp4',
@@ -516,7 +520,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 4,
             createdAt: '2026-01-02T11:10:00Z',
-            updatedAt: '2026-01-06T11:05:00Z',
+            updatedAt: '2025-12-28T11:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2004_lecture_004.mp4',
@@ -546,7 +550,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 99000,
     level: 'INTERMEDIATE',
     studentCount: 182,
-    rating: 4.5,
+    rating: 5.0,
     sections: [
       {
         sectionId: '3001-sec-1',
@@ -560,7 +564,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 1,
             createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-06T10:30:00Z',
+            updatedAt: '2026-01-03T10:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3001_lecture_001.mp4',
@@ -574,7 +578,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 2,
             createdAt: '2026-01-01T09:20:00Z',
-            updatedAt: '2026-01-06T10:40:00Z',
+            updatedAt: '2026-01-03T10:00:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/3001_lecture_002.pdf',
@@ -595,7 +599,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 3,
             createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-06T10:55:00Z',
+            updatedAt: '2026-01-03T10:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3001_lecture_003.mp4',
@@ -609,7 +613,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 4,
             createdAt: '2026-01-02T11:10:00Z',
-            updatedAt: '2026-01-06T11:05:00Z',
+            updatedAt: '2026-01-03T10:00:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3001_lecture_004.mp4',
@@ -653,7 +657,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 1,
             createdAt: '2026-01-01T09:00:00Z',
-            updatedAt: '2026-01-06T10:30:00Z',
+            updatedAt: '2025-12-18T09:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3002_lecture_001.mp4',
@@ -667,7 +671,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 2,
             createdAt: '2026-01-01T09:20:00Z',
-            updatedAt: '2026-01-06T10:40:00Z',
+            updatedAt: '2025-12-18T09:30:00Z',
             resource: {
               resourceType: 'PDF',
               fileUrl: 'https://example.com/files/3002_lecture_002.pdf',
@@ -688,7 +692,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: true,
             orderIndex: 3,
             createdAt: '2026-01-02T11:00:00Z',
-            updatedAt: '2026-01-06T10:55:00Z',
+            updatedAt: '2025-12-18T09:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3002_lecture_003.mp4',
@@ -702,7 +706,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             isPreview: false,
             orderIndex: 4,
             createdAt: '2026-01-02T11:10:00Z',
-            updatedAt: '2026-01-06T11:05:00Z',
+            updatedAt: '2025-12-18T09:30:00Z',
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/3002_lecture_004.mp4',

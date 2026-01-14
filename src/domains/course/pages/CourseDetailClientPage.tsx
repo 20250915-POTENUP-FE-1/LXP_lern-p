@@ -75,16 +75,6 @@ export default function CourseDetailClientPage() {
         ? '리뷰 등록 완료'
         : '리뷰 등록하기';
 
-  const handleOpenReviewModal = () => {
-    if (!user) {
-      loginModal.open();
-      return;
-    }
-    if (!isEnrolled) return;
-    if (hasMyReview) return;
-    setIsReviewOpen(true);
-  };
-
   const isInCart = !!user?.cart?.includes(id);
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
@@ -363,7 +353,11 @@ export default function CourseDetailClientPage() {
                             <button
                               type="button"
                               className={styles['course-detail__review-card__delete-btn']}
-                              onClick={handleOpenReviewModal}
+                              onClick={async () => {
+                                if (myReviewStatus.status !== 'exists') return;
+                                if (!confirm('정말 삭제할까요?')) return;
+                                await deleteReview(myReviewStatus.reviewId);
+                              }}
                             >
                               삭제
                             </button>

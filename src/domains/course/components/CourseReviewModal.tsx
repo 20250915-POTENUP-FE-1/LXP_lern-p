@@ -25,7 +25,7 @@ export default function CourseReviewModal({
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState('');
   const [focused, setFocused] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const maxLength = 500;
   const minLength = 10;
@@ -47,17 +47,17 @@ export default function CourseReviewModal({
     }
 
     setFocused(false);
-    setSaving(false);
+    setSubmitted(false);
   }, [isOpen, isMine, initialReview]);
 
   const handleSubmit = async () => {
-    if (!isValid || saving) return;
+    if (!isValid || submitted) return;
 
     try {
-      setSaving(true);
+      setSubmitted(true);
       await onSubmit({ rating, content: content.trim() });
     } finally {
-      setSaving(false);
+      setSubmitted(false);
     }
   };
 
@@ -90,7 +90,7 @@ export default function CourseReviewModal({
                   setRating((prev) => (prev === v ? 0 : v));
                 }}
                 aria-label={`${v}점`}
-                disabled={saving}
+                disabled={submitted}
               >
                 ★
               </button>
@@ -112,7 +112,7 @@ export default function CourseReviewModal({
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 maxLength={maxLength}
-                disabled={saving}
+                disabled={submitted}
               />
               <div className={styles['review-modal__count-float']}>
                 {content.length} / {maxLength}
@@ -130,7 +130,7 @@ export default function CourseReviewModal({
           type="button"
           className={styles['review-modal__button--cancel']}
           onClick={onClose}
-          disabled={saving}
+          disabled={submitted}
         >
           취소
         </button>
@@ -143,7 +143,7 @@ export default function CourseReviewModal({
               ? styles['review-modal__button--submit--ready']
               : styles['review-modal__button--submit--idle'],
           ].join(' ')}
-          disabled={!isValid || saving}
+          disabled={!isValid || submitted}
           onClick={handleSubmit}
         >
           {isMine ? '수정' : '등록'}
