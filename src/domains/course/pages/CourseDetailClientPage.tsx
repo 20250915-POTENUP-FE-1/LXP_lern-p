@@ -51,8 +51,7 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, UseCreateReview, UseUpdateReview, UseDeleteReview, myReviewStatus } =
-    useCourseReviews(id);
+  const { reviews, writeReview, editReview, removeReview, myReviewStatus } = useCourseReviews(id);
   const reviewCount = reviews.length;
 
   const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
@@ -355,7 +354,7 @@ export default function CourseDetailClientPage() {
                               onClick={async () => {
                                 if (myReviewStatus.status !== 'exists') return;
                                 if (!confirm('정말 삭제할까요?')) return;
-                                await UseDeleteReview();
+                                await removeReview();
                               }}
                             >
                               삭제
@@ -406,9 +405,9 @@ export default function CourseDetailClientPage() {
         onSubmit={async ({ rating, content }) => {
           try {
             if (myReviewStatus.status === 'exists') {
-              await UseUpdateReview({ rating, content });
+              await editReview({ rating, content });
             } else {
-              await UseCreateReview({ rating, content });
+              await writeReview({ rating, content });
             }
             setIsReviewOpen(false);
           } catch (e) {

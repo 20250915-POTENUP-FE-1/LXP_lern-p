@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
-// TODO: 임시 목업 데이터
-// import { getEnrollmentList } from '@/domains/user/services/enrollmentService';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
@@ -30,7 +28,7 @@ export default function EnrollmentClientPage() {
     [reviewTarget],
   );
 
-  const { myReview, myReviewStatus, canWriteReview, UseCreateReview, UseUpdateReview } =
+  const { myReview, myReviewStatus, canWriteReview, writeReview, editReview } =
     useCourseReviews(selectedCourseId);
 
   const isReviewed = myReviewStatus.status === 'exists';
@@ -57,7 +55,7 @@ export default function EnrollmentClientPage() {
 
     try {
       if (canWriteReview) {
-        await UseCreateReview({
+        await writeReview({
           rating: payload.rating,
           content: payload.content,
         });
@@ -66,7 +64,7 @@ export default function EnrollmentClientPage() {
           prev.map((it) => (String(it.courseId) === courseId ? { ...it, isReviewed: true } : it)),
         );
       } else if (myReviewStatus.status === 'exists') {
-        await UseUpdateReview({
+        await editReview({
           rating: payload.rating,
           content: payload.content,
         });
@@ -104,7 +102,7 @@ export default function EnrollmentClientPage() {
           new Set(content.map((it) => Number(it.courseId)).filter((v) => Number.isFinite(v))),
         );
 
-        const flags = await getIsReviewed({ courseIds }); // TODO: GetIsReviewed 로 교체
+        const flags = await getIsReviewed({ courseIds });
 
         const reviewedMap = new Map(flags.map((f) => [String(f.courseId), !!f.isReviewed]));
 

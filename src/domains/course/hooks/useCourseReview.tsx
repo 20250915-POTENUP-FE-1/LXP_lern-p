@@ -66,7 +66,7 @@ export function useCourseReviews(courseId: string) {
   const canWriteReview = myReviewStatus.status === 'none';
 
   // A 방식: 저장만 (버튼 전환은 상위에서 isReviewed=true 처리)
-  const UseCreateReview = useCallback(
+  const writeReview = useCallback(
     async (payload: CreateReviewRequest) => {
       if (!courseId) return;
 
@@ -105,7 +105,7 @@ export function useCourseReviews(courseId: string) {
   );
 
   // 수정: API가 courseId 기반이라 reviewId 필요 없음
-  const UseUpdateReview = useCallback(
+  const editReview = useCallback(
     async (payload: UpdateReviewRequest) => {
       if (!courseId) return;
 
@@ -135,7 +135,7 @@ export function useCourseReviews(courseId: string) {
   );
 
   // 삭제: API가 courseId 기반이라 reviewId 필요 없음
-  const UseDeleteReview = useCallback(async () => {
+  const removeReview = useCallback(async () => {
     if (!courseId) return;
 
     if (process.env.NODE_ENV === 'development') {
@@ -151,8 +151,8 @@ export function useCourseReviews(courseId: string) {
     myReview,
     myReviewStatus,
     canWriteReview,
-    UseCreateReview,
-    UseUpdateReview,
-    UseDeleteReview,
+    writeReview,
+    editReview,
+    removeReview,
   };
 }
