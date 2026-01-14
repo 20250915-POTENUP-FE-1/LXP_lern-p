@@ -31,7 +31,7 @@ export function useCourseReviews(courseId: string) {
           process.env.NODE_ENV === 'development'
             ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
             : await getAllReviews(courseId);
-
+        
         const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
           return {
             id: String(it.id),

@@ -71,7 +71,7 @@ export default function CourseDetailClientPage() {
   const isInCart = USE_MOCK
     ? MOCK_GET_CART.items.some((item) => String(item.courseId) === id)
     : !!user?.cart?.includes(id);
-
+    
   const canOpenReviewModal = !user || (isEnrolled && !hasMyReview);
   const reviewButtonLabel = !user
     ? '리뷰 등록하기'
@@ -80,7 +80,7 @@ export default function CourseDetailClientPage() {
       : hasMyReview
         ? '리뷰 등록 완료'
         : '리뷰 등록하기';
-
+  
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
   }
