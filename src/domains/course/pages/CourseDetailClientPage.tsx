@@ -51,12 +51,13 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, createReview, updateReview, deleteReview, myReviewStatus, canWriteReview } =
-    useCourseReviews(id, {
-      nickname: user?.nickname,
-    });
-
+  const { reviews, createReview, updateReview, deleteReview, myReviewStatus } = useCourseReviews({
+    courseId: id,
+  });
   const reviewCount = reviews.length;
+
+  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
+  const hasMyReview = myReviewStatus.status === 'exists';
 
   const avgRating = useMemo(() => {
     if (reviewCount === 0) return 0;
@@ -64,13 +65,7 @@ export default function CourseDetailClientPage() {
     return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
   }, [reviews, reviewCount]);
 
-  const isInCart = !!user?.cart?.includes(id);
-
-  const hasMyReview = myReviewStatus.status === 'exists';
-
-  const canOpenReviewModal = !user ? true : isEnrolled && !hasMyReview;
-
-  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
+  const canOpenReviewModal = !user || (isEnrolled && !hasMyReview);
 
   const reviewButtonLabel = !user
     ? '리뷰 등록하기'
@@ -80,6 +75,17 @@ export default function CourseDetailClientPage() {
         ? '리뷰 등록 완료'
         : '리뷰 등록하기';
 
+  const handleOpenReviewModal = () => {
+    if (!user) {
+      loginModal.open();
+      return;
+    }
+    if (!isEnrolled) return;
+    if (hasMyReview) return;
+    setIsReviewOpen(true);
+  };
+
+  const isInCart = !!user?.cart?.includes(id);
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
   }
@@ -357,11 +363,7 @@ export default function CourseDetailClientPage() {
                             <button
                               type="button"
                               className={styles['course-detail__review-card__delete-btn']}
-                              onClick={async () => {
-                                if (myReviewStatus.status !== 'exists') return;
-                                if (!confirm('정말 삭제할까요?')) return;
-                                await deleteReview(myReviewStatus.reviewId);
-                              }}
+                              onClick={handleOpenReviewModal}
                             >
                               삭제
                             </button>
@@ -402,17 +404,22 @@ export default function CourseDetailClientPage() {
       {/* 모달들 */}
       <CourseReviewModal
         isOpen={isReviewOpen}
-        nickname={user?.nickname ?? ''}
+        nickname={user?.nickname ?? ''} // 모달 표시용
         isMine={hasMyReview}
         onClose={() => setIsReviewOpen(false)}
         initialReview={
           myReview ? { rating: myReview.rating, content: myReview.content } : undefined
         }
         onSubmit={async ({ rating, content }) => {
-          if (myReviewStatus.status === 'exists') {
-            await updateReview(myReviewStatus.reviewId, { rating, content });
-          } else {
-            await createReview({ rating, content });
+          try {
+            if (myReviewStatus.status === 'exists') {
+              await updateReview(myReviewStatus.reviewId, { rating, content });
+            } else {
+              await createReview({ rating, content });
+            }
+            setIsReviewOpen(false);
+          } catch (e) {
+            console.error('리뷰 저장 실패:', e);
           }
         }}
       />

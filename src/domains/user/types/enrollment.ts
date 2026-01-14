@@ -10,7 +10,7 @@ export type EnrollmentListContent = {
   progressRate: number;
   expiredAt: string;
   categories: string[];
-  isReviewed: boolean;
+  isReviewed?: boolean;
 };
 
 export type EnrollmentListResponse = {

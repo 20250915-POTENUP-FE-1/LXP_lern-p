@@ -3,8 +3,23 @@ import type { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/co
 export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
     {
+      courseId: '2001',
+      title: '종덕재희수연힘내자',
+      categories: ['프런트', '팀A'],
+      thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
+      status: 'PUBLISHED',
+      price: 0,
+      studentCount: 12,
+      rating: 5.0,
+      lastModifiedAt: '2026-01-07T12:00:00Z',
+      level: 'BEGINNER',
+      summary: '팀A 프런트 프로젝트 진행을 위한 단기 집중 코스입니다.',
+      instructorName: '팀A',
+    },
+
+    {
       courseId: '2002',
-      title: 'Spring Boot 완벽 가이드',
+      title: '스프링 부트 완벽 가이드',
       categories: ['백엔드', 'Spring'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
       status: 'PUBLISHED',
@@ -27,9 +42,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       rating: 4.6,
       lastModifiedAt: '2026-01-05T09:12:00Z',
       level: 'INTERMEDIATE',
-      summary: 'React 핵심부터 Next.js 렌더링 흐름까지 한 번에 정리합니다.',
+      summary: 'React 핵심부터 Next.js App Router까지 정리합니다.',
       instructorName: '이프론트',
     },
+
     {
       courseId: '2004',
       title: '데이터베이스 기초',
@@ -41,9 +57,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       rating: 4.2,
       lastModifiedAt: '2025-12-28T11:00:00Z',
       level: 'BEGINNER',
-      summary: '관계형 데이터베이스 개념과 SQL 기초를 학습합니다.',
+      summary: '관계형 DB 개념과 SQL 기초를 학습합니다.',
       instructorName: '박디비',
     },
+
     {
       courseId: '3001',
       title: 'Node.js 백엔드 실전',
@@ -55,9 +72,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       rating: 4.5,
       lastModifiedAt: '2026-01-03T10:00:00Z',
       level: 'INTERMEDIATE',
-      summary: 'Node.js로 REST API와 서버 구조를 설계합니다.',
+      summary: 'Node.js 기반 서버 개발 실전 과정',
       instructorName: '정노드',
     },
+
     {
       courseId: '3002',
       title: '프론트엔드 테스트 전략',
@@ -73,23 +91,117 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       instructorName: '최테스트',
     },
   ],
-  cureentPage: 0,
+  currentPage: 0,
   size: 30,
-  totalElements: 5,
+  totalElements: 6,
   totalPages: '1',
   hasNext: false,
 };
 
 export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
+  '2001': {
+    courseId: '2001',
+    title: '종덕재희수연힘내자',
+    categories: ['프런트', '팀A'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
+    summary: '팀A 프런트 단기 집중 코스',
+    description:
+      '팀A 협업 규칙, 컴포넌트 구조, 코드리뷰 기준을 빠르게 맞추기 위한 내부 코스입니다.',
+    instructor: {
+      id: 'inst-2001',
+      name: '팀A',
+      profileUrl: 'https://example.com/profiles/instructor_2001.png',
+    },
+    isPurchased: true,
+    totalDuration: 3600,
+    status: 'PUBLISHED',
+    price: 0,
+    level: 'BEGINNER',
+    studentCount: 12,
+    rating: 5.0,
+    sections: [
+      {
+        sectionId: '2001-sec-1',
+        title: '협업 기본기',
+        order: 1,
+        lectures: [
+          {
+            lectureId: '2001-lec-1',
+            title: '브랜치/PR 룰 빠르게 맞추기',
+            totalDurationSeconds: 600,
+            isPreview: true,
+            orderIndex: 1,
+            createdAt: '2026-01-01T09:00:00Z',
+            updatedAt: '2026-01-07T09:00:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2001_lecture_001.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2001-lec-2',
+            title: '코드리뷰 체크리스트',
+            totalDurationSeconds: 900,
+            isPreview: false,
+            orderIndex: 2,
+            createdAt: '2026-01-01T09:20:00Z',
+            updatedAt: '2026-01-07T09:10:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2001_lecture_002.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+      {
+        sectionId: '2001-sec-2',
+        title: 'UI 구조',
+        order: 2,
+        lectures: [
+          {
+            lectureId: '2001-lec-3',
+            title: '레이아웃/라우팅 구조',
+            totalDurationSeconds: 900,
+            isPreview: true,
+            orderIndex: 3,
+            createdAt: '2026-01-02T11:00:00Z',
+            updatedAt: '2026-01-07T09:20:00Z',
+            resource: {
+              resourceType: 'VIDEO',
+              fileUrl: 'https://example.com/videos/2001_lecture_003.mp4',
+              isDownloadable: false,
+            },
+          },
+          {
+            lectureId: '2001-lec-4',
+            title: '상태관리/데이터 패칭 기준',
+            totalDurationSeconds: 1200,
+            isPreview: false,
+            orderIndex: 4,
+            createdAt: '2026-01-02T11:20:00Z',
+            updatedAt: '2026-01-07T09:30:00Z',
+            resource: {
+              resourceType: 'PDF',
+              fileUrl: 'https://example.com/files/2001_lecture_004.pdf',
+              isDownloadable: true,
+            },
+          },
+        ],
+      },
+    ],
+  },
+
   '2002': {
     courseId: '2002',
-    title: 'Spring Boot 완벽 가이드',
+    title: '스프링 부트 완벽 가이드',
     categories: ['백엔드', 'Spring'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
     summary: 'Spring Boot 기반 실무 백엔드 완성 로드맵',
     description: 'Spring Boot 프로젝트 구조, REST API 설계, JPA 연동까지 실무 중심으로 다룹니다.',
     instructor: {
-      id: '2002',
+      id: 'inst-2002',
       name: '김백엔드',
       profileUrl: 'https://example.com/profiles/instructor_2002.png',
     },
@@ -102,12 +214,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     rating: 4.7,
     sections: [
       {
-        sectionId: '1',
+        sectionId: '2002-sec-1',
         title: '프로젝트 구조 이해',
         order: 1,
         lectures: [
           {
-            lectureId: '1',
+            lectureId: '2002-lec-1',
             title: 'Spring Boot 프로젝트 개요',
             totalDurationSeconds: 600,
             isPreview: true,
@@ -121,7 +233,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '2',
+            lectureId: '2002-lec-2',
             title: '레이어드 아키텍처 빠르게 잡기',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -135,7 +247,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '3',
+            lectureId: '2002-lec-3',
             title: '설정(application.yml)과 프로파일',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -151,14 +263,14 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
         ],
       },
       {
-        sectionId: '2',
+        sectionId: '2002-sec-2',
         title: '강좌 도메인 구현',
         order: 2,
         lectures: [
           {
-            lectureId: '4',
+            lectureId: '2002-lec-4',
             title: 'DTO/Entity 분리 기준',
-            totalDurationSeconds: 100,
+            totalDurationSeconds: 1000,
             isPreview: true,
             orderIndex: 4,
             createdAt: '2026-01-02T11:00:00Z',
@@ -166,11 +278,11 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             resource: {
               resourceType: 'VIDEO',
               fileUrl: 'https://example.com/videos/2002_lecture_004.mp4',
-              isDownloadable: true,
+              isDownloadable: false,
             },
           },
           {
-            lectureId: '5',
+            lectureId: '2002-lec-5',
             title: '보안 체크리스트(내부 문서)',
             totalDurationSeconds: 800,
             isPreview: false,
@@ -184,7 +296,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '6',
+            lectureId: '2002-lec-6',
             title: 'JPA 연관관계 설계 실수 방지',
             totalDurationSeconds: 1200,
             isPreview: false,
@@ -210,7 +322,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: 'React와 Next.js App Router를 함께 학습합니다.',
     description: '컴포넌트 설계부터 App Router 렌더링 흐름까지 연결합니다.',
     instructor: {
-      id: '2003',
+      id: 'inst-2003',
       name: '이프론트',
       profileUrl: 'https://example.com/profiles/instructor_2003.png',
     },
@@ -223,12 +335,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     rating: 4.6,
     sections: [
       {
-        sectionId: '1',
+        sectionId: '2003-sec-1',
         title: 'App Router 렌더링 이해',
         order: 1,
         lectures: [
           {
-            lectureId: '1',
+            lectureId: '2003-lec-1',
             title: 'App Router 서비스 개요',
             totalDurationSeconds: 540,
             isPreview: true,
@@ -242,7 +354,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '2',
+            lectureId: '2003-lec-2',
             title: 'RSC / CSR 경계 감각',
             totalDurationSeconds: 780,
             isPreview: true,
@@ -256,7 +368,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '3',
+            lectureId: '2003-lec-3',
             title: 'fetch 캐싱과 revalidate',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -272,12 +384,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
         ],
       },
       {
-        sectionId: '2',
+        sectionId: '2003-sec-2',
         title: '실전 패턴',
         order: 2,
         lectures: [
           {
-            lectureId: '4',
+            lectureId: '2003-lec-4',
             title: '서버 액션 폼 처리',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -291,7 +403,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '5',
+            lectureId: '2003-lec-5',
             title: 'route handler로 API 프록시',
             totalDurationSeconds: 800,
             isPreview: false,
@@ -305,7 +417,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '6',
+            lectureId: '2003-lec-6',
             title: '에러 핸들링/토스트 UX',
             totalDurationSeconds: 1100,
             isPreview: false,
@@ -331,7 +443,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     summary: '데이터베이스 기본 개념과 SQL 기초',
     description: '테이블, 관계, 정규화 개념과 SQL 기본 문법을 학습합니다.',
     instructor: {
-      id: '2004',
+      id: 'inst-2004',
       name: '박디비',
       profileUrl: 'https://example.com/profiles/instructor_2004.png',
     },
@@ -344,12 +456,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     rating: 4.2,
     sections: [
       {
-        sectionId: '1',
+        sectionId: '2004-sec-1',
         title: 'DB 기본기',
         order: 1,
         lectures: [
           {
-            lectureId: '1',
+            lectureId: '2004-lec-1',
             title: '테이블/행/열 개념',
             totalDurationSeconds: 600,
             isPreview: true,
@@ -363,7 +475,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '2',
+            lectureId: '2004-lec-2',
             title: '키와 인덱스 기초',
             totalDurationSeconds: 780,
             isPreview: false,
@@ -379,12 +491,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
         ],
       },
       {
-        sectionId: '2',
+        sectionId: '2004-sec-2',
         title: 'SQL 입문',
         order: 2,
         lectures: [
           {
-            lectureId: '3',
+            lectureId: '2004-lec-3',
             title: 'SELECT / WHERE',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -398,7 +510,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '4',
+            lectureId: '2004-lec-4',
             title: 'GROUP BY 감각',
             totalDurationSeconds: 1000,
             isPreview: false,
@@ -422,9 +534,9 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     categories: ['백엔드', 'Node.js'],
     thumbnailUrl: 'https://example.com/thumbnails/course_3001.png',
     summary: 'Node.js 기반 서버 개발 실전 과정',
-    description: 'Express 기반 API 설계, 인증, 에러 처리, 배포까지 백엔드 전 과정을 다룹니다.',
+    description: 'Express 기반 API 설계, 인증, 에러 처리, 배포까지 다룹니다.',
     instructor: {
-      id: '3001',
+      id: 'inst-3001',
       name: '정노드',
       profileUrl: 'https://example.com/profiles/instructor_3001.png',
     },
@@ -437,12 +549,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     rating: 4.5,
     sections: [
       {
-        sectionId: '1',
+        sectionId: '3001-sec-1',
         title: '런타임 감각',
         order: 1,
         lectures: [
           {
-            lectureId: '1',
+            lectureId: '3001-lec-1',
             title: '이벤트 루프 이해',
             totalDurationSeconds: 720,
             isPreview: true,
@@ -456,7 +568,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '2',
+            lectureId: '3001-lec-2',
             title: '비동기 패턴 정리',
             totalDurationSeconds: 840,
             isPreview: false,
@@ -472,12 +584,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
         ],
       },
       {
-        sectionId: '2',
+        sectionId: '3001-sec-2',
         title: 'API 실전',
         order: 2,
         lectures: [
           {
-            lectureId: '3',
+            lectureId: '3001-lec-3',
             title: '라우팅/미들웨어 설계',
             totalDurationSeconds: 960,
             isPreview: true,
@@ -491,7 +603,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '4',
+            lectureId: '3001-lec-4',
             title: '인증/인가 기본',
             totalDurationSeconds: 1100,
             isPreview: false,
@@ -515,9 +627,9 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     categories: ['프론트엔드', '테스트'],
     thumbnailUrl: 'https://example.com/thumbnails/course_3002.png',
     summary: '프론트엔드 테스트 입문',
-    description: 'Jest, Testing Library를 활용해 안정적인 프론트엔드 테스트를 작성합니다.',
+    description: 'Jest, Testing Library를 활용해 안정적인 테스트를 작성합니다.',
     instructor: {
-      id: '3002',
+      id: 'inst-3002',
       name: '최테스트',
       profileUrl: 'https://example.com/profiles/instructor_3002.png',
     },
@@ -530,12 +642,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     rating: 4.3,
     sections: [
       {
-        sectionId: '1',
+        sectionId: '3002-sec-1',
         title: '테스트 시작',
         order: 1,
         lectures: [
           {
-            lectureId: '1',
+            lectureId: '3002-lec-1',
             title: '테스트 범위 잡기',
             totalDurationSeconds: 600,
             isPreview: true,
@@ -549,7 +661,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '2',
+            lectureId: '3002-lec-2',
             title: 'Jest 기본 문법',
             totalDurationSeconds: 780,
             isPreview: false,
@@ -565,12 +677,12 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
         ],
       },
       {
-        sectionId: '2',
+        sectionId: '3002-sec-2',
         title: '실전 테스트',
         order: 2,
         lectures: [
           {
-            lectureId: '3',
+            lectureId: '3002-lec-3',
             title: 'Testing Library 쿼리',
             totalDurationSeconds: 900,
             isPreview: true,
@@ -584,7 +696,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
             },
           },
           {
-            lectureId: '4',
+            lectureId: '3002-lec-4',
             title: '비동기 테스트 패턴',
             totalDurationSeconds: 1050,
             isPreview: false,

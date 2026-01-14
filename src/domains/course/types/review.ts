@@ -44,6 +44,20 @@ export type GetReviewResponse = {
   reported: number;
   createdAt: string;
   updatedAt: string;
+  isMine: boolean;
 };
 
 export type GetAllReviewsResponse = GetReviewResponse[];
+
+export type GetIsReviewedRequestItem = {
+  courseId: number;
+};
+
+export type GetIsReviewedRequest = GetIsReviewedRequestItem[];
+
+export type GetIsReviewedResponseItem = {
+  courseId: number;
+  isReviewed: boolean;
+};
+
+export type GetIsReviewedResponse = GetIsReviewedResponseItem[];

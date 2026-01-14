@@ -1,18 +1,26 @@
 import type { EnrollmentListResponse } from '@/domains/user/types/enrollment';
-import { mockLearnProgress } from './learn.mock';
 
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
   content: [
     {
       userId: 'user_001',
       enrollmentId: 'mock-enrollment-1',
+      courseId: '2001',
+      courseName: '종덕재희수연힘내자',
+      status: 'ENROLLED',
+      progressRate: 0,
+      expiredAt: '2026-01-01T09:00:00',
+      categories: ['프런트', '팀A'],
+    },
+    {
+      userId: 'user_001',
+      enrollmentId: 'mock-enrollment-2',
       courseId: '2002',
       courseName: '스프링 부트 완벽 가이드',
       status: 'ENROLLED',
       progressRate: 0,
       expiredAt: '2026-01-01T09:00:00',
       categories: ['백엔드', 'Spring'],
-      isReviewed: false,
     },
     {
       userId: 'user_001',
@@ -23,7 +31,6 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 70,
       expiredAt: '2025-12-31T09:00:00',
       categories: ['프론트엔드', 'React'],
-      isReviewed: true,
     },
     {
       userId: 'user_001',
@@ -34,7 +41,6 @@ export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {
       progressRate: 20,
       expiredAt: '2026-03-10T09:00:00',
       categories: ['데이터베이스'],
-      isReviewed: false,
     },
   ],
   totalElements: 3,

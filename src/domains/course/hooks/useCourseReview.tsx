@@ -9,37 +9,68 @@ import type {
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { getAllReviews } from '../services/reviewService';
 
-type UseCourseReviewsProps = {
-  nickname?: string;
-};
+// import { getMyReview } from '@/domains/course/services/reviewService';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
-export function useCourseReviews(courseId: string, options?: UseCourseReviewsProps) {
+type UseCourseReviewsArgs = {
+  courseId: string;
+  mode?: 'list' | 'mine';
+};
+
+export function useCourseReviews({ courseId, mode = 'list' }: UseCourseReviewsArgs) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const nickname = options?.nickname;
 
   useEffect(() => {
     if (!courseId) return;
+
     (async () => {
       try {
+        /**
+         * mode === 'list'  : 리뷰 다중조회(강의상세 탭)
+         * mode === 'mine'  : 내 리뷰 단건조회(마이페이지 모달)
+         */
         const items = await (async () => {
+          // DEV: mock
           if (process.env.NODE_ENV === 'development') {
-            return MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+            const list = MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+            if (mode === 'mine') {
+              // mock에서 내 리뷰만
+              return list.filter((r: any) => Boolean(r.isMine));
+            }
+            // mock 전체
+            return list;
           }
+
+          // PROD
+          if (mode === 'mine') {
+            /**
+             * TODO: 내 리뷰 단건조회 API
+             * GET /api/courses/{courseId}/review
+             *
+             * const mine = await getMyReview(courseId);
+             * return mine ? [mine] : [];
+             */
+            return [];
+          }
+
+          /**
+           * TODO: 리뷰 다중조회 API
+           * GET /api/courses/{courseId}/reviews
+           */
           return await getAllReviews(courseId);
         })();
 
-        const mapped: Review[] = items.map((it) => ({
+        const mapped: Review[] = (items ?? []).map((it: any) => ({
           id: String(it.id),
-          courseId: String(it.courseId),
-          nickname: it.nickname,
-          rating: it.rating,
-          content: it.content,
-          createdAt: it.createdAt,
-          updatedAt: it.updatedAt,
-          user: { nickname: it.nickname },
-          isMine: nickname ? it.nickname === nickname : false,
+          courseId: String(it.courseId ?? courseId),
+          nickname: String(it.nickname ?? it.user?.nickname ?? ''),
+          rating: Number(it.rating ?? 0),
+          content: String(it.content ?? ''),
+          createdAt: String(it.createdAt ?? it.createAt ?? ''),
+          updatedAt: String(it.updatedAt ?? it.updateAt ?? ''),
+          user: { nickname: String(it.nickname ?? it.user?.nickname ?? '') },
+          isMine: Boolean(it.isMine),
           status: it.status === 'BLIND' ? 'BLINDED' : 'DISPLAY',
         }));
 
@@ -49,7 +80,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
         setReviews([]);
       }
     })();
-  }, [courseId]);
+  }, [courseId, mode]);
 
   const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
 
@@ -62,77 +93,76 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
   const createReview = useCallback(
     async (payload: CreateReviewRequest) => {
-      if (!nickname) {
-        throw new Error('MISSING_NICKNAME');
-      }
-
-      // TODO: 리뷰 생성 서버 연동 시 수정 필요
-      // const data = await createReviewApi(courseId, payload);
-
       const now = new Date().toISOString();
 
+      // DEV: mock optimistic
       const newReview: Review = {
-        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`, // String(data.reviewId),
+        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
         courseId,
-        nickname,
+        nickname: 'me',
         rating: payload.rating ?? 0,
         content: payload.content?.trim() ?? '',
         createdAt: now,
         updatedAt: now,
-        user: { nickname },
+        user: { nickname: 'me' },
         isMine: true,
         status: 'DISPLAY',
       };
 
-      setReviews((prev) => [newReview, ...prev]);
+      setReviews((prev) => [newReview, ...prev.map((r) => ({ ...r, isMine: false }))]);
+
+      /**
+       * TODO: 리뷰 생성 API
+       * await createReviewApi(courseId, payload);
+       * await refresh(=재조회) 하고 싶으면, 여기서 mode 기준으로 다시 fetch 하면 됨
+       */
+
       return newReview;
-    },
-    [courseId, nickname],
-  );
-
-  const updateReview = useCallback(
-    async (reviewId: string, payload: UpdateReviewRequest) => {
-      // TODO: 리뷰 수정 서버 연동 시 수정 필요
-      // await updateReviewApi(courseId, reviewId, payload);
-      if (!nickname) {
-        throw new Error('MISSING_NICKNAME');
-      }
-
-      const now = new Date().toISOString();
-
-      let updated: Review | null = null;
-
-      setReviews((prev) =>
-        prev.map((review) => {
-          if (review.id !== reviewId) return review;
-
-          updated = {
-            ...review,
-            rating: payload.rating ?? review.rating,
-            content: payload.content?.trim() ?? review.content,
-            updatedAt: now,
-          };
-
-          return updated;
-        }),
-      );
-
-      return updated;
-    },
-    [nickname],
-  );
-
-  const deleteReview = useCallback(
-    async (reviewId: string) => {
-      // TODO: 리뷰 삭제 서버 연동 시 수정 필요
-      // await deleteReviewApi(courseId, reviewId);
-      setReviews((prev) => prev.filter((review) => review.id !== reviewId));
     },
     [courseId],
   );
 
+  const updateReview = useCallback(async (reviewId: string, payload: UpdateReviewRequest) => {
+    const now = new Date().toISOString();
+
+    let updated: Review | null = null;
+
+    setReviews((prev) =>
+      prev.map((review) => {
+        if (review.id !== reviewId) return review;
+
+        updated = {
+          ...review,
+          rating: payload.rating ?? review.rating,
+          content: payload.content?.trim() ?? review.content,
+          updatedAt: now,
+          isMine: true,
+        };
+
+        return updated;
+      }),
+    );
+
+    /**
+     * TODO: 리뷰 수정 API
+     * await updateReviewApi(reviewId, payload);
+     */
+
+    return updated;
+  }, []);
+
+  const deleteReview = useCallback(async (reviewId: string) => {
+    setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+
+    /**
+     * TODO: 리뷰 삭제 API
+     * await deleteReviewApi(reviewId);
+     */
+  }, []);
+
   return {
     reviews,
+    myReview,
     myReviewStatus,
     canWriteReview,
     createReview,

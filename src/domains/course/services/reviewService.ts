@@ -4,6 +4,9 @@ import {
   CreateReviewResponse,
   DeleteReviewResponse,
   GetAllReviewsResponse,
+  GetIsReviewedRequest,
+  GetIsReviewedResponse,
+  GetIsReviewedResponseItem,
   GetReviewResponse,
   UpdateReviewRequest,
   UpdateReviewResponse,
@@ -47,6 +50,11 @@ export const getAllReviews = async (courseId: string): Promise<GetAllReviewsResp
 };
 
 // 리뷰 단건 조회 API
-export const getMyReview = async (courseId: string): Promise<GetReviewResponse> => {
-  return await getApi<GetReviewResponse>(`/api/courses/${courseId}/review`);
-};
+export async function getMyReview(courseId: string | number): Promise<GetReviewResponse> {
+  return getApi<GetReviewResponse>(`/api/courses/${courseId}/review`);
+}
+// 수강중인 강좌 리뷰 여부 확인 API
+export async function getIsReviewed(request: GetIsReviewedRequest): Promise<GetIsReviewedResponse> {
+  const courseIds = request.map((it) => it.courseId).join(',');
+  return getApi<GetIsReviewedResponse>(`/api/reviews/my?courseIds=${courseIds}`);
+}
