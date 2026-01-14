@@ -19,9 +19,10 @@ export default function CourseListClientPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // TODO: API 정상화 후 제거 또는 MSW로 전환
-        const data: GetAllCourseResponse =
-          process.env.NODE_ENV === 'development' ? MOCK_GET_ALL_COURSE : await getAllCourses();
+        // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
+        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+        const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
 
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
           id: item.courseId,

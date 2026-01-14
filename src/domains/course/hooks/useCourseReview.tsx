@@ -7,13 +7,13 @@ import type {
   UpdateReviewRequest,
 } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import {
   createReview as createReviewApi,
   deleteReview as deleteReviewApi,
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
-import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
@@ -26,10 +26,12 @@ export function useCourseReviews(courseId: string) {
 
     (async () => {
       try {
-        const items =
-          process.env.NODE_ENV === 'development'
-            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-            : await getAllReviews(courseId);
+        // TODO(mock): 개발 중 환경변수로 강의 리뷰 데이터를 mock으로 조회
+        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+        const items = USE_MOCK
+          ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
+          : await getAllReviews(courseId);
 
         const mapped: Review[] = (items ?? []).map((it: any) => {
           const nickname = String(it.nickname ?? it.user?.nickname ?? '');

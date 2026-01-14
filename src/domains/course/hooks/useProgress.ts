@@ -14,6 +14,7 @@ import type {
 // import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
 
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
+import { getLearnProgress } from '../services/learnService';
 
 export function useProgress(enrollmentId: string) {
   const [progressData, setProgressData] = useState<UpdateProgressResponse | null>(null);
@@ -27,15 +28,16 @@ export function useProgress(enrollmentId: string) {
       try {
         setIsLoading(true);
 
-        if (process.env.NODE_ENV === 'development') {
-          // UI 검증용 mock
+        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+        if (USE_MOCK) {
+          // TODO(mock): 개발 중 학습 진행률 UI 검증을 위한 mock 데이터 사용
           setProgressData(MOCK_LEARN_PROGRESS);
           return;
         }
 
-        // TODO: 실제 서버 연동
-        // const response = await getLearnProgress(enrollmentId);
-        // setProgressData(response);
+        const response = await getLearnProgress(enrollmentId);
+        setProgressData(response);
       } catch (e) {
         setError(e as Error);
       } finally {

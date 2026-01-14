@@ -6,9 +6,9 @@ import { getOrders } from '@/domains/user/services/orderService';
 import { MOCK_GET_ORDERS } from '@/mocks/order.mock';
 
 export default async function PurchaseHistoryPage() {
-  // TODO: API 정상화 후 제거 또는 MSW로 전환
-  const { orders, totalCount } =
-    process.env.NODE_ENV === 'development' ? MOCK_GET_ORDERS : await getOrders();
+  // TODO(mock): 환경변수로 mock 사용 여부 제어
+  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+  const { orders, totalCount } = USE_MOCK ? MOCK_GET_ORDERS : await getOrders();
 
   const isEmpty = orders.length === 0;
 

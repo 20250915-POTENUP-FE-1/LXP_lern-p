@@ -3,15 +3,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
-import { MOCK_GET_COURSE_REVIEWS, MOCK_GET_IS_REVIEWED } from '@/mocks/review.mock';
+import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
 import { getIsReviewed } from '@/domains/course/services/reviewService';
 import { getEnrollmentList } from '../services/enrollmentService';
-import { useRouter } from 'next/navigation';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
@@ -81,11 +81,13 @@ export default function EnrollmentClientPage() {
     async function fetchEnrollments() {
       setEnrolledLoading(true);
       try {
-        const page =
-          process.env.NODE_ENV === 'development' ? MOCK_ENROLLMENT_LIST : await getEnrollmentList(); // TODO: getEnrollmentList로 교체
+        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+        // TODO(mock): 개발 중 환경변수로 수강 목록 및 리뷰 상태를 mock 데이터로 구성
+        const page = USE_MOCK ? MOCK_ENROLLMENT_LIST : await getEnrollmentList();
         const content = page.content;
 
-        if (process.env.NODE_ENV === 'development') {
+        if (USE_MOCK) {
           const merged = content.map((it) => {
             const cid = String(it.courseId);
             const list = MOCK_GET_COURSE_REVIEWS[cid] ?? [];
@@ -101,11 +103,8 @@ export default function EnrollmentClientPage() {
         const courseIds = Array.from(
           new Set(content.map((it) => Number(it.courseId)).filter((v) => Number.isFinite(v))),
         );
-
         const flags = await getIsReviewed({ courseIds });
-
         const reviewedMap = new Map(flags.map((f) => [String(f.courseId), !!f.isReviewed]));
-
         const merged = content.map((it) => ({
           ...it,
           isReviewed: reviewedMap.get(String(it.courseId)) ?? false,
@@ -181,7 +180,7 @@ export default function EnrollmentClientPage() {
 
                   {hasProgress && (
                     <Link
-                      href={buttonHref} 
+                      href={buttonHref}
                       className={styles['btn-primary']}
                       aria-label={buttonLabel}
                     >
