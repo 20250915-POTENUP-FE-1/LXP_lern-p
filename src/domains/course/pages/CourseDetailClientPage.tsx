@@ -3,7 +3,7 @@
 import { MouseEvent, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -34,7 +34,9 @@ export default function CourseDetailClientPage() {
 
   const { user, setUser } = useAuthState();
 
-  const [activeTab, setActiveTab] = useState<TabKey>('curriculum');
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') === 'review' ? 'reviews' : 'curriculum') as TabKey;
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [cartPending, setCartPending] = useState(false);
 
   const loginModal = useModal(false);
@@ -49,12 +51,11 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, createReview, updateReview, deleteReview, myReviewStatus, canWriteReview } =
-    useCourseReviews(id, {
-      nickname: user?.nickname,
-    });
-
+  const { reviews, writeReview, editReview, removeReview, myReviewStatus } = useCourseReviews(id);
   const reviewCount = reviews.length;
+
+  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
+  const hasMyReview = myReviewStatus.status === 'exists';
 
   const avgRating = useMemo(() => {
     if (reviewCount === 0) return 0;
@@ -62,11 +63,7 @@ export default function CourseDetailClientPage() {
     return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
   }, [reviews, reviewCount]);
 
-  const isInCart = !!user?.cart?.includes(id);
-
-  const hasMyReview = myReviewStatus.status === 'exists';
-
-  const canOpenReviewModal = !user ? true : isEnrolled && !hasMyReview;
+  const canOpenReviewModal = !user || (isEnrolled && !hasMyReview);
 
   const reviewButtonLabel = !user
     ? '리뷰 등록하기'
@@ -76,6 +73,7 @@ export default function CourseDetailClientPage() {
         ? '리뷰 등록 완료'
         : '리뷰 등록하기';
 
+  const isInCart = !!user?.cart?.includes(id);
   if (loading) {
     return <div className={styles.loading}>로딩 중...</div>;
   }
@@ -334,7 +332,7 @@ export default function CourseDetailClientPage() {
                     >
                       <div className={styles['course-detail__review-card__author']}>
                         <span className={styles['course-detail__review-card__nickname']}>
-                          {r.user.nickname}
+                          {r.nickname}
                         </span>
                         <span className={styles['course-detail__review-card__date']}>
                           {formatReviewDate(r.createdAt)}
@@ -356,7 +354,7 @@ export default function CourseDetailClientPage() {
                               onClick={async () => {
                                 if (myReviewStatus.status !== 'exists') return;
                                 if (!confirm('정말 삭제할까요?')) return;
-                                await deleteReview(myReviewStatus.reviewId);
+                                await removeReview();
                               }}
                             >
                               삭제
@@ -398,15 +396,22 @@ export default function CourseDetailClientPage() {
       {/* 모달들 */}
       <CourseReviewModal
         isOpen={isReviewOpen}
-        onClose={() => setIsReviewOpen(false)}
+        nickname={user?.nickname ?? ''} // 모달 표시용
         isMine={hasMyReview}
-        initialReview={hasMyReview ? reviews.find((r) => r.isMine) : undefined}
-        nickname={user?.nickname ?? ''}
+        onClose={() => setIsReviewOpen(false)}
+        initialReview={
+          myReview ? { rating: myReview.rating, content: myReview.content } : undefined
+        }
         onSubmit={async ({ rating, content }) => {
-          if (myReviewStatus.status === 'exists') {
-            await updateReview(myReviewStatus.reviewId, { rating, content });
-          } else {
-            await createReview({ rating, content });
+          try {
+            if (myReviewStatus.status === 'exists') {
+              await editReview({ rating, content });
+            } else {
+              await writeReview({ rating, content });
+            }
+            setIsReviewOpen(false);
+          } catch (e) {
+            console.error('리뷰 저장 실패:', e);
           }
         }}
       />

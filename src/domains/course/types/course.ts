@@ -232,7 +232,7 @@ export type GetAllCourseResponse = {
     summary: string;
     instructorName: string;
   }>;
-  cureentPage: number;
+  currentPage: number;
   size: number;
   totalElements: number;
   totalPages: string;
