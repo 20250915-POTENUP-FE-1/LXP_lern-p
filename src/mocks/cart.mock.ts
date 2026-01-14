@@ -5,10 +5,10 @@ export const MOCK_GET_CART: GetCartResponse = {
   items: [
     {
       cartItemId: 10101,
-      courseId: 2002,
-      courseTitle: 'Spring Boot 완벽 가이드',
+      courseId: 2001,
+      courseTitle: 'Spring Boot 완벽 가이드1',
       instructorName: '김백엔드',
-      price: 99000,
+      price: 55000,
       thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
     },
     {

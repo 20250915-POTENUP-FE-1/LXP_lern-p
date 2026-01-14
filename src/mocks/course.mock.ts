@@ -13,7 +13,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
   content: [
     {
       courseId: '2001',
-      title: '스프링 부트 완벽 가이드',
+      title: '스프링 부트 완벽 가이드1',
       categories: ['백엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
       status: 'PUBLISHED',
@@ -27,7 +27,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     },
     {
       courseId: '2002',
-      title: '스프링 부트 완벽 가이드',
+      title: '스프링 부트 완벽 가이드2',
       categories: ['백엔드', 'Spring'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
       status: 'PUBLISHED',
@@ -106,7 +106,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
 export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2001': {
     courseId: '2001',
-    title: '스프링 부트 완벽 가이드',
+    title: '스프링 부트 완벽 가이드1',
     categories: ['백엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
     summary: '스프링 부트의 모든 것',
@@ -199,7 +199,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
 
   '2002': {
     courseId: '2002',
-    title: '스프링 부트 완벽 가이드',
+    title: '스프링 부트 완벽 가이드2',
     categories: ['백엔드', 'Spring'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
     summary: 'Spring Boot 기반 실무 백엔드 완성 로드맵',
@@ -531,7 +531,6 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
       },
     ],
   },
-
   '3001': {
     courseId: '3001',
     title: 'Node.js 백엔드 실전',
