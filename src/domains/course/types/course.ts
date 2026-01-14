@@ -1,4 +1,16 @@
-// === 0. 기본
+// ===== Enums / Unions =====
+export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
+export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
+export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
+
+// ===== Core Domain =====
+export type Resource = {
+  resourceType: ResourceType;
+  fileUrl: string;
+  isDownloadable: boolean;
+};
+
 export type Course = {
   id: string;
   title: string;
@@ -17,10 +29,9 @@ export type Course = {
   isFree: boolean;
 
   studentCount: number;
-
   duration: number;
-  status: Status;
 
+  status: Status;
   createdAt?: string;
   updatedAt?: string;
 
@@ -48,69 +59,6 @@ export type Lecture = {
   updatedAt: string;
 };
 
-export type Category = {
-  categoryId: number;
-  name: string;
-  children: CategoryChild[];
-};
-export type CategoryChild = {
-  categoryId: number;
-  name: string;
-};
-
-// 강좌 생성/ 수정
-export type CourseDraftForm = {
-  title: string;
-  summary: string;
-  description: string;
-  category: string[];
-  level: string;
-  price: number | string;
-  thumbnail: string;
-  status?: string;
-};
-
-// 섹션 생성 / 수정
-export type SectionDraftForm = DraftMeta & {
-  localId: string;
-  id: string;
-  title: string;
-  lectures: LectureDraftForm[];
-};
-
-// 강의 생성 / 수정
-export type LectureDraftForm = DraftMeta & {
-  localId: string;
-  id: string;
-  title: string;
-  duration: number;
-  videoUrl: string;
-  isPreview: boolean;
-  resource: LectureResource[];
-  file?: File;
-};
-
-// === 2. 내부 데이터 구조
-
-export type DraftMeta = {
-  _dirty: boolean;
-  _deleted?: boolean;
-};
-
-// 강의 리소스 타입
-export type LectureResource = {
-  resourceType?: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP' | undefined;
-  isDownloadable?: boolean;
-  fileUrl?: string;
-};
-
-// 강좌 수강 상태
-export type Resource = {
-  resourceType: ResourceType;
-  fileUrl: string;
-  isDownloadable: boolean;
-};
-
 export type Enrollment = {
   id: string;
   userId: string;
@@ -125,22 +73,101 @@ export type CourseDetail = {
   lectures: Record<string, Lecture[]>;
 };
 
-//강좌 생성/수정 요청
+export type CourseCardType = Omit<
+  Course,
+  'description' | 'sections' | 'duration' | 'status' | 'instructorId'
+>;
+
+// ===== Category =====
+export type CategoryChild = {
+  categoryId: number;
+  name: string;
+};
+
+export type Category = {
+  categoryId: number;
+  name: string;
+  children: CategoryChild[];
+};
+
+// ===== Draft (강좌/섹션/강의 작성 중 상태) =====
+export type DraftMeta = {
+  _dirty: boolean;
+  _deleted?: boolean;
+};
+
+export type CourseDraftForm = {
+  title: string;
+  summary: string;
+  description: string;
+  category: string[];
+  level: string;
+  price: number | string;
+  thumbnail: string;
+  status?: string;
+};
+
+export type LectureResource = {
+  resourceType?: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP' | undefined;
+  isDownloadable?: boolean;
+  fileUrl?: string;
+};
+
+export type LectureDraftForm = DraftMeta & {
+  localId: string;
+  id: string;
+  title: string;
+  duration: number;
+  videoUrl: string;
+  isPreview: boolean;
+  resource: LectureResource[];
+  file?: File;
+};
+
+export type SectionDraftForm = DraftMeta & {
+  localId: string;
+  id: string;
+  title: string;
+  lectures: LectureDraftForm[];
+};
+
+export type GetDraftCourseResponse = {
+  courseDraft: CourseDraftForm;
+  sectionDrafts: SectionDraftForm[];
+};
+
+// ===== API: 강좌 생성 / 수정 =====
 export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
   thumbnail: string;
-  categoryId: string;
+  categoryId: string; ////number?
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 };
-export type UpdateCourseRequest = CreateCourseRequest;
 
-// 섹션 생성 요청
+export type CreateCourseResponse = {
+  courseId: string; //number?
+};
+
+export type UpdateCourseRequest = CreateCourseRequest;
+export type UpdateCourseResponse = {
+  courseId: string; //number?
+};
+
+// ===== API: 섹션 생성 / 수정 =====
 export type CreateSectionRequest = {
   title: string;
   orderIndex: number;
+};
+
+export type CreateSectionResponse = {
+  sectionId: string; //number?
+  title: string;
+  orderIndex: number;
+  createdAt: string; //원래 응답값에 없음
+  updatedAt: string; //원래 응답값에 없음
 };
 
 export type UpdateSectionRequest = {
@@ -148,15 +175,52 @@ export type UpdateSectionRequest = {
   orderIndex: number;
 };
 
-// 강의 생성/ 수정 요청
+export type UpdateSectionResponse = {
+  sectionId: string;
+  title: string;
+  orderIndex: number;
+  updatedAt: string;
+};
+// ===== API: Presigned URL 생성 =====
+export type CreateLectureResourcePresignedUrlRequest = {}; // body 없음
+export type CreateLectureResourcePresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+// 썸네일 업로드 url 생성 API
+export type CreateThumbnailPresignedUrlRequest = {}; // body 없음
+export type CreateThumbnailPresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+export type DeleteSectionRequest = {};
+export type DeleteSectionResponse = {
+  sectionId?: string;
+};
+
+// ===== API: 강의 생성 / 수정 =====
 export type CreateLectureRequest = {
+  title: string;
+  isPreview: boolean;
+  orderIndex: number;
+  resourceKey: string;
+  totalDurationSeconds: number; //응답에 없는 값
+};
+
+export type CreateLectureResponse = {
+  lectureId: string; // 응답에 없는 값
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
+  createdAt: string; // 응답에 없는 값
+  updatedAt: string; // 응답에 없는 값
   resource: {
+    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
     isDownloadable: boolean;
-    fileUrl?: string;
+    fileKey: string;
   };
 };
 
@@ -164,32 +228,16 @@ export type UpdateLectureRequest = {
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
-  resource: {
-    isDownloadable: boolean;
-    fileUrl?: string;
-  };
+  resourceKey?: string;
 };
 
-// 강좌 생성 응답
-export type CreateCourseResponse = CourseIdResponse;
-
-// 섹션 생성 응답
-export type CreateSectionResponse = {
-  sectionId: string;
-  title: string;
-  orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// 강의 생성 응답
-export type CreateLectureResponse = {
+export type UpdateLectureResponse = {
   lectureId: string;
   title: string;
+  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
+  updatedAt: string; //응답에 없는 값
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
     isDownloadable: boolean;
@@ -197,26 +245,20 @@ export type CreateLectureResponse = {
   };
 };
 
-export type CourseIdResponse = {
-  courseId: string;
+export type DeleteLectureRequest = {};
+export type DeleteLectureResponse = {
+  lectureId?: string;
 };
 
-// 섹션/강의 순서 변경 요청
-
-export type ReorderSectionsRequest = {
-  sectionIds: string[];
+// ===== API: 강좌 발행 =====
+export type PublishCourseRequest = {}; // body 없음
+export type PublishCourseResponse = {
+  id: number;
+  title: string;
+  courseState: 'PUBLISHED';
 };
 
-export type ReorderLecturesRequest = {
-  lectures: {
-    lectureId: string;
-    orderIndex: number;
-  }[];
-};
-
-export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
-export type CourseLevel = 'BEGINNER' | 'NOVICE' | 'INTERMEDIATE' | 'ADVANCED';
-
+// ===== API: 강좌/섹션/강의 조회 =====
 export type GetAllCourseResponse = {
   content: Array<{
     courseId: string;
@@ -235,12 +277,34 @@ export type GetAllCourseResponse = {
   currentPage: number;
   size: number;
   totalElements: number;
-  totalPages: string;
+  totalPages: string; // number?
   hasNext: boolean;
 };
 
+export type LectureDetailResponse = {
+  lectureId: string;
+  title: string;
+  totalDurationSeconds: number; // 응답에는 없음
+  isPreview: boolean;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+  resource: {
+    resourceType: ResourceType;
+    fileUrl: string;
+    isDownloadable: boolean;
+  }; // resources: LectureResourceResponse[];
+};
+
+export type SectionDetailResponse = {
+  sectionId: string;
+  title: string;
+  order: number;
+  lectures: LectureDetailResponse[];
+};
+
 export type GetCourseDetailResponse = {
-  courseId: string;
+  courseId: string; // number?
   title: string;
   categories: string[];
   thumbnailUrl: string;
@@ -253,56 +317,34 @@ export type GetCourseDetailResponse = {
   };
   isPurchased: boolean;
   totalDuration: number;
-  status: Status;
   price: number;
+  status: Status;
   level: CourseLevel;
   studentCount: number;
-  rating: number;
   sections: SectionDetailResponse[];
+  reviewRatingAvg: number; // 추가
+  reviewcount: number; // 추가
 };
 
-export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
+// 추가됨
+export type GetCourseDetailRequest = {
+  courseId: number;
+};
 
+// 추가됨
+export type LectureResourceResponse = {
+  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+  fileUrl: string;
+  isDownloadable: boolean;
+};
+
+// ===== API: 수강 정보 조회 =====
 export type GetEnrollmentResponse = {
   enrollmentId: string;
   studentId: string;
   courseId: string;
   status: EnrollmentStatus;
   progressRate: 45;
-  createdAt: string;
+  createdAt: string; // number?
   expiredAt: string;
-};
-
-export type SectionDetailResponse = {
-  sectionId: string;
-  title: string;
-  order: number;
-  lectures: LectureDetailResponse[];
-};
-
-export type LectureDetailResponse = {
-  lectureId: string;
-  title: string;
-  totalDurationSeconds: number;
-  isPreview: boolean;
-  orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
-  resource: {
-    resourceType: ResourceType;
-    fileUrl: string;
-    isDownloadable: boolean;
-  };
-};
-
-export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
-
-export type CourseCardType = Omit<
-  Course,
-  'description' | 'sections' | 'duration' | 'status' | 'instructorId'
->;
-
-export type GetDraftCourseResponse = {
-  courseDraft: CourseDraftForm;
-  sectionDrafts: SectionDraftForm[];
 };
