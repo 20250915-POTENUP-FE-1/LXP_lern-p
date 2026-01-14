@@ -51,9 +51,8 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, createReview, updateReview, deleteReview, myReviewStatus } = useCourseReviews({
-    courseId: id,
-  });
+  const { reviews, UseCreateReview, UseUpdateReview, UseDeleteReview, myReviewStatus } =
+    useCourseReviews(id);
   const reviewCount = reviews.length;
 
   const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
@@ -334,7 +333,7 @@ export default function CourseDetailClientPage() {
                     >
                       <div className={styles['course-detail__review-card__author']}>
                         <span className={styles['course-detail__review-card__nickname']}>
-                          {r.user.nickname}
+                          {r.nickname}
                         </span>
                         <span className={styles['course-detail__review-card__date']}>
                           {formatReviewDate(r.createdAt)}
@@ -356,7 +355,7 @@ export default function CourseDetailClientPage() {
                               onClick={async () => {
                                 if (myReviewStatus.status !== 'exists') return;
                                 if (!confirm('정말 삭제할까요?')) return;
-                                await deleteReview(myReviewStatus.reviewId);
+                                await UseDeleteReview();
                               }}
                             >
                               삭제
@@ -407,9 +406,9 @@ export default function CourseDetailClientPage() {
         onSubmit={async ({ rating, content }) => {
           try {
             if (myReviewStatus.status === 'exists') {
-              await updateReview(myReviewStatus.reviewId, { rating, content });
+              await UseUpdateReview({ rating, content });
             } else {
-              await createReview({ rating, content });
+              await UseCreateReview({ rating, content });
             }
             setIsReviewOpen(false);
           } catch (e) {

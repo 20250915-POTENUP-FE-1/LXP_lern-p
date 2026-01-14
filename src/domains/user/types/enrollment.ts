@@ -10,7 +10,7 @@ export type EnrollmentListContent = {
   progressRate: number;
   expiredAt: string;
   categories: string[];
-  isReviewed?: boolean;
+  isReviewed?: boolean; // TODO: 추후에 변경 가능성
 };
 
 export type EnrollmentListResponse = {

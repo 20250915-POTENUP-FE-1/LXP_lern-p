@@ -6,7 +6,6 @@ import {
   GetAllReviewsResponse,
   GetIsReviewedRequest,
   GetIsReviewedResponse,
-  GetIsReviewedResponseItem,
   GetReviewResponse,
   UpdateReviewRequest,
   UpdateReviewResponse,
@@ -28,14 +27,9 @@ export const updateReview = async (
   courseId: string,
   payload: UpdateReviewRequest,
 ): Promise<UpdateReviewResponse> => {
-  return await patchApi<UpdateReviewResponse>(`/api/courses/${courseId}/reviews`, {
-    rating: payload.rating ?? null,
-    content:
-      payload.content === undefined
-        ? null
-        : payload.content === null
-          ? null
-          : payload.content.trim(),
+  return patchApi<UpdateReviewResponse>(`/api/courses/${courseId}/reviews`, {
+    rating: payload.rating,
+    content: payload.content.trim(),
   });
 };
 
@@ -55,6 +49,5 @@ export async function getMyReview(courseId: string | number): Promise<GetReviewR
 }
 // 수강중인 강좌 리뷰 여부 확인 API
 export async function getIsReviewed(request: GetIsReviewedRequest): Promise<GetIsReviewedResponse> {
-  const courseIds = request.map((it) => it.courseId).join(',');
-  return getApi<GetIsReviewedResponse>(`/api/reviews/my?courseIds=${courseIds}`);
+  return postApi<GetIsReviewedResponse>(`/api/reviews/my`);
 }

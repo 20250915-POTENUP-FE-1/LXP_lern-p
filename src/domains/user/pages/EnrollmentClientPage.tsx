@@ -9,11 +9,11 @@ import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
-import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
+import { MOCK_GET_COURSE_REVIEWS, MOCK_GET_IS_REVIEWED } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
 import { getIsReviewed } from '@/domains/course/services/reviewService';
 import { getEnrollmentList } from '../services/enrollmentService';
-// import { getIsReviewed } from '@/domains/course/services/reviewService';
+import { useRouter } from 'next/navigation';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
@@ -23,17 +23,17 @@ export default function EnrollmentClientPage() {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   const [enrolledLoading, setEnrolledLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const selectedCourseId = useMemo(
     () => (reviewTarget ? String(reviewTarget.courseId) : ''),
     [reviewTarget],
   );
 
-  const { myReview, myReviewStatus, canWriteReview, createReview, updateReview } = useCourseReviews(
-    { courseId: selectedCourseId, mode: 'mine' },
-  );
+  const { myReview, myReviewStatus, canWriteReview, UseCreateReview, UseUpdateReview } =
+    useCourseReviews(selectedCourseId);
 
-  const modalIsMine = myReviewStatus.status === 'exists';
+  const isReviewed = myReviewStatus.status === 'exists';
 
   const initialReview = useMemo(() => {
     if (!isReviewOpen) return undefined;
@@ -49,7 +49,6 @@ export default function EnrollmentClientPage() {
 
   const closeReviewModal = () => {
     setIsReviewOpen(false);
-    setReviewTarget(null);
   };
 
   const submitReview = async (payload: { rating: number; content: string }) => {
@@ -58,7 +57,7 @@ export default function EnrollmentClientPage() {
 
     try {
       if (canWriteReview) {
-        await createReview({
+        await UseCreateReview({
           rating: payload.rating,
           content: payload.content,
         });
@@ -67,13 +66,14 @@ export default function EnrollmentClientPage() {
           prev.map((it) => (String(it.courseId) === courseId ? { ...it, isReviewed: true } : it)),
         );
       } else if (myReviewStatus.status === 'exists') {
-        await updateReview(myReviewStatus.reviewId, {
+        await UseUpdateReview({
           rating: payload.rating,
           content: payload.content,
         });
       }
 
       closeReviewModal();
+      router.push(`/courses/${courseId}/?tab=review#reviews`);
     } catch (e) {
       console.error('리뷰 제출 실패:', e);
     }
@@ -87,52 +87,33 @@ export default function EnrollmentClientPage() {
           process.env.NODE_ENV === 'development' ? MOCK_ENROLLMENT_LIST : await getEnrollmentList(); // TODO: getEnrollmentList로 교체
         const content = page.content;
 
-        /**
-         */
-        const merged = content.map((it) => {
-          const courseId = String(it.courseId);
-          const list = MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+        if (process.env.NODE_ENV === 'development') {
+          const merged = content.map((it) => {
+            const cid = String(it.courseId);
+            const list = MOCK_GET_COURSE_REVIEWS[cid] ?? [];
+            const hasMine = list.some((r: any) => Boolean(r.isMine));
 
-          const hasMine = list.some((r: any) => Boolean(r.isMine));
+            return { ...it, isReviewed: hasMine };
+          });
 
-          return {
-            ...it,
-            isReviewed: hasMine,
-          };
-        });
-
-        setItems(merged);
-
-        /**
-        /*
-        const courseIds = Array.from(
-          new Set(
-            content
-              .map((it) => Number(it.courseId))
-              .filter((v) => Number.isFinite(v)),
-          ),
-        );
-
-        if (courseIds.length === 0) {
-          setItems(content.map((it) => ({ ...it, isReviewed: false })));
+          setItems(merged);
           return;
         }
 
-        const flags = await getIsReviewed(
-          courseIds.map((courseId) => ({ courseId })),
+        const courseIds = Array.from(
+          new Set(content.map((it) => Number(it.courseId)).filter((v) => Number.isFinite(v))),
         );
 
-        const map = new Map(
-          flags.map((f) => [String(f.courseId), !!f.isReviewed]),
-        );
+        const flags = await getIsReviewed({ courseIds }); // TODO: GetIsReviewed 로 교체
+
+        const reviewedMap = new Map(flags.map((f) => [String(f.courseId), !!f.isReviewed]));
 
         const merged = content.map((it) => ({
           ...it,
-          isReviewed: map.get(String(it.courseId)) ?? false,
+          isReviewed: reviewedMap.get(String(it.courseId)) ?? false,
         }));
 
         setItems(merged);
-        */
       } catch (e) {
         console.error('수강 목록 조회 실패:', e);
       } finally {
@@ -200,7 +181,7 @@ export default function EnrollmentClientPage() {
                       className={styles['btn-primary']}
                       aria-label="이어보기"
                     >
-                      <span className={styles['play-icon']} />
+                      <span className={styles['enrollment-play-icon']} />
                     </Link>
                   )}
                 </div>
@@ -223,7 +204,7 @@ export default function EnrollmentClientPage() {
 
       <CourseReviewModal
         isOpen={isReviewOpen}
-        isMine={modalIsMine}
+        isMine={isReviewed}
         nickname={myReview?.nickname ?? ''}
         initialReview={initialReview}
         onClose={closeReviewModal}

@@ -8,7 +8,6 @@ export type Review = {
   content: string;
   createdAt: string;
   updatedAt: string;
-  user: { nickname: string };
   isMine: boolean;
   status: ReviewStatus;
 };
@@ -49,11 +48,9 @@ export type GetReviewResponse = {
 
 export type GetAllReviewsResponse = GetReviewResponse[];
 
-export type GetIsReviewedRequestItem = {
-  courseId: number;
+export type GetIsReviewedRequest = {
+  courseIds: number[];
 };
-
-export type GetIsReviewedRequest = GetIsReviewedRequestItem[];
 
 export type GetIsReviewedResponseItem = {
   courseId: number;
