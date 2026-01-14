@@ -131,7 +131,7 @@ export type CreateCourseRequest = {
   summary: string;
   description: string;
   thumbnail: string;
-  categoryId: string;
+  categoryId: string; ////number?
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 };
@@ -151,49 +151,46 @@ export type UpdateSectionRequest = {
 // 강의 생성/ 수정 요청
 export type CreateLectureRequest = {
   title: string;
-  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  resource: {
-    isDownloadable: boolean;
-    fileUrl?: string;
-  };
+  resourceKey: string;
+  totalDurationSeconds: number; //응답에 없는 값
 };
 
 export type UpdateLectureRequest = {
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
-  resource: {
-    isDownloadable: boolean;
-    fileUrl?: string;
-  };
+  resourceKey?: string;
 };
 
 // 강좌 생성 응답
-export type CreateCourseResponse = CourseIdResponse;
+export type CreateCourseResponse = {
+  courseId: string; //number?
+};
 
 // 섹션 생성 응답
 export type CreateSectionResponse = {
-  sectionId: string;
+  sectionId: string; //number?
   title: string;
   orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; //원래 응답값에 없음
+  updatedAt: string; //원래 응답값에 없음
 };
 
 // 강의 생성 응답
 export type CreateLectureResponse = {
-  lectureId: string;
+  lectureId: string; // 응답에 없는 값
   title: string;
+  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; // 응답에 없는 값
+  updatedAt: string; // 응답에 없는 값
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
     isDownloadable: boolean;
-    fileUrl: string;
+    fileKey: string;
   };
 };
 
@@ -215,7 +212,7 @@ export type ReorderLecturesRequest = {
 };
 
 export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
-export type CourseLevel = 'BEGINNER' | 'NOVICE' | 'INTERMEDIATE' | 'ADVANCED';
+export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 export type GetAllCourseResponse = {
   content: Array<{
@@ -235,12 +232,12 @@ export type GetAllCourseResponse = {
   currentPage: number;
   size: number;
   totalElements: number;
-  totalPages: string;
+  totalPages: string; // number?
   hasNext: boolean;
 };
 
 export type GetCourseDetailResponse = {
-  courseId: string;
+  courseId: string; // number?
   title: string;
   categories: string[];
   thumbnailUrl: string;
@@ -253,12 +250,13 @@ export type GetCourseDetailResponse = {
   };
   isPurchased: boolean;
   totalDuration: number;
-  status: Status;
   price: number;
+  status: Status;
   level: CourseLevel;
   studentCount: number;
-  rating: number;
   sections: SectionDetailResponse[];
+  reviewRatingAvg: number; // 추가
+  reviewcount: number; // 추가
 };
 
 export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
@@ -269,7 +267,7 @@ export type GetEnrollmentResponse = {
   courseId: string;
   status: EnrollmentStatus;
   progressRate: 45;
-  createdAt: string;
+  createdAt: string; // number?
   expiredAt: string;
 };
 
@@ -283,7 +281,7 @@ export type SectionDetailResponse = {
 export type LectureDetailResponse = {
   lectureId: string;
   title: string;
-  totalDurationSeconds: number;
+  totalDurationSeconds: number; // 응답에는 없음
   isPreview: boolean;
   orderIndex: number;
   createdAt: string;
@@ -292,7 +290,7 @@ export type LectureDetailResponse = {
     resourceType: ResourceType;
     fileUrl: string;
     isDownloadable: boolean;
-  };
+  }; // resources: LectureResourceResponse[];
 };
 
 export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -305,4 +303,77 @@ export type CourseCardType = Omit<
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
   sectionDrafts: SectionDraftForm[];
+};
+
+// 1번 타입에 없던(= 2번에서 추가된) 내용 모음
+
+// ===== API: 강좌 생성 / 수정 =====
+export type UpdateCourseResponse = {
+  courseId: string; //number?
+};
+
+// ===== API: 섹션 생성 / 수정 =====
+export type UpdateSectionResponse = {
+  sectionId: string;
+  title: string;
+  orderIndex: number;
+  updatedAt: string;
+};
+
+// ===== API: Presigned URL 생성 =====
+export type CreateLectureResourcePresignedUrlRequest = {}; // body 없음
+export type CreateLectureResourcePresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+// 썸네일 업로드 url 생성 API
+export type CreateThumbnailPresignedUrlRequest = {}; // body 없음
+export type CreateThumbnailPresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+export type DeleteSectionRequest = {};
+export type DeleteSectionResponse = {
+  sectionId?: string;
+};
+
+// ===== API: 강의 생성 / 수정 =====
+export type UpdateLectureResponse = {
+  lectureId: string;
+  title: string;
+  totalDurationSeconds: number;
+  isPreview: boolean;
+  orderIndex: number;
+  updatedAt: string; //응답에 없는 값
+  resource: {
+    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    isDownloadable: boolean;
+    fileUrl: string;
+  };
+};
+
+export type DeleteLectureRequest = {};
+export type DeleteLectureResponse = {
+  lectureId?: string;
+};
+
+// ===== API: 강좌 발행 =====
+export type PublishCourseRequest = {}; // body 없음
+export type PublishCourseResponse = {
+  id: number;
+  title: string;
+  courseState: 'PUBLISHED';
+};
+
+// ===== API: 강좌/섹션/강의 조회 =====
+export type GetCourseDetailRequest = {
+  courseId: number;
+};
+
+export type LectureResourceResponse = {
+  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+  fileUrl: string;
+  isDownloadable: boolean;
 };
