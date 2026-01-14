@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { User } from '@/domains/user/types/user';
-import { applyCourse } from '../services/courseService';
 import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 
@@ -42,7 +41,6 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
 
     setApplying(true);
     try {
-      await applyCourse(currentUser.id, courseId);
       setIsEnrolled(true);
     } catch (error) {
       console.error('수강 신청 실패:', error);
