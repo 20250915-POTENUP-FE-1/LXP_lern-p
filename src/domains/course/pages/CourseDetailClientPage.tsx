@@ -13,6 +13,8 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
+import { MOCK_GET_CART } from '@/mocks/cart.mock';
+import { addCartItem } from '@/domains/cart/services/cartService';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
@@ -21,6 +23,8 @@ import CourseReviewModal from '../components/CourseReviewModal';
 import { useCourseReviews } from '../hooks/useCourseReview';
 import { StarRating } from '../components/StarRating';
 import { formatReviewDate } from '../utils/formatReviewDate';
+
+const USE_MOCK = true;
 
 type TabKey = 'intro' | 'curriculum' | 'reviews';
 
@@ -62,7 +66,10 @@ export default function CourseDetailClientPage() {
     return Math.round((sum / reviewCount) * 10) / 10; // 소수점 1자리
   }, [reviews, reviewCount]);
 
-  const isInCart = !!user?.cart?.includes(id);
+  // TODO: API 정상화 후 제거 또는 MSW로 전환
+  const isInCart = USE_MOCK
+    ? MOCK_GET_CART.items.some((item) => String(item.courseId) === id)
+    : !!user?.cart?.includes(id);
 
   const hasMyReview = myReviewStatus.status === 'exists';
 
@@ -117,7 +124,10 @@ export default function CourseDetailClientPage() {
 
     setCartPending(true);
     try {
-      // TODO: 장바구니 담기 API 연동 - await addToCart(...) 호출
+      // TODO: API 정상화 후 제거 또는 MSW로 전환
+      if (!USE_MOCK) {
+        await addCartItem({ courseId: Number(id) });
+      }
       setUser({
         ...user,
         cart: [...(user.cart ?? []), id],
