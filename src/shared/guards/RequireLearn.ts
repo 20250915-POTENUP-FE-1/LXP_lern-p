@@ -19,7 +19,7 @@ export async function requireLearn(courseId: string): Promise<GuardLearnResult> 
   // TODO: 임시 목업 데이터
   // const enrollment = await getEnrollmentByCourseId(courseId);
   const enrollment = MOCK_ENROLLMENT_LIST.content.find(
-    (e) => e.userId === user.userId && e.courseId === courseId,
+    (e) => e.userId === user.id && e.courseId === courseId,
   );
 
   if (!enrollment) {

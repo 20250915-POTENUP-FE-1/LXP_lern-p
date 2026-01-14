@@ -1,5 +1,6 @@
 import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
+// API: Course / Enrollment
 export type LearnLectureResourceResponse = {
   resourceId: string;
   resourceType: 'VIDEO' | 'PDF';
@@ -55,47 +56,22 @@ export type LearnEnrollmentResponse = {
   expiredAt: string;
 };
 
-export type LearnLectureProgressResponse = {
-  resourceId: string;
-  title: string;
-  currentProgressRate: number;
-  watchedDuration: number;
-  totalDurationSeconds: number;
-  isCompleted: boolean;
-  lastWatchedAt: string | null;
-};
-
-export type LearnProgressResponse = {
-  enrollmentId: string;
-  progressRate: number;
-  lastVideoId: string | null;
-  lastWatchedDuration: number;
-  lastWatchedAt: string | null;
-  lectureProgresses: LearnLectureProgressResponse[];
-  updatedAt: string;
-};
-
-export type LearnProgressRequest = {
-  resourceId: string;
-  watchedDuration: number;
-};
-
+// Domain: Course + Enrollment
 export type CourseLearn = {
   course: LearnCourseResponse;
   enrollment: LearnEnrollmentResponse;
-  progress: LearnProgressResponse;
 };
 
+// UI Types (Learn Page)
 export type UILecture = {
   id: string;
+  resourceId: string;
   title: string;
   description?: string;
   duration: number;
   type: 'VIDEO' | 'PDF';
   videoUrl?: string;
   pdfUrl?: string;
-  completed: boolean;
-  isCurrent: boolean;
 };
 
 export type UISection = {

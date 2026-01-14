@@ -1,5 +1,5 @@
-export type LectureProgress = {
-  resourceId: number;
+export type GetProgressResponse = {
+  resourceId: string;
   title: string;
   currentProgressRate: number;
   watchedDuration: number;
@@ -8,30 +8,46 @@ export type LectureProgress = {
   lastWatchedAt: string | null;
 };
 
-export type CourseProgressDetail = {
-  enrollmentId: number;
-  overallProgressRate: number;
-
-  lastWatchedVideoId: number | null;
-  lastWatchedDurationOfLastVideo: number | null;
+export type UpdateProgressResponse = {
+  enrollmentId: string;
+  progressRate: number;
+  lastVideoId: string | null;
+  lastWatchedDuration: number;
   lastWatchedAt: string | null;
-
-  lectureProgresses: LectureProgress[];
+  lectureProgresses: GetProgressResponse[];
+  updatedAt: string;
 };
 
-export type LearnLecture = {
-  id: number;
-  title: string;
-  type: 'VIDEO' | 'PDF';
-
-  duration?: number;
+export type UpdateProgressRequest = {
+  resourceId: string;
   watchedDuration: number;
-  progressRate: number;
+};
 
+// 이어보기 정보
+export type ProgressInfo = {
+  lectureId: string;
+  resumeAt: number;
+};
+
+// Map에 들어갈 progress 값
+export type LectureProgressMapValue = {
+  progressRate: number;
+  watchedDuration: number;
+  totalDurationSeconds: number;
   completed: boolean;
 };
 
-export type ResumeInfo = {
-  lectureId: number | null;
-  startTime: number;
+// useProgress 반환 타입
+export type CourseLearnProgress = {
+  enrollmentId: string;
+  overallProgressRate: number;
+  progressInfo: ProgressInfo | null;
+  lectureProgressMap: Map<string, LectureProgressMapValue>;
+};
+
+// 진도율 갱신 보류
+export type PendingProgress = {
+  resourceId: string;
+  watchedDuration: number;
+  retryCount: number;
 };

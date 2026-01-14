@@ -182,61 +182,125 @@
 }
 
 .enrollment__link {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--space-3);
 }
+
 .enrollment-card__actions {
   display: flex;
+  align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
+
 .enrollment-card__actions .btn-primary {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-brand);
-  color: var(--color-brand-700);
-  text-decoration: none;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+  border-radius: 10px;
+
+  background: #fff;
+  border: 1px solid #111;
+  color: #111;
 }
-.enrollment-card__actions .btn-secondary {
-  display: flex;
+
+.enrollment-card__actions .btn-primary::before {
+  content: '';
+  position: absolute;
+
+  width: 0;
+  height: 0;
+
+  border-left: 8px solid #ffffff;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-45%, -50%);
+}
+
+.enrollment-card__actions .btn-primary:hover {
+  background: var(--color-gray-200);
+  border-color: #000;
+}
+
+.enrollment-card__actions .btn-primary:hover::before {
+  border-left-color: #000;
+}
+
+/* active */
+.enrollment-card__actions .btn-primary:active {
+  transform: translateY(1px);
+}
+.enrollment-card__actions .btn-secondary,
+.enrollment-card__actions .btn-primary {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
+  justify-content: center;
+
+  height: 36px;
+  padding: 0 14px;
+
+  border-radius: 10px;
   text-decoration: none;
-  font-size: var(--text-sm);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
+  white-space: nowrap;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+.enrollment-play-icon {
+  width: 0;
+  height: 0;
+
+  border-left: 9px solid #111;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+
+  margin-left: 2px;
+}
+
+.enrollment-card__actions .btn-secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.enrollment-card__actions .btn-secondary:hover {
+  border-color: var(--color-text-muted);
 }
 
 .enrollment__title {
   margin: 0;
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
+
+  min-width: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1; /* 스샷처럼 1줄 */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+.enrollment__header {
+  display: grid;
+  gap: 4px;
+  align-items: start;
+}
+
 .enrollment__category {
   margin: 0;
-  font-size: var(--text-xs);
+  font-size: 12px;
   color: var(--color-text-muted);
+
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -255,10 +319,19 @@
   background: linear-gradient(90deg, var(--color-brand), var(--color-brand-700));
 }
 
+.enrollment-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-elevated);
+  display: grid;
+  gap: 10px;
+}
+
 .enrollment-card__percent {
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--color-text);
-  font-size: var(--text-sm);
 }
 
 @media (min-width: 768px) {
@@ -822,6 +895,57 @@
 .order-card__link--primary {
   border-color: var(--color-brand);
   color: var(--color-brand);
+}
+
+.enrollment__review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 36px;
+  padding: 0 14px;
+
+  border-radius: 10px;
+  border: 1px solid var(--color-brand);
+  background: transparent;
+  color: var(--color-brand-700);
+
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 120ms ease;
+}
+.enrollment__review-btn:hover {
+  background: rgba(239, 104, 23, 0.08);
+  border-color: var(--color-brand-700);
+}
+
+.enrollment__review-btn:active {
+  transform: translateY(1px);
+}
+
+.enrollment__review-btn:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+.enrollment__review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 링크/오버레이에 덮여 클릭이 안 되는 경우 대비 */
+.enrollment__header {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 479px) {

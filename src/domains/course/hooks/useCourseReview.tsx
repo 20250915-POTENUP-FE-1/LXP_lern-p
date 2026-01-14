@@ -3,48 +3,52 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   CreateReviewRequest,
+  GetReviewResponse,
   Review,
   UpdateReviewRequest,
 } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
-import { getAllReviews } from '../services/reviewService';
-
-type UseCourseReviewsProps = {
-  nickname?: string;
-};
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
+import {
+  createReview as createReviewApi,
+  deleteReview as deleteReviewApi,
+  getAllReviews,
+  updateReview as updateReviewApi,
+} from '../services/reviewService';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
-export function useCourseReviews(courseId: string, options?: UseCourseReviewsProps) {
+export function useCourseReviews(courseId: string) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const nickname = options?.nickname;
+  const { user } = useAuthState();
 
   useEffect(() => {
     if (!courseId) return;
+
     (async () => {
       try {
-        const items = await (async () => {
-          if (process.env.NODE_ENV === 'development') {
-            return MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
-          }
-          return await getAllReviews(courseId);
-        })();
+        const items =
+          process.env.NODE_ENV === 'development'
+            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
+            : await getAllReviews(courseId);
 
-        const mapped: Review[] = items.map((it) => ({
-          id: String(it.id),
-          courseId: String(it.courseId),
-          rating: it.rating,
-          content: it.content,
-          createdAt: it.createdAt,
-          updatedAt: it.updatedAt,
-          user: { nickname: '익명' },
-          isMine: false,
-          status: it.status === 'BLIND' ? 'BLINDED' : 'DISPLAY',
-        }));
+        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
+          return {
+            id: String(it.id),
+            courseId: String(it.courseId ?? courseId),
+            nickname: String(it.nickname ?? ''),
+            rating: Number(it.rating ?? 0),
+            content: String(it.content ?? ''),
+            createdAt: String(it.createdAt ?? ''),
+            updatedAt: String(it.updatedAt ?? ''),
+            isMine: Boolean(it.isMine),
+            status: it.status,
+          };
+        });
 
         setReviews(mapped);
-      } catch (err) {
-        console.error('리뷰 불러오기 실패:', err);
+      } catch (e) {
+        console.error('리뷰 불러오기 실패:', e);
         setReviews([]);
       }
     })();
@@ -59,82 +63,94 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsPro
 
   const canWriteReview = myReviewStatus.status === 'none';
 
-  const createReview = useCallback(
+  // A 방식: 저장만 (버튼 전환은 상위에서 isReviewed=true 처리)
+  const writeReview = useCallback(
     async (payload: CreateReviewRequest) => {
-      if (!nickname) {
-        throw new Error('MISSING_NICKNAME');
-      }
+      if (!courseId) return;
 
-      // TODO: 리뷰 생성 서버 연동 시 수정 필요
-      // const data = await createReviewApi(courseId, payload);
+      if (process.env.NODE_ENV === 'development') {
+        if (!user) return;
 
-      const now = new Date().toISOString();
+        const now = new Date().toISOString();
 
-      const newReview: Review = {
-        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`, // String(data.reviewId),
-        courseId,
-        rating: payload.rating,
-        content: payload.content,
-        createdAt: now,
-        updatedAt: now,
-        user: { nickname },
-        isMine: true,
-        status: 'DISPLAY',
-      };
-
-      setReviews((prev) => [newReview, ...prev]);
-      return newReview;
-    },
-    [courseId, nickname],
-  );
-
-  const updateReview = useCallback(
-    async (reviewId: string, payload: UpdateReviewRequest) => {
-      // TODO: 리뷰 수정 서버 연동 시 수정 필요
-      // await updateReviewApi(courseId, reviewId, payload);
-      if (!nickname) {
-        throw new Error('MISSING_NICKNAME');
-      }
-
-      const now = new Date().toISOString();
-
-      let updated: Review | null = null;
-
-      setReviews((prev) =>
-        prev.map((review) => {
-          if (!review.isMine) return review;
-
-          updated = {
-            ...review,
-            rating: payload.rating,
-            content: payload.content,
+        // DEV: 화면 확인용 로컬 반영 (원치 않으면 삭제 가능)
+        setReviews((prev) => {
+          const nickname = user.nickname;
+          const newReview: Review = {
+            id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
+            courseId,
+            nickname,
+            rating: payload.rating ?? 0,
+            content: payload.content?.trim() ?? '',
+            createdAt: now,
             updatedAt: now,
+            isMine: true,
+            status: 'DISPLAY',
           };
 
-          return updated;
-        }),
-      );
+          return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
+        });
 
-      return updated;
+        return;
+      }
+
+      await createReviewApi(courseId, {
+        rating: payload.rating,
+        content: payload.content.trim(),
+      });
     },
-    [nickname],
+    [courseId, user],
   );
 
-  const deleteReview = useCallback(
-    async (reviewId: string) => {
-      // TODO: 리뷰 삭제 서버 연동 시 수정 필요
-      // await deleteReviewApi(courseId, reviewId);
-      setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+  // 수정: API가 courseId 기반이라 reviewId 필요 없음
+  const editReview = useCallback(
+    async (payload: UpdateReviewRequest) => {
+      if (!courseId) return;
+
+      if (process.env.NODE_ENV === 'development') {
+        const now = new Date().toISOString();
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.isMine
+              ? {
+                  ...r,
+                  rating: payload.rating,
+                  content: payload.content.trim(),
+                  updatedAt: now,
+                }
+              : r,
+          ),
+        );
+        return;
+      }
+
+      await updateReviewApi(courseId, {
+        rating: payload.rating,
+        content: payload.content.trim(),
+      });
     },
     [courseId],
   );
 
+  // 삭제: API가 courseId 기반이라 reviewId 필요 없음
+  const removeReview = useCallback(async () => {
+    if (!courseId) return;
+
+    if (process.env.NODE_ENV === 'development') {
+      setReviews((prev) => prev.filter((r) => !r.isMine));
+      return;
+    }
+
+    await deleteReviewApi(courseId);
+  }, [courseId]);
+
   return {
     reviews,
+    myReview,
     myReviewStatus,
     canWriteReview,
-    createReview,
-    updateReview,
-    deleteReview,
+    writeReview,
+    editReview,
+    removeReview,
   };
 }
