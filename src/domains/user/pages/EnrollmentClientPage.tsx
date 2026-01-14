@@ -140,6 +140,11 @@ export default function EnrollmentClientPage() {
         {items.map((item) => {
           const hasProgress = (item.progressRate ?? 0) > 0;
 
+          const buttonLabel = hasProgress ? '이어보기' : '처음부터';
+          const buttonHref = hasProgress
+            ? `/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`
+            : `/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}&start=first`;
+
           return (
             <div key={item.enrollmentId} className={styles['enrollment-card']}>
               <div className={styles['enrollment__link']}>
@@ -165,19 +170,20 @@ export default function EnrollmentClientPage() {
                   >
                     {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
                   </button>
-                  {/*<Link
-                    href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}&start=first`}
-                    className={styles['btn-secondary']}
-                  >
-                    처음부터
-                  </Link>
+                  {/*
+                    <Link href={`/courses/${item.courseId}`}>
+                      <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+                      <p className={styles['enrollment__category']}>
+                        {item.categories?.join(' / ') ?? '카테고리 없음'}
+                      </p>
+                    </Link>
                   */}
 
                   {hasProgress && (
                     <Link
-                      href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
+                      href={buttonHref} 
                       className={styles['btn-primary']}
-                      aria-label="이어보기"
+                      aria-label={buttonLabel}
                     >
                       <span className={styles['enrollment-play-icon']} />
                     </Link>
@@ -185,16 +191,14 @@ export default function EnrollmentClientPage() {
                 </div>
               </div>
 
-              <div className={styles['progress']} aria-label={`${item.progressRate ?? 0}%`}>
+              <div className={styles['progress']}>
                 <div
                   className={styles['progress__bar']}
                   style={{ width: `${item.progressRate ?? 0}%` }}
                 />
               </div>
 
-              <span
-                className={styles['enrollment-card__percent']}
-              >{`${item.progressRate ?? 0}%`}</span>
+              <span className={styles['enrollment-card__percent']}>{item.progressRate ?? 0}%</span>
             </div>
           );
         })}
