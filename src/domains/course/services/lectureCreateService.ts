@@ -22,9 +22,7 @@ export const createLecture = async (
 
 // 강의 삭제 API
 export async function deleteLecture(courseId: string, lectureId: string) {
-  return deleteApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`, {
-    credentials: 'include',
-  });
+  return deleteApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`);
 }
 
 // 강의 자료 업로드 presigned url 생성
