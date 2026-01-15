@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   CreateReviewRequest,
+  GetReviewResponse,
   Review,
   UpdateReviewRequest,
 } from '@/domains/course/types/review';
@@ -27,23 +28,20 @@ export function useCourseReviews(courseId: string) {
 
     (async () => {
       try {
-        // TODO(mock): 개발 중 환경변수로 강의 리뷰 데이터를 mock으로 조회
-        const items = USE_MOCK
-          ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-          : await getAllReviews(courseId);
+        const items =
+          process.env.NODE_ENV === 'development'
+            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
+            : await getAllReviews(courseId);
 
-        const mapped: Review[] = (items ?? []).map((it: any) => {
-          const nickname = String(it.nickname ?? it.user?.nickname ?? '');
-
+        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
           return {
-            id: String(it.id ?? it.reviewId),
+            id: String(it.id),
             courseId: String(it.courseId ?? courseId),
-            nickname,
+            nickname: String(it.nickname ?? ''),
             rating: Number(it.rating ?? 0),
             content: String(it.content ?? ''),
-            createdAt: String(it.createdAt ?? it.createAt ?? ''),
-            updatedAt: String(it.updatedAt ?? it.updateAt ?? ''),
-            user: { nickname },
+            createdAt: String(it.createdAt ?? ''),
+            updatedAt: String(it.updatedAt ?? ''),
             isMine: Boolean(it.isMine),
             status: it.status,
           };
@@ -69,37 +67,33 @@ export function useCourseReviews(courseId: string) {
   // A 방식: 저장만 (버튼 전환은 상위에서 isReviewed=true 처리)
   const writeReview = useCallback(
     async (payload: CreateReviewRequest) => {
-      if (!courseId) return;
+      if (!courseId || !user) return;
 
-      if (process.env.NODE_ENV === 'development') {
-        if (!user) return;
-
-        const now = new Date().toISOString();
-
-        // DEV: 화면 확인용 로컬 반영 (원치 않으면 삭제 가능)
-        setReviews((prev) => {
-          const nickname = user.nickname;
-          const newReview: Review = {
-            id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
-            courseId,
-            nickname,
-            rating: payload.rating ?? 0,
-            content: payload.content?.trim() ?? '',
-            createdAt: now,
-            updatedAt: now,
-            isMine: true,
-            status: 'DISPLAY',
-          };
-
-          return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
+      // mock 단계에서는 실제 API 호출 생략
+      if (!USE_MOCK) {
+        await createReviewApi(courseId, {
+          rating: payload.rating,
+          content: payload.content.trim(),
         });
-
-        return;
       }
 
-      await createReviewApi(courseId, {
-        rating: payload.rating,
-        content: payload.content.trim(),
+      const now = new Date().toISOString();
+
+      // mock / real 공통: UI 즉시 반영
+      setReviews((prev) => {
+        const newReview: Review = {
+          id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
+          courseId,
+          nickname: user.nickname,
+          rating: payload.rating ?? 0,
+          content: payload.content?.trim() ?? '',
+          createdAt: now,
+          updatedAt: now,
+          isMine: true,
+          status: 'DISPLAY',
+        };
+
+        return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
       });
     },
     [courseId, user],

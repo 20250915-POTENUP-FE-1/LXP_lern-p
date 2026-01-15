@@ -1,5 +1,6 @@
 'use client';
 
+import { useParams, useRouter } from 'next/navigation';
 import styles from '@/app/courses/[id]/FloatingCTA.module.css';
 import { LEVEL_LABEL } from '../constants/level';
 import { CourseLevel } from '../types/course';
@@ -36,7 +37,24 @@ export const FloatingCTA = ({
   totalTime,
   level,
 }: FloatingCTAProps) => {
-  const primaryLabel = isOwner ? '내가 등록한 강좌' : isEnrolled ? '학습하기' : '수강신청하기';
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+
+  const primaryLabel = isOwner
+    ? '내가 등록한 강좌'
+    : isEnrolled
+      ? '학습하기'
+      : isInCart
+        ? '장바구니로 이동'
+        : '수강신청하기';
+
+  const handlePrimaryClick = () => {
+    if (!isOwner && !isEnrolled && isInCart) {
+      router.push(`/cart?courseId=${id}`);
+      return;
+    }
+    onApply();
+  };
 
   const showAddToCartButton = !isFree && !isEnrolled && !isOwner && !isInCart && !!onAddToCart;
 
@@ -55,7 +73,7 @@ export const FloatingCTA = ({
             className={`${styles['floating-cta__button']} ${
               isOwner ? styles['floating-cta__button--disabled'] : ''
             }`}
-            onClick={onApply}
+            onClick={handlePrimaryClick}
             disabled={isOwner}
           >
             {primaryLabel}

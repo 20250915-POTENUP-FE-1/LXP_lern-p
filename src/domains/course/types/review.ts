@@ -39,7 +39,7 @@ export type GetReviewResponse = {
   courseId: string;
   rating: number;
   content: string;
-  status: 'DISPLAY' | 'BLIND';
+  status: ReviewStatus;
   reported: number;
   createdAt: string;
   updatedAt: string;

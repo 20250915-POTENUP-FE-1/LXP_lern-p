@@ -42,7 +42,6 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
 
     setApplying(true);
     try {
-      await applyCourse(currentUser.id, courseId);
       setIsEnrolled(true);
     } catch (error) {
       console.error('수강 신청 실패:', error);
