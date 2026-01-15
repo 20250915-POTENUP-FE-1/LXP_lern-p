@@ -9,7 +9,7 @@ import type {
   GetCourseDetailResponse,
 } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export function useCourseDetail(courseId: string) {
   const [courseData, setCourseData] = useState<CourseDetail>({

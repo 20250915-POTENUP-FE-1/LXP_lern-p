@@ -9,7 +9,7 @@ import type { CourseCardType, GetAllCourseResponse } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import { SortSelect, sortCourses } from '../components/SortSelect';
 import { LEVEL_LABEL } from '../constants/level';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);

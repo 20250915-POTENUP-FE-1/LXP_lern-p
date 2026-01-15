@@ -13,7 +13,7 @@ import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
 import { getIsReviewed } from '@/domains/course/services/reviewService';
 import { getEnrollmentList } from '../services/enrollmentService';
 import { Play } from 'lucide-react';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);

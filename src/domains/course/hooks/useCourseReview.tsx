@@ -15,7 +15,7 @@ import {
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 

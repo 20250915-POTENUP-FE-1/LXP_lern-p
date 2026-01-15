@@ -9,7 +9,7 @@ import type {
   ProgressInfo,
   PendingProgress,
 } from '@/domains/course/types/progress';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 

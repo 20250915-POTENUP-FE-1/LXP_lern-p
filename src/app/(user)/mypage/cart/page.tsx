@@ -4,7 +4,7 @@ import type { OrderStatus } from '@/domains/user/types/order';
 import { formatDate } from '@/shared/util/formatDate';
 import { getOrders } from '@/domains/user/services/orderService';
 import { MOCK_GET_ORDERS } from '@/mocks/order.mock';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export default async function PurchaseHistoryPage() {
   // TODO(mock): 환경변수로 mock 사용 여부 제어

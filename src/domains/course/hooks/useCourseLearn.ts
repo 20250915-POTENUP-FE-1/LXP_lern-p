@@ -12,7 +12,7 @@ import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
 import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 type UseCourseLearnOptions = {
   start?: 'first';

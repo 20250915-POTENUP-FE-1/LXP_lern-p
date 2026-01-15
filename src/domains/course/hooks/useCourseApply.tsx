@@ -3,7 +3,7 @@ import { User } from '@/domains/user/types/user';
 import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import { applyCourse } from '../services/courseService';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export function useCourseApply(currentUser: User | null, courseId: string) {
   const [isEnrolled, setIsEnrolled] = useState<boolean>(false);

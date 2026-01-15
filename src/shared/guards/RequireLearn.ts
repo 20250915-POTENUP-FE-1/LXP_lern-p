@@ -3,7 +3,7 @@ import { getEnrollmentByCourseId } from '@/domains/course/services/learnService.
 
 import { MOCK_USER } from '@/mocks/user.mock';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
-import { USE_MOCK } from '@/shared/constants/env';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export type GuardLearnResult = {
   enrollmentId: string;
