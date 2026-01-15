@@ -39,25 +39,6 @@ export const createLectureResourcePresignedUrl = async (
   );
 };
 
-// presigned url 로 실제 업로드 API
-export const uploadLectureResourceToPresignedUrl = async ({
-  presignedUrl,
-  file,
-  contentType,
-}: {
-  presignedUrl: string;
-  file: File | Blob;
-  contentType: string;
-}) => {
-  await fetch(presignedUrl, {
-    method: 'PUT',
-    body: file,
-    headers: {
-      'Content-Type': contentType,
-    },
-  });
-};
-
 // 리소스 삭제 API
 export async function deleteLectureResource(resourceId: string) {
   return deleteApi(`/api/instructor/resources/${resourceId}`, {
