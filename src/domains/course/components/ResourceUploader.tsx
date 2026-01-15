@@ -9,11 +9,15 @@ export type ResourceType = 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
 
 export type UploadResult = {
   resourceType: ResourceType;
-  fileUrl: string;
-  previewUrl?: string;
+  // 저장 기준: presigned 응답 key
+  resourceKey: string;
+  // UI용(선택)
+  previewUrl?: string; // VIDEO 미리보기(대개 blob URL)
+  displayUrl?: string; // 문서류 표시/다운로드 링크(선택)
+
   isDownloadable: boolean;
   duration?: number | null;
-  fileName?: string | undefined;
+  fileName?: string;
   multiFile?: File;
 };
 
@@ -64,6 +68,7 @@ export function ResourceUploader({
   const [uploading, setUploading] = useState(false);
 
   const [draftPreviewUrl, setDraftPreviewUrl] = useState<string>(''); // blob url
+  const [draftDisplayUrl, setDraftDisplayUrl] = useState<string>('');
   const [draftFileName, setDraftFileName] = useState<string>('');
   const [draftDuration, setDraftDuration] = useState<number | null>(null);
   const [draftIsDownloadable, setDraftIsDownloadable] = useState<boolean | null>(null);
@@ -73,10 +78,20 @@ export function ResourceUploader({
 
   const effectiveType: ResourceType = draftType ?? initialValue?.resourceType ?? 'VIDEO';
 
-  const initialUrl = initialValue?.fileUrl ?? '';
-  const effectivePreviewUrl = draftPreviewUrl || initialUrl;
+  // 저장 기준 key
+  const initialResourceKey = initialValue?.resourceKey ?? '';
 
-  const initialName = initialValue?.fileName ?? getFileNameFromUrl(initialUrl);
+  // 미리보기/표시 URL은 key가 아니라 별도 필드로 관리
+  const initialPreviewUrl = initialValue?.previewUrl ?? '';
+  const initialDisplayUrl = initialValue?.displayUrl ?? '';
+
+  const effectivePreviewUrl = draftPreviewUrl || initialPreviewUrl;
+  const effectiveDisplayUrl = draftDisplayUrl || initialDisplayUrl;
+
+  const initialName =
+    initialValue?.fileName ??
+    getFileNameFromUrl(effectiveDisplayUrl) ??
+    getFileNameFromUrl(initialPreviewUrl);
 
   const effectiveFileName = draftFileName || initialName;
 
@@ -109,6 +124,7 @@ export function ResourceUploader({
     revokeBlobIfAny();
     setUploading(false);
     setDraftPreviewUrl('');
+    setDraftDisplayUrl('');
     setDraftFileName('');
     setDraftDuration(null);
     setDraftIsDownloadable(null);
@@ -118,7 +134,8 @@ export function ResourceUploader({
   const handleResourceTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const newType = e.target.value as ResourceType;
 
-    if (effectiveFileName) {
+    const hasAnyFile = Boolean(effectiveFileName) || Boolean(initialResourceKey);
+    if (hasAnyFile) {
       const confirmed = window.confirm(
         '파일 종류를 변경하면 업로드된 파일이 초기화됩니다. 계속하시겠습니까?',
       );
@@ -174,8 +191,9 @@ export function ResourceUploader({
 
       onUploadComplete?.({
         resourceType: effectiveType,
-        fileUrl: storedUrl,
-        previewUrl: objectUrl,
+        resourceKey: effectiveDisplayUrl,
+        previewUrl: effectiveType === 'VIDEO' ? objectUrl : undefined,
+        displayUrl: effectiveType === 'VIDEO' ? undefined : objectUrl,
         isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
         duration: videoSeconds ?? undefined,
         fileName: file.name,

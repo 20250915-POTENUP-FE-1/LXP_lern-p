@@ -10,7 +10,7 @@ import type {
   LectureResource,
 } from '../types/course';
 import { createEmptyLecture, createEmptySection } from '../utils/courseDraft';
-import { publishCourse, publishDraftCourse } from '../services/courseCreateService';
+import { publishCourse } from '../services/courseCreateService';
 import type { UploadResult } from '../components/ResourceUploader';
 import { deleteLecture, createLecture, updateLecture } from '../services/lectureCreateService';
 import { deleteSection, createSection, updateSection } from '../services/sectionCreateService';
@@ -52,6 +52,13 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const activeSections = sections.filter((sec) => !sec._deleted);
   const getActiveLectures = (sec: SectionDraftForm) => sec.lectures.filter((lec) => !lec._deleted);
 
+  // === 인덱스 헬퍼 (sections 선언 이후에 있어야 함) ===
+  const findSectionIndexByLocalId = (sectionLocalId: string) =>
+    sections.findIndex((s) => s.localId === sectionLocalId);
+
+  const findLectureIndexByLocalId = (sec: SectionDraftForm, lectureLocalId: string) =>
+    sec.lectures.findIndex((l) => l.localId === lectureLocalId);
+
   // URL/props 우선, 없으면 sessionStorage
   useEffect(() => {
     const idFromUrl = typeof params.id === 'string' ? params.id : '';
@@ -86,22 +93,17 @@ export function useSectionForm(options?: UseSectionFormParams) {
       return activeLectures.some((lecture) => {
         if (!lecture.title.trim()) return true;
 
-        const resources = lecture.resource ?? [];
-        const primaryResource: LectureResource | undefined = Array.isArray(resources)
-          ? resources[0]
+        const primary: LectureResource | undefined = Array.isArray(lecture.resource)
+          ? lecture.resource[0]
           : undefined;
 
-        const videoUrl = lecture.videoUrl?.trim();
-        const resourceType = primaryResource?.resourceType;
-        const fileUrl = primaryResource?.fileUrl?.trim();
+        const resourceType = primary?.resourceType;
+        const resourceKey = primary?.fileUrl?.trim(); // 여기엔 key(resourceKey)가 저장돼야 함
 
-        if (resourceType === 'VIDEO') return !videoUrl;
+        if (!resourceType) return true;
+        if (!resourceKey) return true;
 
-        if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP') {
-          return !fileUrl;
-        }
-
-        return true;
+        return false;
       });
     });
 
@@ -198,10 +200,16 @@ export function useSectionForm(options?: UseSectionFormParams) {
   const handleSectionDelete = (sectionLocalId: string) => {
     if (!window.confirm('정말 이 섹션을 삭제하시겠습니까?')) return;
 
+    // 섹션 삭제 시 하위 강의도 함께 삭제 플래그 전파
     updateSectionByLocalId(sectionLocalId, (sec) => ({
       ...sec,
       _deleted: true,
       _dirty: true,
+      lectures: sec.lectures.map((lec) => ({
+        ...lec,
+        _deleted: true,
+        _dirty: true,
+      })),
     }));
   };
 
@@ -241,6 +249,120 @@ export function useSectionForm(options?: UseSectionFormParams) {
     }));
   };
 
+  const handleSectionTitleBlur = async (sectionLocalId: string) => {
+    if (!courseId) return;
+
+    const sIndex = findSectionIndexByLocalId(sectionLocalId);
+    if (sIndex < 0) return;
+
+    const sec = sections[sIndex];
+    if (sec._deleted) return;
+
+    const title = sec.title.trim();
+    if (!title) return;
+
+    const orderIndex = sIndex + 1;
+
+    try {
+      setDrafting(true);
+
+      // create
+      if (!sec.id) {
+        const created = await createSection(courseId, { title, orderIndex });
+
+        updateSectionByLocalId(sectionLocalId, (prev) => ({
+          ...prev,
+          id: String(created.sectionId),
+          _dirty: false,
+        }));
+        return;
+      }
+
+      // update
+      if (sec._dirty) {
+        await updateSection(courseId, String(sec.id), { title, orderIndex });
+
+        updateSectionByLocalId(sectionLocalId, (prev) => ({
+          ...prev,
+          _dirty: false,
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : '섹션 저장 중 오류가 발생했습니다.');
+    } finally {
+      setDrafting(false);
+    }
+  };
+
+  // === onBlur: 강의 자동 저장 ===
+  const handleLectureTitleBlur = async (sectionLocalId: string, lectureLocalId: string) => {
+    if (!courseId) return;
+
+    const sIndex = findSectionIndexByLocalId(sectionLocalId);
+    if (sIndex < 0) return;
+
+    const sec = sections[sIndex];
+    if (sec._deleted) return;
+    if (!sec.id) return; // section.id 없으면 강의 저장 불가
+
+    const lIndex = findLectureIndexByLocalId(sec, lectureLocalId);
+    if (lIndex < 0) return;
+
+    const lec = sec.lectures[lIndex];
+    if (lec._deleted) return;
+
+    const title = lec.title.trim();
+    if (!title) return;
+
+    const primary = Array.isArray(lec.resource) ? lec.resource[0] : undefined;
+    const resourceKey = primary?.fileUrl?.trim() ?? '';
+    if (!resourceKey) return;
+
+    const orderIndex = lIndex + 1;
+
+    try {
+      setDrafting(true);
+
+      // create
+      if (!lec.id) {
+        const created = await createLecture(courseId, String(sec.id), {
+          title,
+          isPreview: !!lec.isPreview,
+          orderIndex,
+          resourceKey,
+        });
+
+        updateLectureByLocalId(sectionLocalId, lectureLocalId, (prev) => ({
+          ...prev,
+          id: String(created.lectureId),
+          _dirty: false,
+        }));
+        return;
+      }
+
+      // update
+      if (lec._dirty) {
+        await updateLecture(courseId, String(lec.id), {
+          title,
+          isPreview: !!lec.isPreview,
+          orderIndex,
+          resourceKey,
+        });
+
+        updateLectureByLocalId(sectionLocalId, lectureLocalId, (prev) => ({
+          ...prev,
+          _dirty: false,
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : '강의 저장 중 오류가 발생했습니다.');
+    } finally {
+      setDrafting(false);
+    }
+  };
+
   const handleLectureUpload = async (
     sectionLocalId: string,
     lectureLocalId: string,
@@ -252,11 +374,12 @@ export function useSectionForm(options?: UseSectionFormParams) {
       const newResource: LectureResource = {
         resourceType: result.resourceType,
         isDownloadable: isVideo ? false : result.isDownloadable,
-        fileUrl: result.fileUrl,
+        fileUrl: result.resourceKey,
       };
+      const nextDuration =
+        isVideo && result.duration != null ? Number(result.duration) : lecture.duration;
 
-      const nextDuration = isVideo && result.duration != null ? result.duration : lecture.duration;
-      const nextVideoUrl = isVideo ? (result.previewUrl ?? result.fileUrl) : lecture.videoUrl;
+      const nextVideoUrl = isVideo ? (result.previewUrl ?? lecture.videoUrl) : lecture.videoUrl;
 
       return {
         ...lecture,
@@ -266,125 +389,122 @@ export function useSectionForm(options?: UseSectionFormParams) {
         _file: result.multiFile ?? lecture.file ?? null,
       };
     });
+    await handleLectureTitleBlur(sectionLocalId, lectureLocalId);
   };
 
-  // === 발행하기: 섹션/강의 생성/수정/삭제 반영 ===
+  // === 리소스 제거 ===
+  const handleLectureRemoveResource = (sectionLocalId: string, lectureLocalId: string) => {
+    updateLectureByLocalId(sectionLocalId, lectureLocalId, (lec) => {
+      const primary = Array.isArray(lec.resource) ? lec.resource[0] : undefined;
+      const wasVideo = primary?.resourceType === 'VIDEO';
+
+      return {
+        ...lec,
+        _dirty: true,
+        resource: [] as LectureResource[],
+        ...(wasVideo ? { videoUrl: '', duration: 0 } : {}),
+        file: undefined,
+        _file: null,
+      };
+    });
+  };
   const syncSectionsAndLectures = async (courseId: string) => {
+    // 1) 섹션 delete
+    for (const sec of sections) {
+      if (!sec._deleted) continue;
+      if (sec.id) await deleteSection(courseId, String(sec.id));
+    }
+
+    // 2) 섹션 create/update
     for (let sIndex = 0; sIndex < sections.length; sIndex++) {
       const sec = sections[sIndex];
+      if (sec._deleted) continue;
 
-      // 1) 삭제된 섹션 처리
-      if (sec._deleted) {
-        if (sec.id) await deleteSection(courseId, String(sec.id));
-        continue;
+      const title = sec.title.trim();
+      if (!title) continue;
+
+      const orderIndex = sIndex + 1;
+
+      // create: id 없음 && title 유효
+      if (!sec.id) {
+        const created = await createSection(courseId, { title, orderIndex });
+
+        // 로컬 반영
+        const newSectionId = String(created.sectionId);
+        updateSectionByLocalId(sec.localId, (prev) => ({
+          ...prev,
+          id: newSectionId,
+          _dirty: false,
+        }));
+        // 이후 강의 처리에 필요하므로 sec.id를 즉시 반영된 값으로 사용하기 위해 로컬 변수로도 유지
+        sec.id = newSectionId;
+      } else if (sec._dirty) {
+        // update: id 있음 && _dirty
+        await updateSection(courseId, String(sec.id), { title, orderIndex });
+        updateSectionByLocalId(sec.localId, (prev) => ({ ...prev, _dirty: false }));
       }
+    }
 
-      const activeLectures = getActiveLectures(sec);
-      const hasContent =
-        !!sec.title.trim() &&
-        activeLectures.some((lec) => {
-          if (!lec.title.trim()) return false;
-
-          const resources = lec.resource ?? [];
-          const primaryResource: LectureResource | undefined = Array.isArray(resources)
-            ? resources[0]
-            : undefined;
-
-          const videoUrl = lec.videoUrl?.trim();
-          const resourceType = primaryResource?.resourceType;
-          const fileUrl = primaryResource?.fileUrl?.trim();
-
-          if (resourceType === 'VIDEO') return !!videoUrl;
-          if (resourceType === 'PDF' || resourceType === 'DOC' || resourceType === 'ZIP')
-            return !!fileUrl;
-
-          return false;
-        });
-
-      let sectionId = sec.id ? String(sec.id) : undefined;
-
-      // 2) 섹션 생성
-      if (!sectionId && hasContent) {
-        const created = await createSection(courseId, { title: sec.title, orderIndex: sIndex + 1 });
-        sectionId = String(created.sectionId);
+    // 3) 강의 delete
+    for (const sec of sections) {
+      for (const lec of sec.lectures) {
+        if (!lec._deleted) continue;
+        if (lec.id) await deleteLecture(courseId, String(lec.id));
       }
+    }
 
-      // 3) 섹션 수정
-      if (sectionId && sec._dirty) {
-        await updateSection(courseId, sectionId, { title: sec.title, orderIndex: sIndex + 1 });
-      }
+    // 4) 강의 create/update
+    for (const sec of sections) {
+      if (sec._deleted) continue;
+      if (!sec.id) continue;
 
-      if (!sectionId) continue;
-
-      // === 강의 처리 ===
       for (let lIndex = 0; lIndex < sec.lectures.length; lIndex++) {
         const lec = sec.lectures[lIndex];
+        if (lec._deleted) continue;
 
-        // 4) 강의 삭제 처리
-        if (lec._deleted) {
-          if (lec.id) await deleteLecture(courseId, String(lec.id));
+        const title = lec.title.trim();
+        if (!title) continue;
+
+        const primary = Array.isArray(lec.resource) ? lec.resource[0] : undefined;
+        const resourceKey = primary?.fileUrl?.trim() ?? '';
+        if (!resourceKey) continue;
+
+        const orderIndex = lIndex + 1;
+
+        // create
+        if (!lec.id) {
+          const created = await createLecture(courseId, String(sec.id), {
+            title,
+            isPreview: !!lec.isPreview,
+            orderIndex,
+            resourceKey,
+          });
+
+          updateLectureByLocalId(sec.localId, lec.localId, (prev) => ({
+            ...prev,
+            id: String(created.lectureId),
+            _dirty: false,
+          }));
           continue;
         }
 
-        const resources = lec.resource ?? [];
-        const primaryResource: LectureResource | undefined = Array.isArray(resources)
-          ? resources[0]
-          : undefined;
-
-        const file = lec.file ?? undefined;
-        let lectureId = lec.id ? String(lec.id) : undefined;
-        let isJustCreated = false;
-
-        // 5) 새 강의 생성
-        if (!lectureId && lec.title.trim()) {
-          const createPayload = {
-            title: lec.title,
-            totalDurationSeconds: lec.duration ?? 0,
-            isPreview: lec.isPreview ?? false,
-            orderIndex: lIndex + 1,
-            resource:
-              primaryResource && primaryResource.resourceType
-                ? [
-                    {
-                      resourceType: primaryResource.resourceType,
-                      isDownloadable: Boolean(primaryResource.isDownloadable),
-                      fileUrl: primaryResource.fileUrl,
-                    },
-                  ]
-                : undefined,
-          };
-
-          // TODO: 현재 강의 생성 API 동작 X. 추후 명세 따라 수정 필요
-          const created = await createLecture(courseId, sectionId, createPayload, file);
-          lectureId = String(created.lectureId ?? created.lectureId);
-          isJustCreated = true;
-        }
-
-        // 6) 기존 강의 수정
-        if (lectureId && lec._dirty && !isJustCreated) {
-          // resource 필수 계약이면 여기서 보장/가드
-          if (!primaryResource?.resourceType) {
-            // 여기로 오면 데이터가 깨진 상태라 실패시키는 게 맞음
-            throw new Error('강의 리소스가 누락되어 업데이트할 수 없습니다.');
-          }
-
-          const updateResource: LectureResource = {
-            resourceType: primaryResource.resourceType,
-            isDownloadable: Boolean(primaryResource.isDownloadable),
-            fileUrl: primaryResource.fileUrl,
-          };
-
-          await updateLecture(courseId, lectureId, {
-            title: lec.title,
-            isPreview: lec.isPreview ?? false,
-            orderIndex: lIndex + 1,
-            resource: updateResource,
+        // update
+        if (lec._dirty) {
+          await updateLecture(courseId, String(lec.id), {
+            title,
+            isPreview: !!lec.isPreview,
+            orderIndex,
+            resourceKey,
           });
+
+          updateLectureByLocalId(sec.localId, lec.localId, (prev) => ({
+            ...prev,
+            _dirty: false,
+          }));
         }
       }
     }
   };
-
   // === 최종 등록 버튼 ===
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -401,7 +521,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
       return;
     }
 
-    // 최종적으로도 세션 fallback 한 번 더
     const finalCourseId = courseId || readDraftCourseId();
     if (!finalCourseId) {
       alert('유효한 강좌 ID를 찾을 수 없습니다. 다시 시도해 주세요.');
@@ -413,7 +532,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
     setSubmitting(true);
 
     try {
-      // TODO: 현재 강의 생성 API 동작 X. 추후 명세 따라 수정 필요
       await syncSectionsAndLectures(finalCourseId);
       await publishCourse(finalCourseId);
 
@@ -452,22 +570,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
     sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
   }, [sections, initialized]);
 
-  const handleLectureRemoveResource = (sectionLocalId: string, lectureLocalId: string) => {
-    updateLectureByLocalId(sectionLocalId, lectureLocalId, (lec) => {
-      const primary = lec.resource?.[0];
-      const wasVideo = primary?.resourceType === 'VIDEO';
-
-      return {
-        ...lec,
-        _dirty: true,
-        resource: [] as LectureResource[], // 리소스 제거
-        ...(wasVideo ? { videoUrl: '', duration: 0 } : {}), // VIDEO였던 경우 영상 관련도 제거
-        file: undefined, // 업로드 파일 제거
-        _file: null,
-      };
-    });
-  };
-
   return {
     user,
     sections: activeSections,
@@ -480,10 +582,12 @@ export function useSectionForm(options?: UseSectionFormParams) {
     isInvalid,
     handleSectionAdd,
     handleSectionDelete,
+    handleSectionTitleChange,
+    handleSectionTitleBlur,
     handleLectureAdd,
     handleLectureDelete,
-    handleSectionTitleChange,
     handleLectureTitleChange,
+    handleLectureTitleBlur,
     handleLectureUpload,
     handleLectureRemoveResource,
     handleFinalSubmit,

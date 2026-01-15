@@ -20,7 +20,9 @@ export function SectionForm() {
     handleLectureAdd,
     handleLectureDelete,
     handleSectionTitleChange,
+    handleSectionTitleBlur,
     handleLectureTitleChange,
+    handleLectureTitleBlur,
     handleLectureUpload,
     handleLectureRemoveResource,
     handleFinalSubmit,
@@ -68,6 +70,7 @@ export function SectionForm() {
                   type="text"
                   value={section.title}
                   onChange={(e) => handleSectionTitleChange(section.localId, e.target.value)}
+                  onBlur={() => handleSectionTitleBlur(section.localId)}
                   className={styles['course-form__input']}
                   placeholder={`섹션 ${sectionIdx + 1} 제목 입력`}
                 />
@@ -113,6 +116,9 @@ export function SectionForm() {
                                     e.target.value,
                                   )
                                 }
+                                onBlur={() =>
+                                  handleLectureTitleBlur(section.localId, lecture.localId)
+                                }
                                 className={styles['course-form__input']}
                                 placeholder="강의 제목 입력"
                               />
@@ -133,10 +139,10 @@ export function SectionForm() {
                                   ? {
                                       resourceType: lecture.resource[0]
                                         .resourceType as ResourceType,
-                                      fileUrl:
-                                        lecture.resource[0].resourceType === 'VIDEO'
-                                          ? (lecture.videoUrl ?? lecture.resource[0].fileUrl ?? '')
-                                          : (lecture.resource[0].fileUrl ?? ''),
+                                      // lecture.resource[0].fileUrl에는 resourceKey가 들어있다고 가정(최종 법칙)
+                                      resourceKey: lecture.resource[0].fileUrl ?? '',
+                                      // 미리보기용 (선택): VIDEO일 때만
+                                      previewUrl: lecture.videoUrl || undefined,
                                       isDownloadable: !!lecture.resource[0].isDownloadable,
                                       duration: lecture.duration,
                                       fileName: undefined,

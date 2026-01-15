@@ -1,4 +1,4 @@
-import { CourseDraftForm, LectureDraftForm, SectionDraftForm } from '../types/course';
+import { CourseDraftForm, CourseLevel, LectureDraftForm, SectionDraftForm } from '../types/course';
 
 // 공통 ID 생성 유틸
 const generateId = () =>
@@ -45,7 +45,7 @@ export type CourseFormState = {
   summary: string;
   description: string;
   category: string[];
-  level: string;
+  level: CourseLevel;
   price: number | string | ''; // input 제어용
   thumbnailUrl: string;
 };

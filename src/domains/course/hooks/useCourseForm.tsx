@@ -3,8 +3,8 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
-import { createDraftCourse } from '../services/courseCreateService';
-import type { CourseDraftForm } from '../types/course';
+import { createCourse } from '../services/courseCreateService';
+import type { CourseDraftForm, CreateCourseRequest } from '../types/course';
 
 const COURSE_DRAFT_ID_KEY = 'courseDraftId';
 
@@ -24,7 +24,7 @@ export function useCourseForm() {
     summary: '',
     description: '',
     category: [],
-    level: '',
+    level: 'NOVICE',
     price: '',
     thumbnailUrl: '',
   });
@@ -67,9 +67,19 @@ export function useCourseForm() {
   const ensureDraftCreated = async (draftData: CourseDraftForm) => {
     const savedId = sessionStorage.getItem(COURSE_DRAFT_ID_KEY);
     if (savedId) return savedId;
+    const payload: CreateCourseRequest = {
+      title: draftData.title,
+      summary: draftData.summary,
+      description: draftData.description,
+      // TODO: thumbnail은 지금 optional이라 일단 draftData.thumbnail로 넘기거나 빈 값 가능
+      // thumbnail: draftData.thumbnail,
+      categoryId: Number(draftData.category[draftData.category.length - 1]),
+      price: draftData.price,
+      courseLevel: draftData.level as CreateCourseRequest['courseLevel'],
+    };
 
     // 서버에 draft 강좌 생성 → courseId 확보
-    const { courseId } = await createDraftCourse(draftData, thumbnailFile ?? undefined);
+    const { courseId } = await createCourse(payload);
     sessionStorage.setItem(COURSE_DRAFT_ID_KEY, courseId);
     return courseId;
   };
@@ -144,7 +154,7 @@ export function useCourseForm() {
             summary: raw.summary ?? '',
             description: raw.description ?? '',
             category: raw.category ?? [],
-            level: raw.level ?? '',
+            level: raw.level ?? 'NOVICE',
             price: raw.price == null ? '' : String(raw.price),
             thumbnailUrl: raw.thumbnail ?? '',
           };
