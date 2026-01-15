@@ -17,7 +17,6 @@ export const createLecture = async (
   return await postApi<CreateLectureResponse>(
     `/api/instructor/courses/${courseId}/sections/${sectionId}/lectures`,
     payload,
-    { credentials: 'include' },
   );
 };
 
@@ -35,7 +34,6 @@ export const createLectureResourcePresignedUrl = async (
   return await postApi<CreateLectureResourcePresignedUrlResponse>(
     `/api/instructor/resources`,
     payload,
-    { credentials: 'include' },
   );
 };
 
@@ -55,6 +53,5 @@ export async function updateLecture(
   return putApi<UpdateLectureResponse>(
     `/api/instructor/courses/${courseId}/lectures/${lectureId}`,
     body,
-    { credentials: 'include' },
   );
 }
