@@ -19,7 +19,7 @@ import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 import type { CartItemResponse, PreparePaymentResponse } from '../types/cart';
 import { useTossPayment } from '../hooks/useTossPayment';
 
-const USE_MOCK = true;
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK;
 
 export function CartClientPage() {
   const searchParams = useSearchParams();
@@ -205,11 +205,13 @@ export function CartClientPage() {
 
     (async () => {
       try {
-        const prepared = await preparePayment({
-          items: selectedItems.map((it) => ({ courseId: Number(it.id) })),
-        });
-        if (cancelled) return;
-        setPaymentPayload(prepared);
+        if (!USE_MOCK) {
+          const prepared = await preparePayment({
+            items: selectedItems.map((it) => ({ courseId: Number(it.id) })),
+          });
+          if (cancelled) return;
+          setPaymentPayload(prepared);
+        }
       } catch (error) {
         console.error('결제 준비 요청에 실패했습니다.', error);
       }
