@@ -8,12 +8,12 @@ declare global {
     hot?: { dispose(cb: () => void): void };
   }
 }
-// TODO(mock): 환경변수로 mock 사용 여부 제어
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
 const mockingEnabledPromise =
-  typeof window !== 'undefined' 
+  typeof window !== 'undefined'
     ? import('@/mocks/browser').then(async ({ default: worker }) => {
+        if (process.env.NODE_ENV === 'production') {
+          return;
+        }
         await worker.start({
           onUnhandledRequest(request, print) {
             if (request.url.includes('_next')) return;
