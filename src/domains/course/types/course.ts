@@ -184,11 +184,19 @@ export type CreateLectureResponse = {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
+  // TODO: 효진님 확인 필요, 주석일 수도 있음
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-    fileUrl: string;
+    filekey: string;
     isDownloadable: boolean;
   };
+  // resource: {
+  //   resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+  //   isDownloadable: boolean;
+  //   fileUrl: string;
+  //   totalDurationSeconds: number;
+  //
+  // };
 };
 
 export type CourseIdResponse = {
@@ -239,7 +247,7 @@ export type GetAllCourseResponse = {
 };
 
 export type GetCourseDetailResponse = {
-  courseId: string; // number?
+  courseId: string;
   title: string;
   categories: string[];
   thumbnailUrl: string;
@@ -270,7 +278,7 @@ export type GetEnrollmentResponse = {
   studentId: string;
   courseId: string;
   status: EnrollmentStatus;
-  progressRate: 45;
+  progressRate: 45; // 고정숫자 수정 필요
   createdAt: string;
   expiredAt: string;
 };
@@ -290,11 +298,15 @@ export type LectureDetailResponse = {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
+  //TODO: 배열 일 경우 아래 주석으로 바꾸기
   resource: {
     resourceType: ResourceType;
     fileUrl: string;
     isDownloadable: boolean;
   };
+  /**
+   * resources: LectureResourceResponse[];
+   */
 };
 
 export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -325,7 +337,6 @@ export type UpdateSectionResponse = {
 };
 
 // ===== API: Presigned URL 생성 =====
-export type CreateLectureResourcePresignedUrlRequest = {}; // body 없음
 export type CreateLectureResourcePresignedUrlResponse = {
   presignedUrl: string;
   key: string;
@@ -362,4 +373,10 @@ export type PublishCourseResponse = {
   id: number;
   title: string;
   courseState: 'PUBLISHED';
+};
+
+export type LectureResourceResponse = {
+  resourceType: ResourceType;
+  fileUrl: string;
+  isDownloadable: boolean;
 };
