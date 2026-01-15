@@ -184,19 +184,11 @@ export type CreateLectureResponse = {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
-  // TODO: 효진님 확인 필요, 주석일 수도 있음
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-    filekey: string;
+    fileUrl: string;
     isDownloadable: boolean;
   };
-  // resource: {
-  //   resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-  //   isDownloadable: boolean;
-  //   fileUrl: string;
-  //   totalDurationSeconds: number;
-  //
-  // };
 };
 
 export type CourseIdResponse = {
@@ -298,15 +290,11 @@ export type LectureDetailResponse = {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
-  //TODO: 배열 일 경우 아래 주석으로 바꾸기
   resource: {
     resourceType: ResourceType;
     fileUrl: string;
     isDownloadable: boolean;
   };
-  /**
-   * resources: LectureResourceResponse[];
-   */
 };
 
 export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -340,6 +328,7 @@ export type UpdateSectionResponse = {
 export type CreateLectureResourcePresignedUrlResponse = {
   presignedUrl: string;
   key: string;
+  contentType: string;
 };
 
 // 썸네일 업로드 url 생성 API
