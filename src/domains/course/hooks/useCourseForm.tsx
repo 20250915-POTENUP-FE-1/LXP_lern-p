@@ -154,7 +154,7 @@ export function useCourseForm() {
             summary: raw.summary ?? '',
             description: raw.description ?? '',
             category: raw.category ?? [],
-            level: raw.level ?? 'NOVICE',
+            level: raw.level ?? 'BEGINNER',
             price: raw.price == null ? '' : String(raw.price),
             thumbnailUrl: raw.thumbnail ?? '',
           };

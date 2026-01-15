@@ -9,9 +9,8 @@ export type ResourceType = 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
 
 export type UploadResult = {
   resourceType: ResourceType;
-  // 저장 기준: presigned 응답 key
+
   resourceKey: string;
-  // UI용(선택)
   previewUrl?: string; // VIDEO 미리보기(대개 blob URL)
   displayUrl?: string; // 문서류 표시/다운로드 링크(선택)
 

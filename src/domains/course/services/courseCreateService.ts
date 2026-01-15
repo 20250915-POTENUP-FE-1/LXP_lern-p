@@ -17,21 +17,6 @@ import {
   mapResponseToCourseDraft,
 } from '../utils/courseCreate';
 
-// 강좌 생성 API
-// export const createDraftCourse = async (
-//   draftData: CourseDraftForm,
-//   thumbnailFile?: File,
-// ): Promise<CreateCourseResponse> => {
-//   const requestBody = mapDraftToCreateRequest(draftData);
-
-//   const formData = createCourseFormData(requestBody, thumbnailFile);
-
-//   return await postApi<CreateCourseResponse>('/api/instructor/courses', null, {
-//     body: formData,
-//     credentials: 'include',
-//   });
-// };
-
 // 강좌 발행 API
 export const publishCourse = async (courseId: string): Promise<PublishCourseResponse> => {
   return await patchApi<PublishCourseResponse>(`/api/instructor/courses/${courseId}/publish`);

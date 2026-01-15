@@ -21,7 +21,7 @@ export const createCourseFormData = (data: any, file?: File) => {
 
 // 강좌 생성용 데이터 매핑 함수
 export const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseRequest => {
-  const categoryId = Number(draft.category[draft.category.length]);
+  const categoryId = Number(draft.category[draft.category.length - 1]);
 
   return {
     title: draft.title,
@@ -29,7 +29,6 @@ export const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseReq
     description: draft.description,
     categoryId, // number
     price: draft.price,
-    // draft.level은 이미 CourseLevel(BEGINNER/INTERMEDIATE/ADVANCED/NOVICE)
     courseLevel: draft.level,
   };
 };

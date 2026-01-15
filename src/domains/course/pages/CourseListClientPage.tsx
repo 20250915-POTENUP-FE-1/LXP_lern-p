@@ -22,24 +22,19 @@ export default function CourseListClientPage() {
       try {
         // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
         const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
-        const courseCardData: CourseCardType[] = data.content.map((item) => {
-          const lastCategory = item.categories.at(-1) ?? '기타'; // 빈 배열 방어
-          const thumbnailUrl = item.thumbnailUrl ?? ''; // optional 방어(원하면 기본 이미지 url)
-
-          return {
-            id: item.courseId,
-            title: item.title,
-            summary: item.summary,
-            thumbnailUrl,
-            instructorName: item.instructorName,
-            category: item.categories,
-            level: item.level,
-            tags: [lastCategory, LEVEL_LABEL[item.level]], // 이제 string[] 확정
-            price: item.price,
-            isFree: item.price === 0,
-            studentCount: item.studentCount,
-          };
-        });
+        const courseCardData: CourseCardType[] = data.content.map((item) => ({
+          id: item.courseId,
+          title: item.title,
+          summary: item.summary,
+          thumbnailUrl: item.thumbnailUrl ?? '/images/default-thumbnail.png',
+          instructorName: item.instructorName,
+          category: item.categories,
+          level: item.level,
+          tags: [item.categories[item.categories.length - 1], LEVEL_LABEL[item.level]],
+          price: item.price,
+          isFree: item.price === 0,
+          studentCount: item.studentCount,
+        }));
 
         setCourses(courseCardData);
       } catch (error) {
