@@ -3,17 +3,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   CreateReviewRequest,
+  GetReviewResponse,
   Review,
   UpdateReviewRequest,
 } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import {
   createReview as createReviewApi,
   deleteReview as deleteReviewApi,
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
-import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
@@ -30,19 +31,16 @@ export function useCourseReviews(courseId: string) {
           process.env.NODE_ENV === 'development'
             ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
             : await getAllReviews(courseId);
-
-        const mapped: Review[] = (items ?? []).map((it: any) => {
-          const nickname = String(it.nickname ?? it.user?.nickname ?? '');
-
+        
+        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
           return {
-            id: String(it.id ?? it.reviewId),
+            id: String(it.id),
             courseId: String(it.courseId ?? courseId),
-            nickname,
+            nickname: String(it.nickname ?? ''),
             rating: Number(it.rating ?? 0),
             content: String(it.content ?? ''),
-            createdAt: String(it.createdAt ?? it.createAt ?? ''),
-            updatedAt: String(it.updatedAt ?? it.updateAt ?? ''),
-            user: { nickname },
+            createdAt: String(it.createdAt ?? ''),
+            updatedAt: String(it.updatedAt ?? ''),
             isMine: Boolean(it.isMine),
             status: it.status,
           };

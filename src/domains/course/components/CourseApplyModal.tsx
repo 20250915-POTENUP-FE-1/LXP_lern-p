@@ -1,10 +1,10 @@
 'use client';
 
-import type { Course } from '../types/course';
-import type { User } from '@/domains/user/types/user';
-import styles from './CourseApplyModal.module.css';
-import { Modal } from '@/shared/ui/Modal';
 import { useRouter } from 'next/navigation';
+import type { User } from '@/domains/user/types/user';
+import { Modal } from '@/shared/ui/Modal';
+import type { Course } from '../types/course';
+import styles from './CourseApplyModal.module.css';
 
 export type CourseApplyModalProps = {
   isOpen: boolean;
@@ -13,7 +13,7 @@ export type CourseApplyModalProps = {
   user: User | null;
   isEnrolled: boolean;
   applying: boolean;
-  onApply: () => Promise<void>;
+  onApply?: () => Promise<void>;
 };
 
 export const CourseApplyModal = ({
@@ -25,9 +25,8 @@ export const CourseApplyModal = ({
   applying,
   onApply,
 }: CourseApplyModalProps) => {
-  if (!isOpen || !course) return null;
-
   const router = useRouter();
+  if (!isOpen || !course) return null;
 
   const priceLabel = course.isFree
     ? '무료'
@@ -44,7 +43,7 @@ export const CourseApplyModal = ({
     }
 
     try {
-      await onApply();
+      await onApply?.();
       onClose();
     } catch (error: unknown) {
       if (error instanceof Error) {

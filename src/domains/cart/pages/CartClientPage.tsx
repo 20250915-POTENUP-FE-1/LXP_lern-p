@@ -6,12 +6,20 @@ import { useSearchParams } from 'next/navigation';
 import { CartItem as CartItemType } from '@/domains/cart/types/cart';
 import { OrderSummary } from '@/domains/cart/components/OrderSummary';
 import { CartItem } from '@/domains/cart/components/CartItem';
-import { preparePayment } from '@/domains/cart/services/cartService';
-import { getCourseDetail } from '@/domains/course/services/courseService';
+import {
+  addCartItem,
+  deleteCartItem,
+  getCart,
+  preparePayment,
+} from '@/domains/cart/services/cartService';
+
 import styles from '@/app/cart/CartPage.module.css';
+import { MOCK_GET_CART } from '@/mocks/cart.mock';
 import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
-import type { PreparePaymentResponse } from '../types/cart';
+import type { CartItemResponse, PreparePaymentResponse } from '../types/cart';
 import { useTossPayment } from '../hooks/useTossPayment';
+
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK;
 
 export function CartClientPage() {
   const searchParams = useSearchParams();
@@ -38,35 +46,22 @@ export function CartClientPage() {
   const hasItems = items.length > 0;
   const isAllSelected = items.length > 0 && selectedItems.length === items.length;
 
-  // 결제 payload가 최신 선택 기준인지 간단 가드(선택)
   const canSubmit =
     canCheckout && !!paymentPayload?.orderId && paymentPayload.amount === finalPrice;
 
-  const refetchCart = async () => {
+  const refetchCart = async (opts?: { selectOnlyCourseId?: string | null }) => {
     setCartLoading(true);
     try {
-      // TODO: 장바구니 조회 API 연동
-
-      const courseIds: string[] = []; // TODO: 장바구니 조회 API 연동 후 교체
-
-      const details = await Promise.all(courseIds.map((id) => getCourseDetail(id)));
-
-      const mappedItems = details.filter(Boolean).map((detail) => ({
-        id: Number(detail.courseId),
-        title: detail.title,
-        instructor: detail.instructor?.name ?? '강사',
-        price: detail.price,
-        originalPrice: detail.price,
-        thumbnailUrl: detail.thumbnailUrl,
-      })) as CartItemType[];
+      const { items: details } = await getCart();
+      const mappedItems = mapCartDetailsToItems(details);
 
       setItems(mappedItems);
-      setSelectedMap(
-        Object.fromEntries(mappedItems.map((item) => [String(item.id), true])) as Record<
-          string,
-          boolean
-        >,
-      );
+
+      if (opts?.selectOnlyCourseId) {
+        setSelectedMap(buildSelectOnlyMap(mappedItems, opts.selectOnlyCourseId));
+      } else {
+        setSelectedMap(buildSelectAllMap(mappedItems));
+      }
     } catch (e) {
       console.error('장바구니 목록 조회에 실패했습니다.', e);
     } finally {
@@ -75,49 +70,68 @@ export function CartClientPage() {
   };
 
   useEffect(() => {
-    // TODO: 장바구니 조회 API 연동 후 호출
-    // void refetchCart();
+    // TODO: API 정상화 후 제거 또는 MSW로 전환
+    if (USE_MOCK) {
+      const base = mapCartDetailsToItems(MOCK_GET_CART.items);
+      setItems((prev) => {
+        const byId = new Map(prev.map((it) => [String(it.id), it]));
+        base.forEach((it) => byId.set(String(it.id), it));
+        const nextItems = Array.from(byId.values());
+
+        setSelectedMap(() =>
+          initialCourseId
+            ? buildSelectOnlyMap(nextItems, initialCourseId)
+            : buildSelectAllMap(nextItems),
+        );
+
+        return nextItems;
+      });
+
+      return;
+    }
+
+    void refetchCart({ selectOnlyCourseId: initialCourseId });
   }, []);
 
   useEffect(() => {
     if (!initialCourseId) return;
-
     if (handledInitialCourseIdRef.current === initialCourseId) return;
     handledInitialCourseIdRef.current = initialCourseId;
 
     (async () => {
       setCartMutating(true);
       try {
-        // TODO: 장바구니 담기 API 연동 (추가/수정/삭제가 같은 API일 수도 있음)
+        // TODO: API 정상화 후 제거 또는 MSW로 전환
+        if (USE_MOCK) {
+          const detail = MOCK_GET_COURSE_DETAIL[Number(initialCourseId)];
 
-        // TODO: 장바구니 조회 API 연동 후 교체 및 refetchCart() 호출
-        const detail = MOCK_GET_COURSE_DETAIL[Number(initialCourseId)];
+          if (detail) {
+            const mapped: CartItemType = {
+              id: Number(detail.courseId),
+              title: detail.title,
+              instructor: detail.instructor?.name ?? '강사',
+              price: detail.price,
+              originalPrice: detail.price,
+              thumbnailUrl: detail.thumbnailUrl,
+            };
 
-        if (detail) {
-          const mapped: CartItemType = {
-            id: Number(detail.courseId),
-            title: detail.title,
-            instructor: detail.instructor?.name ?? '강사',
-            price: detail.price,
-            originalPrice: detail.price,
-            thumbnailUrl: detail.thumbnailUrl,
-          };
+            setItems((prev) => {
+              const nextItems = prev.some((x) => String(x.id) === String(mapped.id))
+                ? prev
+                : [...prev, mapped];
 
-          setItems((prev) =>
-            prev.some((x) => String(x.id) === String(mapped.id)) ? prev : [...prev, mapped],
-          );
-
-          setSelectedMap((prev) => ({
-            ...prev,
-            [String(mapped.id)]: true,
-          }));
+              setSelectedMap(buildSelectOnlyMap(nextItems, mapped.id));
+              return nextItems;
+            });
+          } else {
+            setSelectedMap((prev) => ({ ...prev, [String(initialCourseId)]: true }));
+          }
+          return;
         }
-        // await refetchCart();
 
-        setSelectedMap((prev) => ({
-          ...prev,
-          [String(initialCourseId)]: true,
-        }));
+        await addCartItem({ courseId: Number(initialCourseId) });
+
+        await refetchCart({ selectOnlyCourseId: initialCourseId });
       } catch (e) {
         console.error('장바구니 담기(추가) 처리에 실패했습니다.', e);
       } finally {
@@ -151,18 +165,18 @@ export function CartClientPage() {
     (async () => {
       setCartMutating(true);
       try {
-        // TODO: 장바구니 취소(제거) API 연동 (추가/수정/삭제가 같은 API일 수도 있음)
+        if (USE_MOCK) {
+          setItems((prev) => prev.filter((item) => !deleteIds.has(String(item.id))));
+          setSelectedMap((prev) => {
+            const next = { ...prev };
+            deleteIds.forEach((k) => delete next[k]);
+            return next;
+          });
+          return;
+        }
 
-        setItems((prev) => {
-          const remaining = prev.filter((item) => !deleteIds.has(String(item.id)));
-          setSelectedMap(
-            Object.fromEntries(remaining.map((item) => [String(item.id), true])) as Record<
-              string,
-              boolean
-            >,
-          );
-          return remaining;
-        });
+        await Promise.all(selectedItems.map((it) => deleteCartItem(Number(it.id))));
+        await refetchCart();
       } catch (e) {
         console.error('장바구니 제거에 실패했습니다.', e);
       } finally {
@@ -191,11 +205,13 @@ export function CartClientPage() {
 
     (async () => {
       try {
-        const prepared = await preparePayment({
-          items: selectedItems.map((it) => ({ courseId: Number(it.id) })),
-        });
-        if (cancelled) return;
-        setPaymentPayload(prepared);
+        if (!USE_MOCK) {
+          const prepared = await preparePayment({
+            items: selectedItems.map((it) => ({ courseId: Number(it.id) })),
+          });
+          if (cancelled) return;
+          setPaymentPayload(prepared);
+        }
       } catch (error) {
         console.error('결제 준비 요청에 실패했습니다.', error);
       }
@@ -310,3 +326,24 @@ export function CartClientPage() {
     </main>
   );
 }
+
+const mapCartDetailsToItems = (details: Array<CartItemResponse>) =>
+  details.filter(Boolean).map((detail) => ({
+    id: Number(detail.courseId),
+    title: detail.courseTitle,
+    instructor: detail.instructorName ?? '강사',
+    price: detail.price,
+    originalPrice: detail.price,
+    thumbnailUrl: detail.thumbnailUrl,
+  })) as CartItemType[];
+
+const buildSelectAllMap = (list: CartItemType[]) =>
+  Object.fromEntries(list.map((it) => [String(it.id), true])) as Record<string, boolean>;
+
+const buildSelectOnlyMap = (list: CartItemType[], onlyId: string | number) => {
+  const target = String(onlyId);
+  return Object.fromEntries(list.map((it) => [String(it.id), String(it.id) === target])) as Record<
+    string,
+    boolean
+  >;
+};

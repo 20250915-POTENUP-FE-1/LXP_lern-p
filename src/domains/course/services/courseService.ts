@@ -3,20 +3,12 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDocs,
   increment,
-  query,
   runTransaction,
   serverTimestamp,
-  where,
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-import { getApi } from '@/shared/lib/api/fetchApi';
-import type {
-  GetAllCourseResponse,
-  GetCourseDetailResponse,
-  GetEnrollmentResponse,
-} from '../types/course';
+import type { GetAllCourseResponse, GetCourseDetailResponse } from '../types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
@@ -84,20 +76,5 @@ export const applyCourse = async (userId: string, courseId: string): Promise<boo
   } catch (err) {
     console.error('applyCourse 실패:', err);
     throw new Error('수강 신청 중 오류가 발생했습니다.');
-  }
-};
-export const getEnrollmentStatus = async (userId: string, courseId: string): Promise<boolean> => {
-  if (!userId || !courseId) return false;
-  try {
-    const q = query(
-      collection(db, 'enrollments'),
-      where('userId', '==', userId),
-      where('courseId', '==', courseId),
-    );
-    const snap = await getDocs(q);
-    return !snap.empty;
-  } catch (err) {
-    console.error('getEnrollmentStatus 실패:', err);
-    return false;
   }
 };

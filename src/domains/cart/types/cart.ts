@@ -7,7 +7,7 @@ export type PreparePaymentResponse = {
   amount: number;
 };
 
-export type ComfirmPaymentRequest = {
+export type ConfirmPaymentRequest = {
   orderId: string;
   amount: number;
   paymentKey: string;
@@ -20,4 +20,35 @@ export type CartItem = {
   price: number;
   originalPrice: number;
   thumbnailUrl: string;
+};
+
+export type CartItemResponse = {
+  cartItemId: number;
+  courseId: number;
+  courseTitle: string;
+  instructorName: string;
+  price: number;
+  thumbnailUrl: string;
+};
+
+export type GetCartResponse = {
+  cartId: number;
+  items: CartItemResponse[];
+  totalAmount: number;
+};
+
+export type AddCartItemRequest = {
+  courseId: number;
+};
+
+export type AddCartItemResponse = {
+  cartId: number;
+  cartItemId: number;
+  amount: number;
+};
+
+export type DeleteCartItemResponse = {
+  cartId: number;
+  removedCartItemId: number;
+  amount: number;
 };

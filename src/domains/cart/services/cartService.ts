@@ -1,6 +1,10 @@
-import { postApi } from '@/shared/lib/api/fetchApi';
+import { getApi, postApi } from '@/shared/lib/api/fetchApi';
 import {
-  ComfirmPaymentRequest,
+  AddCartItemRequest,
+  AddCartItemResponse,
+  ConfirmPaymentRequest,
+  DeleteCartItemResponse,
+  GetCartResponse,
   PreparePaymentRequest,
   PreparePaymentResponse,
 } from '../types/cart';
@@ -21,6 +25,29 @@ export const confirmPayment = async ({
   orderId,
   paymentKey,
   amount,
-}: ComfirmPaymentRequest): Promise<null> => {
+}: ConfirmPaymentRequest): Promise<null> => {
   return await postApi<null>('/api/payments/confirm', { orderId, paymentKey, amount });
+};
+
+/**
+ * 장바구니 항목 전체 조회
+ */
+export const getCart = async (): Promise<GetCartResponse> => {
+  return await getApi<GetCartResponse>('/api/cart');
+};
+
+/**
+ * 장바구니 항목 추가
+ */
+export const addCartItem = async ({
+  courseId,
+}: AddCartItemRequest): Promise<AddCartItemResponse> => {
+  return await postApi<AddCartItemResponse>('/api/cart/items', { courseId });
+};
+
+/**
+ * 장바구니 항목 제거
+ */
+export const deleteCartItem = async (cartItemId: number): Promise<DeleteCartItemResponse> => {
+  return await postApi<DeleteCartItemResponse>(`/api/cart/items/${cartItemId}`);
 };
