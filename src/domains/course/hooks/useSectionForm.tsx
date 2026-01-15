@@ -10,7 +10,7 @@ import type {
   LectureResource,
 } from '../types/course';
 import { createEmptyLecture, createEmptySection } from '../utils/courseDraft';
-import { publishDraftCourse } from '../services/courseCreateService';
+import { publishCourse, publishDraftCourse } from '../services/courseCreateService';
 import type { UploadResult } from '../components/ResourceUploader';
 import { deleteLecture, createLecture, updateLecture } from '../services/lectureCreateService';
 import { deleteSection, createSection, updateSection } from '../services/sectionCreateService';
@@ -376,7 +376,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
 
           await updateLecture(courseId, lectureId, {
             title: lec.title,
-            totalDurationSeconds: lec.duration ?? 0,
             isPreview: lec.isPreview ?? false,
             orderIndex: lIndex + 1,
             resource: updateResource,
@@ -416,7 +415,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
     try {
       // TODO: 현재 강의 생성 API 동작 X. 추후 명세 따라 수정 필요
       await syncSectionsAndLectures(finalCourseId);
-      await publishDraftCourse(finalCourseId);
+      await publishCourse(finalCourseId);
 
       alert('강좌가 발행되었습니다.');
       setSuccess(true);

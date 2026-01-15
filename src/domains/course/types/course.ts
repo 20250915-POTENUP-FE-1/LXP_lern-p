@@ -58,7 +58,7 @@ export type CategoryChild = {
   name: string;
 };
 
-// 강좌 생성/ 수정
+// 강좌 생성/ 수정 //안씀
 export type CourseDraftForm = {
   title: string;
   summary: string;
@@ -70,7 +70,7 @@ export type CourseDraftForm = {
   status?: string;
 };
 
-// 섹션 생성 / 수정
+// 섹션 생성 / 수정 //안씀
 export type SectionDraftForm = DraftMeta & {
   localId: string;
   id: string;
@@ -78,7 +78,7 @@ export type SectionDraftForm = DraftMeta & {
   lectures: LectureDraftForm[];
 };
 
-// 강의 생성 / 수정
+// 강의 생성 / 수정 //안씀
 export type LectureDraftForm = DraftMeta & {
   localId: string;
   id: string;
@@ -92,6 +92,7 @@ export type LectureDraftForm = DraftMeta & {
 
 // === 2. 내부 데이터 구조
 
+//안씀
 export type DraftMeta = {
   _dirty: boolean;
   _deleted?: boolean;
@@ -304,6 +305,7 @@ export type CourseCardType = Omit<
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
 >;
 
+// 안씀
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
   sectionDrafts: SectionDraftForm[];
@@ -351,7 +353,7 @@ export type DeleteSectionResponse = {
   sectionId?: string;
 };
 
-// ===== API: 강의 생성 / 수정 =====
+// ===== 강의 수정 API =====
 export type UpdateLectureResponse = {
   lectureId: string;
   title: string;
