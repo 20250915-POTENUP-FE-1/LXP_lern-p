@@ -12,13 +12,15 @@ import {
   getCart,
   preparePayment,
 } from '@/domains/cart/services/cartService';
-
 import styles from '@/app/cart/CartPage.module.css';
 import { MOCK_GET_CART } from '@/mocks/cart.mock';
 import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
+import { USE_MOCK } from '@/shared/constants/config';
+import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import type { CartItemResponse, PreparePaymentResponse } from '../types/cart';
 import { useTossPayment } from '../hooks/useTossPayment';
-import { USE_MOCK } from '@/shared/constants/config';
+
+const normalize = (arr: string[]) => arr.slice().sort().join('|');
 
 export function CartClientPage() {
   const searchParams = useSearchParams();
@@ -32,6 +34,29 @@ export function CartClientPage() {
   const [cartMutating, setCartMutating] = useState(false);
 
   const handledInitialCourseIdRef = useRef<string | null>(null);
+
+  const { user, setUser } = useAuthState();
+  const cartInitializedRef = useRef(false);
+
+  const syncUserCartFromItems = (nextItems: CartItemType[]) => {
+    const currentUser = user;
+    if (!currentUser) return;
+
+    const nextCourseIds = Array.from(new Set(nextItems.map((it) => String(it.id))));
+    const prev = currentUser.cart ?? [];
+
+    if (normalize(prev) === normalize(nextCourseIds)) return;
+
+    setUser({
+      ...currentUser,
+      cart: nextCourseIds,
+    });
+  };
+
+  useEffect(() => {
+    if (!cartInitializedRef.current) return;
+    syncUserCartFromItems(items);
+  }, [items]);
 
   const selectedItems = useMemo(
     () => items.filter((item) => selectedMap[String(item.id)]),
@@ -54,6 +79,8 @@ export function CartClientPage() {
       const { items: details } = await getCart();
       const mappedItems = mapCartDetailsToItems(details);
 
+      cartInitializedRef.current = true;
+
       setItems(mappedItems);
 
       if (opts?.selectOnlyCourseId) {
@@ -72,6 +99,9 @@ export function CartClientPage() {
     // TODO: API 정상화 후 제거 또는 MSW로 전환
     if (USE_MOCK) {
       const base = mapCartDetailsToItems(MOCK_GET_CART.items);
+
+      cartInitializedRef.current = true;
+
       setItems((prev) => {
         const byId = new Map(prev.map((it) => [String(it.id), it]));
         base.forEach((it) => byId.set(String(it.id), it));
@@ -129,7 +159,6 @@ export function CartClientPage() {
         }
 
         await addCartItem({ courseId: Number(initialCourseId) });
-
         await refetchCart({ selectOnlyCourseId: initialCourseId });
       } catch (e) {
         console.error('장바구니 담기(추가) 처리에 실패했습니다.', e);
