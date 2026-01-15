@@ -1,8 +1,6 @@
 import { postApi, deleteApi, putApi } from '@/shared/lib/api/fetchApi';
 import {
   CreateLectureRequest,
-  CreateLectureResourcePresignedUrlRequest,
-  CreateLectureResourcePresignedUrlResponse,
   CreateLectureResponse,
   UpdateLectureRequest,
   UpdateLectureResponse,
@@ -23,21 +21,6 @@ export const createLecture = async (
 // 강의 삭제 API
 export async function deleteLecture(courseId: string, lectureId: string) {
   return deleteApi(`/api/instructor/courses/${courseId}/lectures/${lectureId}`);
-}
-
-// 강의 자료 업로드 presigned url 생성
-export const createLectureResourcePresignedUrl = async (
-  payload: CreateLectureResourcePresignedUrlRequest,
-): Promise<CreateLectureResourcePresignedUrlResponse> => {
-  return await postApi<CreateLectureResourcePresignedUrlResponse>(
-    `/api/instructor/resources`,
-    payload,
-  );
-};
-
-// 리소스 삭제 API
-export async function deleteLectureResource(resourceId: string) {
-  return deleteApi(`/api/instructor/resources/${resourceId}`);
 }
 
 // 강의 수정 API (임시강의생성수정 API)

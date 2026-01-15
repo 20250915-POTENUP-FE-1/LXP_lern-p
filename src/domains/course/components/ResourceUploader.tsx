@@ -4,16 +4,19 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { formatDuration, formatLectureDuration } from '../utils/formatDuration';
 import { RESOURCE_CONFIG } from '../constants/resource';
 import styles from './CourseForm.module.css';
-
+import { createPresignedUploadUrl } from '../services/resourceService';
+import { bytesToKB } from '@/shared/util/fileSize';
+import { useDraftResource } from '@/domains/course/hooks/useDraftResource';
 export type ResourceType = 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
 
 export type UploadResult = {
   resourceType: ResourceType;
+  fileKey: string;
   fileUrl: string;
   previewUrl?: string;
-  isDownloadable: boolean;
-  duration?: number | null;
-  fileName?: string | undefined;
+  fileName?: string;
+  duration?: number;
+  isDownloadable?: boolean;
   multiFile?: File;
 };
 
@@ -59,6 +62,8 @@ export function ResourceUploader({
   onUploadComplete,
   onRemove,
 }: ResourceUploaderProps) {
+  const { addDraftResource } = useDraftResource();
+
   // ===== "로컬(draft)"만 state로 관리 (props->state 동기화 useEffect 제거) =====
   const [draftType, setDraftType] = useState<ResourceType | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -167,20 +172,32 @@ export function ResourceUploader({
         setDraftDuration(null);
       }
 
-      // 저장용 URL (지금은 더미. 실제로는 업로드 API 응답에서 받는 게 정석)
-      const storedUrl = `/uploads/${encodeURIComponent(file.name)}`;
+      const { key } = await createPresignedUploadUrl({
+        fileName: file.name,
+        contentType: file.type,
+        size: bytesToKB(file.size),
+        duration: videoSeconds ?? 0,
+        isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
+      });
 
-      setUploading(false);
+      addDraftResource({
+        resourceType: effectiveType,
+        key,
+        fileName: file.name,
+        duration: videoSeconds ?? undefined,
+        isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
+      });
 
       onUploadComplete?.({
         resourceType: effectiveType,
-        fileUrl: storedUrl,
+        fileKey: key,
+        fileUrl: key,
         previewUrl: objectUrl,
-        isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
         duration: videoSeconds ?? undefined,
-        fileName: file.name,
-        multiFile: file,
+        isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
       });
+
+      setUploading(false);
     } catch (err) {
       let msg = '파일 처리 중 오류가 발생했습니다.';
       if (err instanceof Error) {
