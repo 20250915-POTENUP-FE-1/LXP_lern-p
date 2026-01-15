@@ -325,10 +325,19 @@ export type UpdateSectionResponse = {
 };
 
 // ===== API: Presigned URL 생성 =====
+export type CreateLectureResourcePresignedUrlRequest = {
+  fileName: string;
+  contentType: string;
+  size: number;
+  duration: number;
+  isDownloadable: boolean;
+};
+
 export type CreateLectureResourcePresignedUrlResponse = {
   presignedUrl: string;
   key: string;
-  contentType: string;
+  method: 'PUT' | 'GET';
+  expireSeconds: number;
 };
 
 // 썸네일 업로드 url 생성 API

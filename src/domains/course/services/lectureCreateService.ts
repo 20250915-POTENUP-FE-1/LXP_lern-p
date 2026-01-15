@@ -1,6 +1,7 @@
 import { postApi, deleteApi, putApi } from '@/shared/lib/api/fetchApi';
 import {
   CreateLectureRequest,
+  CreateLectureResourcePresignedUrlRequest,
   CreateLectureResourcePresignedUrlResponse,
   CreateLectureResponse,
   UpdateLectureRequest,
@@ -29,11 +30,11 @@ export async function deleteLecture(courseId: string, lectureId: string) {
 
 // 강의 자료 업로드 presigned url 생성
 export const createLectureResourcePresignedUrl = async (
-  lectureId: string,
+  payload: CreateLectureResourcePresignedUrlRequest,
 ): Promise<CreateLectureResourcePresignedUrlResponse> => {
   return await postApi<CreateLectureResourcePresignedUrlResponse>(
-    `/api/instructor/lectures/${lectureId}/resources`,
-    {},
+    `/api/instructor/resources`,
+    payload,
     { credentials: 'include' },
   );
 };
