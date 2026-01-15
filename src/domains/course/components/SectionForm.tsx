@@ -70,7 +70,10 @@ export function SectionForm() {
                   type="text"
                   value={section.title}
                   onChange={(e) => handleSectionTitleChange(section.localId, e.target.value)}
-                  onBlur={() => handleSectionTitleBlur(section.localId)}
+                  onBlur={() => {
+                    console.log('SECTION BLUR', section.localId, section.title);
+                    handleSectionTitleBlur(section.localId);
+                  }}
                   className={styles['course-form__input']}
                   placeholder={`섹션 ${sectionIdx + 1} 제목 입력`}
                 />

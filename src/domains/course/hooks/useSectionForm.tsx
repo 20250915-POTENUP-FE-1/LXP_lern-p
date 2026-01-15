@@ -468,6 +468,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
         const primary = Array.isArray(lec.resource) ? lec.resource[0] : undefined;
         const resourceKey = primary?.fileUrl?.trim() ?? '';
         if (!resourceKey) continue;
+        if (resourceKey.startsWith('tmp/')) continue;
 
         const orderIndex = lIndex + 1;
 
@@ -520,6 +521,21 @@ export function useSectionForm(options?: UseSectionFormParams) {
       alert('섹션과 강의 정보를 모두 입력해주세요.');
       return;
     }
+    const hasTmpKey = sections.some((sec) => {
+      if (sec._deleted) return false;
+
+      return sec.lectures.some((lec) => {
+        if (lec._deleted) return false;
+        const key = lec.resource?.[0]?.fileUrl?.trim() ?? '';
+        return key.startsWith('tmp/');
+      });
+    });
+    if (hasTmpKey) {
+      alert(
+        '파일 업로드가 아직 연동되지 않아 임시 키(tmp/) 상태입니다. 업로드 연동 후 등록할 수 있습니다.',
+      );
+      return;
+    }
 
     const finalCourseId = courseId || readDraftCourseId();
     if (!finalCourseId) {
@@ -568,6 +584,34 @@ export function useSectionForm(options?: UseSectionFormParams) {
     if (typeof window === 'undefined') return;
 
     sessionStorage.setItem('courseDraft_step2', JSON.stringify(sections));
+  }, [sections, initialized]);
+
+  useEffect(() => {
+    if (!initialized) return;
+
+    const reasons: string[] = [];
+    const activeSecs = sections.filter((s) => !s._deleted);
+
+    if (activeSecs.length === 0) reasons.push('활성 섹션 0개');
+
+    activeSecs.forEach((sec, si) => {
+      if (!sec.title.trim()) reasons.push(`섹션${si + 1}: 제목 없음`);
+
+      const activeLecs = sec.lectures.filter((l) => !l._deleted);
+      if (activeLecs.length === 0) reasons.push(`섹션${si + 1}: 활성 강의 0개`);
+
+      activeLecs.forEach((lec, li) => {
+        if (!lec.title.trim()) reasons.push(`섹션${si + 1}-강의${li + 1}: 제목 없음`);
+
+        const primary = Array.isArray(lec.resource) ? lec.resource[0] : undefined;
+        if (!primary) reasons.push(`섹션${si + 1}-강의${li + 1}: 리소스 없음`);
+
+        const rt = primary?.resourceType;
+        const rk = primary?.fileUrl?.trim();
+      });
+    });
+
+    console.log('isInvalid:', reasons.length > 0, reasons);
   }, [sections, initialized]);
 
   return {

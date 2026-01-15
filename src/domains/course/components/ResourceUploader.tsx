@@ -184,14 +184,18 @@ export function ResourceUploader({
         setDraftDuration(null);
       }
 
-      // 저장용 URL (지금은 더미. 실제로는 업로드 API 응답에서 받는 게 정석)
-      const storedUrl = `/uploads/${encodeURIComponent(file.name)}`;
-
+      // TODO: 저장용 storedKey (지금은 더미. 실제로는 업로드 API 응답에서 받는 게 정석)
       setUploading(false);
+
+      const storedKey = `tmp/${effectiveType}/${Date.now()}_${encodeURIComponent(file.name)}`;
+      console.log('UPLOAD RESULT', {
+        resourceKey: storedKey,
+        type: effectiveType,
+      });
 
       onUploadComplete?.({
         resourceType: effectiveType,
-        resourceKey: effectiveDisplayUrl,
+        resourceKey: storedKey, // TODO: 실제 resourseKey 넣기
         previewUrl: effectiveType === 'VIDEO' ? objectUrl : undefined,
         displayUrl: effectiveType === 'VIDEO' ? undefined : objectUrl,
         isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
