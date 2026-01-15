@@ -12,7 +12,7 @@ declare global {
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 const mockingEnabledPromise =
-  typeof window !== 'undefined' && USE_MOCK
+  typeof window !== 'undefined' 
     ? import('@/mocks/browser').then(async ({ default: worker }) => {
         await worker.start({
           onUnhandledRequest(request, print) {
