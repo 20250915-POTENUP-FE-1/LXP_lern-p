@@ -14,6 +14,7 @@ import {
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
+import { USE_MOCK } from '@/shared/constants/env';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
@@ -27,8 +28,6 @@ export function useCourseReviews(courseId: string) {
     (async () => {
       try {
         // TODO(mock): 개발 중 환경변수로 강의 리뷰 데이터를 mock으로 조회
-        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
         const items = USE_MOCK
           ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
           : await getAllReviews(courseId);

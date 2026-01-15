@@ -12,6 +12,8 @@ import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
 import { getIsReviewed } from '@/domains/course/services/reviewService';
 import { getEnrollmentList } from '../services/enrollmentService';
+import { Play } from 'lucide-react';
+import { USE_MOCK } from '@/shared/constants/env';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
@@ -81,8 +83,6 @@ export default function EnrollmentClientPage() {
     async function fetchEnrollments() {
       setEnrolledLoading(true);
       try {
-        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
         // TODO(mock): 개발 중 환경변수로 수강 목록 및 리뷰 상태를 mock 데이터로 구성
         const page = USE_MOCK ? MOCK_ENROLLMENT_LIST : await getEnrollmentList();
         const content = page.content;
@@ -177,14 +177,13 @@ export default function EnrollmentClientPage() {
                       </p>
                     </Link>
                   */}
-
                   {hasProgress && (
                     <Link
                       href={buttonHref}
                       className={styles['btn-primary']}
                       aria-label={buttonLabel}
                     >
-                      <span className={styles['enrollment-play-icon']} />
+                      <Play />
                     </Link>
                   )}
                 </div>

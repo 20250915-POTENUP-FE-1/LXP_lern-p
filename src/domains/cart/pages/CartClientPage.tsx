@@ -12,6 +12,7 @@ import styles from '@/app/cart/CartPage.module.css';
 import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 import type { PreparePaymentResponse } from '../types/cart';
 import { useTossPayment } from '../hooks/useTossPayment';
+import { USE_MOCK } from '@/shared/constants/env';
 
 export function CartClientPage() {
   const searchParams = useSearchParams();
@@ -91,7 +92,6 @@ export function CartClientPage() {
         // TODO: 장바구니 담기 API 연동 (추가/수정/삭제가 같은 API일 수도 있음)
 
         // TODO: 장바구니 조회 API 연동 후 교체 및 refetchCart() 호출
-        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
         const detail = USE_MOCK
           ? MOCK_GET_COURSE_DETAIL[Number(initialCourseId)]
           : await getCourseDetail(initialCourseId);

@@ -12,6 +12,7 @@ import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
 import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
+import { USE_MOCK } from '@/shared/constants/env';
 
 type UseCourseLearnOptions = {
   start?: 'first';
@@ -28,11 +29,9 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
 
-    const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
     async function fetchAll() {
+      // TODO(mock): 개발 중 환경변수로 학습 페이지 UI 검증을 위한 mock 데이터 사용
       if (USE_MOCK) {
-        // TODO(mock): 개발 중 환경변수로 학습 페이지 UI 검증을 위한 mock 데이터 사용
         const course = MOCK_LEARN_COURSE_MAP[courseId];
         if (!course) return;
 

@@ -9,6 +9,7 @@ import type {
   GetCourseDetailResponse,
 } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
+import { USE_MOCK } from '@/shared/constants/env';
 
 export function useCourseDetail(courseId: string) {
   const [courseData, setCourseData] = useState<CourseDetail>({
@@ -27,8 +28,6 @@ export function useCourseDetail(courseId: string) {
         setLoading(true);
 
         // TODO(mock): 개발 중 환경변수로 강좌 상세 데이터를 mock으로 조회
-        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
         const courseDetailResponse: GetCourseDetailResponse = USE_MOCK
           ? MOCK_GET_COURSE_DETAIL[courseId]
           : await getCourseDetail(courseId);

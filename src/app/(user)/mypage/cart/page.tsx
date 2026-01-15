@@ -4,10 +4,10 @@ import type { OrderStatus } from '@/domains/user/types/order';
 import { formatDate } from '@/shared/util/formatDate';
 import { getOrders } from '@/domains/user/services/orderService';
 import { MOCK_GET_ORDERS } from '@/mocks/order.mock';
+import { USE_MOCK } from '@/shared/constants/env';
 
 export default async function PurchaseHistoryPage() {
   // TODO(mock): 환경변수로 mock 사용 여부 제어
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
   const { orders, totalCount } = USE_MOCK ? MOCK_GET_ORDERS : await getOrders();
 
   const isEmpty = orders.length === 0;

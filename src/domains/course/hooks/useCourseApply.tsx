@@ -3,6 +3,7 @@ import { User } from '@/domains/user/types/user';
 import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import { applyCourse } from '../services/courseService';
+import { USE_MOCK } from '@/shared/constants/env';
 
 export function useCourseApply(currentUser: User | null, courseId: string) {
   const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
@@ -17,8 +18,6 @@ export function useCourseApply(currentUser: User | null, courseId: string) {
     (async () => {
       try {
         // TODO(mock): 개발 중 환경변수로 수강 여부를 mock 데이터로 판단
-        const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
         const enrolled = USE_MOCK
           ? MOCK_ENROLLMENT_LIST.content.some(
               (e) => e.courseId === String(courseId) && e.status === 'ENROLLED',
