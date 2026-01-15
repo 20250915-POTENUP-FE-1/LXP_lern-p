@@ -325,7 +325,7 @@ export type UpdateSectionResponse = {
 };
 
 // ===== API: Presigned URL 생성 =====
-export type CreateLectureResourcePresignedUrlRequest = {
+export type PresignedUploadUrlRequest = {
   fileName: string;
   contentType: string;
   size: number;
@@ -333,17 +333,11 @@ export type CreateLectureResourcePresignedUrlRequest = {
   isDownloadable: boolean;
 };
 
-export type CreateLectureResourcePresignedUrlResponse = {
+export type PresignedUrlResponse = {
   presignedUrl: string;
   key: string;
-  method: 'PUT' | 'GET';
-  expireSeconds: number;
-};
-
-// 썸네일 업로드 url 생성 API
-export type CreateThumbnailPresignedUrlResponse = {
-  presignedUrl: string;
-  key: string;
+  method?: 'PUT' | 'GET';
+  expireSeconds?: number;
 };
 
 export type DeleteSectionRequest = {};
