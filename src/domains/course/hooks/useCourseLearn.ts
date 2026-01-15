@@ -3,11 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/learn';
-import { getCourse } from '@/domains/course/services/learnService';
+import {
+  getCourse,
+  getLearnEnrollment,
+  getLearnProgress,
+} from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
 import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
+import { USE_MOCK } from '@/shared/constants/config';
 
 type UseCourseLearnOptions = {
   start?: 'first';
@@ -24,28 +29,26 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
   useEffect(() => {
     if (!courseId || !enrollmentId) return;
 
-    // TODO: UI 검증용 mock 데이터 세팅
-    const course = MOCK_LEARN_COURSE_MAP[courseId];
-    if (!course) return;
+    async function fetchAll() {
+      // TODO(mock): 개발 중 환경변수로 학습 페이지 UI 검증을 위한 mock 데이터 사용
+      if (USE_MOCK) {
+        const course = MOCK_LEARN_COURSE_MAP[courseId];
+        if (!course) return;
 
-    setLearnData({
-      course,
-      enrollment: MOCK_LEARN_ENROLLMENT,
-    });
+        setLearnData({
+          course,
+          enrollment: MOCK_LEARN_ENROLLMENT,
+        });
+        return;
+      }
 
-    /**
-     * TODO: 서버 연동 원본 코드 (복구용)
-     *
-     * async function fetchAll() {
-     *   const course = await getCourse(courseId);
-     *   const enrollment = await getLearnEnrollment(enrollmentId);
-     *   const progress = await getLearnProgress(enrollmentId);
-     *
-     *   setLearnData({ course, enrollment, progress });
-     * }
-     *
-     * fetchAll();
-     */
+      const course = await getCourse(courseId);
+      const enrollment = await getLearnEnrollment(enrollmentId);
+
+      setLearnData({ course, enrollment });
+    }
+
+    fetchAll();
   }, [courseId, enrollmentId]);
 
   // TODO: UI 완료 상태 기준으로 courseData 생성

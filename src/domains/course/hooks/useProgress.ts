@@ -9,10 +9,8 @@ import type {
   ProgressInfo,
   PendingProgress,
 } from '@/domains/course/types/progress';
-
-// TODO: 실제 API (복구용)
-// import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
-
+import { USE_MOCK } from '@/shared/constants/config';
+import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(enrollmentId: string) {
@@ -27,15 +25,10 @@ export function useProgress(enrollmentId: string) {
       try {
         setIsLoading(true);
 
-        if (process.env.NODE_ENV === 'development') {
-          // UI 검증용 mock
-          setProgressData(MOCK_LEARN_PROGRESS);
-          return;
-        }
+        // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
+        const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(enrollmentId);
 
-        // TODO: 실제 서버 연동
-        // const response = await getLearnProgress(enrollmentId);
-        // setProgressData(response);
+        setProgressData(progress);
       } catch (e) {
         setError(e as Error);
       } finally {
@@ -101,12 +94,13 @@ export function useProgress(enrollmentId: string) {
 
     setTimeout(async () => {
       try {
-        /**
-         * await updateLearnProgress({
-         *   resourceId: pending.resourceId,
-         *   watchedDuration: pending.watchedDuration,
-         * });
-         */
+        // TODO(mock): mock 단계에서는 실제 API 호출 없이 UI 상태만 갱신
+        if (!USE_MOCK) {
+          await updateLearnProgress({
+            resourceId: pending.resourceId,
+            watchedDuration: pending.watchedDuration,
+          });
+        }
 
         setProgressData((prev) =>
           prev ? applyProgressUpdate(prev, pending.resourceId, pending.watchedDuration) : prev,
@@ -123,13 +117,13 @@ export function useProgress(enrollmentId: string) {
   // 진도 즉시 저장
   const saveProgress = async (resourceId: string, watchedDuration: number) => {
     try {
-      /**
-       * TODO: 서버 연동 원본 코드 (복구용)
-       * await updateLearnProgress({
-       *   resourceId,
-       *   watchedDuration,
-       * });
-       */
+      // TODO(mock): mock 단계에서는 실제 네트워크 요청 없이 처리
+      if (!USE_MOCK) {
+        await updateLearnProgress({
+          resourceId,
+          watchedDuration,
+        });
+      }
 
       setProgressData((prev) =>
         prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,

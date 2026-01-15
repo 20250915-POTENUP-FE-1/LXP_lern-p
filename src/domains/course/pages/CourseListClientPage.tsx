@@ -9,6 +9,7 @@ import type { CourseCardType, GetAllCourseResponse } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import { SortSelect, sortCourses } from '../components/SortSelect';
 import { LEVEL_LABEL } from '../constants/level';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
@@ -19,9 +20,8 @@ export default function CourseListClientPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // TODO: API 정상화 후 제거 또는 MSW로 전환
-        const data: GetAllCourseResponse =
-          process.env.NODE_ENV === 'development' ? MOCK_GET_ALL_COURSE : await getAllCourses();
+        // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
+        const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
 
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
           id: item.courseId,

@@ -9,6 +9,7 @@ import type {
   GetCourseDetailResponse,
 } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
+import { USE_MOCK } from '@/shared/constants/config';
 
 export function useCourseDetail(courseId: string) {
   const [courseData, setCourseData] = useState<CourseDetail>({
@@ -26,11 +27,10 @@ export function useCourseDetail(courseId: string) {
       try {
         setLoading(true);
 
-        // TODO: API 정상화 후 제거 또는 MSW로 전환
-        const courseDetailResponse: GetCourseDetailResponse =
-          process.env.NODE_ENV === 'development'
-            ? MOCK_GET_COURSE_DETAIL[courseId]
-            : await getCourseDetail(courseId);
+        // TODO(mock): 개발 중 환경변수로 강좌 상세 데이터를 mock으로 조회
+        const courseDetailResponse: GetCourseDetailResponse = USE_MOCK
+          ? MOCK_GET_COURSE_DETAIL[courseId]
+          : await getCourseDetail(courseId);
 
         // 1) CourseDetail.course 매핑 (API 응답 → Course 도메인)
         const course: Course = {

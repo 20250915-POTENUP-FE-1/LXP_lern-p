@@ -207,8 +207,12 @@
   border-radius: 10px;
 
   background: #fff;
-  border: 1px solid #111;
-  color: #111;
+  border: 1px solid #222;
+  color: #222;
+}
+
+.enrollment-card__actions .btn-primary svg {
+  fill: #222;
 }
 
 .enrollment-card__actions .btn-primary::before {
@@ -247,7 +251,7 @@
   justify-content: center;
 
   height: 36px;
-  padding: 0 14px;
+  padding: 0 10px;
 
   border-radius: 10px;
   text-decoration: none;

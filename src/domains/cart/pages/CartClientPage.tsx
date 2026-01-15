@@ -18,8 +18,7 @@ import { MOCK_GET_CART } from '@/mocks/cart.mock';
 import { MOCK_GET_COURSE_DETAIL } from '@/mocks/course.mock';
 import type { CartItemResponse, PreparePaymentResponse } from '../types/cart';
 import { useTossPayment } from '../hooks/useTossPayment';
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK;
+import { USE_MOCK } from '@/shared/constants/config';
 
 export function CartClientPage() {
   const searchParams = useSearchParams();

@@ -15,6 +15,7 @@ import {
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
+import { USE_MOCK } from '@/shared/constants/config';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
@@ -31,7 +32,7 @@ export function useCourseReviews(courseId: string) {
           process.env.NODE_ENV === 'development'
             ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
             : await getAllReviews(courseId);
-        
+
         const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
           return {
             id: String(it.id),
@@ -66,37 +67,33 @@ export function useCourseReviews(courseId: string) {
   // A 방식: 저장만 (버튼 전환은 상위에서 isReviewed=true 처리)
   const writeReview = useCallback(
     async (payload: CreateReviewRequest) => {
-      if (!courseId) return;
+      if (!courseId || !user) return;
 
-      if (process.env.NODE_ENV === 'development') {
-        if (!user) return;
-
-        const now = new Date().toISOString();
-
-        // DEV: 화면 확인용 로컬 반영 (원치 않으면 삭제 가능)
-        setReviews((prev) => {
-          const nickname = user.nickname;
-          const newReview: Review = {
-            id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
-            courseId,
-            nickname,
-            rating: payload.rating ?? 0,
-            content: payload.content?.trim() ?? '',
-            createdAt: now,
-            updatedAt: now,
-            isMine: true,
-            status: 'DISPLAY',
-          };
-
-          return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
+      // mock 단계에서는 실제 API 호출 생략
+      if (!USE_MOCK) {
+        await createReviewApi(courseId, {
+          rating: payload.rating,
+          content: payload.content.trim(),
         });
-
-        return;
       }
 
-      await createReviewApi(courseId, {
-        rating: payload.rating,
-        content: payload.content.trim(),
+      const now = new Date().toISOString();
+
+      // mock / real 공통: UI 즉시 반영
+      setReviews((prev) => {
+        const newReview: Review = {
+          id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
+          courseId,
+          nickname: user.nickname,
+          rating: payload.rating ?? 0,
+          content: payload.content?.trim() ?? '',
+          createdAt: now,
+          updatedAt: now,
+          isMine: true,
+          status: 'DISPLAY',
+        };
+
+        return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
       });
     },
     [courseId, user],

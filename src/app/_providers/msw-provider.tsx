@@ -8,7 +8,6 @@ declare global {
     hot?: { dispose(cb: () => void): void };
   }
 }
-
 const mockingEnabledPromise =
   typeof window !== 'undefined'
     ? import('@/mocks/browser').then(async ({ default: worker }) => {
@@ -17,26 +16,22 @@ const mockingEnabledPromise =
         }
         await worker.start({
           onUnhandledRequest(request, print) {
-            if (request.url.includes('_next')) {
-              return;
-            }
+            if (request.url.includes('_next')) return;
             print.warning();
           },
         });
+
         worker.use(...handlers);
 
         import.meta.hot?.dispose(() => {
           worker.stop();
         });
-        console.log(worker.listHandlers());
+
+        console.log('[MSW] active handlers:', worker.listHandlers());
       })
     : Promise.resolve();
 
-export const MSWProvider = ({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) => {
+export const MSWProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense fallback={null}>
       <MSWProviderWrapper>{children}</MSWProviderWrapper>
@@ -44,7 +39,7 @@ export const MSWProvider = ({
   );
 };
 
-const MSWProviderWrapper = ({
+export const MSWProvider = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
