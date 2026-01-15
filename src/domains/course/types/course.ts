@@ -131,7 +131,7 @@ export type CreateCourseRequest = {
   summary: string;
   description: string;
   thumbnail: string;
-  categoryId: string;
+  categoryId: string; // number;
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 };
@@ -151,50 +151,52 @@ export type UpdateSectionRequest = {
 // 강의 생성/ 수정 요청
 export type CreateLectureRequest = {
   title: string;
-  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  resource: {
-    isDownloadable: boolean;
-    fileUrl?: string;
-  };
+  resourceKey: string;
 };
 
 export type UpdateLectureRequest = {
   title: string;
-  totalDurationSeconds: number;
   isPreview: boolean;
-  resource: {
-    isDownloadable: boolean;
-    fileUrl?: string;
-  };
+  resourceKey: string;
+  orderIndex: number;
 };
 
 // 강좌 생성 응답
-export type CreateCourseResponse = CourseIdResponse;
+export type CreateCourseResponse = {
+  courseId: string;
+};
 
 // 섹션 생성 응답
 export type CreateSectionResponse = {
   sectionId: string;
   title: string;
   orderIndex: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
 // 강의 생성 응답
 export type CreateLectureResponse = {
   lectureId: string;
   title: string;
+  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
+  // TODO: 효진님 확인 필요, 주석일 수도 있음
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    filekey: string;
     isDownloadable: boolean;
-    fileUrl: string;
   };
+  // resource: {
+  //   resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+  //   isDownloadable: boolean;
+  //   fileUrl: string;
+  //   totalDurationSeconds: number;
+  //
+  // };
 };
 
 export type CourseIdResponse = {
@@ -215,7 +217,7 @@ export type ReorderLecturesRequest = {
 };
 
 export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
-export type CourseLevel = 'BEGINNER' | 'NOVICE' | 'INTERMEDIATE' | 'ADVANCED';
+export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 export type GetAllCourseResponse = {
   content: Array<{
@@ -231,11 +233,16 @@ export type GetAllCourseResponse = {
     level: CourseLevel;
     summary: string;
     instructorName: string;
+    // 추가한 정보
+    reviewInfo: {
+      reviewCount: number;
+      avgRating: number;
+    };
   }>;
   currentPage: number;
   size: number;
   totalElements: number;
-  totalPages: string;
+  totalPages: number;
   hasNext: boolean;
 };
 
@@ -253,12 +260,15 @@ export type GetCourseDetailResponse = {
   };
   isPurchased: boolean;
   totalDuration: number;
-  status: Status;
   price: number;
+  status: Status;
   level: CourseLevel;
   studentCount: number;
-  rating: number;
   sections: SectionDetailResponse[];
+  reviewInfo: {
+    reviewCount: number;
+    avgRating: number;
+  };
 };
 
 export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
@@ -268,7 +278,7 @@ export type GetEnrollmentResponse = {
   studentId: string;
   courseId: string;
   status: EnrollmentStatus;
-  progressRate: 45;
+  progressRate: number;
   createdAt: string;
   expiredAt: string;
 };
@@ -288,11 +298,15 @@ export type LectureDetailResponse = {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
+  //TODO: 배열 일 경우 아래 주석으로 바꾸기
   resource: {
     resourceType: ResourceType;
     fileUrl: string;
     isDownloadable: boolean;
   };
+  /**
+   * resources: LectureResourceResponse[];
+   */
 };
 
 export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -305,4 +319,64 @@ export type CourseCardType = Omit<
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
   sectionDrafts: SectionDraftForm[];
+};
+
+// 1번 타입에 없던(= 2번에서 추가된) 내용 모음
+
+// ===== API: 강좌 생성 / 수정 =====
+export type UpdateCourseResponse = {
+  courseId: string; //number?
+};
+
+// ===== API: 섹션 생성 / 수정 =====
+export type UpdateSectionResponse = {
+  sectionId: string;
+  title: string;
+  orderIndex: number;
+  updatedAt: string;
+};
+
+// ===== API: Presigned URL 생성 =====
+export type CreateLectureResourcePresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+// 썸네일 업로드 url 생성 API
+export type CreateThumbnailPresignedUrlResponse = {
+  presignedUrl: string;
+  key: string;
+};
+
+export type DeleteSectionRequest = {};
+export type DeleteSectionResponse = {
+  sectionId?: string;
+};
+
+// ===== API: 강의 생성 / 수정 =====
+export type UpdateLectureResponse = {
+  lectureId: string;
+  title: string;
+  isPreview: boolean;
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+  resource: {
+    resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    isDownloadable: boolean;
+    fileUrl: string;
+  };
+};
+
+// ===== API: 강좌 발행 =====
+export type PublishCourseResponse = {
+  id: number;
+  title: string;
+  courseState: 'PUBLISHED';
+};
+
+export type LectureResourceResponse = {
+  resourceType: ResourceType;
+  fileUrl: string;
+  isDownloadable: boolean;
 };
