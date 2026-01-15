@@ -39,7 +39,11 @@ export const MSWProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const MSWProviderWrapper = ({ children }: { children: React.ReactNode }) => {
+export const MSWProvider = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
   use(mockingEnabledPromise);
   return children;
 };
