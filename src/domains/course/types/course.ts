@@ -131,7 +131,7 @@ export type CreateCourseRequest = {
   summary: string;
   description: string;
   thumbnail: string;
-  categoryId: string; ////number?
+  categoryId: string; // number;
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 };
@@ -154,43 +154,40 @@ export type CreateLectureRequest = {
   isPreview: boolean;
   orderIndex: number;
   resourceKey: string;
-  totalDurationSeconds: number; //응답에 없는 값
 };
 
 export type UpdateLectureRequest = {
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
-  resourceKey?: string;
+  resourceKey: string;
 };
 
 // 강좌 생성 응답
 export type CreateCourseResponse = {
-  courseId: string; //number?
+  courseId: string;
 };
 
 // 섹션 생성 응답
 export type CreateSectionResponse = {
-  sectionId: string; //number?
+  sectionId: string;
   title: string;
   orderIndex: number;
-  createdAt: string; //원래 응답값에 없음
-  updatedAt: string; //원래 응답값에 없음
 };
 
 // 강의 생성 응답
 export type CreateLectureResponse = {
-  lectureId: string; // 응답에 없는 값
+  lectureId: string;
   title: string;
   totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  createdAt: string; // 응답에 없는 값
-  updatedAt: string; // 응답에 없는 값
+  createdAt: string;
+  updatedAt: string;
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
+    fileUrl: string;
     isDownloadable: boolean;
-    fileKey: string;
   };
 };
 
@@ -228,11 +225,16 @@ export type GetAllCourseResponse = {
     level: CourseLevel;
     summary: string;
     instructorName: string;
+    // 추가한 정보
+    reviewInfo: {
+      reviewCount: number;
+      avgRating: number;
+    };
   }>;
   currentPage: number;
   size: number;
   totalElements: number;
-  totalPages: string; // number?
+  totalPages: number;
   hasNext: boolean;
 };
 
@@ -255,8 +257,10 @@ export type GetCourseDetailResponse = {
   level: CourseLevel;
   studentCount: number;
   sections: SectionDetailResponse[];
-  reviewRatingAvg: number; // 추가
-  reviewcount: number; // 추가
+  reviewInfo: {
+    reviewCount: number;
+    avgRating: number;
+  };
 };
 
 export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
@@ -267,7 +271,7 @@ export type GetEnrollmentResponse = {
   courseId: string;
   status: EnrollmentStatus;
   progressRate: 45;
-  createdAt: string; // number?
+  createdAt: string;
   expiredAt: string;
 };
 
@@ -281,7 +285,7 @@ export type SectionDetailResponse = {
 export type LectureDetailResponse = {
   lectureId: string;
   title: string;
-  totalDurationSeconds: number; // 응답에는 없음
+  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
   createdAt: string;
@@ -290,7 +294,7 @@ export type LectureDetailResponse = {
     resourceType: ResourceType;
     fileUrl: string;
     isDownloadable: boolean;
-  }; // resources: LectureResourceResponse[];
+  };
 };
 
 export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
@@ -328,7 +332,6 @@ export type CreateLectureResourcePresignedUrlResponse = {
 };
 
 // 썸네일 업로드 url 생성 API
-export type CreateThumbnailPresignedUrlRequest = {}; // body 없음
 export type CreateThumbnailPresignedUrlResponse = {
   presignedUrl: string;
   key: string;
@@ -343,10 +346,10 @@ export type DeleteSectionResponse = {
 export type UpdateLectureResponse = {
   lectureId: string;
   title: string;
-  totalDurationSeconds: number;
   isPreview: boolean;
   orderIndex: number;
-  updatedAt: string; //응답에 없는 값
+  createdAt: string;
+  updatedAt: string;
   resource: {
     resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
     isDownloadable: boolean;
@@ -354,26 +357,9 @@ export type UpdateLectureResponse = {
   };
 };
 
-export type DeleteLectureRequest = {};
-export type DeleteLectureResponse = {
-  lectureId?: string;
-};
-
 // ===== API: 강좌 발행 =====
-export type PublishCourseRequest = {}; // body 없음
 export type PublishCourseResponse = {
   id: number;
   title: string;
   courseState: 'PUBLISHED';
-};
-
-// ===== API: 강좌/섹션/강의 조회 =====
-export type GetCourseDetailRequest = {
-  courseId: number;
-};
-
-export type LectureResourceResponse = {
-  resourceType: 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
-  fileUrl: string;
-  isDownloadable: boolean;
 };
