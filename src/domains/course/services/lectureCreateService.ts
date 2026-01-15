@@ -37,9 +37,7 @@ export const createLectureResourcePresignedUrl = async (
 
 // 리소스 삭제 API
 export async function deleteLectureResource(resourceId: string) {
-  return deleteApi(`/api/instructor/resources/${resourceId}`, {
-    credentials: 'include',
-  });
+  return deleteApi(`/api/instructor/resources/${resourceId}`);
 }
 
 // 강의 수정 API (임시강의생성수정 API)
