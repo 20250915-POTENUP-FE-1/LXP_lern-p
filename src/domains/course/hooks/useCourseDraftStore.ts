@@ -120,15 +120,10 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
       }
 
       for (const [lectureIndex, lecture] of section.lectures.entries()) {
-        // (1) delete: id string 보장
         if (lecture._deleted && lecture.id) {
-          await deleteLecture(courseId, String(lecture.id));
+          await deleteLecture(courseId, lecture.id);
           continue;
         }
-
-        // (2) CreateLectureRequest/UpdateLectureRequest는 resourceKey가 필수
-        //     Draft에는 resourceKey가 없으니, 최소한 resource[0].fileUrl을 key처럼 사용(임시)
-        //     없으면 요청을 보내지 않고 skip (에러 방지)
         const resourceKey = lecture.resource?.[0]?.fileUrl?.trim();
         const safeOrderIndex = lectureIndex + 1; // orderIndex 통일(1-based)
 
