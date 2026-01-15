@@ -158,9 +158,9 @@ export type CreateLectureRequest = {
 
 export type UpdateLectureRequest = {
   title: string;
-  totalDurationSeconds: number;
   isPreview: boolean;
   resourceKey: string;
+  orderIndex: number;
 };
 
 // 강좌 생성 응답
@@ -278,7 +278,7 @@ export type GetEnrollmentResponse = {
   studentId: string;
   courseId: string;
   status: EnrollmentStatus;
-  progressRate: 45; // 고정숫자 수정 필요
+  progressRate: number;
   createdAt: string;
   expiredAt: string;
 };
