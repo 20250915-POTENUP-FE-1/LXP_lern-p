@@ -11,9 +11,9 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'http',
-        hostname: '3.34.122.45',
-        port: '8080',
-        pathname: '/uploads/**',
+        hostname: 'localhost',
+        port: '8081',
+        pathname: '/images/**',
       },
       {
         protocol: 'https',
