@@ -123,7 +123,8 @@ export function CourseForm() {
             <input
               id="price"
               type="text"
-              pattern="[0-1000000000]*"
+              inputMode="numeric"
+              pattern="^\d*$"
               value={formData.price}
               onChange={handleChange}
               className={styles['course-form__input']}
