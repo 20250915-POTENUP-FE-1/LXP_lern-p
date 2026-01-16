@@ -28,7 +28,7 @@ export async function getEnrollmentList(params?: {
 }): Promise<EnrollmentListResponse> {
   const query = new URLSearchParams({
     status: params?.status ?? 'ENROLLED',
-    page: String(params?.page ?? 1),
+    page: String(params?.page ?? 0),
     size: String(params?.size ?? 10),
   });
 

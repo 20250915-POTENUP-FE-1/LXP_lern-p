@@ -2,18 +2,17 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-
 import { useRouter } from 'next/navigation';
+import { Play } from 'lucide-react';
 import styles from '@/app/(user)/mypage/MyPageSections.module.css';
 import type { EnrollmentListContent } from '@/domains/user/types/enrollment';
 import { MOCK_ENROLLMENT_LIST } from '@/mocks/enrollmentList.mock';
 import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
-import { getIsReviewed } from '@/domains/course/services/reviewService';
-import { getEnrollmentList } from '../services/enrollmentService';
-import { Play } from 'lucide-react';
 import { USE_MOCK } from '@/shared/constants/config';
+import { getEnrollmentList } from '../services/enrollmentService';
+import { getIsReviewed } from '@/domains/course/services/reviewService';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
@@ -91,7 +90,7 @@ export default function EnrollmentClientPage() {
           const merged = content.map((it) => {
             const cid = String(it.courseId);
             const list = MOCK_GET_COURSE_REVIEWS[cid] ?? [];
-            const hasMine = list.some((r: any) => Boolean(r.isMine));
+            const hasMine = list.some((r) => Boolean(r.isMine));
 
             return { ...it, isReviewed: hasMine };
           });

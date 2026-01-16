@@ -49,5 +49,5 @@ export async function getMyReview(courseId: string | number): Promise<GetReviewR
 }
 // 수강중인 강좌 리뷰 여부 확인 API
 export async function getIsReviewed(request: GetIsReviewedRequest): Promise<GetIsReviewedResponse> {
-  return postApi<GetIsReviewedResponse>(`/api/reviews/my`);
+  return postApi<GetIsReviewedResponse>(`/api/reviews/my`, request);
 }
