@@ -215,22 +215,6 @@
   fill: #222;
 }
 
-.enrollment-card__actions .btn-primary::before {
-  content: '';
-  position: absolute;
-
-  width: 0;
-  height: 0;
-
-  border-left: 8px solid #ffffff;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-
-  left: 50%;
-  top: 50%;
-  transform: translate(-45%, -50%);
-}
-
 .enrollment-card__actions .btn-primary:hover {
   background: var(--color-gray-200);
   border-color: #000;
@@ -387,9 +371,13 @@
 }
 
 .authored__category {
-  margin: 0;
-  font-size: var(--text-sm);
   color: var(--color-text-muted);
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  margin: 0;
+  font-size: 12px;
+  display: -webkit-box;
+  overflow: hidden;
 }
 
 .authored__actions {

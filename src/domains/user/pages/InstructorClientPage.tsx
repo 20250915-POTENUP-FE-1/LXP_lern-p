@@ -61,7 +61,9 @@ export default function InstructorCourseClientPage() {
             <div className={styles['authored__item']}>
               <div className={styles['authored__meta']}>
                 <h3 className={styles['authored__title']}>{course.title}</h3>
-                <p className={styles['authored__category']}></p>
+                <p className={styles['authored__category']}>
+                  {course.categories?.join(' / ') ?? '카테고리 없음'}
+                </p>
               </div>
 
               {/* <div className={styles["authored__actions"]}>
