@@ -8,6 +8,7 @@ import { ResourceUploader } from './ResourceUploader';
 
 export function SectionForm() {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
   const {
     sections,
     step1Data,
@@ -155,6 +156,10 @@ export function SectionForm() {
                                     }
                                   : undefined
                               }
+                              isPreview={lecture.isPreview}
+                              onPreviewChange={(next) =>
+                                handleLecturePreviewChange(section.localId, lecture.localId, next)
+                              }
                               onUploadComplete={(result) =>
                                 handleLectureUpload(section.localId, lecture.localId, result)
                               }
@@ -162,22 +167,6 @@ export function SectionForm() {
                                 handleLectureRemoveResource(section.localId, lecture.localId)
                               }
                             />
-                            {!!lecture.resource?.[0]?.fileUrl && (
-                              <label className={styles['form__checkbox']}>
-                                <input
-                                  type="checkbox"
-                                  checked={lecture.isPreview}
-                                  onChange={(e) =>
-                                    handleLecturePreviewChange(
-                                      section.localId,
-                                      lecture.localId,
-                                      e.target.checked,
-                                    )
-                                  }
-                                />
-                                <span>미리보기 허용</span>
-                              </label>
-                            )}
                           </div>
                         </li>
                       ))}

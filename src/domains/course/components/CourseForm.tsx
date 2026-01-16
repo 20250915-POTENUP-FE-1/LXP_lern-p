@@ -122,7 +122,8 @@ export function CourseForm() {
             </label>
             <input
               id="price"
-              type="number"
+              type="text"
+              pattern="[0-1000000000]*"
               value={formData.price}
               onChange={handleChange}
               className={styles['course-form__input']}
