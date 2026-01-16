@@ -374,7 +374,7 @@ export function useSectionForm(options?: UseSectionFormParams) {
       const newResource: LectureResource = {
         resourceType: result.resourceType,
         isDownloadable: isVideo ? false : result.isDownloadable,
-        fileUrl: result.resourceKey,
+        fileUrl: result.fileUrl,
       };
       const nextDuration =
         isVideo && result.duration != null ? Number(result.duration) : lecture.duration;

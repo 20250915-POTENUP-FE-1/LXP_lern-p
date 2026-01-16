@@ -1,4 +1,5 @@
 'use client';
+
 import { useMemo, useState } from 'react';
 import { useSectionForm } from '../hooks/useSectionForm';
 import { ResourceType } from '../types/course';
@@ -143,8 +144,9 @@ export function SectionForm() {
                                       resourceType: lecture.resource[0]
                                         .resourceType as ResourceType,
                                       // lecture.resource[0].fileUrl에는 resourceKey가 들어있다고 가정(최종 법칙)
-                                      resourceKey: lecture.resource[0].fileUrl ?? '',
+                                      fileKey: lecture.resource[0].fileUrl ?? '',
                                       // 미리보기용 (선택): VIDEO일 때만
+                                      fileUrl: lecture.videoUrl,
                                       previewUrl: lecture.videoUrl || undefined,
                                       isDownloadable: !!lecture.resource[0].isDownloadable,
                                       duration: lecture.duration,
