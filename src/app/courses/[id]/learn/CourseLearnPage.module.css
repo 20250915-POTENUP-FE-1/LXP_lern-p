@@ -27,16 +27,29 @@
 
 .course-learn__back-btn {
   background: transparent;
-  border: none;
-  padding: 6px 0;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  padding: 6px 8px;
+  border-radius: 8px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .course-learn__icon {
   width: 20px;
   height: 20px;
-  color: var(--color-text-muted);
+  color: currentColor;
+}
+
+.course-learn__back-btn:hover,
+.course-learn__back-btn:focus-visible {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
 }
 
 .course-learn__title {
