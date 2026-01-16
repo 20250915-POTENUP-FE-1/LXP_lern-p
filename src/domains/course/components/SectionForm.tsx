@@ -29,6 +29,7 @@ export function SectionForm() {
     handleFinalSubmit,
     handlePrevStep,
     handleCancel,
+    handleLecturePreviewChange,
   } = useSectionForm();
 
   const toggleSection = (sectionId: string) => {
@@ -161,6 +162,22 @@ export function SectionForm() {
                                 handleLectureRemoveResource(section.localId, lecture.localId)
                               }
                             />
+                            {!!lecture.resource?.[0]?.fileUrl && (
+                              <label className={styles['form__checkbox']}>
+                                <input
+                                  type="checkbox"
+                                  checked={lecture.isPreview}
+                                  onChange={(e) =>
+                                    handleLecturePreviewChange(
+                                      section.localId,
+                                      lecture.localId,
+                                      e.target.checked,
+                                    )
+                                  }
+                                />
+                                <span>미리보기 허용</span>
+                              </label>
+                            )}
                           </div>
                         </li>
                       ))}

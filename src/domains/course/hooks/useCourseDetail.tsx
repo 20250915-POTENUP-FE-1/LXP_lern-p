@@ -38,7 +38,7 @@ export function useCourseDetail(courseId: string) {
           title: courseDetailResponse.title,
           summary: courseDetailResponse.summary,
           description: courseDetailResponse.description,
-          thumbnailUrl: courseDetailResponse.thumbnailUrl,
+          thumbnailUrl: courseDetailResponse.thumbnailUrl ?? '',
 
           instructorId: courseDetailResponse.instructor.id,
           instructorName: courseDetailResponse.instructor.name,
