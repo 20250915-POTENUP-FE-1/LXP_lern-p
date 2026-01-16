@@ -30,7 +30,7 @@ export default function EnrollmentClientPage() {
   );
 
   const { myReview, myReviewStatus, canWriteReview, writeReview, editReview } =
-    useCourseReviews(selectedCourseId);
+    useCourseReviews(selectedCourseId, { fetchAll: false });
 
   const isReviewed = myReviewStatus.status === 'exists';
 
