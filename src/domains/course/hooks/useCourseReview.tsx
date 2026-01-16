@@ -14,17 +14,24 @@ import {
   createReview as createReviewApi,
   deleteReview as deleteReviewApi,
   getAllReviews,
+  getMyReview,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
-export function useCourseReviews(courseId: string) {
+type UseCourseReviewsOptions = {
+  fetchAll?: boolean;
+};
+
+export function useCourseReviews(courseId: string, options?: UseCourseReviewsOptions) {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [myReviewState, setMyReviewState] = useState<Review | null>(null);
   const { user } = useAuthState();
+  const shouldFetchAll = options?.fetchAll ?? true;
 
   useEffect(() => {
-    if (!courseId) return;
+    if (!courseId || !shouldFetchAll) return;
 
     (async () => {
       try {
@@ -32,19 +39,9 @@ export function useCourseReviews(courseId: string) {
           ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
           : await getAllReviews(courseId);
 
-        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
-          return {
-            id: String(it.id),
-            courseId: String(it.courseId ?? courseId),
-            nickname: String(it.nickname ?? ''),
-            rating: Number(it.rating ?? 0),
-            content: String(it.content ?? ''),
-            createdAt: String(it.createdAt ?? ''),
-            updatedAt: String(it.updatedAt ?? ''),
-            isMine: Boolean(it.isMine),
-            status: it.status,
-          };
-        });
+        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) =>
+          mapReview(it, courseId),
+        );
 
         setReviews(mapped);
       } catch (e) {
@@ -54,7 +51,43 @@ export function useCourseReviews(courseId: string) {
     })();
   }, [courseId]);
 
-  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
+  useEffect(() => {
+    if (USE_MOCK) return;
+    if (!courseId || !user) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const review = await getMyReview(courseId);
+        if (cancelled) return;
+        setMyReviewState(mapReview(review, courseId, true));
+      } catch (e) {
+        if (cancelled) return;
+        setMyReviewState(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId, user]);
+
+  const myReview = useMemo(() => {
+    if (!courseId || !user) return null;
+
+    if (USE_MOCK) {
+      if (shouldFetchAll) {
+        return reviews.find((r) => r.isMine) ?? null;
+      }
+      const list = MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+      const mine = list.find((r) => Boolean(r.isMine));
+      return mine ? mapReview(mine, courseId, true) : null;
+    }
+
+    if (!myReviewState) return null;
+    if (String(myReviewState.courseId) !== String(courseId)) return null;
+    return myReviewState;
+  }, [courseId, user, reviews, shouldFetchAll, myReviewState]);
 
   const myReviewStatus: MyReviewStatus = useMemo(() => {
     if (!myReview) return { status: 'none' };
@@ -79,21 +112,20 @@ export function useCourseReviews(courseId: string) {
       const now = new Date().toISOString();
 
       // mock / real 공통: UI 즉시 반영
-      setReviews((prev) => {
-        const newReview: Review = {
-          id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
-          courseId,
-          nickname: user.nickname,
-          rating: payload.rating ?? 0,
-          content: payload.content?.trim() ?? '',
-          createdAt: now,
-          updatedAt: now,
-          isMine: true,
-          status: 'DISPLAY',
-        };
+      const newReview: Review = {
+        id: globalThis.crypto?.randomUUID?.() ?? `rev_${Date.now()}`,
+        courseId,
+        nickname: user.nickname,
+        rating: payload.rating ?? 0,
+        content: payload.content?.trim() ?? '',
+        createdAt: now,
+        updatedAt: now,
+        isMine: true,
+        status: 'DISPLAY',
+      };
 
-        return [newReview, ...prev.map((r) => ({ ...r, isMine: false }))];
-      });
+      setMyReviewState(newReview);
+      setReviews((prev) => [newReview, ...prev.map((r) => ({ ...r, isMine: false }))]);
     },
     [courseId, user],
   );
@@ -105,6 +137,16 @@ export function useCourseReviews(courseId: string) {
 
       if (USE_MOCK) {
         const now = new Date().toISOString();
+        const nextReview = myReviewState
+          ? {
+              ...myReviewState,
+              rating: payload.rating,
+              content: payload.content.trim(),
+              updatedAt: now,
+            }
+          : null;
+
+        setMyReviewState(nextReview);
         setReviews((prev) =>
           prev.map((r) =>
             r.isMine
@@ -124,8 +166,30 @@ export function useCourseReviews(courseId: string) {
         rating: payload.rating,
         content: payload.content.trim(),
       });
+
+      const now = new Date().toISOString();
+      if (myReviewState) {
+        setMyReviewState({
+          ...myReviewState,
+          rating: payload.rating,
+          content: payload.content.trim(),
+          updatedAt: now,
+        });
+      }
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.isMine
+            ? {
+                ...r,
+                rating: payload.rating,
+                content: payload.content.trim(),
+                updatedAt: now,
+              }
+            : r,
+        ),
+      );
     },
-    [courseId],
+    [courseId, myReviewState],
   );
 
   // 삭제: API가 courseId 기반이라 reviewId 필요 없음
@@ -134,10 +198,13 @@ export function useCourseReviews(courseId: string) {
 
     if (USE_MOCK) {
       setReviews((prev) => prev.filter((r) => !r.isMine));
+      setMyReviewState(null);
       return;
     }
 
     await deleteReviewApi(courseId);
+    setReviews((prev) => prev.filter((r) => !r.isMine));
+    setMyReviewState(null);
   }, [courseId]);
 
   return {
@@ -150,3 +217,17 @@ export function useCourseReviews(courseId: string) {
     removeReview,
   };
 }
+
+const mapReview = (review: GetReviewResponse, fallbackCourseId: string, isMine?: boolean): Review => {
+  return {
+    id: String(review.id),
+    courseId: String(review.courseId ?? fallbackCourseId),
+    nickname: String(review.nickname ?? ''),
+    rating: Number(review.rating ?? 0),
+    content: String(review.content ?? ''),
+    createdAt: String(review.createdAt ?? ''),
+    updatedAt: String(review.updatedAt ?? ''),
+    isMine: isMine ?? Boolean(review.isMine),
+    status: review.status,
+  };
+};

@@ -30,7 +30,7 @@ export default function EnrollmentClientPage() {
   );
 
   const { myReview, myReviewStatus, canWriteReview, writeReview, editReview } =
-    useCourseReviews(selectedCourseId);
+    useCourseReviews(selectedCourseId, { fetchAll: false });
 
   const isReviewed = myReviewStatus.status === 'exists';
 
@@ -136,7 +136,7 @@ export default function EnrollmentClientPage() {
 
       <div className={styles['enrollment-section__list']}>
         {items.map((item) => {
-          const hasProgress = (item.progressRate ?? 0) > 0;
+          const hasProgress = (item.progressRate ?? 0) >= 0;
 
           const buttonLabel = hasProgress ? '이어보기' : '처음부터';
           const buttonHref = hasProgress

@@ -54,10 +54,9 @@ export default function CourseDetailClientPage() {
   );
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const { reviews, writeReview, editReview, removeReview, myReviewStatus } = useCourseReviews(id);
+  const { reviews, writeReview, editReview, removeReview, myReviewStatus, myReview } =
+    useCourseReviews(id);
   const reviewCount = reviews.length;
-
-  const myReview = useMemo(() => reviews.find((r) => r.isMine), [reviews]);
   const hasMyReview = myReviewStatus.status === 'exists';
 
   const avgRating = useMemo(() => {
