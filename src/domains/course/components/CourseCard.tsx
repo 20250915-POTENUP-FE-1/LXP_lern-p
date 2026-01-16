@@ -20,7 +20,11 @@ export function CourseCard({ course }: CourseCardProps) {
           width={1200} // 혹은 800
           height={675}
           className={styles['course-card__thumb']}
-          src={formatAbsoluteUrl(course.thumbnailUrl)}
+          src={
+            course.thumbnailUrl && !course.thumbnailUrl.includes('example.com')
+              ? formatAbsoluteUrl(course.thumbnailUrl)
+              : '/course-thumbnail-fallback.png'
+          }
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
