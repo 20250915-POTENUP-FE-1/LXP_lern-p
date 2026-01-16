@@ -156,11 +156,8 @@ export default function CourseDetailClientPage() {
           width={800}
           height={450}
           className={styles['course-detail__hero']}
-          src={
-            course.thumbnailUrl && !course.thumbnailUrl.includes('example.com')
-              ? formatAbsoluteUrl(course.thumbnailUrl)
-              : '/course-thumbnail-fallback.png'
-          }
+          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
+          src={'/course-thumbnail-fallback.png'}
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />

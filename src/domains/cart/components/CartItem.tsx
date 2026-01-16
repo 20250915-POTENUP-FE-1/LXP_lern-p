@@ -43,12 +43,8 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
       </label>
       <div className={styles['cart-item__thumb']}>
         <Image
-          src={
-            // TODO: 썸네일 임시 처리
-            item.thumbnailUrl && !item.thumbnailUrl.includes('example.com')
-              ? formatAbsoluteUrl(item.thumbnailUrl)
-              : '/default-thumbnail.png'
-          }
+          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
+          src={'/course-thumbnail-fallback.png'}
           alt={`${item.title} 썸네일`}
           width={160}
           height={90}
