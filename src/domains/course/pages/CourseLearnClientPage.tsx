@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useRef, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import { useProgress } from '@/domains/course/hooks/useProgress';
@@ -102,8 +103,16 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
             </button>
             <h1 className={styles['course-learn__title']}>{courseData.title}</h1>
           </div>
-          <div className={styles['course-learn__progress']}>
-            진도율: {completedLectures}/{totalLectures} 완료
+          <div className={styles['course-learn__header-right']}>
+            <div className={styles['course-learn__progress']}>
+              진도율: {completedLectures}/{totalLectures} 완료
+            </div>
+            <Link
+              className={styles['course-learn__detail-button']}
+              href={`/courses/${courseData.courseId}`}
+            >
+              강좌 상세 보기
+            </Link>
           </div>
         </div>
       </header>
