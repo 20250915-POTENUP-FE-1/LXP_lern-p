@@ -1,6 +1,12 @@
 import { createLecture } from '../services/lectureCreateService';
 import { createSection } from '../services/sectionCreateService';
-import { CourseDraftForm, CreateCourseRequest, SectionDraftForm } from '../types/course';
+import {
+  CourseDraftForm,
+  CreateCourseRequest,
+  CreateLectureRequest,
+  LectureDraftForm,
+  SectionDraftForm,
+} from '../types/course';
 
 export const createCourseFormData = (data: any, file?: File) => {
   const formData = new FormData();
@@ -15,48 +21,33 @@ export const createCourseFormData = (data: any, file?: File) => {
 
 // 강좌 생성용 데이터 매핑 함수
 export const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseRequest => {
-  const categoryId = 1;
-
-  const levelMap: Record<string, CreateCourseRequest['courseLevel']> = {
-    beginner: 'BEGINNER',
-    intermediate: 'INTERMEDIATE',
-    advanced: 'ADVANCED',
-  };
-
-  const normalizedLevel = draft.level?.toLowerCase() ?? 'beginner';
+  const categoryId = Number(draft.category[draft.category.length - 1]);
 
   return {
     title: draft.title,
     summary: draft.summary,
     description: draft.description,
-    thumbnail: draft.thumbnail,
-    categoryId: String(categoryId),
+    categoryId, // number
     price: draft.price,
-    courseLevel: levelMap[normalizedLevel] ?? 'BEGINNER',
+    courseLevel: draft.level,
   };
 };
 
 // 강좌 발행용 - 섹션/강의 데이터 포맷팅 함수
-export const formatLectureData = (lecDraft: any, lIndex: number) => {
-  const resources = lecDraft.resource ?? [];
-  const primaryResource = Array.isArray(resources) ? resources[0] : resources;
+export const formatLectureData = (
+  lecDraft: LectureDraftForm,
+  lIndex: number,
+): CreateLectureRequest => {
+  const primary = Array.isArray(lecDraft.resource) ? lecDraft.resource[0] : undefined;
 
-  const hasValidResource = primaryResource?.resourceType;
+  // 최종 규칙: lecture.resource[0].fileUrl === resourceKey
+  const resourceKey = primary?.fileUrl?.trim() ?? '';
 
   return {
     title: lecDraft.title,
-    totalDurationSeconds: lecDraft.duration ?? 0,
-    isPreview: lecDraft.isPreview ?? false,
+    isPreview: !!lecDraft.isPreview,
     orderIndex: lIndex + 1,
-    resource: hasValidResource
-      ? [
-          {
-            resourceType: primaryResource.resourceType,
-            isDownloadable: Boolean(primaryResource.isDownloadable),
-            fileUrl: primaryResource.fileUrl,
-          },
-        ]
-      : undefined,
+    resourceKey,
   };
 };
 
@@ -68,51 +59,68 @@ export const applySectionDraftsForNewCourse = async (
   for (let sIndex = 0; sIndex < sectionDrafts.length; sIndex++) {
     const secDraft = sectionDrafts[sIndex];
 
+    // 섹션 제목 없으면 생성 스킵 (최종 정책에 맞춰 조정 가능)
+    if (!secDraft.title.trim()) continue;
+
     const sectionRes = await createSection(courseId, {
       title: secDraft.title,
-      orderIndex: sIndex,
+      orderIndex: sIndex + 1,
     });
+
     const sectionId = String(sectionRes.sectionId ?? '');
 
     for (let lIndex = 0; lIndex < secDraft.lectures.length; lIndex++) {
       const lecDraft = secDraft.lectures[lIndex];
 
-      const formattedData = formatLectureData(lecDraft, lIndex);
+      // 강의 제목 없으면 스킵
+      if (!lecDraft.title.trim()) continue;
 
-      await createLecture(courseId, sectionId, formattedData, lecDraft.file);
+      const payload = formatLectureData(lecDraft, lIndex);
+
+      // 스펙: resourceKey 유효할 때만 createLecture 가능
+      if (!payload.resourceKey) continue;
+
+      await createLecture(courseId, sectionId, payload);
     }
   }
 };
 
 // 생성된 강좌조회 용 데이터 매핑 함수
 export const mapResponseToCourseDraft = (data: any) => {
-  //카테고리
+  // categoryIds가 배열로 오면 그대로 string 배열로 저장
   const category = Array.isArray(data.categoryIds)
     ? data.categoryIds.map((id: unknown) => String(id))
     : data.category
       ? [String(data.category)]
       : [];
-  // 강좌 정보 가공
+
   const courseDraft: CourseDraftForm = {
     title: data.title ?? '',
     summary: data.summary ?? '',
     description: data.description ?? '',
     thumbnail: data.thumbnailUrl ?? '',
     category,
-    level: data.courseLevel ?? '',
+    level: data.courseLevel ?? 'BEGINNER',
     price: data.price ?? 0,
   };
-  // 섹션 및 강의 정보 가공
+
+  // SectionDraftForm / LectureDraftForm 필드에 맞춰 최소 매핑
   const sectionDrafts: SectionDraftForm[] = (data.sections ?? []).map((sec: any) => ({
-    id: String(sec.id),
+    localId: String(sec.id ?? crypto.randomUUID?.() ?? Date.now()),
+    id: String(sec.id ?? ''),
     title: sec.title ?? '',
-    status: sec.status ?? 'draft',
+    _dirty: false,
+    _deleted: false,
     lectures: (sec.lectures ?? []).map((lec: any) => ({
-      id: String(lec.id),
+      localId: String(lec.id ?? crypto.randomUUID?.() ?? Date.now()),
+      id: String(lec.id ?? ''),
       title: lec.title ?? '',
       duration: lec.totalDurationSeconds ?? 0,
       videoUrl: lec.videoUrl ?? '',
-      resource: lec.resource,
+      isPreview: !!lec.isPreview,
+      resource: Array.isArray(lec.resource) ? lec.resource : lec.resource ? [lec.resource] : [],
+      _dirty: false,
+      _deleted: false,
     })),
   }));
 

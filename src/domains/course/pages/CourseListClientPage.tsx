@@ -22,12 +22,11 @@ export default function CourseListClientPage() {
       try {
         // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
         const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
-
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
           id: item.courseId,
           title: item.title,
           summary: item.summary,
-          thumbnailUrl: item.thumbnailUrl,
+          thumbnailUrl: item.thumbnailUrl ?? '/images/default-thumbnail.png',
           instructorName: item.instructorName,
           category: item.categories,
           level: item.level,

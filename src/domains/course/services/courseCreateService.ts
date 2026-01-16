@@ -1,57 +1,34 @@
-import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
+import { getApi, patchApi, postApi, putApi } from '@/shared/lib/api/fetchApi';
 import type {
   CourseDraftForm,
   SectionDraftForm,
   Category,
   CreateCourseResponse,
   GetDraftCourseResponse,
+  CreateCourseRequest,
+  PublishCourseResponse,
+  UpdateLectureRequest,
+  UpdateLectureResponse,
 } from '../types/course';
 
 import {
-  applySectionDraftsForNewCourse,
   createCourseFormData,
   mapDraftToCreateRequest,
   mapResponseToCourseDraft,
 } from '../utils/courseCreate';
 
-// 강좌 임시 생성 API
-export const createDraftCourse = async (
-  draftData: CourseDraftForm,
-  thumbnailFile?: File,
-): Promise<CreateCourseResponse> => {
-  const requestBody = mapDraftToCreateRequest(draftData);
-
-  const formData = createCourseFormData(requestBody, thumbnailFile);
-
-  return await postApi<CreateCourseResponse>('/api/instructor/courses', null, {
-    body: formData,
-    credentials: 'include',
-  });
-};
-
 // 강좌 발행 API
-export const publishDraftCourse = async (courseId: string): Promise<void> => {
-  return await patchApi<void>(`/api/instructor/courses/${courseId}/publish`);
+export const publishCourse = async (courseId: string): Promise<PublishCourseResponse> => {
+  return await patchApi<PublishCourseResponse>(`/api/instructor/courses/${courseId}/publish`);
 };
 
-export const createCourse = async (
-  courseDraft: CourseDraftForm,
-  sectionDrafts: SectionDraftForm[],
-  shouldPublish: boolean = false,
-): Promise<CreateCourseResponse> => {
-  try {
-    const { courseId } = await createDraftCourse(courseDraft);
-    await applySectionDraftsForNewCourse(courseId, sectionDrafts);
+// 강좌 생성 API
+export const createCourse = async (payload: CreateCourseRequest): Promise<CreateCourseResponse> => {
+  const data = await postApi<{ courseId: string | number }>(`/api/instructor/courses`, payload);
 
-    if (shouldPublish) {
-      await publishDraftCourse(courseId);
-    }
-
-    return { courseId };
-  } catch (err) {
-    console.error('createCourse 실패:', err);
-    throw new Error('강좌 등록 중 오류가 발생했습니다.');
-  }
+  return {
+    courseId: String(data.courseId),
+  };
 };
 
 // 카테고리 조회 API
@@ -65,24 +42,16 @@ export const getCategories = async (): Promise<Category[]> => {
   }
 };
 
-// 강좌 수정 API
-export const updateDraftCourse = async (
+// 강좌 수정 API (임시생성 강좌 수정 이용)
+export const updateLecture = async (
   courseId: string,
-  payload: Partial<CourseDraftForm>,
-): Promise<void> => {
-  if (!courseId) throw new Error('Invalid courseId');
-
-  try {
-    const formData = createCourseFormData(payload);
-
-    await patchApi<void>(`/api/instructor/courses/${courseId}`, null, {
-      body: formData,
-      credentials: 'include',
-    });
-  } catch (err) {
-    console.error('updateDraftCourse 실패:', err);
-    throw err instanceof Error ? err : new Error('강좌 수정 중 오류가 발생했습니다.');
-  }
+  lectureId: string,
+  payload: UpdateLectureRequest,
+): Promise<UpdateLectureResponse> => {
+  return await putApi<UpdateLectureResponse>(
+    `/api/instructor/courses/${courseId}/lectures/${lectureId}`,
+    payload,
+  );
 };
 
 // 임시 생성된 강좌 조회 API

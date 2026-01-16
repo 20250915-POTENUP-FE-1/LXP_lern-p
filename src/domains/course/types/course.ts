@@ -64,9 +64,9 @@ export type CourseDraftForm = {
   summary: string;
   description: string;
   category: string[];
-  level: string;
+  level: CourseLevel;
   price: number | string;
-  thumbnail: string;
+  thumbnail?: string;
   status?: string;
 };
 
@@ -81,7 +81,7 @@ export type SectionDraftForm = DraftMeta & {
 // 강의 생성 / 수정
 export type LectureDraftForm = DraftMeta & {
   localId: string;
-  id: string;
+  id?: string; // 각각 courseId, lectureId 가 없을 경우에 local 의 경우를 만들기 위해
   title: string;
   duration: number;
   videoUrl: string;
@@ -130,10 +130,10 @@ export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
-  thumbnail: string;
-  categoryId: string; // number;
+  //thumbnail?: string; // TODO: 추후에 반영 예정
+  categoryId: number;
   price: number | string;
-  courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'NOVICE';
 };
 export type UpdateCourseRequest = CreateCourseRequest;
 
@@ -209,14 +209,14 @@ export type ReorderLecturesRequest = {
 };
 
 export type Status = 'DRAFT' | 'PUBLISHED' | 'DELETED';
-export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'NOVICE';
 
 export type GetAllCourseResponse = {
   content: Array<{
     courseId: string;
     title: string;
     categories: string[];
-    thumbnailUrl: string;
+    thumbnailUrl?: string;
     status: Status;
     price: number;
     studentCount: number;
@@ -225,8 +225,7 @@ export type GetAllCourseResponse = {
     level: CourseLevel;
     summary: string;
     instructorName: string;
-    // 추가한 정보
-    reviewInfo: {
+    reviewStat: {
       reviewCount: number;
       avgRating: number;
     };
@@ -242,7 +241,7 @@ export type GetCourseDetailResponse = {
   courseId: string;
   title: string;
   categories: string[];
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   summary: string;
   description: string;
   instructor: {
@@ -257,7 +256,7 @@ export type GetCourseDetailResponse = {
   level: CourseLevel;
   studentCount: number;
   sections: SectionDetailResponse[];
-  reviewInfo: {
+  reviewStat: {
     reviewCount: number;
     avgRating: number;
   };
@@ -345,7 +344,7 @@ export type DeleteSectionResponse = {
   sectionId?: string;
 };
 
-// ===== API: 강의 생성 / 수정 =====
+// ===== 강의 수정 API =====
 export type UpdateLectureResponse = {
   lectureId: string;
   title: string;

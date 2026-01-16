@@ -96,10 +96,10 @@ export function CourseForm() {
               <option value="" disabled>
                 난이도 선택
               </option>
-              <option>입문</option>
-              <option>초급</option>
-              <option>중급</option>
-              <option>고급</option>
+              <option value="BEGINNER">입문</option>
+              <option value="NOVICE">초급</option>
+              <option value="INTERMEDIATE">중급</option>
+              <option value="ADVANCED">고급</option>
             </select>
           </div>
 

@@ -100,7 +100,7 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
       if (!sectionId && section.title.trim()) {
         const res = await createSection(courseId, {
           title: section.title,
-          orderIndex: sectionIndex + 1,
+          orderIndex,
         });
         sectionId = res.sectionId;
         set((s) => ({
@@ -124,26 +124,22 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
           await deleteLecture(courseId, lecture.id);
           continue;
         }
+        const resourceKey = lecture.resource?.[0]?.fileUrl?.trim();
+        const safeOrderIndex = lectureIndex + 1; // orderIndex 통일(1-based)
 
+        // create
         if (!lecture.id && lecture.title.trim()) {
-          const res = await createLecture(
-            courseId,
-            sectionId,
-            {
-              title: lecture.title,
-              totalDurationSeconds: lecture.duration,
-              isPreview: lecture.isPreview,
-              orderIndex: lectureIndex,
-              resource: lecture.resource?.length
-                ? lecture.resource.map((r) => ({
-                    resourceType: r.resourceType as 'VIDEO' | 'PDF' | 'DOC' | 'ZIP',
-                    isDownloadable: Boolean(r.isDownloadable), // 불리언 값 보장
-                    fileUrl: r.fileUrl,
-                  }))
-                : undefined,
-            },
-            lecture.file,
-          );
+          if (!resourceKey) {
+            // resourceKey 없으면 타입/서버 에러 날 수 있으니 생성 스킵
+            continue;
+          }
+
+          const res = await createLecture(courseId, String(sectionId), {
+            title: lecture.title,
+            isPreview: lecture.isPreview,
+            orderIndex: safeOrderIndex,
+            resourceKey,
+          });
 
           const createdLectureId = res.lectureId;
           set((s) => ({
@@ -161,12 +157,18 @@ export const useCourseDraftStore = create<CourseDraftStore>((set, get) => ({
           continue;
         }
 
+        // update
         if (lecture.id && lecture._dirty) {
-          await updateLecture(courseId, lecture.id, {
+          if (!resourceKey) {
+            // update도 resourceKey 필수라 가드
+            continue;
+          }
+
+          await updateLecture(courseId, String(lecture.id), {
             title: lecture.title,
-            totalDurationSeconds: lecture.duration,
             isPreview: lecture.isPreview,
-            resource: lecture.resource[0],
+            orderIndex: safeOrderIndex,
+            resourceKey,
           });
         }
       }
