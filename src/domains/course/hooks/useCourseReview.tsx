@@ -9,13 +9,13 @@ import type {
 } from '@/domains/course/types/review';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
+import { USE_MOCK } from '@/shared/constants/config';
 import {
   createReview as createReviewApi,
   deleteReview as deleteReviewApi,
   getAllReviews,
   updateReview as updateReviewApi,
 } from '../services/reviewService';
-import { USE_MOCK } from '@/shared/constants/config';
 
 type MyReviewStatus = { status: 'none' } | { status: 'exists'; reviewId: string };
 
@@ -28,10 +28,9 @@ export function useCourseReviews(courseId: string) {
 
     (async () => {
       try {
-        const items =
-          process.env.NODE_ENV === 'development'
-            ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-            : await getAllReviews(courseId);
+        const items = USE_MOCK
+          ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
+          : await getAllReviews(courseId);
 
         const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) => {
           return {
@@ -104,7 +103,7 @@ export function useCourseReviews(courseId: string) {
     async (payload: UpdateReviewRequest) => {
       if (!courseId) return;
 
-      if (process.env.NODE_ENV === 'development') {
+      if (USE_MOCK) {
         const now = new Date().toISOString();
         setReviews((prev) =>
           prev.map((r) =>
@@ -133,7 +132,7 @@ export function useCourseReviews(courseId: string) {
   const removeReview = useCallback(async () => {
     if (!courseId) return;
 
-    if (process.env.NODE_ENV === 'development') {
+    if (USE_MOCK) {
       setReviews((prev) => prev.filter((r) => !r.isMine));
       return;
     }
