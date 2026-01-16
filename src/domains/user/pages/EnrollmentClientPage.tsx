@@ -136,13 +136,6 @@ export default function EnrollmentClientPage() {
 
       <div className={styles['enrollment-section__list']}>
         {items.map((item) => {
-          const hasProgress = (item.progressRate ?? 0) > 0;
-
-          const buttonLabel = hasProgress ? '이어보기' : '처음부터';
-          const buttonHref = hasProgress
-            ? `/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`
-            : `/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}&start=first`;
-
           return (
             <div key={item.enrollmentId} className={styles['enrollment-card']}>
               <div className={styles['enrollment__link']}>
@@ -170,15 +163,13 @@ export default function EnrollmentClientPage() {
                   >
                     {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
                   </button>
-                  {hasProgress && (
-                    <Link
-                      href={buttonHref}
-                      className={styles['btn-primary']}
-                      aria-label={buttonLabel}
-                    >
-                      <Play />
-                    </Link>
-                  )}
+                  <Link
+                    href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
+                    className={styles['btn-primary']}
+                    aria-label="학습하기"
+                  >
+                    <Play />
+                  </Link>
                 </div>
               </div>
 
