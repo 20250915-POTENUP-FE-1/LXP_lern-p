@@ -26,7 +26,7 @@ export default function CourseListClientPage() {
           id: item.courseId,
           title: item.title,
           summary: item.summary,
-          thumbnailUrl: item.thumbnailUrl ?? '/images/default-thumbnail.png',
+          thumbnailUrl: item.thumbnailUrl ?? '/default-thumbnail.png',
           instructorName: item.instructorName,
           category: item.categories,
           level: item.level,
