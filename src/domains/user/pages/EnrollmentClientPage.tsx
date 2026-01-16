@@ -149,7 +149,9 @@ export default function EnrollmentClientPage() {
               <div className={styles['enrollment__link']}>
                 <div className={styles['enrollment__text']}>
                   <div className={styles['enrollment__header']}>
-                    <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+                    <Link href={`/courses/${item.courseId}`}>
+                      <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
+                    </Link>
                   </div>
 
                   <p className={styles['enrollment__category']}>
@@ -169,14 +171,6 @@ export default function EnrollmentClientPage() {
                   >
                     {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
                   </button>
-                  {/*
-                    <Link href={`/courses/${item.courseId}`}>
-                      <h3 className={styles['enrollment__title']}>{item.courseName}</h3>
-                      <p className={styles['enrollment__category']}>
-                        {item.categories?.join(' / ') ?? '카테고리 없음'}
-                      </p>
-                    </Link>
-                  */}
                   {hasProgress && (
                     <Link
                       href={buttonHref}
