@@ -25,6 +25,12 @@
   gap: 6px;
 }
 
+.course-learn__header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .course-learn__back-btn {
   background: transparent;
   border: 1px solid var(--color-border);
@@ -61,6 +67,28 @@
 .course-learn__progress {
   font-size: var(--text-sm);
   color: var(--muted);
+}
+
+.course-learn__detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.course-learn__detail-button:hover,
+.course-learn__detail-button:focus-visible {
+  color: var(--color-brand);
+  border-color: var(--color-brand);
 }
 
 .course-learn__layout {
