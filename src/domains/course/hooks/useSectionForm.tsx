@@ -295,6 +295,24 @@ export function useSectionForm(options?: UseSectionFormParams) {
     }
   };
 
+  const handleLecturePreviewChange = (
+    sectionLocalId: string,
+    lectureLocalId: string,
+    next: boolean,
+  ) => {
+    setSections((prev) =>
+      prev.map((sec) =>
+        sec.localId !== sectionLocalId
+          ? sec
+          : {
+              ...sec,
+              lectures: sec.lectures.map((lec) =>
+                lec.localId !== lectureLocalId ? lec : { ...lec, isPreview: next, _dirty: true },
+              ),
+            },
+      ),
+    );
+  };
   // === onBlur: 강의 자동 저장 ===
   const handleLectureTitleBlur = async (sectionLocalId: string, lectureLocalId: string) => {
     if (!courseId) return;
@@ -637,5 +655,6 @@ export function useSectionForm(options?: UseSectionFormParams) {
     handleFinalSubmit,
     handlePrevStep,
     handleCancel,
+    handleLecturePreviewChange,
   };
 }

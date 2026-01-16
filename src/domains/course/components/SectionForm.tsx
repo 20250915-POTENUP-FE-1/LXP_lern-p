@@ -8,6 +8,7 @@ import { ResourceUploader } from './ResourceUploader';
 
 export function SectionForm() {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
   const {
     sections,
     step1Data,
@@ -29,6 +30,7 @@ export function SectionForm() {
     handleFinalSubmit,
     handlePrevStep,
     handleCancel,
+    handleLecturePreviewChange,
   } = useSectionForm();
 
   const toggleSection = (sectionId: string) => {
@@ -153,6 +155,10 @@ export function SectionForm() {
                                       fileName: undefined,
                                     }
                                   : undefined
+                              }
+                              isPreview={lecture.isPreview}
+                              onPreviewChange={(next) =>
+                                handleLecturePreviewChange(section.localId, lecture.localId, next)
                               }
                               onUploadComplete={(result) =>
                                 handleLectureUpload(section.localId, lecture.localId, result)

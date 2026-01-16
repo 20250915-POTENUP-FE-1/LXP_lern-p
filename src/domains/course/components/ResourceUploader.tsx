@@ -18,10 +18,13 @@ export type UploadResult = {
   duration?: number;
   isDownloadable?: boolean;
   multiFile?: File;
+  isPreview?: boolean;
 };
 
 type ResourceUploaderProps = {
   initialValue?: UploadResult;
+  isPreview?: boolean;
+  onPreviewChange?: (next: boolean) => void;
   onUploadComplete?: (result: UploadResult) => void;
   onRemove?: () => void;
 };
@@ -59,6 +62,8 @@ async function getVideoDurationSeconds(url: string): Promise<number> {
 
 export function ResourceUploader({
   initialValue,
+  isPreview,
+  onPreviewChange,
   onUploadComplete,
   onRemove,
 }: ResourceUploaderProps) {
@@ -75,7 +80,6 @@ export function ResourceUploader({
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const blobUrlRef = useRef<string | null>(null);
-
   const effectiveType: ResourceType = draftType ?? initialValue?.resourceType ?? 'VIDEO';
 
   const initialUrl = initialValue?.fileUrl ?? '';
@@ -140,6 +144,7 @@ export function ResourceUploader({
 
   const handleRemoveFile = () => {
     resetDraftFileOnly();
+    onRemove?.();
     onRemove?.();
   };
 
@@ -256,6 +261,18 @@ export function ResourceUploader({
           />
           {!effectiveFileName && <p className={styles['upload__hint']}>{config.hint}</p>}
         </div>
+        {effectiveType === 'VIDEO' && effectiveFileName && !uploading && (
+          <div className={styles['form__field']}>
+            <label className={styles['form__checkbox']}>
+              <input
+                type="checkbox"
+                checked={!!isPreview}
+                onChange={(e) => onPreviewChange?.(e.target.checked)}
+              />
+              <span>미리보기 허용</span>
+            </label>
+          </div>
+        )}
 
         {uploading && <p className={styles['upload__status']}>업로드 중...</p>}
       </div>

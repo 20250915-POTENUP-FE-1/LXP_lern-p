@@ -24,7 +24,7 @@ export function useCourseForm() {
     summary: '',
     description: '',
     category: [],
-    level: 'NOVICE',
+    level: 'BEGINNER',
     price: '',
     thumbnailUrl: '',
   });
