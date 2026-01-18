@@ -9,8 +9,8 @@ import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logoutAction } from '@/domains/auth/actions/logoutAction';
-import styles from './Header.module.css';
 import { useCourseCreateEntry } from '@/domains/course/hooks/useCourseCreateEntry';
+import styles from './Header.module.css';
 
 export function Header() {
   const router = useRouter();
