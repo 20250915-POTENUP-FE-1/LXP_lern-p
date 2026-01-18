@@ -20,5 +20,17 @@ export async function uploadThumbnail(file: File): Promise<string> {
     requestBody,
   );
 
+  const uploadRes = await fetch(presignedUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type,
+    },
+    body: file,
+  });
+
+  if (!uploadRes.ok) {
+    throw new Error('Thumbnail upload failed');
+  }
+
   return key;
 }
