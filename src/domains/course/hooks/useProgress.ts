@@ -4,17 +4,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   CourseLearnProgress,
-  UpdateProgressResponse,
   LectureProgressMapValue,
   ProgressInfo,
   PendingProgress,
+  GetProgressResponse,
 } from '@/domains/course/types/progress';
+
 import { USE_MOCK } from '@/shared/constants/config';
 import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(courseId: string) {
-  const [progressData, setProgressData] = useState<UpdateProgressResponse | null>(null);
+  const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -45,30 +46,36 @@ export function useProgress(courseId: string) {
       progressData.lectureProgresses.map((p) => [
         p.resourceId,
         {
-          progressRate: p.currentProgressRate,
+          progressRate: p.progressRate,
           watchedDuration: p.watchedDuration,
           totalDurationSeconds: p.totalDurationSeconds,
-          completed: p.isCompleted,
+          completed: p.completed,
         },
       ]),
     );
   }, [progressData]);
 
+  // 이어보기 정보
   const progressInfo = useMemo<ProgressInfo | null>(() => {
-    if (!progressData?.lastVideoId) return null;
+    if (!progressData?.lastWatchedResourceId) return null;
+
+    // 마지막 watchedDuration은 강의별 목록에서 찾아오는 방식으로 맞춤
+    const last = progressData.lectureProgresses.find(
+      (p) => p.resourceId === progressData.lastWatchedResourceId,
+    );
 
     return {
-      lectureId: progressData.lastVideoId,
-      resumeAt: progressData.lastWatchedDuration ?? 0,
+      lectureId: progressData.lastWatchedResourceId,
+      resumeAt: last?.watchedDuration ?? 0,
     };
   }, [progressData]);
 
   const progress = useMemo<CourseLearnProgress | null>(() => {
-    if (!progressData) return null;
+    if (!progressData || !progressInfo) return null;
 
     return {
       enrollmentId: progressData.enrollmentId,
-      overallProgressRate: progressData.progressRate,
+      overallProgressRate: progressData.overallProgressRate,
       progressInfo,
       lectureProgressMap,
     };
@@ -132,6 +139,14 @@ export function useProgress(courseId: string) {
       lastSavedDurationRef.current = watchedDuration;
     } catch (e) {
       console.error('[progress] save failed', e);
+
+      // 실패한 값 저장해두고 재시도 큐로 넘김
+      pendingRef.current = {
+        resourceId,
+        watchedDuration,
+        retryCount: 0,
+      };
+      retryPending();
     }
   };
 
@@ -154,10 +169,10 @@ export function useProgress(courseId: string) {
 
   // 프론트에서 진도 상태를 계산/반영
   function applyProgressUpdate(
-    prev: UpdateProgressResponse,
+    prev: GetProgressResponse,
     resourceId: string,
     watchedDuration: number,
-  ): UpdateProgressResponse {
+  ): GetProgressResponse {
     const lectureProgresses = prev.lectureProgresses.map((p) => {
       if (p.resourceId !== resourceId) return p;
 
@@ -169,19 +184,20 @@ export function useProgress(courseId: string) {
       return {
         ...p,
         watchedDuration,
-        currentProgressRate: progressRate,
-        isCompleted: progressRate >= 100,
+        progressRate,
+        completed: progressRate >= 100,
         lastWatchedAt: new Date().toISOString(),
       };
     });
 
-    return {
+    const next: GetProgressResponse = {
       ...prev,
       lectureProgresses,
-      lastVideoId: resourceId,
-      lastWatchedDuration: watchedDuration,
+      lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
     };
+
+    return next;
   }
 
   return {
