@@ -25,6 +25,7 @@ export function useProgress(courseId: string) {
       try {
         setIsLoading(true);
 
+        // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
         const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
         setProgressData(progress);
