@@ -1,4 +1,4 @@
-import { getApi, postApi } from '@/shared/lib/api/fetchApi';
+import { deleteApi, getApi, postApi } from '@/shared/lib/api/fetchApi';
 import {
   AddCartItemRequest,
   AddCartItemResponse,
@@ -49,5 +49,5 @@ export const addCartItem = async ({
  * 장바구니 항목 제거
  */
 export const deleteCartItem = async (cartItemId: number): Promise<DeleteCartItemResponse> => {
-  return await postApi<DeleteCartItemResponse>(`/api/cart/items/${cartItemId}`);
+  return await deleteApi<DeleteCartItemResponse>(`/api/cart/items/${cartItemId}`);
 };
