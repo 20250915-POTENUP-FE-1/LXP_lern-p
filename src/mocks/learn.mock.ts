@@ -1,4 +1,4 @@
-import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
+import type { LearnCourseResponse } from '@/domains/course/types/learn';
 import { GetProgressResponse } from '@/domains/course/types/progress';
 
 export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
@@ -93,19 +93,8 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   },
 };
 
-export const MOCK_LEARN_ENROLLMENT: LearnEnrollmentResponse = {
-  enrollmentId: '5001',
-  userId: 'user_001',
-  courseId: '2002',
-  studentId: 'user_001',
-  status: 'ENROLLED',
-  progressRate: 0,
-  createdAt: '2025-12-02T09:00:00',
-  expiredAt: '2026-01-01T09:00:00',
-};
-
 export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
-  enrollmentId: '5001',
+  enrollmentId: '5002',
   overallProgressRate: 5,
   lastWatchedResourceId: '3001', // 마지막으로 재생했던 Video ID
   lastWatchedAt: '2025-12-02T09:30:00',
