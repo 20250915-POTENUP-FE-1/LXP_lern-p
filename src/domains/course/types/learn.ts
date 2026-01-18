@@ -47,7 +47,6 @@ export type LearnCourseResponse = {
 
 export type LearnEnrollmentResponse = {
   enrollmentId: string;
-  userId: string;
   courseId: string;
   studentId: string;
   status: EnrollmentStatus;
