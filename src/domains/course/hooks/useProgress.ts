@@ -58,15 +58,14 @@ export function useProgress(courseId: string) {
 
   // 이어보기 정보
   const progressInfo = useMemo<ProgressInfo | null>(() => {
-    if (!progressData?.lastWatchedResourceId) return null;
+    const id = progressData?.lastWatchedResourceId;
+    if (!id) return null;
 
     // 마지막 watchedDuration은 강의별 목록에서 찾아오는 방식으로 맞춤
-    const last = progressData.lectureProgresses.find(
-      (p) => p.resourceId === progressData.lastWatchedResourceId,
-    );
+    const last = progressData.lectureProgresses.find((p) => p.resourceId === id);
 
     return {
-      lectureId: progressData.lastWatchedResourceId,
+      resourceId: id,
       resumeAt: last?.watchedDuration ?? 0,
     };
   }, [progressData]);
@@ -87,7 +86,7 @@ export function useProgress(courseId: string) {
 
   const pendingRef = useRef<PendingProgress | null>(null); // 저장 실패 시 재시도 대상
 
-  const THROTTLE_INTERVAL = 10; // 저장 최소 호출 간격 (ms)
+  const THROTTLE_INTERVAL = 10_000; // 저장 최소 호출 간격 (ms)
   const MIN_SAVE_DELTA = 3; // 저장할 최소 재생 시간 변화량 (초)
   const RETRY_DELAYS = [2000, 5000, 15000]; // 저장 실패 시 재시도 간격 (ms)
 
@@ -103,7 +102,7 @@ export function useProgress(courseId: string) {
       try {
         // TODO(mock): mock 단계에서는 실제 API 호출 없이 UI 상태만 갱신
         if (!USE_MOCK) {
-          await updateLearnProgress({
+          await updateLearnProgress(courseId, {
             resourceId: pending.resourceId,
             watchedDuration: pending.watchedDuration,
           });
@@ -123,13 +122,14 @@ export function useProgress(courseId: string) {
 
   // 진도 즉시 저장
   const saveProgress = async (resourceId: string, watchedDuration: number) => {
+    if (!resourceId) {
+      console.warn('[progress] missing resourceId -> skip save', { courseId, watchedDuration });
+      return;
+    }
     try {
       // TODO(mock): mock 단계에서는 실제 네트워크 요청 없이 처리
       if (!USE_MOCK) {
-        await updateLearnProgress({
-          resourceId,
-          watchedDuration,
-        });
+        await updateLearnProgress(courseId, { resourceId, watchedDuration });
       }
 
       setProgressData((prev) =>
