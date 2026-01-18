@@ -32,7 +32,7 @@ export type UpdateProgressResponse = {
 
 // 이어보기 정보
 export type ProgressInfo = {
-  lectureId: string;
+  resourceId: string;
   resumeAt: number;
 };
 
