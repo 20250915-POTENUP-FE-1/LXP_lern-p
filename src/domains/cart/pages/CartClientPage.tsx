@@ -124,8 +124,17 @@ export function CartClientPage() {
 
   useEffect(() => {
     if (!initialCourseId) return;
+    if (!cartInitializedRef.current) return;
+
+    // courseId 당 1회만 처리
     if (handledInitialCourseIdRef.current === initialCourseId) return;
     handledInitialCourseIdRef.current = initialCourseId;
+
+    const alreadyInCart = items.some((it) => String(it.id) === initialCourseId);
+    if (alreadyInCart) {
+      setSelectedMap(buildSelectOnlyMap(items, initialCourseId));
+      return;
+    }
 
     (async () => {
       setCartMutating(true);
@@ -141,7 +150,8 @@ export function CartClientPage() {
               instructor: detail.instructor?.name ?? '강사',
               price: detail.price,
               originalPrice: detail.price,
-              thumbnailUrl: detail.thumbnailUrl,
+              // thumbnailUrl: formatAbsoluteUrl(detail?.thumbnailUrl),
+              thumbnailUrl: '/default-thumbnail.png',
             };
 
             setItems((prev) => {
@@ -166,7 +176,7 @@ export function CartClientPage() {
         setCartMutating(false);
       }
     })();
-  }, [initialCourseId]);
+  }, [initialCourseId, items]);
 
   const handleSelectChange = (id: number, checked: boolean) => {
     setSelectedMap((prev) => ({
@@ -203,7 +213,7 @@ export function CartClientPage() {
           return;
         }
 
-        await Promise.all(selectedItems.map((it) => deleteCartItem(Number(it.id))));
+        await Promise.all(selectedItems.map((it) => deleteCartItem(Number(it.cartItemId))));
         await refetchCart();
       } catch (e) {
         console.error('장바구니 제거에 실패했습니다.', e);
@@ -358,6 +368,7 @@ export function CartClientPage() {
 const mapCartDetailsToItems = (details: Array<CartItemResponse>) =>
   details.filter(Boolean).map((detail) => ({
     id: Number(detail.courseId),
+    cartItemId: Number(detail.cartItemId),
     title: detail.courseTitle,
     instructor: detail.instructorName ?? '강사',
     price: detail.price,
