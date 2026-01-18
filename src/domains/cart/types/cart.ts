@@ -14,7 +14,8 @@ export type ConfirmPaymentRequest = {
 };
 
 export type CartItem = {
-  id: number;
+  id: number; // 강좌 ID
+  cartItemId?: number; // 장바구니 ID
   title: string;
   instructor: string;
   price: number;
