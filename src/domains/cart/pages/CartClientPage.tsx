@@ -124,8 +124,17 @@ export function CartClientPage() {
 
   useEffect(() => {
     if (!initialCourseId) return;
+    if (!cartInitializedRef.current) return;
+
+    // courseId 당 1회만 처리
     if (handledInitialCourseIdRef.current === initialCourseId) return;
     handledInitialCourseIdRef.current = initialCourseId;
+
+    const alreadyInCart = items.some((it) => String(it.id) === initialCourseId);
+    if (alreadyInCart) {
+      setSelectedMap(buildSelectOnlyMap(items, initialCourseId));
+      return;
+    }
 
     (async () => {
       setCartMutating(true);
@@ -167,7 +176,7 @@ export function CartClientPage() {
         setCartMutating(false);
       }
     })();
-  }, [initialCourseId]);
+  }, [initialCourseId, items]);
 
   const handleSelectChange = (id: number, checked: boolean) => {
     setSelectedMap((prev) => ({
