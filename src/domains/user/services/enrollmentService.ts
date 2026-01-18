@@ -2,24 +2,24 @@ import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
   EnrollmentListResponse,
   EnrollmentDetailResponse,
-  EnrollmentProgressResponse,
 } from '@/domains/user/types/enrollment';
-import type { GetEnrollmentResponse } from '@/domains/course/types/course';
+import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
 
+// 수강 정보 조회 (강좌 ID 기준)
 export const getEnrollmentByCourseId = async (
   courseId: string,
-): Promise<GetEnrollmentResponse | null> => {
-  try {
-    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
-      cache: 'no-store',
-    });
-  } catch (err) {
-    if (err instanceof Error && err.message.includes('[404 (EE004)')) {
-      return null;
-    }
-    throw err;
-  }
+): Promise<LearnEnrollmentResponse> => {
+  return await getApi<LearnEnrollmentResponse>(`/api/enrollments/course/${courseId}`, {
+    cache: 'no-store',
+  });
 };
+
+// 수강 정보 조회 (수강 ID 기준)
+export async function getEnrollmentByEnrollmentId(
+  enrollmentId: string,
+): Promise<LearnEnrollmentResponse> {
+  return getApi(`/api/enrollments/${enrollmentId}`, { cache: 'no-store' });
+}
 
 export async function getEnrollmentList(params?: {
   status?: string;
@@ -39,12 +39,6 @@ export async function getEnrollmentList(params?: {
 
 export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResponse> {
   return await getApi<EnrollmentDetailResponse>(`/api/enrollments/${enrollmentId}`, {
-    cache: 'no-store',
-  });
-}
-
-export async function getProgress(courseId: string): Promise<EnrollmentProgressResponse> {
-  return await getApi<EnrollmentProgressResponse>(`/api/progresses/course/${courseId}`, {
     cache: 'no-store',
   });
 }
