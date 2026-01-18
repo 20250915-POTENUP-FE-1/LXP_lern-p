@@ -13,11 +13,10 @@ import { useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
-import { useProgress } from '@/domains/course/hooks/useProgress';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
-import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
-import { LearnEnrollmentResponse } from '../types/learn';
+import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
+import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
 
 type CourseLearnClientProps = {
   enrollment: LearnEnrollmentResponse;
@@ -39,9 +38,10 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
     toggleSection,
     handleLectureClick,
     moveToNextLecture,
+    lectureProgressMap,
+    autoSaveProgress,
+    saveFinalProgressOnEnd,
   } = useCourseLearn({ start });
-  const { progressInfo, autoSaveProgress, saveFinalProgressOnEnd, lectureProgressMap } =
-    useProgress(enrollment.courseId);
 
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;
@@ -68,23 +68,20 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
     const video = videoRef.current;
     if (!video) return;
     if (!currentLecture) return;
-    if (!progressInfo) return;
     if (hasSeekedRef.current) return;
 
-    if (progressInfo.lectureId !== currentLecture.id) return;
+    const saved = lectureProgressMap.get(currentLecture.resourceId)?.watchedDuration ?? 0;
 
     const handleLoadedMetadata = () => {
-      if (progressInfo.resumeAt < video.duration) {
-        video.currentTime = progressInfo.resumeAt;
+      if (saved > 0 && saved < video.duration) {
+        video.currentTime = saved;
       }
       hasSeekedRef.current = true;
     };
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    return () => {
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, [currentLecture?.id, progressInfo]);
+    return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+  }, [currentLecture?.resourceId, lectureProgressMap]);
 
   if (!courseData || !currentLecture) {
     return <div className={styles['course-learn__loading']}>강의를 불러오는 중입니다...</div>;
@@ -132,8 +129,9 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                   controls
                   autoPlay
                   onEnded={() => {
-                    if (!currentLecture.duration) return;
-                    saveFinalProgressOnEnd(currentLecture.resourceId, currentLecture.duration);
+                    const video = videoRef.current;
+                    const t = video ? Math.floor(video.currentTime) : 0;
+                    saveFinalProgressOnEnd(currentLecture.resourceId, t);
                     moveToNextLecture();
                   }}
                   onTimeUpdate={(e) => {
@@ -159,7 +157,7 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                 {currentLecture.pdfUrl && (
                   <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
                     <button
-                      onClick={() => saveFinalProgressOnEnd(currentLecture.id, 0)}
+                      onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId, 0)}
                       className={styles['course-learn__brand-btn']}
                     >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
