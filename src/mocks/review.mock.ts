@@ -1,11 +1,7 @@
-import type {
-  GetIsReviewedRequest,
-  GetIsReviewedResponse,
-  GetReviewResponse,
-} from '@/domains/course/types/review';
+import type { GetAllReviewsResponse, GetIsReviewedResponse } from '@/domains/course/types/review';
 
-export const MOCK_GET_COURSE_REVIEWS: Record<string, GetReviewResponse[]> = {
-  '2002': [
+export const MOCK_GET_COURSE_REVIEWS: GetAllReviewsResponse = {
+  content: [
     {
       id: '1',
       userId: 'user_001',
@@ -19,8 +15,6 @@ export const MOCK_GET_COURSE_REVIEWS: Record<string, GetReviewResponse[]> = {
       updatedAt: '2026-01-02T09:00:00Z',
       isMine: true,
     },
-  ],
-  '2003': [
     {
       id: '2',
       userId: 'user_001',
@@ -34,8 +28,6 @@ export const MOCK_GET_COURSE_REVIEWS: Record<string, GetReviewResponse[]> = {
       updatedAt: '2026-01-03T09:00:00Z',
       isMine: true,
     },
-  ],
-  '3001': [
     {
       id: '3',
       userId: 'user_002',
@@ -50,7 +42,9 @@ export const MOCK_GET_COURSE_REVIEWS: Record<string, GetReviewResponse[]> = {
       isMine: false,
     },
   ],
-  '2004': [],
+  page: 0,
+  size: 10,
+  hasNext: false,
 };
 
 export const MOCK_GET_IS_REVIEWED: GetIsReviewedResponse = [

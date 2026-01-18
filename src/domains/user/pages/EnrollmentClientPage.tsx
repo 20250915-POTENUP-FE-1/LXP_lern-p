@@ -29,8 +29,10 @@ export default function EnrollmentClientPage() {
     [reviewTarget],
   );
 
-  const { myReview, myReviewStatus, canWriteReview, writeReview, editReview } =
-    useCourseReviews(selectedCourseId, { fetchAll: false });
+  const { myReview, myReviewStatus, canWriteReview, writeReview, editReview } = useCourseReviews(
+    selectedCourseId,
+    { fetchAll: false },
+  );
 
   const isReviewed = myReviewStatus.status === 'exists';
 
@@ -88,8 +90,7 @@ export default function EnrollmentClientPage() {
 
         if (USE_MOCK) {
           const merged = content.map((it) => {
-            const cid = String(it.courseId);
-            const list = MOCK_GET_COURSE_REVIEWS[cid] ?? [];
+            const list = MOCK_GET_COURSE_REVIEWS.content ?? [];
             const hasMine = list.some((r) => Boolean(r.isMine));
 
             return { ...it, isReviewed: hasMine };
