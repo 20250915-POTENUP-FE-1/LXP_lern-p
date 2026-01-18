@@ -16,8 +16,8 @@ export async function getLearnEnrollment(enrollmentId: string): Promise<LearnEnr
 }
 
 // 학습 이력 조회
-export async function getLearnProgress(enrollmentId: string): Promise<UpdateProgressResponse> {
-  return getApi(`/api/progresses/${enrollmentId}`, { cache: 'no-store' });
+export async function getLearnProgress(courseId: string): Promise<UpdateProgressResponse> {
+  return getApi(`/api/progresses/course/${courseId}`, { cache: 'no-store' });
 }
 
 // 진도율 갱신

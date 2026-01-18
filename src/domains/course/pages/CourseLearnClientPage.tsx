@@ -19,10 +19,10 @@ import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 
 type CourseLearnClientProps = {
-  enrollmentId: string;
+  courseId: string;
 };
 
-export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
+export default function CourseLearnClient({ courseId }: CourseLearnClientProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
@@ -38,9 +38,9 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     toggleSection,
     handleLectureClick,
     moveToNextLecture,
-  } = useCourseLearn(enrollmentId, { start });
+  } = useCourseLearn(courseId, { start });
   const { progressInfo, autoSaveProgress, saveFinalProgressOnEnd, lectureProgressMap } =
-    useProgress(enrollmentId);
+    useProgress(courseId);
 
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;

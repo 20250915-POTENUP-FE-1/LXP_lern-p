@@ -13,20 +13,19 @@ import { USE_MOCK } from '@/shared/constants/config';
 import { getLearnProgress, updateLearnProgress } from '@/domains/course/services/learnService';
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
-export function useProgress(enrollmentId: string) {
+export function useProgress(courseId: string) {
   const [progressData, setProgressData] = useState<UpdateProgressResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!enrollmentId) return;
+    if (!courseId) return;
 
     const fetchProgress = async () => {
       try {
         setIsLoading(true);
 
-        // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
-        const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(enrollmentId);
+        const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
         setProgressData(progress);
       } catch (e) {
@@ -37,7 +36,7 @@ export function useProgress(enrollmentId: string) {
     };
 
     fetchProgress();
-  }, [enrollmentId]);
+  }, [courseId]);
 
   const lectureProgressMap = useMemo<Map<string, LectureProgressMapValue>>(() => {
     if (!progressData) return new Map();

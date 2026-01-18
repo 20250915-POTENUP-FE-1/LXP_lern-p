@@ -43,8 +43,8 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
   });
 }
 
-export async function getProgress(enrollmentId: string): Promise<EnrollmentProgressResponse> {
-  return await getApi<EnrollmentProgressResponse>(`/api/progresses/${enrollmentId}`, {
+export async function getProgress(courseId: string): Promise<EnrollmentProgressResponse> {
+  return await getApi<EnrollmentProgressResponse>(`/api/progresses/course/${courseId}`, {
     cache: 'no-store',
   });
 }

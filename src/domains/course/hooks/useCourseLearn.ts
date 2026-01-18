@@ -3,34 +3,27 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/learn';
-import {
-  getCourse,
-  getLearnEnrollment,
-  getLearnProgress,
-} from '@/domains/course/services/learnService';
+import { getCourse, getLearnEnrollment } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
 import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
-import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
 import { USE_MOCK } from '@/shared/constants/config';
+import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
 
 type UseCourseLearnOptions = {
   start?: 'first';
 };
 
-export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOptions) {
-  const params = useParams<{ id: string }>();
-  const courseId = params?.id;
+export function useCourseLearn(courseId: string, options?: UseCourseLearnOptions) {
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
   const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
   const [openSections, setOpenSections] = useState<string[]>([]);
-  const { progressInfo, lectureProgressMap } = useProgress(enrollmentId);
+  const { progressInfo, lectureProgressMap } = useProgress(courseId);
 
   useEffect(() => {
-    if (!courseId || !enrollmentId) return;
+    if (!courseId) return;
 
     async function fetchAll() {
-      // TODO(mock): 개발 중 환경변수로 학습 페이지 UI 검증을 위한 mock 데이터 사용
       if (USE_MOCK) {
         const course = MOCK_LEARN_COURSE_MAP[courseId];
         if (!course) return;
@@ -43,13 +36,13 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
       }
 
       const course = await getCourse(courseId);
-      const enrollment = await getLearnEnrollment(enrollmentId);
+      const enrollment = await getLearnEnrollment(courseId);
 
       setLearnData({ course, enrollment });
     }
 
     fetchAll();
-  }, [courseId, enrollmentId]);
+  }, [courseId]);
 
   // TODO: UI 완료 상태 기준으로 courseData 생성
   const courseData = useMemo<UICourse | null>(() => {
@@ -159,6 +152,7 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
 
   return {
     courseData,
+    enrollmentId: learnData?.enrollment?.enrollmentId ?? null,
     currentLecture,
     openSections,
     handleLectureClick,
