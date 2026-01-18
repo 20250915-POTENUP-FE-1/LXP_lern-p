@@ -2,7 +2,6 @@ export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED'
 
 // 1) 수강 목록 조회 (GET /api/enrollments)
 export type EnrollmentListContent = {
-  userId: string;
   enrollmentId: string;
   courseId: string;
   courseName: string;
