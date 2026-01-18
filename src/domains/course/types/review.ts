@@ -46,7 +46,12 @@ export type GetReviewResponse = {
   isMine: boolean;
 };
 
-export type GetAllReviewsResponse = GetReviewResponse[];
+export type GetAllReviewsResponse = {
+  content: GetReviewResponse[];
+  page: number;
+  size: number;
+  hasNext: boolean;
+};
 
 export type GetIsReviewedRequest = {
   courseIds: number[];
