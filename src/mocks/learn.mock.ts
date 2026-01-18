@@ -1,5 +1,5 @@
-import type { LearnCourseResponse, LearnEnrollmentResponse } from '@/domains/course/types/learn';
-import { UpdateProgressResponse } from '@/domains/course/types/progress';
+import type { LearnCourseResponse } from '@/domains/course/types/learn';
+import { GetProgressResponse } from '@/domains/course/types/progress';
 
 export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   '2002': {
@@ -93,63 +93,47 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   },
 };
 
-export const MOCK_LEARN_ENROLLMENT: LearnEnrollmentResponse = {
-  enrollmentId: '5001',
-  userId: 'user_001',
-  courseId: '2002',
-  studentId: 'user_001',
-  status: 'ENROLLED',
-  progressRate: 0,
-  createdAt: '2025-12-02T09:00:00',
-  expiredAt: '2026-01-01T09:00:00',
-};
-
-export const MOCK_LEARN_PROGRESS: UpdateProgressResponse = {
-  enrollmentId: '5001',
-  progressRate: 5,
-
-  lastVideoId: '3001',
-  lastWatchedDuration: 5,
+export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
+  enrollmentId: '5002',
+  overallProgressRate: 5,
+  lastWatchedResourceId: '3001', // 마지막으로 재생했던 Video ID
   lastWatchedAt: '2025-12-02T09:30:00',
-
   lectureProgresses: [
     {
       resourceId: '3001',
       title: 'JPA란?',
-      currentProgressRate: 50,
+      progressRate: 50,
       watchedDuration: 5,
       totalDurationSeconds: 10,
-      isCompleted: false,
+      completed: false,
       lastWatchedAt: '2025-12-02T09:30:00',
     },
     {
       resourceId: '3002',
       title: '엔티티 매핑',
-      currentProgressRate: 0,
+      progressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
-      isCompleted: false,
+      completed: false,
       lastWatchedAt: '2025-12-02T09:40:00',
     },
     {
       resourceId: '3003',
       title: '엔티티 매핑',
-      currentProgressRate: 0,
+      progressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
-      isCompleted: false,
+      completed: false,
       lastWatchedAt: '2025-12-02T09:40:00',
     },
     {
       resourceId: '3004',
       title: '엔티티 매핑',
-      currentProgressRate: 0,
+      progressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
-      isCompleted: false,
+      completed: false,
       lastWatchedAt: '2025-12-02T09:40:00',
     },
   ],
-
-  updatedAt: '2025-12-02T09:30:00',
 };

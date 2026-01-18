@@ -17,12 +17,13 @@ import { useProgress } from '@/domains/course/hooks/useProgress';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
+import { LearnEnrollmentResponse } from '../types/learn';
 
 type CourseLearnClientProps = {
-  enrollmentId: string;
+  enrollment: LearnEnrollmentResponse;
 };
 
-export default function CourseLearnClient({ enrollmentId }: CourseLearnClientProps) {
+export default function CourseLearnClient({ enrollment }: CourseLearnClientProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
@@ -38,9 +39,9 @@ export default function CourseLearnClient({ enrollmentId }: CourseLearnClientPro
     toggleSection,
     handleLectureClick,
     moveToNextLecture,
-  } = useCourseLearn(enrollmentId, { start });
+  } = useCourseLearn({ start });
   const { progressInfo, autoSaveProgress, saveFinalProgressOnEnd, lectureProgressMap } =
-    useProgress(enrollmentId);
+    useProgress(enrollment.courseId);
 
   const totalLectures = useMemo(() => {
     if (!courseData) return 0;

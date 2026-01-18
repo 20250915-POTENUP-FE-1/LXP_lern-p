@@ -1,33 +1,33 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/learn';
-import {
-  getCourse,
-  getLearnEnrollment,
-  getLearnProgress,
-} from '@/domains/course/services/learnService';
+import { getCourse } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
-import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
-import { LectureProgressMapValue, ProgressInfo } from '../types/progress';
+import { MOCK_LEARN_COURSE_MAP } from '@/mocks/learn.mock';
 import { USE_MOCK } from '@/shared/constants/config';
+import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
+import { MOCK_GET_ENROLLMENT_BY_COURSEID } from '@/mocks/enrollmentList.mock';
+import { ProgressInfo, LectureProgressMapValue } from '../types/progress';
 
 type UseCourseLearnOptions = {
   start?: 'first';
 };
 
-export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOptions) {
-  const params = useParams<{ id: string }>();
-  const courseId = params?.id;
+export function useCourseLearn(options?: UseCourseLearnOptions) {
+  const { id: courseId } = useParams<{ id: string }>();
+
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
-  const [currentLecture, setCurrentLecture] = useState<UILecture | null>(null);
-  const [openSections, setOpenSections] = useState<string[]>([]);
-  const { progressInfo, lectureProgressMap } = useProgress(enrollmentId);
+
+  const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set());
+
+  const { progressInfo, lectureProgressMap } = useProgress(courseId);
 
   useEffect(() => {
-    if (!courseId || !enrollmentId) return;
+    if (!courseId) return;
 
     async function fetchAll() {
       // TODO(mock): 개발 중 환경변수로 학습 페이지 UI 검증을 위한 mock 데이터 사용
@@ -37,19 +37,19 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
 
         setLearnData({
           course,
-          enrollment: MOCK_LEARN_ENROLLMENT,
+          enrollment: MOCK_GET_ENROLLMENT_BY_COURSEID,
         });
         return;
       }
 
       const course = await getCourse(courseId);
-      const enrollment = await getLearnEnrollment(enrollmentId);
+      const enrollment = await getEnrollmentByCourseId(courseId);
 
       setLearnData({ course, enrollment });
     }
 
     fetchAll();
-  }, [courseId, enrollmentId]);
+  }, [courseId]);
 
   // TODO: UI 완료 상태 기준으로 courseData 생성
   const courseData = useMemo<UICourse | null>(() => {
@@ -67,75 +67,9 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     return mapCourse(learnData.course, lectureProgressMap);
   }, [learnData, lectureProgressMap]);
 
-  const currentSectionId = useMemo(() => {
-    if (!courseData || !currentLecture) return null;
-
-    const section = courseData.sections.find((s) =>
-      s.lectures.some((l) => l.id === currentLecture.id),
-    );
-    return section?.id ?? null;
-  }, [courseData, currentLecture]);
-
-  useEffect(() => {
-    if (!courseData) return;
-
-    setOpenSections(courseData.sections.map((s) => s.id));
+  const flatLectures = useMemo(() => {
+    return courseData?.sections.flatMap((s) => s.lectures) ?? [];
   }, [courseData]);
-
-  useEffect(() => {
-    if (!currentSectionId) return;
-
-    setOpenSections((prev) =>
-      prev.includes(currentSectionId) ? prev : [...prev, currentSectionId],
-    );
-  }, [currentSectionId]);
-
-  const initializedRef = useRef(false);
-  useEffect(() => {
-    if (!courseData) return;
-    if (initializedRef.current) return;
-
-    initializedRef.current = true;
-
-    if (options?.start === 'first') {
-      const first = courseData.sections[0]?.lectures[0] ?? null;
-      setCurrentLecture(first);
-      return;
-    }
-
-    if (progressInfo?.lectureId) {
-      const found = courseData.sections
-        .flatMap((s) => s.lectures)
-        .find((l) => l.id === progressInfo.lectureId);
-
-      if (found) {
-        setCurrentLecture(found);
-        return;
-      }
-    }
-
-    const first = courseData.sections[0]?.lectures[0] ?? null;
-    setCurrentLecture(first);
-  }, [courseData, options?.start, progressInfo?.lectureId]);
-
-  const handleLectureClick = (lecture: UILecture) => {
-    setCurrentLecture(lecture);
-  };
-
-  const moveToNextLecture = () => {
-    if (!courseData || !currentLecture) return;
-
-    const flatLectures = courseData.sections.flatMap((section) => section.lectures);
-
-    const currentIndex = flatLectures.findIndex((l) => l.id === currentLecture.id);
-
-    if (currentIndex === -1) return;
-
-    const nextLecture = flatLectures[currentIndex + 1];
-    if (!nextLecture) return;
-
-    setCurrentLecture(nextLecture);
-  };
 
   function selectLectureToWatch(
     lectures: UILecture[],
@@ -157,13 +91,87 @@ export function useCourseLearn(enrollmentId: string, options?: UseCourseLearnOpt
     return lectures[idx];
   }
 
+  // 유저가 선택하지 않았을 때 자동으로 보여줄 강의 계산
+  const autoLecture = useMemo(() => {
+    if (!flatLectures.length) return null;
+
+    if (options?.start === 'first') return flatLectures[0];
+
+    return selectLectureToWatch(flatLectures, progressInfo, lectureProgressMap);
+  }, [flatLectures, options?.start, progressInfo, lectureProgressMap]);
+
+  const currentLecture = useMemo<UILecture | null>(() => {
+    if (!flatLectures.length) return null;
+
+    if (selectedLectureId) {
+      const found = flatLectures.find((l) => l.id === selectedLectureId);
+      if (found) return found;
+    }
+
+    return autoLecture ?? flatLectures[0] ?? null;
+  }, [flatLectures, selectedLectureId, autoLecture]);
+
+  const currentSectionId = useMemo(() => {
+    if (!courseData || !currentLecture) return null;
+
+    const section = courseData.sections.find((s) =>
+      s.lectures.some((l) => l.id === currentLecture.id),
+    );
+    return section?.id ?? null;
+  }, [courseData, currentLecture]);
+
+  const openSections = useMemo(() => {
+    if (!courseData) return [];
+
+    const all = courseData.sections.map((s) => s.id);
+    const opened = all.filter((id) => !collapsedSections.has(id));
+
+    // 현재 재생 섹션은 항상 열리도록(원하던 UX일 때)
+    if (currentSectionId && !opened.includes(currentSectionId)) {
+      return [...opened, currentSectionId];
+    }
+
+    return opened;
+  }, [courseData, collapsedSections, currentSectionId]);
+
+  const handleLectureClick = (lecture: UILecture) => {
+    setSelectedLectureId(lecture.id);
+  };
+
+  const moveToNextLecture = () => {
+    if (!currentLecture) return;
+
+    const currentIndex = flatLectures.findIndex((l) => l.id === currentLecture.id);
+
+    if (currentIndex === -1) return;
+
+    const nextLecture = flatLectures[currentIndex + 1];
+    if (!nextLecture) return;
+
+    setSelectedLectureId(nextLecture.id);
+  };
+
+  const toggleSection = (id: string) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
   return {
     courseData,
+    enrollmentId: learnData?.enrollment?.enrollmentId ?? null,
     currentLecture,
     openSections,
     handleLectureClick,
-    toggleSection: (id: string) =>
-      setOpenSections((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id])),
+    toggleSection,
     moveToNextLecture,
   };
 }
