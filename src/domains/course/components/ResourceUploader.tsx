@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
-import { formatDuration, formatLectureDuration } from '../utils/formatDuration';
-import { RESOURCE_CONFIG } from '../constants/resource';
-import styles from './CourseForm.module.css';
-import { createPresignedUploadUrl } from '../services/resourceService';
 import { bytesToKB } from '@/shared/util/fileSize';
 import { useDraftResource } from '@/domains/course/hooks/useDraftResource';
+import { formatDuration, formatLectureDuration } from '../utils/formatDuration';
+import { RESOURCE_CONFIG } from '../constants/resource';
+import { createPresignedUploadUrl } from '../services/resourceService';
+import styles from './CourseForm.module.css';
 export type ResourceType = 'VIDEO' | 'PDF' | 'DOC' | 'ZIP';
 
 export type UploadResult = {
@@ -177,13 +177,23 @@ export function ResourceUploader({
         setDraftDuration(null);
       }
 
-      const { key } = await createPresignedUploadUrl({
+      const { presignedUrl, key } = await createPresignedUploadUrl({
         fileName: file.name,
         contentType: file.type,
         size: bytesToKB(file.size),
         duration: videoSeconds ?? 0,
         isDownloadable: effectiveType === 'VIDEO' ? false : effectiveIsDownloadable,
       });
+
+      const putRes = await fetch(presignedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      if (!putRes.ok) {
+        throw new Error('파일 업로드(PUT)에 실패했습니다.');
+      }
 
       addDraftResource({
         resourceType: effectiveType,
