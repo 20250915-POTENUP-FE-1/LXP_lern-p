@@ -38,7 +38,7 @@ export default function CourseLearnClient({ courseId }: CourseLearnClientProps) 
     toggleSection,
     handleLectureClick,
     moveToNextLecture,
-  } = useCourseLearn(courseId, { start });
+  } = useCourseLearn({ start });
   const { progressInfo, autoSaveProgress, saveFinalProgressOnEnd, lectureProgressMap } =
     useProgress(courseId);
 
