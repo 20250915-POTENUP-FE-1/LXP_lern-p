@@ -6,9 +6,10 @@ import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/le
 import { getCourse } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
 import { useProgress } from '@/domains/course/hooks/useProgress';
-import { MOCK_LEARN_COURSE_MAP, MOCK_LEARN_ENROLLMENT } from '@/mocks/learn.mock';
+import { MOCK_LEARN_COURSE_MAP } from '@/mocks/learn.mock';
 import { USE_MOCK } from '@/shared/constants/config';
 import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentService';
+import { MOCK_GET_ENROLLMENT_BY_COURSEID } from '@/mocks/enrollmentList.mock';
 import { ProgressInfo, LectureProgressMapValue } from '../types/progress';
 
 type UseCourseLearnOptions = {
@@ -36,7 +37,7 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
 
         setLearnData({
           course,
-          enrollment: MOCK_LEARN_ENROLLMENT,
+          enrollment: MOCK_GET_ENROLLMENT_BY_COURSEID,
         });
         return;
       }
