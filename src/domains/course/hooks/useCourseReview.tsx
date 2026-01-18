@@ -35,11 +35,9 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
 
     (async () => {
       try {
-        const items = USE_MOCK
-          ? (MOCK_GET_COURSE_REVIEWS[courseId] ?? [])
-          : await getAllReviews(courseId);
+        const items = USE_MOCK ? MOCK_GET_COURSE_REVIEWS : ((await getAllReviews(courseId)) ?? []);
 
-        const mapped: Review[] = (items ?? []).map((it: GetReviewResponse) =>
+        const mapped: Review[] = items.content.map((it: GetReviewResponse) =>
           mapReview(it, courseId),
         );
 
@@ -79,7 +77,7 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
       if (shouldFetchAll) {
         return reviews.find((r) => r.isMine) ?? null;
       }
-      const list = MOCK_GET_COURSE_REVIEWS[courseId] ?? [];
+      const list = MOCK_GET_COURSE_REVIEWS.content ?? [];
       const mine = list.find((r) => Boolean(r.isMine));
       return mine ? mapReview(mine, courseId, true) : null;
     }
@@ -218,7 +216,11 @@ export function useCourseReviews(courseId: string, options?: UseCourseReviewsOpt
   };
 }
 
-const mapReview = (review: GetReviewResponse, fallbackCourseId: string, isMine?: boolean): Review => {
+const mapReview = (
+  review: GetReviewResponse,
+  fallbackCourseId: string,
+  isMine?: boolean,
+): Review => {
   return {
     id: String(review.id),
     courseId: String(review.courseId ?? fallbackCourseId),
