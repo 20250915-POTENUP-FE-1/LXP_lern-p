@@ -58,7 +58,7 @@ export type LearnEnrollmentResponse = {
 // Domain: Course + Enrollment
 export type CourseLearn = {
   course: LearnCourseResponse;
-  enrollment: LearnEnrollmentResponse;
+  enrollment: LearnEnrollmentResponse | null;
 };
 
 // UI Types (Learn Page)

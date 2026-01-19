@@ -18,7 +18,8 @@ export async function getLearnProgress(courseId: string): Promise<GetProgressRes
 
 // 진도율 갱신
 export async function updateLearnProgress(
+  courseId: string,
   payload: UpdateProgressRequest,
 ): Promise<UpdateProgressResponse> {
-  return patchApi<UpdateProgressResponse>(`/api/progresses/${payload.resourceId}`, payload);
+  return patchApi<UpdateProgressResponse>(`/api/progresses/${courseId}`, payload);
 }

@@ -24,7 +24,8 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set());
 
-  const { progressInfo, lectureProgressMap } = useProgress(courseId);
+  const { progressInfo, lectureProgressMap, autoSaveProgress, saveFinalProgressOnEnd } =
+    useProgress(courseId);
 
   useEffect(() => {
     if (!courseId) return;
@@ -78,11 +79,11 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
   ): UILecture {
     if (!progressInfo) return lectures[0];
 
-    const idx = lectures.findIndex((l) => l.id === progressInfo.lectureId);
+    const idx = lectures.findIndex((l) => l.resourceId === progressInfo.resourceId);
 
     if (idx === -1) return lectures[0];
 
-    const progress = lectureProgressMap.get(progressInfo.lectureId);
+    const progress = lectureProgressMap.get(progressInfo.resourceId);
 
     if (progress?.completed) {
       return lectures[idx + 1] ?? lectures[idx];
@@ -173,5 +174,10 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
     handleLectureClick,
     toggleSection,
     moveToNextLecture,
+
+    progressInfo,
+    lectureProgressMap,
+    autoSaveProgress,
+    saveFinalProgressOnEnd,
   };
 }
