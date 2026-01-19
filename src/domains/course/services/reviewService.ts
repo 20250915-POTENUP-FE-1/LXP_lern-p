@@ -35,7 +35,7 @@ export const updateReview = async (
 
 //리뷰 삭제 API
 export const deleteReview = async (courseId: string): Promise<DeleteReviewResponse> => {
-  return await deleteApi<DeleteReviewResponse>(`/api/courses/${courseId}/reviews`);
+  return await deleteApi<DeleteReviewResponse>(`/api/courses/${courseId}/review`);
 };
 
 //강좌 리뷰 조회 API
