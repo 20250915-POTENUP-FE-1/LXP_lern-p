@@ -2,7 +2,7 @@ import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 // API: Course / Enrollment
 export type LearnLectureResourceResponse = {
-  resourceId: string;
+  resourceId: number;
   resourceType: 'VIDEO' | 'PDF';
   fileUrl: string;
   isDownloadable: boolean;

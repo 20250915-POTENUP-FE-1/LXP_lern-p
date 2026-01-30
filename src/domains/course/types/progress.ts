@@ -1,5 +1,5 @@
 export type LectureProgressResponse = {
-  resourceId: string;
+  resourceId: number;
   title: string;
   watchedDuration: number;
   progressRate: number;
@@ -9,22 +9,22 @@ export type LectureProgressResponse = {
 };
 
 export type GetProgressResponse = {
-  enrollmentId: string;
+  enrollmentId: number;
   overallProgressRate: number; // 해당 수강 내역의 전체 진도율
-  lastWatchedResourceId: string; // 마지막으로 재생했던 Video ID
+  lastWatchedResourceId: number; // 마지막으로 재생했던 Video ID
   lastWatchedAt: string; // 마지막 학습 활동 시간
   lectureProgresses: LectureProgressResponse[]; // 개별 강의별 진도 상세 목록
 };
 
 export type UpdateProgressRequest = {
-  resourceId: string;
+  resourceId: number;
   watchedDuration: number;
 };
 
 export type UpdateProgressResponse = {
-  progressId: string;
-  enrollmentId: string;
-  resourceId: string;
+  progressId: number;
+  enrollmentId: number;
+  resourceId: number;
   watchedDuration: number;
   completed: boolean;
   updatedAt: string;
@@ -54,7 +54,7 @@ export type CourseLearnProgress = {
 
 // 진도율 갱신 보류
 export type PendingProgress = {
-  resourceId: string;
+  resourceId: number;
   watchedDuration: number;
   retryCount: number;
 };
