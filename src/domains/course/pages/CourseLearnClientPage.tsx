@@ -16,8 +16,13 @@ import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
+import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
 
-export default function CourseLearnClient() {
+type CourseLearnClientProps = {
+  enrollment: LearnEnrollmentResponse;
+};
+
+export default function CourseLearnClient({ enrollment }: CourseLearnClientProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
@@ -203,7 +208,7 @@ export default function CourseLearnClient() {
                 {openSections.includes(section.id) && (
                   <div className={styles['course-learn__section-content']}>
                     {section.lectures.map((lecture) => {
-                      const progress = lectureProgressMap.get(String(lecture.resourceId));
+                      const progress = lectureProgressMap.get(lecture.resourceId);
                       const completed = progress?.completed === true;
 
                       return (
