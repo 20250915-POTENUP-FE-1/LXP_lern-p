@@ -71,6 +71,8 @@ export type UILecture = {
   type: 'VIDEO' | 'PDF';
   videoUrl?: string;
   pdfUrl?: string;
+  completed: boolean;
+  isCurrent: boolean;
 };
 
 export type UISection = {

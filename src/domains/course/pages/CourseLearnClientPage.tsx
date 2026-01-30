@@ -22,10 +22,6 @@ export default function CourseLearnClient() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
 
-  const searchParams = useSearchParams();
-  const rawStart = searchParams.get('start');
-  const start = rawStart === 'first' ? 'first' : undefined;
-
   const {
     courseData,
     currentLecture,
@@ -36,34 +32,18 @@ export default function CourseLearnClient() {
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
-  } = useCourseLearn({ start });
-
-  const totalLectures = useMemo(() => {
-    if (!courseData) return 0;
-    return courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0);
-  }, [courseData]);
-
-  const completedLectures = useMemo(() => {
-    if (!courseData) return 0;
-
-    return courseData.sections
-      .flatMap((s) => s.lectures)
-      .filter((lecture) => {
-        const progress = lectureProgressMap.get(lecture.resourceId);
-        return progress?.completed === true;
-      }).length;
-  }, [courseData, lectureProgressMap]);
+    totalLectures,
+    completedLectures,
+  } = useCourseLearn();
 
   useEffect(() => {
     if (!currentLecture) return;
     hasSeekedRef.current = false;
-  }, [currentLecture?.id]);
+  }, [currentLecture?.resourceId]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    if (!currentLecture) return;
-    if (hasSeekedRef.current) return;
+    if (!video || !currentLecture) return;
 
     const saved = lectureProgressMap.get(currentLecture.resourceId)?.watchedDuration ?? 0;
 
@@ -71,8 +51,9 @@ export default function CourseLearnClient() {
       if (saved > 0 && saved < video.duration) {
         video.currentTime = saved;
       }
-      hasSeekedRef.current = true;
     };
+
+    console.log('[RENDER] lectureProgressMap', Array.from(lectureProgressMap.entries()));
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -126,6 +107,13 @@ export default function CourseLearnClient() {
                   onEnded={() => {
                     const video = videoRef.current;
                     const t = video ? Math.floor(video.currentTime) : 0;
+
+                    console.log('[VIDEO ENDED]', {
+                      lectureId: currentLecture.id,
+                      resourceId: currentLecture.resourceId,
+                      time: t,
+                    });
+
                     saveFinalProgressOnEnd(currentLecture.resourceId, t);
                     moveToNextLecture();
                   }}
@@ -213,7 +201,7 @@ export default function CourseLearnClient() {
                 {openSections.includes(section.id) && (
                   <div className={styles['course-learn__section-content']}>
                     {section.lectures.map((lecture) => {
-                      const progress = lectureProgressMap.get(lecture.resourceId);
+                      const progress = lectureProgressMap.get(String(lecture.resourceId));
                       const completed = progress?.completed === true;
 
                       return (

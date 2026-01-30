@@ -151,6 +151,12 @@ export function useProgress(courseId: string) {
   // 영상 종료 시 최종 진도 저장
   const saveFinalProgressOnEnd = (resourceId: string, watchedDuration: number) => {
     if (pendingRef.current) return;
+
+    console.log('[END] 영상 종료', {
+      resourceId,
+      watchedDuration,
+    });
+
     saveProgress(resourceId, watchedDuration);
   };
 
@@ -177,14 +183,18 @@ export function useProgress(courseId: string) {
       };
     });
 
-    const next: GetProgressResponse = {
+    // 전체 진도율 재계산
+    const overallProgressRate = Math.round(
+      lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) / lectureProgresses.length,
+    );
+
+    return {
       ...prev,
       lectureProgresses,
+      overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
     };
-
-    return next;
   }
 
   return {

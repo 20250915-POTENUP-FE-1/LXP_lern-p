@@ -29,7 +29,7 @@ export function mapCourse(
           .slice()
           .sort((a, b) => a.orderIndex - b.orderIndex)
           .map((lecture) => {
-            const progress = lectureProgressMap.get(lecture.resource.resourceId);
+            const progress = lectureProgressMap.get(String(lecture.resource.resourceId));
 
             return {
               id: lecture.lectureId,
