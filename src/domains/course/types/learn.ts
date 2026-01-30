@@ -64,7 +64,7 @@ export type CourseLearn = {
 // UI Types (Learn Page)
 export type UILecture = {
   id: string;
-  resourceId: string;
+  resourceId: number;
   title: string;
   description?: string;
   duration: number;
