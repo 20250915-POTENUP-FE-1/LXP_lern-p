@@ -152,6 +152,7 @@ export function useProgress(courseId: string) {
   const saveFinalProgressOnEnd = (resourceId: string, watchedDuration: number) => {
     if (pendingRef.current) return;
 
+    // TODO: 영상 종료 처리
     console.log('[END] 영상 종료', {
       resourceId,
       watchedDuration,

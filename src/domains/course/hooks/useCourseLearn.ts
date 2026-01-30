@@ -78,6 +78,7 @@ export function useCourseLearn() {
   ): UILecture {
     if (!progressInfo) return lectures[0];
 
+    // TODO: 초기 자동 선택 (이어보기), 다음 강의 상태
     console.log('[AUTO SELECT]', {
       lastWatched: progressInfo?.resourceId,
       completed: lectureProgressMap.get(progressInfo?.resourceId)?.completed,
@@ -110,6 +111,7 @@ export function useCourseLearn() {
   const currentLecture = useMemo<UILecture | null>(() => {
     if (!flatLectures.length) return null;
 
+    // TODO: 다음 강의 자동 이동
     console.log('[CURRENT LECTURE DECIDE]', {
       selectedLectureId,
       autoLecture: autoLecture?.id,

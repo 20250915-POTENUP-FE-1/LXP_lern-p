@@ -53,6 +53,7 @@ export default function CourseLearnClient() {
       }
     };
 
+    // TODO: 강의 progress map 렌더링
     console.log('[RENDER] lectureProgressMap', Array.from(lectureProgressMap.entries()));
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -108,6 +109,7 @@ export default function CourseLearnClient() {
                     const video = videoRef.current;
                     const t = video ? Math.floor(video.currentTime) : 0;
 
+                    // TODO: 영상 종료 처리
                     console.log('[VIDEO ENDED]', {
                       lectureId: currentLecture.id,
                       resourceId: currentLecture.resourceId,
