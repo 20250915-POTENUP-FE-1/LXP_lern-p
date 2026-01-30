@@ -35,7 +35,7 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             isPreview: false,
             orderIndex: 1,
             resource: {
-              resourceId: 3001, // ✅ number
+              resourceId: 3001,
               resourceType: 'VIDEO',
               fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
@@ -94,9 +94,9 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
 };
 
 export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
-  enrollmentId: 5002, // ✅ number
+  enrollmentId: 5002,
   overallProgressRate: 25,
-  lastWatchedResourceId: 3001, // ✅ number
+  lastWatchedResourceId: 3001,
   lastWatchedAt: '2025-12-02T09:30:00',
   lectureProgresses: [
     {
