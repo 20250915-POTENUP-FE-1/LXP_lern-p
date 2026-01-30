@@ -74,7 +74,7 @@ export function useCourseLearn() {
   function selectLectureToWatch(
     lectures: UILecture[],
     progressInfo: ProgressInfo | null,
-    lectureProgressMap: Map<string, LectureProgressMapValue>,
+    lectureProgressMap: Map<number, LectureProgressMapValue>,
   ): UILecture {
     if (!progressInfo) return lectures[0];
 

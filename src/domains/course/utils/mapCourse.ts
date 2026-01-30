@@ -3,7 +3,7 @@ import type { LectureProgressMapValue } from '@/domains/course/types/progress';
 
 export function mapCourse(
   course: LearnCourseResponse,
-  lectureProgressMap: Map<string, LectureProgressMapValue>,
+  lectureProgressMap: Map<number, LectureProgressMapValue>,
 ): UICourse {
   return {
     courseId: course.courseId,
@@ -29,7 +29,7 @@ export function mapCourse(
           .slice()
           .sort((a, b) => a.orderIndex - b.orderIndex)
           .map((lecture) => {
-            const progress = lectureProgressMap.get(String(lecture.resource.resourceId));
+            const progress = lectureProgressMap.get(lecture.resource.resourceId);
 
             return {
               id: lecture.lectureId,

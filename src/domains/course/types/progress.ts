@@ -32,7 +32,7 @@ export type UpdateProgressResponse = {
 
 // 이어보기 정보
 export type ProgressInfo = {
-  resourceId: string;
+  resourceId: number;
   resumeAt: number;
 };
 
@@ -49,7 +49,7 @@ export type CourseLearnProgress = {
   enrollmentId: string;
   overallProgressRate: number;
   progressInfo: ProgressInfo;
-  lectureProgressMap: Map<string, LectureProgressMapValue>;
+  lectureProgressMap: Map<number, LectureProgressMapValue>;
 };
 
 // 진도율 갱신 보류
