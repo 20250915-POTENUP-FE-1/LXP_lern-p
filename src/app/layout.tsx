@@ -7,7 +7,6 @@ import { getCart } from '@/domains/cart/services/cartService';
 import { MOCK_GET_CART } from '@/mocks/cart.mock';
 import { USE_MOCK } from '@/shared/constants/config';
 import { initMSW } from '@/mocks';
-import { MSWProvider } from './_providers/msw-provider';
 import { AuthProvider } from './_providers/AuthProvider';
 
 if (process.env.NODE_ENV === 'development') {
