@@ -40,12 +40,12 @@ export function useProgress(courseId: string) {
     fetchProgress();
   }, [courseId]);
 
-  const lectureProgressMap = useMemo<Map<string, LectureProgressMapValue>>(() => {
+  const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
     if (!progressData) return new Map();
 
     return new Map(
       progressData.lectureProgresses.map((p) => [
-        String(p.resourceId),
+        p.resourceId,
         {
           progressRate: p.progressRate,
           watchedDuration: p.watchedDuration,
@@ -65,7 +65,7 @@ export function useProgress(courseId: string) {
     const last = progressData.lectureProgresses.find((p) => p.resourceId === id);
 
     return {
-      resourceId: String(id),
+      resourceId: id,
       resumeAt: last?.watchedDuration ?? 0,
     };
   }, [progressData]);
@@ -121,24 +121,21 @@ export function useProgress(courseId: string) {
   };
 
   // 진도 즉시 저장
-  const saveProgress = async (resourceId: string, watchedDuration: number) => {
-    const numericResourceId = Number(resourceId);
-    if (Number.isNaN(numericResourceId)) return;
-
+  const saveProgress = async (resourceId: number, watchedDuration: number) => {
     if (!USE_MOCK) {
       await updateLearnProgress(courseId, {
-        resourceId: numericResourceId,
+        resourceId,
         watchedDuration,
       });
     }
 
     setProgressData((prev) =>
-      prev ? applyProgressUpdate(prev, numericResourceId, watchedDuration) : prev,
+      prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
     );
   };
 
   // 재생 중 주기적 진도 저장
-  const autoSaveProgress = (resourceId: string, watchedDuration: number) => {
+  const autoSaveProgress = (resourceId: number, watchedDuration: number) => {
     const now = Date.now();
 
     if (now - lastSavedAtRef.current < THROTTLE_INTERVAL) return;
@@ -149,7 +146,7 @@ export function useProgress(courseId: string) {
   };
 
   // 영상 종료 시 최종 진도 저장
-  const saveFinalProgressOnEnd = (resourceId: string, watchedDuration: number) => {
+  const saveFinalProgressOnEnd = (resourceId: number, watchedDuration: number) => {
     if (pendingRef.current) return;
 
     // TODO: 영상 종료 처리
