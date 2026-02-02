@@ -40,7 +40,7 @@ export function useProgress(courseId: string) {
     fetchProgress();
   }, [courseId]);
 
-  const lectureProgressMap = useMemo<Map<string, LectureProgressMapValue>>(() => {
+  const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
     if (!progressData) return new Map();
 
     return new Map(
@@ -74,7 +74,7 @@ export function useProgress(courseId: string) {
     if (!progressData || !progressInfo) return null;
 
     return {
-      enrollmentId: progressData.enrollmentId,
+      enrollmentId: String(progressData.enrollmentId),
       overallProgressRate: progressData.overallProgressRate,
       progressInfo,
       lectureProgressMap,
@@ -121,38 +121,21 @@ export function useProgress(courseId: string) {
   };
 
   // 진도 즉시 저장
-  const saveProgress = async (resourceId: string, watchedDuration: number) => {
-    if (!resourceId) {
-      console.warn('[progress] missing resourceId -> skip save', { courseId, watchedDuration });
-      return;
-    }
-    try {
-      // TODO(mock): mock 단계에서는 실제 네트워크 요청 없이 처리
-      if (!USE_MOCK) {
-        await updateLearnProgress(courseId, { resourceId, watchedDuration });
-      }
-
-      setProgressData((prev) =>
-        prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
-      );
-
-      // mock 단계에서는 실제 네트워크 호출 없음
-      lastSavedDurationRef.current = watchedDuration;
-    } catch (e) {
-      console.error('[progress] save failed', e);
-
-      // 실패한 값 저장해두고 재시도 큐로 넘김
-      pendingRef.current = {
+  const saveProgress = async (resourceId: number, watchedDuration: number) => {
+    if (!USE_MOCK) {
+      await updateLearnProgress(courseId, {
         resourceId,
         watchedDuration,
-        retryCount: 0,
-      };
-      retryPending();
+      });
     }
+
+    setProgressData((prev) =>
+      prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
+    );
   };
 
   // 재생 중 주기적 진도 저장
-  const autoSaveProgress = (resourceId: string, watchedDuration: number) => {
+  const autoSaveProgress = (resourceId: number, watchedDuration: number) => {
     const now = Date.now();
 
     if (now - lastSavedAtRef.current < THROTTLE_INTERVAL) return;
@@ -163,15 +146,22 @@ export function useProgress(courseId: string) {
   };
 
   // 영상 종료 시 최종 진도 저장
-  const saveFinalProgressOnEnd = (resourceId: string, watchedDuration: number) => {
+  const saveFinalProgressOnEnd = (resourceId: number, watchedDuration: number) => {
     if (pendingRef.current) return;
+
+    // TODO: 영상 종료 처리
+    console.log('[END] 영상 종료', {
+      resourceId,
+      watchedDuration,
+    });
+
     saveProgress(resourceId, watchedDuration);
   };
 
   // 프론트에서 진도 상태를 계산/반영
   function applyProgressUpdate(
     prev: GetProgressResponse,
-    resourceId: string,
+    resourceId: number,
     watchedDuration: number,
   ): GetProgressResponse {
     const lectureProgresses = prev.lectureProgresses.map((p) => {
@@ -191,14 +181,18 @@ export function useProgress(courseId: string) {
       };
     });
 
-    const next: GetProgressResponse = {
+    // 전체 진도율 재계산
+    const overallProgressRate = Math.round(
+      lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) / lectureProgresses.length,
+    );
+
+    return {
       ...prev,
       lectureProgresses,
+      overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
     };
-
-    return next;
   }
 
   return {

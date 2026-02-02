@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import type { CourseLearn, UILecture, UICourse } from '@/domains/course/types/learn';
 import { getCourse } from '@/domains/course/services/learnService';
 import { mapCourse } from '@/domains/course/utils/mapCourse';
@@ -12,11 +12,7 @@ import { getEnrollmentByCourseId } from '@/domains/user/services/enrollmentServi
 import { MOCK_GET_ENROLLMENT_BY_COURSEID } from '@/mocks/enrollmentList.mock';
 import { ProgressInfo, LectureProgressMapValue } from '../types/progress';
 
-type UseCourseLearnOptions = {
-  start?: 'first';
-};
-
-export function useCourseLearn(options?: UseCourseLearnOptions) {
+export function useCourseLearn() {
   const { id: courseId } = useParams<{ id: string }>();
 
   const [learnData, setLearnData] = useState<CourseLearn | null>(null);
@@ -26,6 +22,9 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
 
   const { progressInfo, lectureProgressMap, autoSaveProgress, saveFinalProgressOnEnd } =
     useProgress(courseId);
+
+  const searchParams = useSearchParams();
+  const start = searchParams.get('start') === 'first' ? 'first' : undefined;
 
   useEffect(() => {
     if (!courseId) return;
@@ -75,9 +74,15 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
   function selectLectureToWatch(
     lectures: UILecture[],
     progressInfo: ProgressInfo | null,
-    lectureProgressMap: Map<string, LectureProgressMapValue>,
+    lectureProgressMap: Map<number, LectureProgressMapValue>,
   ): UILecture {
     if (!progressInfo) return lectures[0];
+
+    // TODO: 초기 자동 선택 (이어보기), 다음 강의 상태
+    console.log('[AUTO SELECT]', {
+      lastWatched: progressInfo?.resourceId,
+      completed: lectureProgressMap.get(progressInfo?.resourceId)?.completed,
+    });
 
     const idx = lectures.findIndex((l) => l.resourceId === progressInfo.resourceId);
 
@@ -96,13 +101,21 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
   const autoLecture = useMemo(() => {
     if (!flatLectures.length) return null;
 
-    if (options?.start === 'first') return flatLectures[0];
+    if (!progressInfo) return null;
+
+    if (start === 'first') return flatLectures[0];
 
     return selectLectureToWatch(flatLectures, progressInfo, lectureProgressMap);
-  }, [flatLectures, options?.start, progressInfo, lectureProgressMap]);
+  }, [flatLectures, start, progressInfo, lectureProgressMap]);
 
   const currentLecture = useMemo<UILecture | null>(() => {
     if (!flatLectures.length) return null;
+
+    // TODO: 다음 강의 자동 이동
+    console.log('[CURRENT LECTURE DECIDE]', {
+      selectedLectureId,
+      autoLecture: autoLecture?.id,
+    });
 
     if (selectedLectureId) {
       const found = flatLectures.find((l) => l.id === selectedLectureId);
@@ -134,6 +147,16 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
 
     return opened;
   }, [courseData, collapsedSections, currentSectionId]);
+
+  const totalLectures = useMemo(() => {
+    return lectureProgressMap.size;
+  }, [lectureProgressMap]);
+
+  const completedLectures = useMemo(() => {
+    if (!lectureProgressMap.size) return 0;
+
+    return Array.from(lectureProgressMap.values()).filter((p) => p.completed === true).length;
+  }, [lectureProgressMap]);
 
   const handleLectureClick = (lecture: UILecture) => {
     setSelectedLectureId(lecture.id);
@@ -174,10 +197,11 @@ export function useCourseLearn(options?: UseCourseLearnOptions) {
     handleLectureClick,
     toggleSection,
     moveToNextLecture,
-
     progressInfo,
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    totalLectures,
+    completedLectures,
   };
 }

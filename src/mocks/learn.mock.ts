@@ -1,5 +1,5 @@
 import type { LearnCourseResponse } from '@/domains/course/types/learn';
-import { GetProgressResponse } from '@/domains/course/types/progress';
+import type { GetProgressResponse } from '@/domains/course/types/progress';
 
 export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
   '2002': {
@@ -35,7 +35,7 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             isPreview: false,
             orderIndex: 1,
             resource: {
-              resourceId: '3001',
+              resourceId: 3001,
               resourceType: 'VIDEO',
               fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
@@ -48,7 +48,7 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             isPreview: false,
             orderIndex: 2,
             resource: {
-              resourceId: '3002',
+              resourceId: 3002,
               resourceType: 'VIDEO',
               fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
@@ -68,7 +68,7 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             isPreview: false,
             orderIndex: 3,
             resource: {
-              resourceId: '3003',
+              resourceId: 3003,
               resourceType: 'VIDEO',
               fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
@@ -81,7 +81,7 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
             isPreview: false,
             orderIndex: 4,
             resource: {
-              resourceId: '3004',
+              resourceId: 3004,
               resourceType: 'VIDEO',
               fileUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
               isDownloadable: false,
@@ -94,13 +94,13 @@ export const MOCK_LEARN_COURSE_MAP: Record<string, LearnCourseResponse> = {
 };
 
 export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
-  enrollmentId: '5002',
-  overallProgressRate: 5,
-  lastWatchedResourceId: '3001', // 마지막으로 재생했던 Video ID
+  enrollmentId: 5002,
+  overallProgressRate: 25,
+  lastWatchedResourceId: 3001,
   lastWatchedAt: '2025-12-02T09:30:00',
   lectureProgresses: [
     {
-      resourceId: '3001',
+      resourceId: 3001,
       title: 'JPA란?',
       progressRate: 50,
       watchedDuration: 5,
@@ -109,7 +109,7 @@ export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
       lastWatchedAt: '2025-12-02T09:30:00',
     },
     {
-      resourceId: '3002',
+      resourceId: 3002,
       title: '엔티티 매핑',
       progressRate: 0,
       watchedDuration: 0,
@@ -118,8 +118,8 @@ export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
       lastWatchedAt: '2025-12-02T09:40:00',
     },
     {
-      resourceId: '3003',
-      title: '엔티티 매핑',
+      resourceId: 3003,
+      title: '연관관계 기본',
       progressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,
@@ -127,8 +127,8 @@ export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
       lastWatchedAt: '2025-12-02T09:40:00',
     },
     {
-      resourceId: '3004',
-      title: '엔티티 매핑',
+      resourceId: 3004,
+      title: '양방향 매핑',
       progressRate: 0,
       watchedDuration: 0,
       totalDurationSeconds: 10,

@@ -2,7 +2,7 @@ import { EnrollmentStatus } from '@/domains/user/types/enrollment';
 
 // API: Course / Enrollment
 export type LearnLectureResourceResponse = {
-  resourceId: string;
+  resourceId: number;
   resourceType: 'VIDEO' | 'PDF';
   fileUrl: string;
   isDownloadable: boolean;
@@ -64,13 +64,15 @@ export type CourseLearn = {
 // UI Types (Learn Page)
 export type UILecture = {
   id: string;
-  resourceId: string;
+  resourceId: number;
   title: string;
   description?: string;
   duration: number;
   type: 'VIDEO' | 'PDF';
   videoUrl?: string;
   pdfUrl?: string;
+  completed: boolean;
+  isCurrent: boolean;
 };
 
 export type UISection = {

@@ -1,4 +1,4 @@
-import { GetEnrollmentResponse } from '@/domains/course/types/course';
+import type { GetEnrollmentResponse } from '@/domains/course/types/course';
 import type { EnrollmentListResponse } from '@/domains/user/types/enrollment';
 
 export const MOCK_ENROLLMENT_LIST: EnrollmentListResponse = {

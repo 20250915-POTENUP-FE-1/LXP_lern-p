@@ -13,7 +13,7 @@ export async function getCourse(courseId: string): Promise<LearnCourseResponse> 
 
 // 학습 이력 조회
 export async function getLearnProgress(courseId: string): Promise<GetProgressResponse> {
-  return getApi(`/api/progresses/course/${courseId}`, { cache: 'no-store' });
+  return getApi<GetProgressResponse>(`/api/progresses/course/${courseId}`, { cache: 'no-store' });
 }
 
 // 진도율 갱신
@@ -21,5 +21,5 @@ export async function updateLearnProgress(
   courseId: string,
   payload: UpdateProgressRequest,
 ): Promise<UpdateProgressResponse> {
-  return patchApi<UpdateProgressResponse>(`/api/progresses/${courseId}`, payload);
+  return patchApi<UpdateProgressResponse>(`/api/progresses/course/${courseId}`, payload);
 }

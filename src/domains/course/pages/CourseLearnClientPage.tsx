@@ -27,10 +27,6 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
 
-  const searchParams = useSearchParams();
-  const rawStart = searchParams.get('start');
-  const start = rawStart === 'first' ? 'first' : undefined;
-
   const {
     courseData,
     currentLecture,
@@ -41,34 +37,18 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
-  } = useCourseLearn({ start });
-
-  const totalLectures = useMemo(() => {
-    if (!courseData) return 0;
-    return courseData.sections.reduce((acc, s) => acc + s.lectures.length, 0);
-  }, [courseData]);
-
-  const completedLectures = useMemo(() => {
-    if (!courseData) return 0;
-
-    return courseData.sections
-      .flatMap((s) => s.lectures)
-      .filter((lecture) => {
-        const progress = lectureProgressMap.get(lecture.resourceId);
-        return progress?.completed === true;
-      }).length;
-  }, [courseData, lectureProgressMap]);
+    totalLectures,
+    completedLectures,
+  } = useCourseLearn();
 
   useEffect(() => {
     if (!currentLecture) return;
     hasSeekedRef.current = false;
-  }, [currentLecture?.id]);
+  }, [currentLecture?.resourceId]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    if (!currentLecture) return;
-    if (hasSeekedRef.current) return;
+    if (!video || !currentLecture) return;
 
     const saved = lectureProgressMap.get(currentLecture.resourceId)?.watchedDuration ?? 0;
 
@@ -76,8 +56,10 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
       if (saved > 0 && saved < video.duration) {
         video.currentTime = saved;
       }
-      hasSeekedRef.current = true;
     };
+
+    // TODO: 강의 progress map 렌더링
+    console.log('[RENDER] lectureProgressMap', Array.from(lectureProgressMap.entries()));
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -131,6 +113,14 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                   onEnded={() => {
                     const video = videoRef.current;
                     const t = video ? Math.floor(video.currentTime) : 0;
+
+                    // TODO: 영상 종료 처리
+                    console.log('[VIDEO ENDED]', {
+                      lectureId: currentLecture.id,
+                      resourceId: currentLecture.resourceId,
+                      time: t,
+                    });
+
                     saveFinalProgressOnEnd(currentLecture.resourceId, t);
                     moveToNextLecture();
                   }}

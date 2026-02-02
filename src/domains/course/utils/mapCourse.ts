@@ -3,7 +3,7 @@ import type { LectureProgressMapValue } from '@/domains/course/types/progress';
 
 export function mapCourse(
   course: LearnCourseResponse,
-  lectureProgressMap: Map<string, LectureProgressMapValue>,
+  lectureProgressMap: Map<number, LectureProgressMapValue>,
 ): UICourse {
   return {
     courseId: course.courseId,
