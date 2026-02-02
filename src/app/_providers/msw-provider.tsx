@@ -10,7 +10,7 @@ declare global {
 }
 const mockingEnabledPromise =
   typeof window !== 'undefined'
-    ? import('@/mocks/browser').then(async ({ default: worker }) => {
+    ? import('@/mocks/browser').then(async ({ worker }) => {
         if (process.env.NODE_ENV === 'production') {
           return;
         }
@@ -30,14 +30,6 @@ const mockingEnabledPromise =
         console.log('[MSW] active handlers:', worker.listHandlers());
       })
     : Promise.resolve();
-
-export const MSWProvider = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Suspense fallback={null}>
-      <MSWProviderWrapper>{children}</MSWProviderWrapper>
-    </Suspense>
-  );
-};
 
 export const MSWProvider = ({
   children,

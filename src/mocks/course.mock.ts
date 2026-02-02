@@ -24,6 +24,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'BEGINNER',
       summary: '스프링 부트의 모든 것',
       instructorName: '김영한',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
     {
       courseId: '2002',
@@ -38,6 +42,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'INTERMEDIATE',
       summary: 'Spring Boot로 실무 백엔드 API를 설계하고 구현합니다.',
       instructorName: '김백엔드',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
     {
       courseId: '2003',
@@ -52,6 +60,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'INTERMEDIATE',
       summary: 'React 핵심부터 Next.js App Router까지 정리합니다.',
       instructorName: '이프론트',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
     {
       courseId: '2004',
@@ -66,6 +78,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'BEGINNER',
       summary: '관계형 DB 개념과 SQL 기초를 학습합니다.',
       instructorName: '박디비',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
     {
       courseId: '3001',
@@ -80,6 +96,10 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'INTERMEDIATE',
       summary: 'Node.js 기반 서버 개발 실전 과정',
       instructorName: '정노드',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
     {
       courseId: '3002',
@@ -94,12 +114,16 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       level: 'BEGINNER',
       summary: 'Jest와 Testing Library로 테스트를 시작합니다.',
       instructorName: '최테스트',
+      reviewStat: {
+        reviewCount: 1,
+        avgRating: 5.0,
+      },
     },
   ],
   currentPage: 0,
   size: 30,
   totalElements: 6,
-  totalPages: '1',
+  totalPages: 1,
   hasNext: false,
 };
 
@@ -122,7 +146,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 55000,
     level: 'BEGINNER',
     studentCount: 10,
-    rating: 4.6,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '3001',
@@ -215,7 +242,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 99000,
     level: 'INTERMEDIATE',
     studentCount: 412,
-    rating: 5.0,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '2002-sec-1',
@@ -336,7 +366,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 89000,
     level: 'INTERMEDIATE',
     studentCount: 356,
-    rating: 5.0,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '2003-sec-1',
@@ -457,7 +490,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 59000,
     level: 'BEGINNER',
     studentCount: 215,
-    rating: 4.2,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '2004-sec-1',
@@ -549,7 +585,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 99000,
     level: 'INTERMEDIATE',
     studentCount: 182,
-    rating: 5.0,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '3001-sec-1',
@@ -642,7 +681,10 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     price: 69000,
     level: 'BEGINNER',
     studentCount: 96,
-    rating: 4.3,
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
     sections: [
       {
         sectionId: '3002-sec-1',
