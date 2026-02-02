@@ -191,6 +191,7 @@ export function useCourseLearn() {
 
   return {
     courseData,
+    enrollmentId: learnData?.enrollment?.enrollmentId ?? null,
     currentLecture,
     openSections,
     handleLectureClick,
