@@ -1,7 +1,7 @@
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type { GetAdminCoursesResponse, GetAdminCourseDetailResponse } from '../types';
 
-const ADMIN_API_BASE = '/admin';
+const ADMIN_API_BASE = '/api/admin';
 
 /**
  * 관리자 대시보드용 강좌 목록 조회
