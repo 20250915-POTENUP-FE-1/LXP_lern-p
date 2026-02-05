@@ -14,6 +14,7 @@ import type {
   UserResponse,
 } from '@/domains/user/types/user';
 import type { ApiResponse } from '@/shared/lib/api/fetchApi';
+import { adminHandlers } from './admin.mock';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
@@ -268,4 +269,7 @@ export const handlers = [
       );
     },
   ),
+
+  // --- 관리자 API ---
+  ...adminHandlers,
 ];
