@@ -54,15 +54,15 @@ export function useInfiniteScroll<T>({
     (node: HTMLElement | null) => {
       if (!enabled) return;
 
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+      if (!observerRef.current) {
+        observerRef.current = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) {
+            loadMore();
+          }
+        });
       }
 
-      observerRef.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          loadMore();
-        }
-      });
+      observerRef.current.disconnect();
 
       if (node) {
         observerRef.current.observe(node);
