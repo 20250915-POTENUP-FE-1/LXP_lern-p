@@ -1,3 +1,4 @@
+// 관리자 페이지 메인 페이지 - 사이드바 및 메인페이지 포함
 'use client';
 
 import { useState } from 'react';
@@ -7,17 +8,13 @@ import styles from './AdminPage.module.css';
 type AdminMenu = 'overview' | 'instructor';
 
 type AdminPageProps = {
-  overviewContent: React.ReactNode;
+  overviewContent: React.ReactNode; //??
   instructorContent: React.ReactNode;
   pendingCount: number;
 };
 
-export const AdminPage = ({
-  overviewContent,
-  instructorContent,
-  pendingCount,
-}: AdminPageProps) => {
-  const [activeMenu, setActiveMenu] = useState<AdminMenu>('overview');
+export const AdminPage = ({ overviewContent, instructorContent, pendingCount }: AdminPageProps) => {
+  const [activeMenu, setActiveMenu] = useState<AdminMenu>('overview'); // 기본
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleMenuClick = (menu: AdminMenu) => {
@@ -32,7 +29,7 @@ export const AdminPage = ({
         <button
           className={styles['admin__menu-toggle']}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          aria-label={isSidebarOpen ? '메뉴 닫기' : '메뉴 열기'}
+          aria-label={isSidebarOpen ? '메뉴 닫기' : '메뉴 열기'} //??
         >
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -41,10 +38,7 @@ export const AdminPage = ({
 
       {/* 오버레이 (모바일) */}
       {isSidebarOpen && (
-        <div
-          className={styles.admin__overlay}
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className={styles.admin__overlay} onClick={() => setIsSidebarOpen(false)} />
       )}
 
       {/* 사이드바 */}
@@ -70,9 +64,7 @@ export const AdminPage = ({
           >
             <UserCheck size={18} />
             <span className={styles['admin__nav-text']}>강사 승인</span>
-            {pendingCount > 0 && (
-              <span className={styles['admin__nav-badge']}>{pendingCount}</span>
-            )}
+            {pendingCount > 0 && <span className={styles['admin__nav-badge']}>{pendingCount}</span>}
           </button>
         </nav>
       </aside>

@@ -1,3 +1,5 @@
+// 관리자페이지 강사승인
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -23,7 +25,7 @@ export const InstructorManagement = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 필터링된 요청 목록
-  const filteredRequests = requests.filter((req) => req.status === filter);
+  const filteredRequests = requests.filter((req) => req.status === filter); //요청 배열에서, filter 항목에 맞는 목록들을 다시 저장
 
   // 각 상태별 개수
   const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
@@ -49,9 +51,9 @@ export const InstructorManagement = ({
 
       setIsProcessing(true);
       try {
-        await onProcess(selectedRequest.id, action);
+        await onProcess(selectedRequest.id, action); //onProcess 에 선택된 아이디-액션 비동기로 저장
         handleCloseModal();
-        onRefresh();
+        onRefresh(); //선택시 Void(빈값) 출력??
       } catch (error) {
         console.error('처리 실패:', error);
         alert('처리에 실패했습니다. 다시 시도해주세요.');
@@ -59,19 +61,22 @@ export const InstructorManagement = ({
         setIsProcessing(false);
       }
     },
-    [selectedRequest, onProcess, handleCloseModal, onRefresh]
+    [selectedRequest, onProcess, handleCloseModal, onRefresh],
   );
 
   return (
+    // 대시보드 탭 목록 버튼
     <div className={styles.container}>
       {/* 필터 탭 */}
       <div className={styles.filterTabs}>
         <button
-          className={`${styles.filterTab} ${filter === 'PENDING' ? styles['filterTab--active'] : ''}`}
-          onClick={() => setFilter('PENDING')}
+          className={`${styles.filterTab} ${filter === 'PENDING' ? styles['filterTab--active'] : ''}`} // filter 항목 조건에 맞춰서 해당 스타일 return 함
+          onClick={() => setFilter('PENDING')} //클릭시 필터 항목 Pending 으로 바꿈
         >
           대기중
-          <span className={`${styles.filterCount} ${pendingCount > 0 ? styles['filterCount--warning'] : ''}`}>
+          <span
+            className={`${styles.filterCount} ${pendingCount > 0 ? styles['filterCount--warning'] : ''}`}
+          >
             {pendingCount}
           </span>
         </button>
@@ -91,7 +96,7 @@ export const InstructorManagement = ({
         </button>
       </div>
 
-      {/* 요청 목록 */}
+      {/* 탭에 들어가는 내용 */}
       <div className={styles.requestList}>
         {filteredRequests.length === 0 ? (
           <div className={styles.emptyState}>
@@ -101,7 +106,7 @@ export const InstructorManagement = ({
           </div>
         ) : (
           filteredRequests.map((request) => (
-            <InstructorRequestCard
+            <InstructorRequestCard //각 탭별로, 필터링에 해당되는 강사요청카드 띄우기
               key={request.id}
               request={request}
               onClick={() => handleRequestClick(request)}

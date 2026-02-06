@@ -1,3 +1,5 @@
+// 승인 거절 후 결과 표시 카드
+
 'use client';
 
 import { User, Mail, Calendar } from 'lucide-react';
@@ -38,9 +40,7 @@ export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCar
           </span>
         </div>
       </div>
-      {request.status === 'PENDING' && (
-        <span className={styles.badge}>대기중</span>
-      )}
+      {request.status === 'PENDING' && <span className={styles.badge}>대기중</span>}
       {request.status === 'APPROVED' && (
         <span className={`${styles.badge} ${styles['badge--approved']}`}>승인됨</span>
       )}

@@ -1,3 +1,4 @@
+// 관리자페이지 대시보드 (페이지 접속시 기본)
 'use client';
 
 import { Users, BookOpen, UserCheck, Clock } from 'lucide-react';
@@ -12,8 +13,11 @@ type AdminOverviewProps = {
   };
 };
 
+//TODO:  AdminOverviewProps.stats 를 API 로 가져온 값과 연결??
+
 export const AdminOverview = ({ stats }: AdminOverviewProps) => {
   return (
+    //전체현황 내용, 아이콘 포함됨
     <div className={styles.overview}>
       <h2 className={styles.sectionTitle}>전체 현황</h2>
 
@@ -48,7 +52,9 @@ export const AdminOverview = ({ stats }: AdminOverviewProps) => {
           </div>
         </div>
 
-        <div className={`${styles.statCard} ${stats.pendingRequests > 0 ? styles['statCard--highlight'] : ''}`}>
+        <div
+          className={`${styles.statCard} ${stats.pendingRequests > 0 ? styles['statCard--highlight'] : ''}`}
+        >
           <div className={styles.statIcon}>
             <Clock size={24} />
           </div>

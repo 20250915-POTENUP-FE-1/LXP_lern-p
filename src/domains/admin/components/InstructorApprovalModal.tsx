@@ -1,3 +1,5 @@
+// 강사승인 모달
+
 'use client';
 
 import { X, User, Mail, Calendar } from 'lucide-react';
@@ -86,11 +88,7 @@ export const InstructorApprovalModal = ({
             {/* 액션 버튼 (대기중일 때만 표시) */}
             {isPending && (
               <div className={styles.actions}>
-                <button
-                  className={styles.buttonReject}
-                  onClick={onReject}
-                  disabled={isProcessing}
-                >
+                <button className={styles.buttonReject} onClick={onReject} disabled={isProcessing}>
                   {isProcessing ? '처리 중...' : '거절'}
                 </button>
                 <button
