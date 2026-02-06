@@ -3,6 +3,7 @@ import type {
   ProcessInstructorRequestResponse,
   InstructorRequest,
   InstructorRequestStatus,
+  AdminStats,
 } from '../types';
 import { USE_MOCK } from '@/shared/constants/config';
 
@@ -139,4 +140,35 @@ export const processInstructorRequest = async (
  */
 export const resetMockData = () => {
   mockRequests = [...MOCK_INSTRUCTOR_REQUESTS];
+};
+
+/**
+ * 관리자 대시보드 통계 조회
+ */
+export const getAdminStats = async (): Promise<AdminStats> => {
+  if (USE_MOCK) {
+    const pendingCount = mockRequests.filter((r) => r.status === 'PENDING').length;
+    const approvedCount = mockRequests.filter((r) => r.status === 'APPROVED').length;
+
+    return {
+      totalUsers: 1234,
+      totalCourses: 56,
+      totalInstructors: approvedCount + 15, // 기존 강사 + 승인된 요청
+      pendingRequests: pendingCount,
+    };
+  }
+
+  // 실제 API 호출
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const response = await fetch(`${BASE_URL}/api/admin/stats`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`API 요청 실패: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result.data;
 };

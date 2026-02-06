@@ -1,1 +1,1 @@
-export { InstructorManagementPage } from './AdminDashboardPage';
+export { AdminDashboardPage } from './AdminDashboardPage';

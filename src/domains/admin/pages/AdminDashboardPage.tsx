@@ -1,33 +1,49 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { InstructorManagement } from '../components';
-import type { InstructorRequest } from '../types';
-import { getInstructorRequests, processInstructorRequest } from '../services/adminService';
+import { AdminPage, AdminOverview, InstructorManagement } from '../components';
+import type { InstructorRequest, AdminStats } from '../types';
+import {
+  getInstructorRequests,
+  processInstructorRequest,
+  getAdminStats,
+} from '../services/adminService';
 
-export const InstructorManagementPage = () => {
+export const AdminDashboardPage = () => {
   const [requests, setRequests] = useState<InstructorRequest[]>([]);
+  const [stats, setStats] = useState<AdminStats>({
+    totalUsers: 0,
+    totalCourses: 0,
+    totalInstructors: 0,
+    pendingRequests: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 요청 목록 로딩
-  const loadRequests = useCallback(async () => {
+  // 데이터 로딩
+  const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await getInstructorRequests();
-      setRequests(response.requests);
+
+      const [requestsRes, statsRes] = await Promise.all([
+        getInstructorRequests(),
+        getAdminStats(),
+      ]);
+
+      setRequests(requestsRes.requests);
+      setStats(statsRes);
     } catch (err) {
-      console.error('요청 목록 로딩 실패:', err);
-      setError('요청 목록을 불러오는데 실패했습니다.');
+      console.error('데이터 로딩 실패:', err);
+      setError('데이터를 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadRequests();
-  }, [loadRequests]);
+    loadData();
+  }, [loadData]);
 
   // 승인/거절 처리
   const handleProcess = useCallback(
@@ -37,27 +53,36 @@ export const InstructorManagementPage = () => {
     []
   );
 
+  // 대기 중인 요청 수
+  const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
+
   if (isLoading) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-        요청 목록을 불러오는 중...
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+        데이터를 불러오는 중...
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: '#dc2626' }}>
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-danger)' }}>
         {error}
       </div>
     );
   }
 
   return (
-    <InstructorManagement
-      requests={requests}
-      onProcess={handleProcess}
-      onRefresh={loadRequests}
+    <AdminPage
+      pendingCount={pendingCount}
+      overviewContent={<AdminOverview stats={stats} />}
+      instructorContent={
+        <InstructorManagement
+          requests={requests}
+          onProcess={handleProcess}
+          onRefresh={loadData}
+        />
+      }
     />
   );
 };

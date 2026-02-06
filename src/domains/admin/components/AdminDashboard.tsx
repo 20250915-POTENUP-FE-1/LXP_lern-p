@@ -63,12 +63,7 @@ export const InstructorManagement = ({
   );
 
   return (
-    <div className={styles.dashboard}>
-      {/* 헤더 */}
-      <div className={styles.header}>
-        <h1 className={styles.title}>강사 승인 관리</h1>
-      </div>
-
+    <div className={styles.container}>
       {/* 필터 탭 */}
       <div className={styles.filterTabs}>
         <button

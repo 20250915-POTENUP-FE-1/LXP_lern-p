@@ -35,3 +35,11 @@ export type ProcessInstructorRequestResponse = {
 
 // 필터 타입
 export type RequestFilter = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+// 관리자 대시보드 통계
+export type AdminStats = {
+  totalUsers: number;
+  totalCourses: number;
+  totalInstructors: number;
+  pendingRequests: number;
+};
