@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useState } from 'react';
 
 export type PageResponse<T> = {
   content: T[];
@@ -23,15 +23,17 @@ export type UseInfiniteScrollResult<T> = {
   reset: () => void;
 };
 
-export function useInfiniteScroll<T>(
-  options: UseInfiniteScrollOptions<T>,
-): UseInfiniteScrollResult<T> {
-  const { loadPage, initialPage = 0, enabled = true } = options;
-
+export function useInfiniteScroll<T>({
+  loadPage,
+  initialPage = 0,
+  enabled = true,
+}: UseInfiniteScrollOptions<T>): UseInfiniteScrollResult<T> {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const loadMore = useCallback(async () => {
     if (!enabled || isLoading || !hasNext) return;
@@ -48,11 +50,32 @@ export function useInfiniteScroll<T>(
     }
   }, [enabled, isLoading, hasNext, loadPage, page]);
 
+  const setTarget = useCallback(
+    (node: HTMLElement | null) => {
+      if (!enabled) return;
+
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      observerRef.current = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          loadMore();
+        }
+      });
+
+      if (node) {
+        observerRef.current.observe(node);
+      }
+    },
+    [enabled, loadMore],
+  );
+
   return {
     items,
     isLoading,
     hasNext,
-    setTarget: () => {},
+    setTarget,
     reset: () => {},
   };
 }
