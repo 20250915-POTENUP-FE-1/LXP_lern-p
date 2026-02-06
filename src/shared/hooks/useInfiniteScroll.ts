@@ -78,6 +78,12 @@ export function useInfiniteScroll<T>({
     setIsLoading(false);
   }, [initialPage]);
 
+  useEffect(() => {
+    if (!enabled) return;
+
+    loadMore();
+  }, [enabled, loadMore]);
+
   return {
     items,
     isLoading,
