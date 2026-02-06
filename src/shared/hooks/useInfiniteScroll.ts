@@ -23,8 +23,13 @@ export type UseInfiniteScrollResult<T> = {
   reset: () => void;
 };
 
-export function useInfiniteScroll<T>() {
+export function useInfiniteScroll<T>(
+  options: UseInfiniteScrollOptions<T>,
+): UseInfiniteScrollResult<T> {
+  const { initialPage = 0, enabled = true } = options;
+
   const [items, setItems] = useState<T[]>([]);
+  const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
 
