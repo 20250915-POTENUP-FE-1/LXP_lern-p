@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type PageResponse<T> = {
   content: T[];
@@ -71,11 +71,18 @@ export function useInfiniteScroll<T>({
     [enabled, loadMore],
   );
 
+  const reset = useCallback(() => {
+    setItems([]);
+    setPage(initialPage);
+    setHasNext(true);
+    setIsLoading(false);
+  }, [initialPage]);
+
   return {
     items,
     isLoading,
     hasNext,
     setTarget,
-    reset: () => {},
+    reset,
   };
 }
