@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
 import { MOCK_GET_ALL_COURSE } from '@/mocks/course.mock';
 import { USE_MOCK } from '@/shared/constants/config';
-import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
 import type { CourseCardType, GetAllCourseResponse } from '../types/course';
@@ -13,41 +12,40 @@ import { SortSelect, sortCourses } from '../components/SortSelect';
 import { LEVEL_LABEL } from '../constants/level';
 
 export default function CourseListClientPage() {
+  const [courses, setCourses] = useState<CourseCardType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const { sort } = useCourseListQuery();
 
-  const loadCoursePage = useCallback(async (page: number) => {
-    const data: GetAllCourseResponse = USE_MOCK
-      ? MOCK_GET_ALL_COURSE
-      : await getAllCourses({ page, size: 2 });
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
+        const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
+        const courseCardData: CourseCardType[] = data.content.map((item) => ({
+          id: item.courseId,
+          title: item.title,
+          summary: item.summary,
+          thumbnailUrl: item.thumbnailUrl ?? '/default-thumbnail.png',
+          instructorName: item.instructorName,
+          category: item.categories,
+          level: item.level,
+          tags: [item.categories[item.categories.length - 1], LEVEL_LABEL[item.level]],
+          price: item.price,
+          isFree: item.price === 0,
+          studentCount: item.studentCount,
+        }));
 
-    const courseCardData: CourseCardType[] = data.content.map((item) => ({
-      id: item.courseId,
-      title: item.title,
-      summary: item.summary,
-      thumbnailUrl: item.thumbnailUrl ?? '/default-thumbnail.png',
-      instructorName: item.instructorName,
-      category: item.categories,
-      level: item.level,
-      tags: [item.categories[item.categories.length - 1], LEVEL_LABEL[item.level]],
-      price: item.price,
-      isFree: item.price === 0,
-      studentCount: item.studentCount,
-    }));
-
-    return {
-      ...data,
-      content: courseCardData,
+        setCourses(courseCardData);
+      } catch (error) {
+        console.error('강좌 목록 불러오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
 
-  const {
-    items: courses,
-    isLoading,
-    hasNext,
-    setTarget,
-  } = useInfiniteScroll<CourseCardType>({
-    loadPage: loadCoursePage,
-  });
+    void fetchCourses();
+  }, []);
 
   const sortedCourses = useMemo(() => sortCourses<CourseCardType>(courses, sort), [courses, sort]);
 
@@ -63,7 +61,7 @@ export default function CourseListClientPage() {
       </div>
 
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
-        {isLoading && courses.length === 0 ? (
+        {loading ? (
           <p className={styles['course-list__loading']}>불러오는 중...</p>
         ) : courses.length === 0 ? (
           <p className={styles['course-list__empty']}>등록된 강좌가 없습니다.</p>
@@ -78,12 +76,6 @@ export default function CourseListClientPage() {
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>
-
-            {hasNext && (
-              <div ref={setTarget} style={{ height: 40 }} aria-hidden>
-                {isLoading && '불러오는 중...'}
-              </div>
-            )}
           </>
         )}
       </section>

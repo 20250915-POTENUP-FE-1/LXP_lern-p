@@ -11,41 +11,21 @@ import { db } from '@/shared/lib/firebase/firestore';
 import type { GetAllCourseResponse, GetCourseDetailResponse } from '../types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-type GetAllCoursesParams = {
-  page?: number;
-  size?: number;
-};
-
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
-export const getAllCourses = async (
-  params?: GetAllCoursesParams,
-): Promise<GetAllCourseResponse> => {
-  const query = new URLSearchParams();
-
-  if (params?.page !== undefined) {
-    query.append('page', String(params.page));
-  }
-  if (params?.size !== undefined) {
-    query.append('size', String(params.size));
-  }
-
-  const response = await fetch(
-    `${BASE_URL}/api/courses${query.toString() ? `?${query.toString()}` : ''}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
+  const response = await fetch(`${BASE_URL}/api/courses`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
     },
-  );
-
+  });
   if (!response.ok) {
     throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
   }
-
   const resJson = await response.json();
+
   return resJson.data;
 };
 /**
