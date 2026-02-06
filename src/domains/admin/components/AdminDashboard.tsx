@@ -1,140 +1,128 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Search, BookOpen, Star, Users, AlertTriangle } from 'lucide-react';
-import type {
-  AdminCourseItem,
-  AdminCourseDetail,
-  DashboardStats,
-  CourseFilter,
-} from '../types/admin';
-import { StatCard } from './StatCard';
-import { CourseTable } from './CourseTable';
-import { CourseDetailModal } from './CourseDetailModal';
+import type { InstructorRequest, RequestFilter } from '../types/admin';
+import { InstructorRequestCard } from './InstructorRequestCard';
+import { InstructorApprovalModal } from './InstructorApprovalModal';
 import styles from './AdminDashboard.module.css';
 
-type AdminDashboardProps = {
-  courses: AdminCourseItem[];
-  stats: DashboardStats;
-  onLoadCourseDetail: (courseId: string) => Promise<AdminCourseDetail>;
+type InstructorManagementProps = {
+  requests: InstructorRequest[];
+  onProcess: (requestId: string, action: 'approve' | 'reject') => Promise<void>;
+  onRefresh: () => void;
 };
 
-export const AdminDashboard = ({
-  courses,
-  stats,
-  onLoadCourseDetail,
-}: AdminDashboardProps) => {
-  const [filter, setFilter] = useState<CourseFilter>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+export const InstructorManagement = ({
+  requests,
+  onProcess,
+  onRefresh,
+}: InstructorManagementProps) => {
+  const [filter, setFilter] = useState<RequestFilter>('PENDING');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<AdminCourseDetail | null>(null);
-  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<InstructorRequest | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // 필터링된 강좌 목록
-  const filteredCourses = courses.filter((course) => {
-    const matchesFilter = filter === 'all' || course.needsAttention;
-    const matchesSearch =
-      searchQuery === '' ||
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.instructorName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  // 필터링된 요청 목록
+  const filteredRequests = requests.filter((req) => req.status === filter);
 
-  // 강좌 클릭 핸들러
-  const handleCourseClick = useCallback(
-    async (courseId: string) => {
-      setIsModalOpen(true);
-      setIsLoadingDetail(true);
-      try {
-        const detail = await onLoadCourseDetail(courseId);
-        setSelectedCourse(detail);
-      } catch (error) {
-        console.error('강좌 상세 정보 로딩 실패:', error);
-        setSelectedCourse(null);
-      } finally {
-        setIsLoadingDetail(false);
-      }
-    },
-    [onLoadCourseDetail]
-  );
+  // 각 상태별 개수
+  const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
+  const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
+  const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
+
+  // 요청 카드 클릭 핸들러
+  const handleRequestClick = useCallback((request: InstructorRequest) => {
+    setSelectedRequest(request);
+    setIsModalOpen(true);
+  }, []);
 
   // 모달 닫기 핸들러
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-    setSelectedCourse(null);
+    setSelectedRequest(null);
   }, []);
+
+  // 승인/거절 처리 핸들러
+  const handleProcess = useCallback(
+    async (action: 'approve' | 'reject') => {
+      if (!selectedRequest) return;
+
+      setIsProcessing(true);
+      try {
+        await onProcess(selectedRequest.id, action);
+        handleCloseModal();
+        onRefresh();
+      } catch (error) {
+        console.error('처리 실패:', error);
+        alert('처리에 실패했습니다. 다시 시도해주세요.');
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [selectedRequest, onProcess, handleCloseModal, onRefresh]
+  );
 
   return (
     <div className={styles.dashboard}>
       {/* 헤더 */}
       <div className={styles.header}>
-        <h1 className={styles.title}>강좌 관리 대시보드</h1>
-        <div className={styles.searchWrapper}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="강좌명 또는 강사명으로 검색"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* 통계 카드 */}
-      <div className={styles.statsGrid}>
-        <StatCard
-          label="전체 강좌"
-          value={stats.totalCourses.toLocaleString()}
-          icon={<BookOpen size={24} />}
-        />
-        <StatCard
-          label="평균 별점"
-          value={`${stats.averageRating.toFixed(1)}★`}
-          icon={<Star size={24} />}
-        />
-        <StatCard
-          label="총 수강생"
-          value={stats.totalStudents.toLocaleString()}
-          icon={<Users size={24} />}
-        />
-        <StatCard
-          label="주의 필요"
-          value={stats.needsAttentionCount}
-          icon={<AlertTriangle size={24} />}
-          highlight={stats.needsAttentionCount > 0}
-        />
+        <h1 className={styles.title}>강사 승인 관리</h1>
       </div>
 
       {/* 필터 탭 */}
       <div className={styles.filterTabs}>
         <button
-          className={`${styles.filterTab} ${filter === 'all' ? styles['filterTab--active'] : ''}`}
-          onClick={() => setFilter('all')}
+          className={`${styles.filterTab} ${filter === 'PENDING' ? styles['filterTab--active'] : ''}`}
+          onClick={() => setFilter('PENDING')}
         >
-          전체
-          <span className={styles.filterCount}>{courses.length}</span>
+          대기중
+          <span className={`${styles.filterCount} ${pendingCount > 0 ? styles['filterCount--warning'] : ''}`}>
+            {pendingCount}
+          </span>
         </button>
         <button
-          className={`${styles.filterTab} ${filter === 'needs_attention' ? styles['filterTab--active'] : ''}`}
-          onClick={() => setFilter('needs_attention')}
+          className={`${styles.filterTab} ${filter === 'APPROVED' ? styles['filterTab--active'] : ''}`}
+          onClick={() => setFilter('APPROVED')}
         >
-          주의 필요
-          <span className={`${styles.filterCount} ${styles['filterCount--warning']}`}>
-            {courses.filter((c) => c.needsAttention).length}
-          </span>
+          승인됨
+          <span className={styles.filterCount}>{approvedCount}</span>
+        </button>
+        <button
+          className={`${styles.filterTab} ${filter === 'REJECTED' ? styles['filterTab--active'] : ''}`}
+          onClick={() => setFilter('REJECTED')}
+        >
+          거절됨
+          <span className={styles.filterCount}>{rejectedCount}</span>
         </button>
       </div>
 
-      {/* 강좌 테이블 */}
-      <CourseTable courses={filteredCourses} onCourseClick={handleCourseClick} />
+      {/* 요청 목록 */}
+      <div className={styles.requestList}>
+        {filteredRequests.length === 0 ? (
+          <div className={styles.emptyState}>
+            {filter === 'PENDING' && '대기 중인 요청이 없습니다.'}
+            {filter === 'APPROVED' && '승인된 요청이 없습니다.'}
+            {filter === 'REJECTED' && '거절된 요청이 없습니다.'}
+          </div>
+        ) : (
+          filteredRequests.map((request) => (
+            <InstructorRequestCard
+              key={request.id}
+              request={request}
+              onClick={() => handleRequestClick(request)}
+            />
+          ))
+        )}
+      </div>
 
-      {/* 강좌 상세 모달 */}
-      <CourseDetailModal
+      {/* 승인/거절 모달 */}
+      <InstructorApprovalModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        course={selectedCourse}
-        isLoading={isLoadingDetail}
+        request={selectedRequest}
+        onApprove={() => handleProcess('approve')}
+        onReject={() => handleProcess('reject')}
+        isProcessing={isProcessing}
       />
     </div>
   );

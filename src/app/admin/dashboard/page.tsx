@@ -1,5 +1,5 @@
-import { AdminDashboardPage } from '@/domains/admin/pages';
+import { InstructorManagementPage } from '@/domains/admin/pages';
 
 export default function Page() {
-  return <AdminDashboardPage />;
+  return <InstructorManagementPage />;
 }

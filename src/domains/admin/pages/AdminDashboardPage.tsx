@@ -1,44 +1,38 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { AdminDashboard } from '../components';
-import type { AdminCourseItem, AdminCourseDetail, DashboardStats } from '../types';
-import { getAdminCourses, getAdminCourseDetail } from '../services/adminService';
+import { InstructorManagement } from '../components';
+import type { InstructorRequest } from '../types';
+import { getInstructorRequests, processInstructorRequest } from '../services/adminService';
 
-export const AdminDashboardPage = () => {
-  const [courses, setCourses] = useState<AdminCourseItem[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalCourses: 0,
-    averageRating: 0,
-    totalStudents: 0,
-    needsAttentionCount: 0,
-  });
+export const InstructorManagementPage = () => {
+  const [requests, setRequests] = useState<InstructorRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 강좌 목록 로딩
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        setIsLoading(true);
-        const response = await getAdminCourses();
-        setCourses(response.content);
-        setStats(response.stats);
-      } catch (err) {
-        console.error('강좌 목록 로딩 실패:', err);
-        setError('강좌 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCourses();
+  // 요청 목록 로딩
+  const loadRequests = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await getInstructorRequests();
+      setRequests(response.requests);
+    } catch (err) {
+      console.error('요청 목록 로딩 실패:', err);
+      setError('요청 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // 강좌 상세 정보 로딩
-  const handleLoadCourseDetail = useCallback(
-    async (courseId: string): Promise<AdminCourseDetail> => {
-      return await getAdminCourseDetail(courseId);
+  useEffect(() => {
+    loadRequests();
+  }, [loadRequests]);
+
+  // 승인/거절 처리
+  const handleProcess = useCallback(
+    async (requestId: string, action: 'approve' | 'reject') => {
+      await processInstructorRequest(requestId, action);
     },
     []
   );
@@ -46,7 +40,7 @@ export const AdminDashboardPage = () => {
   if (isLoading) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-        강좌 목록을 불러오는 중...
+        요청 목록을 불러오는 중...
       </div>
     );
   }
@@ -60,10 +54,10 @@ export const AdminDashboardPage = () => {
   }
 
   return (
-    <AdminDashboard
-      courses={courses}
-      stats={stats}
-      onLoadCourseDetail={handleLoadCourseDetail}
+    <InstructorManagement
+      requests={requests}
+      onProcess={handleProcess}
+      onRefresh={loadRequests}
     />
   );
 };

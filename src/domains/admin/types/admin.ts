@@ -1,70 +1,37 @@
-// 관리자 대시보드 관련 타입 정의
+// 강사 승인 관리 관련 타입 정의
 
-// AI 리뷰 요약 타입
-export type ReviewSentiment = 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE';
+// 강사 요청 상태
+export type InstructorRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
-export type AIReviewSummary = {
-  sentiment: ReviewSentiment;
-  positive: string;
-  negative: string;
-  suggestion: string;
+// 강사 요청 정보
+export type InstructorRequest = {
+  id: string;
+  userId: string;
+  email: string;
+  nickname: string;
+  status: InstructorRequestStatus;
+  requestedAt: string; // 신청일
+  processedAt?: string; // 처리일 (승인/거절일)
 };
 
-// 별점 분포 타입
-export type RatingDistribution = {
-  rating: number; // 1-5
-  count: number;
-  percentage: number;
+// 강사 요청 목록 응답
+export type GetInstructorRequestsResponse = {
+  requests: InstructorRequest[];
+  total: number;
 };
 
-// 관리자 대시보드용 강좌 타입
-export type AdminCourseItem = {
-  courseId: string;
-  title: string;
-  instructorName: string;
-  categories: string[];
-  rating: number;
-  studentCount: number;
-  reviewCount: number;
-  aiSummary: AIReviewSummary;
-  needsAttention: boolean; // 주의 필요 여부
+// 강사 요청 승인/거절 요청
+export type ProcessInstructorRequestRequest = {
+  requestId: string;
+  action: 'approve' | 'reject';
 };
 
-// 강좌 상세 정보 (모달용)
-export type AdminCourseDetail = {
-  courseId: string;
-  title: string;
-  instructorName: string;
-  categories: string[];
-  rating: number;
-  studentCount: number;
-  reviewCount: number;
-  aiSummary: AIReviewSummary;
-  ratingDistribution: RatingDistribution[];
-  needsAttention: boolean;
+// 강사 요청 승인/거절 응답
+export type ProcessInstructorRequestResponse = {
+  requestId: string;
+  status: InstructorRequestStatus;
+  processedAt: string;
 };
-
-// 대시보드 통계 타입
-export type DashboardStats = {
-  totalCourses: number;
-  averageRating: number;
-  totalStudents: number;
-  needsAttentionCount: number;
-};
-
-// 대시보드 API 응답 타입
-export type GetAdminCoursesResponse = {
-  content: AdminCourseItem[];
-  stats: DashboardStats;
-  currentPage: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  hasNext: boolean;
-};
-
-// 강좌 상세 API 응답 타입
-export type GetAdminCourseDetailResponse = AdminCourseDetail;
 
 // 필터 타입
-export type CourseFilter = 'all' | 'needs_attention';
+export type RequestFilter = 'PENDING' | 'APPROVED' | 'REJECTED';
