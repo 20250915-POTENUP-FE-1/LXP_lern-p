@@ -35,8 +35,15 @@ export function useInfiniteScroll<T>({
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const loadingPageRef = useRef<number | null>(null);
+
+  const didInitLoadRef = useRef(false);
+
   const loadMore = useCallback(async () => {
     if (!enabled || isLoading || !hasNext) return;
+
+    if (loadingPageRef.current === page) return;
+    loadingPageRef.current = page;
 
     setIsLoading(true);
     try {
@@ -44,7 +51,8 @@ export function useInfiniteScroll<T>({
 
       setItems((prev) => [...prev, ...res.content]);
       setHasNext(res.hasNext);
-      setPage(res.currentPage + 1);
+
+      setPage((prev) => prev + 1);
     } finally {
       setIsLoading(false);
     }
@@ -54,15 +62,15 @@ export function useInfiniteScroll<T>({
     (node: HTMLElement | null) => {
       if (!enabled) return;
 
-      if (!observerRef.current) {
-        observerRef.current = new IntersectionObserver(([entry]) => {
-          if (entry.isIntersecting) {
-            loadMore();
-          }
-        });
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
 
-      observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          loadMore();
+        }
+      });
 
       if (node) {
         observerRef.current.observe(node);
@@ -71,18 +79,23 @@ export function useInfiniteScroll<T>({
     [enabled, loadMore],
   );
 
+  useEffect(() => {
+    if (!enabled) return;
+    if (didInitLoadRef.current) return;
+
+    didInitLoadRef.current = true;
+    loadMore();
+  }, [enabled, loadMore]);
+
   const reset = useCallback(() => {
     setItems([]);
     setPage(initialPage);
     setHasNext(true);
     setIsLoading(false);
+
+    loadingPageRef.current = null;
+    didInitLoadRef.current = false;
   }, [initialPage]);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    loadMore();
-  }, [enabled, loadMore]);
 
   return {
     items,
