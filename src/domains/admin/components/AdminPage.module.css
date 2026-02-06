@@ -223,7 +223,8 @@
    =========================================== */
 @media (max-width: 480px) {
   .admin__sidebar {
-    width: 100%;
+    width: 85%; /* 화면의 일부만 가리도록 */
+    max-width: 280px;
   }
 
   .admin__header {
