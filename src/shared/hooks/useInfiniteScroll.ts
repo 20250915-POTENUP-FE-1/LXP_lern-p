@@ -32,12 +32,12 @@ export function useInfiniteScroll<T>({
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
-
   const loadingPageRef = useRef<number | null>(null);
-
   const didInitLoadRef = useRef(false);
+  const targetRef = useRef<HTMLElement | null>(null);
 
   const loadMore = useCallback(async () => {
     if (!enabled || isLoading || !hasNext) return;
@@ -47,37 +47,44 @@ export function useInfiniteScroll<T>({
 
     setIsLoading(true);
     try {
+      setError(null);
       const res = await loadPage(page);
 
       setItems((prev) => [...prev, ...res.content]);
       setHasNext(res.hasNext);
 
       setPage((prev) => prev + 1);
+    } catch (e) {
+      setError(e as Error);
     } finally {
       setIsLoading(false);
     }
   }, [enabled, isLoading, hasNext, loadPage, page]);
 
-  const setTarget = useCallback(
-    (node: HTMLElement | null) => {
-      if (!enabled) return;
+  useEffect(() => {
+    if (!enabled) return;
 
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        loadMore();
       }
+    });
 
-      observerRef.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          loadMore();
-        }
-      });
+    return () => observerRef.current?.disconnect();
+  }, [enabled, loadMore]);
 
-      if (node) {
-        observerRef.current.observe(node);
-      }
-    },
-    [enabled, loadMore],
-  );
+  const setTarget = useCallback((node: HTMLElement | null) => {
+    if (!observerRef.current) return;
+
+    if (targetRef.current) {
+      observerRef.current.unobserve(targetRef.current);
+    }
+
+    if (node) {
+      observerRef.current.observe(node);
+      targetRef.current = node;
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -96,6 +103,12 @@ export function useInfiniteScroll<T>({
     loadingPageRef.current = null;
     didInitLoadRef.current = false;
   }, [initialPage]);
+
+  useEffect(() => {
+    if (!enabled) {
+      reset();
+    }
+  }, [enabled, reset]);
 
   return {
     items,
