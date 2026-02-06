@@ -26,12 +26,27 @@ export type UseInfiniteScrollResult<T> = {
 export function useInfiniteScroll<T>(
   options: UseInfiniteScrollOptions<T>,
 ): UseInfiniteScrollResult<T> {
-  const { initialPage = 0, enabled = true } = options;
+  const { loadPage, initialPage = 0, enabled = true } = options;
 
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
+
+  const loadMore = useCallback(async () => {
+    if (!enabled || isLoading || !hasNext) return;
+
+    setIsLoading(true);
+    try {
+      const res = await loadPage(page);
+
+      setItems((prev) => [...prev, ...res.content]);
+      setHasNext(res.hasNext);
+      setPage(res.currentPage + 1);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [enabled, isLoading, hasNext, loadPage, page]);
 
   return {
     items,
