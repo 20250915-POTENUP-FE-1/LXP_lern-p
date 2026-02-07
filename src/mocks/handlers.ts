@@ -14,13 +14,6 @@ import type {
   UserResponse,
 } from '@/domains/user/types/user';
 import type { ApiResponse } from '@/shared/lib/api/fetchApi';
-import {
-  AdminStats,
-  GetInstructorRequests,
-  InstructorRequestStatus,
-  ProcessInstructorResponse,
-} from '@/domains/admin/types/admin';
-import { MOCK_INSTRUCTOR_REQUESTS } from './admin.mock';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
@@ -66,9 +59,6 @@ const mockUser: UserResponse = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
-
-// Mock 데이터 상태 관리 (승인/거절 시 상태 변경용)
-let mockRequests = [...MOCK_INSTRUCTOR_REQUESTS];
 
 export const handlers = [
   // --- 회원가입 ---
@@ -269,34 +259,6 @@ export const handlers = [
 
       return HttpResponse.json<ApiResponse<SendEmailVerificationResponse>>(
         ok<SendEmailVerificationResponse>(data),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    },
-  ),
-
-  // 추가된 관리자 페이지 관련 처리들
-
-  // 강사 요청 목록 조회
-  http.get<PathParams, never, ApiResponse<GetInstructorRequests>>(
-    `${BASE_URL}/api/admin/instructor-requests`,
-    async ({ request }) => {
-      const url = new URL(request.url);
-      const status = url.searchParams.get('status') as InstructorRequestStatus | null;
-
-      const filtered = status ? mockRequests.filter((r) => r.status === status) : mockRequests;
-
-      const data: GetInstructorRequests = {
-        requests: filtered,
-        total: filtered.length,
-      };
-
-      return HttpResponse.json<ApiResponse<GetInstructorRequests>>(
-        ok<GetInstructorRequests>(data),
         {
           status: 200,
           headers: {
