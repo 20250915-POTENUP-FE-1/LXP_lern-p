@@ -9,7 +9,7 @@ export type PageResponse<T> = {
   hasNext: boolean;
 };
 
-export type UseInfiniteScrollOptions<T> = {
+export type UseInfiniteScrollProps<T> = {
   loadPage: (page: number) => Promise<PageResponse<T>>;
   initialPage?: number;
   enabled?: boolean;
@@ -28,7 +28,7 @@ export function useInfiniteScroll<T>({
   loadPage,
   initialPage = 0,
   enabled = true,
-}: UseInfiniteScrollOptions<T>): UseInfiniteScrollResult<T> {
+}: UseInfiniteScrollProps<T>): UseInfiniteScrollResult<T> {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
