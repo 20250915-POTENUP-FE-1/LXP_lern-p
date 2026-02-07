@@ -96,11 +96,17 @@ export function useInfiniteScroll<T>({
   }, [enabled]);
 
   const setTarget = useCallback((node: HTMLElement | null) => {
+    if (!observerRef.current) return;
+
+    if (targetRef.current) {
+      observerRef.current.unobserve(targetRef.current);
+    }
+
+    if (node) {
+      observerRef.current.observe(node);
+    }
+
     targetRef.current = node;
-
-    if (!observerRef.current || !node) return;
-
-    observerRef.current.observe(node);
   }, []);
 
   useEffect(() => {
