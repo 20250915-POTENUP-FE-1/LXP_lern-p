@@ -1,5 +1,5 @@
 import { AdminDashboardPage } from '@/domains/admin/pages/AdminDashboardPage';
 
-export default function Page() {
+export default function AdminDashboardPage() {
   return <AdminDashboardPage />;
 }
