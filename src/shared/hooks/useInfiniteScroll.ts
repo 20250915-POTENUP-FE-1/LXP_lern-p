@@ -78,11 +78,17 @@ export function useInfiniteScroll<T>({
   useEffect(() => {
     if (!enabled) return;
 
-    observerRef.current = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        loadMoreRef.current();
-      }
-    });
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          loadMoreRef.current();
+        }
+      },
+      {
+        rootMargin: '0px', // 미리 로딩
+        threshold: 0, // 0~1
+      },
+    );
 
     // observer 생성 시 이미 target이 있으면 바로 observe
     if (targetRef.current) {
