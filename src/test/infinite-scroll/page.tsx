@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import { mockLoadPage } from '@/mocks/mockLoadPage';
 import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
 
@@ -8,6 +9,14 @@ export default function InfiniteScrollTestPage() {
     loadPage: mockLoadPage,
   });
 
+  const prevLengthRef = useRef(0);
+  const [startIndex, setStartIndex] = useState(0);
+
+  useEffect(() => {
+    setStartIndex(prevLengthRef.current);
+    prevLengthRef.current = items.length;
+  }, [items.length]);
+
   return (
     <div style={{ padding: 24 }}>
       <h2>Infinite Scroll 테스트</h2>
@@ -15,14 +24,22 @@ export default function InfiniteScrollTestPage() {
       <button onClick={reset}>리셋</button>
 
       <ul>
-        {items.map((item, index) => (
-          <div
-            style={{ height: '300px', backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#eaeaea' }}
-            key={`${item.id}-${index}`}
-          >
-            {item.title}
-          </div>
-        ))}
+        {items.map((item, index) => {
+          const isNew = index >= startIndex;
+
+          return (
+            <li
+              key={item.id}
+              className={isNew ? 'item enter' : 'item'}
+              style={{
+                height: 200,
+                backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#eaeaea',
+              }}
+            >
+              {item.title}
+            </li>
+          );
+        })}
       </ul>
 
       {hasNext && (
