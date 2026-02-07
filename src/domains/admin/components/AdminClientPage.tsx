@@ -3,17 +3,21 @@
 
 import { useState } from 'react';
 import { LayoutDashboard, UserCheck, Settings, Menu, X } from 'lucide-react';
-import styles from './AdminPage.module.css';
+import styles from './AdminClientPage.module.css';
 
 type AdminMenu = 'overview' | 'instructor';
 
-type AdminPageProps = {
+type AdminClientPageProps = {
   overviewContent: React.ReactNode; //??
   instructorContent: React.ReactNode;
   pendingCount: number;
 };
 
-export const AdminPage = ({ overviewContent, instructorContent, pendingCount }: AdminPageProps) => {
+export const AdminClientPage = ({
+  overviewContent,
+  instructorContent,
+  pendingCount,
+}: AdminClientPageProps) => {
   const [activeMenu, setActiveMenu] = useState<AdminMenu>('overview'); // 기본
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -25,7 +29,7 @@ export const AdminPage = ({ overviewContent, instructorContent, pendingCount }: 
   return (
     <div className={styles.admin}>
       {/* 모바일 헤더 */}
-      <header className={styles.admin__mobileHeader}>
+      <header className={styles.admin__mobile__header}>
         <button
           className={styles['admin__menu-toggle']}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}

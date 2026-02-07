@@ -10,7 +10,7 @@ import styles from './AdminDashboard.module.css';
 
 type InstructorManagementProps = {
   requests: InstructorRequest[];
-  onProcess: (requestId: string, action: 'approve' | 'reject') => Promise<void>;
+  onProcess: (requestId: number, action: 'approve' | 'reject') => Promise<void>;
   onRefresh: () => void;
 };
 
@@ -68,38 +68,38 @@ export const InstructorManagement = ({
     // 대시보드 탭 목록 버튼
     <div className={styles.container}>
       {/* 필터 탭 */}
-      <div className={styles.filterTabs}>
+      <div className={styles.filter__tabs}>
         <button
-          className={`${styles.filterTab} ${filter === 'PENDING' ? styles['filterTab--active'] : ''}`} // filter 항목 조건에 맞춰서 해당 스타일 return 함
+          className={`${styles.filter__tab} ${filter === 'PENDING' ? styles['filter__tab--active'] : ''}`} // filter 항목 조건에 맞춰서 해당 스타일 return 함
           onClick={() => setFilter('PENDING')} //클릭시 필터 항목 Pending 으로 바꿈
         >
           대기중
           <span
-            className={`${styles.filterCount} ${pendingCount > 0 ? styles['filterCount--warning'] : ''}`}
+            className={`${styles.filter__count} ${pendingCount > 0 ? styles['filter__count--warning'] : ''}`}
           >
             {pendingCount}
           </span>
         </button>
         <button
-          className={`${styles.filterTab} ${filter === 'APPROVED' ? styles['filterTab--active'] : ''}`}
+          className={`${styles.filter__tab} ${filter === 'APPROVED' ? styles['filter__tab--active'] : ''}`}
           onClick={() => setFilter('APPROVED')}
         >
           승인됨
-          <span className={styles.filterCount}>{approvedCount}</span>
+          <span className={styles.filter__count}>{approvedCount}</span>
         </button>
         <button
-          className={`${styles.filterTab} ${filter === 'REJECTED' ? styles['filterTab--active'] : ''}`}
+          className={`${styles.filter__tab} ${filter === 'REJECTED' ? styles['filter__tab--active'] : ''}`}
           onClick={() => setFilter('REJECTED')}
         >
           거절됨
-          <span className={styles.filterCount}>{rejectedCount}</span>
+          <span className={styles.filter__count}>{rejectedCount}</span>
         </button>
       </div>
 
       {/* 탭에 들어가는 내용 */}
-      <div className={styles.requestList}>
+      <div className={styles.request__list}>
         {filteredRequests.length === 0 ? (
-          <div className={styles.emptyState}>
+          <div className={styles.empty__state}>
             {filter === 'PENDING' && '대기 중인 요청이 없습니다.'}
             {filter === 'APPROVED' && '승인된 요청이 없습니다.'}
             {filter === 'REJECTED' && '거절된 요청이 없습니다.'}

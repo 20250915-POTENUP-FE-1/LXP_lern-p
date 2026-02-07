@@ -2,7 +2,7 @@
   /* 컨테이너 */
 }
 
-.sectionTitle {
+.section__title {
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-text);
@@ -10,13 +10,13 @@
 }
 
 /* 통계 그리드 */
-.statsGrid {
+.stats__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
 }
 
-.statCard {
+.stat__card {
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -27,20 +27,20 @@
   transition: all 0.15s ease;
 }
 
-.statCard:hover {
+.stat__card:hover {
   border-color: var(--color-brand);
 }
 
-.statCard--highlight {
+.stat__card--highlight {
   border-color: var(--color-warning);
   background: rgba(245, 158, 11, 0.05);
 }
 
-.statCard--highlight:hover {
+.stat__card--highlight:hover {
   border-color: var(--color-warning);
 }
 
-.statIcon {
+.stat__icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,45 +52,45 @@
   flex-shrink: 0;
 }
 
-.statCard--highlight .statIcon {
+.stat__card--highlight .stat__icon {
   background: rgba(245, 158, 11, 0.1);
   color: var(--color-warning);
 }
 
-.statContent {
+.stat__content {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.statValue {
+.stat__value {
   font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.2;
 }
 
-.statLabel {
+.stat__label {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
 /* 반응형 */
 @media (max-width: 640px) {
-  .statsGrid {
+  .stats__grid {
     grid-template-columns: 1fr;
   }
 
-  .statCard {
+  .stat__card {
     padding: var(--space-4);
   }
 
-  .statIcon {
+  .stat__icon {
     width: 40px;
     height: 40px;
   }
 
-  .statValue {
+  .stat__value {
     font-size: var(--text-xl);
   }
 }

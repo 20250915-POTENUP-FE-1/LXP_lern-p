@@ -44,7 +44,7 @@ export const InstructorApprovalModal = ({
         {/* 헤더 */}
         <div className={styles.header}>
           <h2 className={styles.title}>강사 승인 요청</h2>
-          <button className={styles.closeButton} onClick={onClose} aria-label="닫기">
+          <button className={styles.close__button} onClick={onClose} aria-label="닫기">
             <X size={20} />
           </button>
         </div>
@@ -53,33 +53,33 @@ export const InstructorApprovalModal = ({
           <>
             {/* 요청 정보 */}
             <div className={styles.content}>
-              <div className={styles.infoItem}>
+              <div className={styles.info__item}>
                 <User size={18} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>닉네임</span>
-                  <span className={styles.infoValue}>{request.nickname}</span>
+                <div className={styles.info__content}>
+                  <span className={styles.info__label}>닉네임</span>
+                  <span className={styles.info__value}>{request.nickname}</span>
                 </div>
               </div>
-              <div className={styles.infoItem}>
+              <div className={styles.info__item}>
                 <Mail size={18} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>이메일</span>
-                  <span className={styles.infoValue}>{request.email}</span>
+                <div className={styles.info__content}>
+                  <span className={styles.info__label}>이메일</span>
+                  <span className={styles.info__value}>{request.email}</span>
                 </div>
               </div>
-              <div className={styles.infoItem}>
+              <div className={styles.info__item}>
                 <Calendar size={18} />
-                <div className={styles.infoContent}>
-                  <span className={styles.infoLabel}>신청일</span>
-                  <span className={styles.infoValue}>{formatDate(request.requestedAt)}</span>
+                <div className={styles.info__content}>
+                  <span className={styles.info__label}>신청일</span>
+                  <span className={styles.info__value}>{formatDate(request.requestedAt)}</span>
                 </div>
               </div>
               {request.processedAt && (
-                <div className={styles.infoItem}>
+                <div className={styles.info__item}>
                   <Calendar size={18} />
-                  <div className={styles.infoContent}>
-                    <span className={styles.infoLabel}>처리일</span>
-                    <span className={styles.infoValue}>{formatDate(request.processedAt)}</span>
+                  <div className={styles.info__content}>
+                    <span className={styles.info__label}>처리일</span>
+                    <span className={styles.info__value}>{formatDate(request.processedAt)}</span>
                   </div>
                 </div>
               )}
@@ -88,11 +88,15 @@ export const InstructorApprovalModal = ({
             {/* 액션 버튼 (대기중일 때만 표시) */}
             {isPending && (
               <div className={styles.actions}>
-                <button className={styles.buttonReject} onClick={onReject} disabled={isProcessing}>
+                <button
+                  className={styles.button__reject}
+                  onClick={onReject}
+                  disabled={isProcessing}
+                >
                   {isProcessing ? '처리 중...' : '거절'}
                 </button>
                 <button
-                  className={styles.buttonApprove}
+                  className={styles.button__approve}
                   onClick={onApprove}
                   disabled={isProcessing}
                 >
@@ -103,12 +107,12 @@ export const InstructorApprovalModal = ({
 
             {/* 이미 처리된 경우 상태 표시 */}
             {!isPending && (
-              <div className={styles.statusMessage}>
+              <div className={styles.status__message}>
                 {request.status === 'APPROVED' && (
-                  <span className={styles.statusApproved}>이 요청은 승인되었습니다.</span>
+                  <span className={styles.status__approved}>이 요청은 승인되었습니다.</span>
                 )}
                 {request.status === 'REJECTED' && (
-                  <span className={styles.statusRejected}>이 요청은 거절되었습니다.</span>
+                  <span className={styles.status__rejected}>이 요청은 거절되었습니다.</span>
                 )}
               </div>
             )}

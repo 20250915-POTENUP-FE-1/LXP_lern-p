@@ -46,7 +46,7 @@
   gap: var(--space-3);
 }
 
-.infoItem {
+.info__item {
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -64,11 +64,11 @@
   border-radius: 9999px;
 }
 
-.badge--approved {
+.badge__approved {
   background: var(--color-success);
 }
 
-.badge--rejected {
+.badge__rejected {
   background: var(--color-text-muted);
 }
 

@@ -19,7 +19,7 @@
   margin: 0;
 }
 
-.closeButton {
+.close__button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +33,7 @@
   transition: all 0.15s ease;
 }
 
-.closeButton:hover {
+.close__button:hover {
   background: var(--color-elevated);
   color: var(--color-text);
 }
@@ -46,7 +46,7 @@
   margin-bottom: var(--space-5);
 }
 
-.infoItem {
+.info__item {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -55,24 +55,24 @@
   border-radius: var(--radius-sm);
 }
 
-.infoItem svg {
+.info__item svg {
   color: var(--color-text-muted);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.infoContent {
+.info__content {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.infoLabel {
+.info__label {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
-.infoValue {
+.info__value {
   font-size: var(--text-md);
   font-weight: 500;
   color: var(--color-text);
@@ -86,8 +86,8 @@
   border-top: 1px solid var(--color-border);
 }
 
-.buttonApprove,
-.buttonReject {
+.button__approve,
+.button__reject {
   flex: 1;
   display: flex;
   align-items: center;
@@ -100,49 +100,49 @@
   transition: all 0.15s ease;
 }
 
-.buttonApprove {
+.button__approve {
   background: var(--color-brand);
   color: #fff;
   border: none;
 }
 
-.buttonApprove:hover:not(:disabled) {
+.button__approve:hover:not(:disabled) {
   background: var(--color-brand-600);
 }
 
-.buttonApprove:disabled {
+.button__approve:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.buttonReject {
+.button__reject {
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
 
-.buttonReject:hover:not(:disabled) {
+.button__reject:hover:not(:disabled) {
   background: var(--color-elevated);
 }
 
-.buttonReject:disabled {
+.button__reject:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* 상태 메시지 */
-.statusMessage {
+.status__message {
   padding: var(--space-4);
   text-align: center;
   border-top: 1px solid var(--color-border);
 }
 
-.statusApproved {
+.status__approved {
   color: var(--color-success);
   font-weight: 500;
 }
 
-.statusRejected {
+.status__rejected {
   color: var(--color-text-muted);
   font-weight: 500;
 }

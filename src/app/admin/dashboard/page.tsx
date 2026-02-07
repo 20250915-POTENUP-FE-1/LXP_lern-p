@@ -1,5 +1,5 @@
-import { AdminDashboardPage } from '@/domains/admin/pages/AdminDashboardPage';
+import { AdminDashboardClientPage } from '@/domains/admin/pages/AdminDashboardClientPage';
 
 export default function Page() {
-  return <AdminDashboardPage />;
+  return <AdminDashboardClientPage />;
 }

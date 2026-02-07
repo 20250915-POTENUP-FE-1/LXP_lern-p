@@ -3,13 +3,13 @@
 }
 
 /* 필터 탭 */
-.filterTabs {
+.filter__tabs {
   display: flex;
   gap: var(--space-2);
   margin-bottom: var(--space-5);
 }
 
-.filterTab {
+.filter__tab {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -24,21 +24,21 @@
   transition: all 0.15s ease;
 }
 
-.filterTab:hover {
+.filter__tab:hover {
   background: var(--color-elevated);
   color: var(--color-text);
 }
 
-.filterTab--active {
+.filter__tab--active {
   background: var(--color-brand);
   color: #fff;
 }
 
-.filterTab--active:hover {
+.filter__tab--active:hover {
   background: var(--color-brand-600);
 }
 
-.filterCount {
+.filter__count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,28 +52,28 @@
   line-height: 1;
 }
 
-.filterTab--active .filterCount {
+.filter__tab--active .filter__count {
   background: rgba(255, 255, 255, 0.25);
 }
 
-.filterCount--warning {
+.filter__count--warning {
   background: var(--color-warning);
   color: #fff;
 }
 
-.filterTab--active .filterCount--warning {
+.filter__tab--active .filter__count--warning {
   background: rgba(255, 255, 255, 0.3);
 }
 
 /* 요청 목록 */
-.requestList {
+.request__list {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
 /* 빈 상태 */
-.emptyState {
+.empty__state {
   text-align: center;
   padding: var(--space-9) var(--space-4);
   color: var(--color-text-muted);
@@ -84,12 +84,12 @@
 
 /* 반응형 */
 @media (max-width: 640px) {
-  .filterTabs {
+  .filter__tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .filterTab {
+  .filter__tab {
     white-space: nowrap;
     padding: var(--space-2) var(--space-3);
   }

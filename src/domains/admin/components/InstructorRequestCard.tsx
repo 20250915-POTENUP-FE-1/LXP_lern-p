@@ -5,6 +5,7 @@
 import { User, Mail, Calendar } from 'lucide-react';
 import type { InstructorRequest } from '../types/admin';
 import styles from './InstructorRequestCard.module.css';
+import { formatDate } from '../../../shared/util/formatDate';
 
 type InstructorRequestCardProps = {
   request: InstructorRequest;
@@ -12,14 +13,6 @@ type InstructorRequestCardProps = {
 };
 
 // 날짜 포맷팅 함수
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
 
 export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCardProps) => {
   return (
@@ -30,11 +23,11 @@ export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCar
       <div className={styles.content}>
         <div className={styles.nickname}>{request.nickname}</div>
         <div className={styles.info}>
-          <span className={styles.infoItem}>
+          <span className={styles.info__item}>
             <Mail size={14} />
             {request.email}
           </span>
-          <span className={styles.infoItem}>
+          <span className={styles.info__item}>
             <Calendar size={14} />
             신청일: {formatDate(request.requestedAt)}
           </span>
@@ -42,10 +35,10 @@ export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCar
       </div>
       {request.status === 'PENDING' && <span className={styles.badge}>대기중</span>}
       {request.status === 'APPROVED' && (
-        <span className={`${styles.badge} ${styles['badge--approved']}`}>승인됨</span>
+        <span className={`${styles.badge} ${styles['badge__approved']}`}>승인됨</span>
       )}
       {request.status === 'REJECTED' && (
-        <span className={`${styles.badge} ${styles['badge--rejected']}`}>거절됨</span>
+        <span className={`${styles.badge} ${styles['badge__rejected']}`}>거절됨</span>
       )}
     </button>
   );

@@ -5,7 +5,7 @@
 }
 
 /* Mobile Header (모바일 전용) */
-.admin__mobileHeader {
+.admin__mobile__header {
   display: none;
 }
 
@@ -129,7 +129,7 @@
   }
 
   /* 모바일 헤더 표시 */
-  .admin__mobileHeader {
+  .admin__mobile__header {
     display: flex;
     align-items: center;
     gap: var(--space-3);

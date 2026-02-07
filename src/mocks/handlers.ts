@@ -16,9 +16,9 @@ import type {
 import type { ApiResponse } from '@/shared/lib/api/fetchApi';
 import {
   AdminStats,
-  GetInstructorRequestsResponse,
+  GetInstructorRequests,
   InstructorRequestStatus,
-  ProcessInstructorRequestResponse,
+  ProcessInstructorResponse,
 } from '@/domains/admin/types/admin';
 import { MOCK_INSTRUCTOR_REQUESTS } from './admin.mock';
 
@@ -282,7 +282,7 @@ export const handlers = [
   // 추가된 관리자 페이지 관련 처리들
 
   // 강사 요청 목록 조회
-  http.get<PathParams, never, ApiResponse<GetInstructorRequestsResponse>>(
+  http.get<PathParams, never, ApiResponse<GetInstructorRequests>>(
     `${BASE_URL}/api/admin/instructor-requests`,
     async ({ request }) => {
       const url = new URL(request.url);
@@ -290,13 +290,13 @@ export const handlers = [
 
       const filtered = status ? mockRequests.filter((r) => r.status === status) : mockRequests;
 
-      const data: GetInstructorRequestsResponse = {
+      const data: GetInstructorRequests = {
         requests: filtered,
         total: filtered.length,
       };
 
-      return HttpResponse.json<ApiResponse<GetInstructorRequestsResponse>>(
-        ok<GetInstructorRequestsResponse>(data),
+      return HttpResponse.json<ApiResponse<GetInstructorRequests>>(
+        ok<GetInstructorRequests>(data),
         {
           status: 200,
           headers: {
@@ -306,69 +306,4 @@ export const handlers = [
       );
     },
   ),
-
-  // 강사 요청 승인/거절 처리
-  http.patch<
-    { requestId: string },
-    { action: 'approve' | 'reject' },
-    ApiResponse<ProcessInstructorRequestResponse | null>
-  >(`${BASE_URL}/api/admin/instructor-requests/:requestId`, async ({ params, request }) => {
-    const { requestId } = params;
-    const body = await request.json();
-    const { action } = body;
-
-    // 단일 소스: mockRequests에서만 찾고/업데이트
-    const requestItem = mockRequests.find((r) => r.id === requestId);
-    if (!requestItem) {
-      return HttpResponse.json<ApiResponse<ProcessInstructorRequestResponse | null>>(
-        errorBody<ProcessInstructorRequestResponse | null>(
-          404,
-          'ER404',
-          '요청을 찾을 수 없습니다.',
-        ),
-        { status: 404, headers: { 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const newStatus: InstructorRequestStatus = action === 'approve' ? 'APPROVED' : 'REJECTED';
-    const processedAt = new Date().toISOString();
-
-    mockRequests = mockRequests.map((r) =>
-      r.id === requestId ? { ...r, status: newStatus, processedAt } : r,
-    );
-
-    const data: ProcessInstructorRequestResponse = {
-      requestId,
-      status: newStatus,
-      processedAt,
-    };
-
-    return HttpResponse.json<ApiResponse<ProcessInstructorRequestResponse>>(
-      ok<ProcessInstructorRequestResponse>(data),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-  }),
-
-  // 관리자페이지 통계 불러오는 핸들러
-  http.get<PathParams, never, ApiResponse<AdminStats>>(`${BASE_URL}/api/admin/stats`, async () => {
-    const pendingCount = mockRequests.filter((r) => r.status === 'PENDING').length;
-    const approvedCount = mockRequests.filter((r) => r.status === 'APPROVED').length;
-
-    const data: AdminStats = {
-      totalUsers: 1234,
-      totalCourses: 56,
-      totalInstructors: approvedCount + 15,
-      pendingRequests: pendingCount,
-    };
-
-    return HttpResponse.json<ApiResponse<AdminStats>>(ok<AdminStats>(data), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }),
 ];
