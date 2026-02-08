@@ -1,0 +1,31 @@
+/* 모든 admin 페이지에서 공통으로 사용하는 스타일 */
+
+/* 공통 헤더 */
+.admin-page__header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.admin-page__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* 공통 콘텐츠 영역 */
+.admin-page__content {
+  flex: 1;
+  padding: var(--space-6);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .admin-page__header {
+    padding: var(--space-4);
+  }
+  .admin-page__content {
+    padding: var(--space-4);
+  }
+}

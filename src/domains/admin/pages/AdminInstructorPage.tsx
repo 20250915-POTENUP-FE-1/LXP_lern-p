@@ -1,31 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { AdminClientPage, AdminOverview, InstructorManagement } from '../components';
-import type { InstructorRequest, AdminStats, InstructorRequestStatus } from '../types/admin';
+import { InstructorManagement } from '@/domains/admin/components/AdminDashboard';
+import type { InstructorRequest, InstructorRequestStatus } from '@/domains/admin/types/admin';
 import { USE_MOCK } from '@/shared/constants/config';
 import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
+import styles from '@/app/admin/AdminPage.module.css';
 
-const calcStats = (requests: InstructorRequest[]): AdminStats => {
-  const pending = requests.filter((r) => r.status === 'PENDING').length;
-  const approved = requests.filter((r) => r.status === 'APPROVED').length;
-
-  return {
-    totalUsers: 1234,
-    totalCourses: 56,
-    totalInstructors: approved + 15,
-    pendingRequests: pending,
-  };
-};
-
-export const AdminDashboardClientPage = () => {
+export function AdminInstructorPage() {
   const [requests, setRequests] = useState<InstructorRequest[]>([]);
-  const [stats, setStats] = useState<AdminStats>({
-    totalUsers: 0,
-    totalCourses: 0,
-    totalInstructors: 0,
-    pendingRequests: 0,
-  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,21 +18,14 @@ export const AdminDashboardClientPage = () => {
       setIsLoading(true);
       setError(null);
 
-      // TODO: 강사 승인 요청 목록 불러오기
       if (USE_MOCK) {
         setRequests(MOCK_INSTRUCTOR_REQUESTS);
-        setStats(calcStats(MOCK_INSTRUCTOR_REQUESTS));
         return;
       }
 
-      //TODO: API 생기면 분기처리하기
-      // const [requestsRes, statsRes] = await Promise.all([
-      //   api<{ requests: InstructorRequest[]; total: number }>('/api/admin/instructor-requests'),
-      //   api<AdminStats>('/api/admin/stats'),
-      // ]);
-
+      // TODO: API 연동
+      // const requestsRes = await api('/api/admin/instructor-requests');
       // setRequests(requestsRes.requests);
-      // setStats(statsRes);
     } catch (err) {
       console.error('데이터 로딩 실패:', err);
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
@@ -66,36 +42,29 @@ export const AdminDashboardClientPage = () => {
   const handleProcess = useCallback(
     async (requestId: number, action: 'approve' | 'reject') => {
       if (!requestId) return;
-      // TODO: 강사 승인 처리 결과
+
       if (USE_MOCK) {
         const newStatus: InstructorRequestStatus = action === 'approve' ? 'APPROVED' : 'REJECTED';
         const processedAt = new Date().toISOString();
 
-        setRequests((prev) => {
-          const next = prev.map((r) =>
-            r.id === requestId ? { ...r, status: newStatus, processedAt } : r,
-          );
-          setStats(calcStats(next));
-          return next;
-        });
+        setRequests((prev) =>
+          prev.map((r) => (r.id === requestId ? { ...r, status: newStatus, processedAt } : r)),
+        );
         return;
       }
 
-      //TODO: API 생기면 분기처리하기
-      // await api(`/api/admin/instructor-requests/${encodeURIComponent(requestId)}`, {
+      // TODO: API 연동
+      // await api(`/api/admin/instructor-requests/${requestId}`, {
       //   method: 'PATCH',
       //   body: JSON.stringify({ action }),
       // });
 
-      // 처리 후 갱신(너의 구조 유지)
       await loadData();
     },
     [loadData],
   );
 
-  // 대기 중인 요청 수
-  const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
-
+  // 로딩 상태
   if (isLoading) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
@@ -104,6 +73,7 @@ export const AdminDashboardClientPage = () => {
     );
   }
 
+  // 에러 상태
   if (error) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-danger)' }}>
@@ -112,13 +82,18 @@ export const AdminDashboardClientPage = () => {
     );
   }
 
+  // 정상 렌더링
   return (
-    <AdminClientPage
-      pendingCount={pendingCount}
-      overviewContent={<AdminOverview stats={stats} />}
-      instructorContent={
+    <>
+      {/* 제목 헤더 (기존 AdminClientPage의 <header> 부분) */}
+      <header className={styles['admin-page__header']}>
+        <h1 className={styles['admin-page__title']}>강사 승인</h1>
+      </header>
+
+      {/* 콘텐츠 영역 (기존 AdminClientPage의 <div className="admin__content"> 부분) */}
+      <div className={styles['admin-page__content']}>
         <InstructorManagement requests={requests} onProcess={handleProcess} onRefresh={loadData} />
-      }
-    />
+      </div>
+    </>
   );
-};
+}

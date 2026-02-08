@@ -1,9 +1,9 @@
-.modal {
+.instructor-approval-modal {
   width: 100%;
   max-width: 400px;
 }
 
-.header {
+.instructor-approval-modal__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -12,14 +12,14 @@
   margin-bottom: var(--space-5);
 }
 
-.title {
+.instructor-approval-modal__title {
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
 }
 
-.close__button {
+.instructor-approval-modal__close-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,20 +33,20 @@
   transition: all 0.15s ease;
 }
 
-.close__button:hover {
+.instructor-approval-modal__close-button:hover {
   background: var(--color-elevated);
   color: var(--color-text);
 }
 
 /* 정보 영역 */
-.content {
+.instructor-approval-modal__content {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   margin-bottom: var(--space-5);
 }
 
-.info__item {
+.instructor-approval-modal__info-item {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -55,39 +55,39 @@
   border-radius: var(--radius-sm);
 }
 
-.info__item svg {
+.instructor-approval-modal__info-item svg {
   color: var(--color-text-muted);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.info__content {
+.instructor-approval-modal__info-content {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.info__label {
+.instructor-approval-modal__info-label {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
-.info__value {
+.instructor-approval-modal__info-value {
   font-size: var(--text-md);
   font-weight: 500;
   color: var(--color-text);
 }
 
 /* 액션 버튼 */
-.actions {
+.instructor-approval-modal__actions {
   display: flex;
   gap: var(--space-3);
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
 }
 
-.button__approve,
-.button__reject {
+.instructor-approval-modal__button-approve,
+.instructor-approval-modal__button-reject {
   flex: 1;
   display: flex;
   align-items: center;
@@ -100,55 +100,55 @@
   transition: all 0.15s ease;
 }
 
-.button__approve {
+.instructor-approval-modal__button-approve {
   background: var(--color-brand);
   color: #fff;
   border: none;
 }
 
-.button__approve:hover:not(:disabled) {
+.instructor-approval-modal__button-approve:hover:not(:disabled) {
   background: var(--color-brand-600);
 }
 
-.button__approve:disabled {
+.instructor-approval-modal__button-approve:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.button__reject {
+.instructor-approval-modal__button-reject {
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
 
-.button__reject:hover:not(:disabled) {
+.instructor-approval-modal__button-reject:hover:not(:disabled) {
   background: var(--color-elevated);
 }
 
-.button__reject:disabled {
+.instructor-approval-modal__button-reject:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* 상태 메시지 */
-.status__message {
+.instructor-approval-modal__status-message {
   padding: var(--space-4);
   text-align: center;
   border-top: 1px solid var(--color-border);
 }
 
-.status__approved {
+.instructor-approval-modal__status--approved {
   color: var(--color-success);
   font-weight: 500;
 }
 
-.status__rejected {
+.instructor-approval-modal__status--rejected {
   color: var(--color-text-muted);
   font-weight: 500;
 }
 
 /* 에러 상태 */
-.error {
+.instructor-approval-modal__error {
   padding: var(--space-8) var(--space-4);
   text-align: center;
   color: var(--color-text-muted);
@@ -156,7 +156,7 @@
 
 /* 반응형 */
 @media (max-width: 480px) {
-  .actions {
+  .instructor-approval-modal__actions {
     flex-direction: column-reverse;
   }
 }

@@ -65,48 +65,55 @@ export const InstructorManagement = ({
   );
 
   return (
-    // 대시보드 탭 목록 버튼
-    <div className={styles.container}>
+    <div className={styles['admin-dashboard']}>
       {/* 필터 탭 */}
-      <div className={styles.filter__tabs}>
+      <div className={styles['admin-dashboard__filter-tabs']}>
         <button
-          className={`${styles.filter__tab} ${filter === 'PENDING' ? styles['filter__tab--active'] : ''}`} // filter 항목 조건에 맞춰서 해당 스타일 return 함
-          onClick={() => setFilter('PENDING')} //클릭시 필터 항목 Pending 으로 바꿈
+          className={`${styles['admin-dashboard__filter-tab']} ${
+            filter === 'PENDING' ? styles['admin-dashboard__filter-tab--active'] : ''
+          }`}
+          onClick={() => setFilter('PENDING')}
         >
           대기중
           <span
-            className={`${styles.filter__count} ${pendingCount > 0 ? styles['filter__count--warning'] : ''}`}
+            className={`${styles['admin-dashboard__filter-count']} ${
+              pendingCount > 0 ? styles['admin-dashboard__filter-count--warning'] : ''
+            }`}
           >
             {pendingCount}
           </span>
         </button>
         <button
-          className={`${styles.filter__tab} ${filter === 'APPROVED' ? styles['filter__tab--active'] : ''}`}
+          className={`${styles['admin-dashboard__filter-tab']} ${
+            filter === 'APPROVED' ? styles['admin-dashboard__filter-tab--active'] : ''
+          }`}
           onClick={() => setFilter('APPROVED')}
         >
           승인됨
-          <span className={styles.filter__count}>{approvedCount}</span>
+          <span className={styles['admin-dashboard__filter-count']}>{approvedCount}</span>
         </button>
         <button
-          className={`${styles.filter__tab} ${filter === 'REJECTED' ? styles['filter__tab--active'] : ''}`}
+          className={`${styles['admin-dashboard__filter-tab']} ${
+            filter === 'REJECTED' ? styles['admin-dashboard__filter-tab--active'] : ''
+          }`}
           onClick={() => setFilter('REJECTED')}
         >
           거절됨
-          <span className={styles.filter__count}>{rejectedCount}</span>
+          <span className={styles['admin-dashboard__filter-count']}>{rejectedCount}</span>
         </button>
       </div>
 
       {/* 탭에 들어가는 내용 */}
-      <div className={styles.request__list}>
+      <div className={styles['admin-dashboard__request-list']}>
         {filteredRequests.length === 0 ? (
-          <div className={styles.empty__state}>
+          <div className={styles['admin-dashboard__empty-state']}>
             {filter === 'PENDING' && '대기 중인 요청이 없습니다.'}
             {filter === 'APPROVED' && '승인된 요청이 없습니다.'}
             {filter === 'REJECTED' && '거절된 요청이 없습니다.'}
           </div>
         ) : (
           filteredRequests.map((request) => (
-            <InstructorRequestCard //각 탭별로, 필터링에 해당되는 강사요청카드 띄우기
+            <InstructorRequestCard
               key={request.id}
               request={request}
               onClick={() => handleRequestClick(request)}

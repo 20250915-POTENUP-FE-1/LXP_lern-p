@@ -4,7 +4,7 @@ import type { InstructorRequest } from '@/domains/admin/types/admin';
 export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   {
     id: 1,
-    userId: 1,
+    userId: 'userID-1',
     email: 'kim@example.com',
     nickname: '김강사',
     status: 'PENDING',
@@ -12,7 +12,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 2,
-    userId: 2,
+    userId: 'userID-2',
     email: 'lee@example.com',
     nickname: '이강사',
     status: 'PENDING',
@@ -20,7 +20,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 3,
-    userId: 3,
+    userId: 'userID-3',
     email: 'park@example.com',
     nickname: '박강사',
     status: 'PENDING',
@@ -28,7 +28,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 4,
-    userId: 4,
+    userId: 'userID-4',
     email: 'choi@example.com',
     nickname: '최강사',
     status: 'APPROVED',
@@ -37,7 +37,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 5,
-    userId: 5,
+    userId: 'userID-5',
     email: 'jung@example.com',
     nickname: '정강사',
     status: 'REJECTED',

@@ -1,15 +1,15 @@
-.container {
-  /* 탭 안에 들어가므로 padding/margin 불필요 */
+.admin-dashboard {
+  /* 컨테이너 */
 }
 
 /* 필터 탭 */
-.filter__tabs {
+.admin-dashboard__filter-tabs {
   display: flex;
   gap: var(--space-2);
   margin-bottom: var(--space-5);
 }
 
-.filter__tab {
+.admin-dashboard__filter-tab {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -24,21 +24,21 @@
   transition: all 0.15s ease;
 }
 
-.filter__tab:hover {
+.admin-dashboard__filter-tab:hover {
   background: var(--color-elevated);
   color: var(--color-text);
 }
 
-.filter__tab--active {
+.admin-dashboard__filter-tab--active {
   background: var(--color-brand);
   color: #fff;
 }
 
-.filter__tab--active:hover {
+.admin-dashboard__filter-tab--active:hover {
   background: var(--color-brand-600);
 }
 
-.filter__count {
+.admin-dashboard__filter-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,28 +52,28 @@
   line-height: 1;
 }
 
-.filter__tab--active .filter__count {
+.admin-dashboard__filter-tab--active .admin-dashboard__filter-count {
   background: rgba(255, 255, 255, 0.25);
 }
 
-.filter__count--warning {
+.admin-dashboard__filter-count--warning {
   background: var(--color-warning);
   color: #fff;
 }
 
-.filter__tab--active .filter__count--warning {
+.admin-dashboard__filter-tab--active .admin-dashboard__filter-count--warning {
   background: rgba(255, 255, 255, 0.3);
 }
 
 /* 요청 목록 */
-.request__list {
+.admin-dashboard__request-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
 /* 빈 상태 */
-.empty__state {
+.admin-dashboard__empty-state {
   text-align: center;
   padding: var(--space-9) var(--space-4);
   color: var(--color-text-muted);
@@ -84,12 +84,12 @@
 
 /* 반응형 */
 @media (max-width: 640px) {
-  .filter__tabs {
+  .admin-dashboard__filter-tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .filter__tab {
+  .admin-dashboard__filter-tab {
     white-space: nowrap;
     padding: var(--space-2) var(--space-3);
   }

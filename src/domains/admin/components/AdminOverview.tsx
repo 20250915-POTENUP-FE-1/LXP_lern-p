@@ -17,50 +17,57 @@ type AdminOverviewProps = {
 
 export const AdminOverview = ({ stats }: AdminOverviewProps) => {
   return (
-    //전체현황 내용, 아이콘 포함됨
-    <div className={styles.overview}>
-      <h2 className={styles.section__title}>전체 현황</h2>
+    <div className={styles['admin-overview']}>
+      <h2 className={styles['admin-overview__section-title']}>전체 현황</h2>
 
-      <div className={styles.stats__grid}>
-        <div className={styles.stat__card}>
-          <div className={styles.stat__icon}>
+      <div className={styles['admin-overview__stats-grid']}>
+        <div className={styles['admin-overview__stat-card']}>
+          <div className={styles['admin-overview__stat-icon']}>
             <Users size={24} />
           </div>
-          <div className={styles.stat__content}>
-            <span className={styles.stat__value}>{stats.totalUsers.toLocaleString()}</span>
-            <span className={styles.stat__label}>전체 사용자</span>
+          <div className={styles['admin-overview__stat-content']}>
+            <span className={styles['admin-overview__stat-value']}>
+              {stats.totalUsers.toLocaleString()}
+            </span>
+            <span className={styles['admin-overview__stat-label']}>전체 사용자</span>
           </div>
         </div>
 
-        <div className={styles.stat__card}>
-          <div className={styles.stat__icon}>
+        <div className={styles['admin-overview__stat-card']}>
+          <div className={styles['admin-overview__stat-icon']}>
             <BookOpen size={24} />
           </div>
-          <div className={styles.stat__content}>
-            <span className={styles.stat__value}>{stats.totalCourses.toLocaleString()}</span>
-            <span className={styles.stat__label}>전체 강좌</span>
+          <div className={styles['admin-overview__stat-content']}>
+            <span className={styles['admin-overview__stat-value']}>
+              {stats.totalCourses.toLocaleString()}
+            </span>
+            <span className={styles['admin-overview__stat-label']}>전체 강좌</span>
           </div>
         </div>
 
-        <div className={styles.stat__card}>
-          <div className={styles.stat__icon}>
+        <div className={styles['admin-overview__stat-card']}>
+          <div className={styles['admin-overview__stat-icon']}>
             <UserCheck size={24} />
           </div>
-          <div className={styles.stat__content}>
-            <span className={styles.stat__value}>{stats.totalInstructors.toLocaleString()}</span>
-            <span className={styles.stat__label}>등록 강사</span>
+          <div className={styles['admin-overview__stat-content']}>
+            <span className={styles['admin-overview__stat-value']}>
+              {stats.totalInstructors.toLocaleString()}
+            </span>
+            <span className={styles['admin-overview__stat-label']}>등록 강사</span>
           </div>
         </div>
 
         <div
-          className={`${styles.stat__card} ${stats.pendingRequests > 0 ? styles['stat__card--highlight'] : ''}`}
+          className={`${styles['admin-overview__stat-card']} ${
+            stats.pendingRequests > 0 ? styles['admin-overview__stat-card--highlight'] : ''
+          }`}
         >
-          <div className={styles.stat__icon}>
+          <div className={styles['admin-overview__stat-icon']}>
             <Clock size={24} />
           </div>
-          <div className={styles.stat__content}>
-            <span className={styles.stat__value}>{stats.pendingRequests}</span>
-            <span className={styles.stat__label}>승인 대기</span>
+          <div className={styles['admin-overview__stat-content']}>
+            <span className={styles['admin-overview__stat-value']}>{stats.pendingRequests}</span>
+            <span className={styles['admin-overview__stat-label']}>승인 대기</span>
           </div>
         </div>
       </div>

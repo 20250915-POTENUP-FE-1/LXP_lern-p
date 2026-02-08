@@ -6,7 +6,7 @@ export type InstructorRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 // 강사 요청 정보
 export type InstructorRequest = {
   id: number;
-  userId: number;
+  userId: string;
   email: string;
   nickname: string;
   status: InstructorRequestStatus;
