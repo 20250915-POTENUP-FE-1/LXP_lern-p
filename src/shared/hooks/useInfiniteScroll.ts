@@ -101,19 +101,19 @@ export function useInfiniteScroll<T>({
     };
   }, [enabled]);
 
-  const setTarget = useCallback((node: HTMLElement | null) => {
-    if (!observerRef.current) return;
+const setTarget = useCallback((node: HTMLElement | null) => {
+  const observer = observerRef.current;
 
-    if (targetRef.current) {
-      observerRef.current.unobserve(targetRef.current);
-    }
+  if (observer && targetRef.current) {
+    observer.unobserve(targetRef.current);
+  }
 
-    if (node) {
-      observerRef.current.observe(node);
-    }
+  targetRef.current = node;
 
-    targetRef.current = node;
-  }, []);
+  if (observer && node) {
+    observer.observe(node);
+  }
+}, []);
 
   useEffect(() => {
     if (!enabled) return;
