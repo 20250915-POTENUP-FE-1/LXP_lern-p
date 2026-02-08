@@ -1,13 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppShell } from '@/shared/ui/AppShell';
 import { AdminPageSidebar } from '@/domains/admin/components/AdminPageSidebar';
 import { Menu, X } from 'lucide-react';
 import styles from '@/app/admin/AdminLayout.module.css';
+import { USE_MOCK } from '@/shared/constants/config';
+import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const loadPendingCount = async () => {
+      try {
+        if (USE_MOCK) {
+          const count = MOCK_INSTRUCTOR_REQUESTS.filter(
+            (request) => request.status === 'PENDING',
+          ).length;
+          setPendingCount(count);
+          return;
+        }
+
+        // TODO: API 연동
+        // const requestsRes = await api('/api/admin/instructor-requests');
+        // const count = requestsRes.requests.filter((request) => request.status === 'PENDING').length;
+        // setPendingCount(count);
+      } catch (error) {
+        console.error('승인 대기 건수 로딩 실패:', error);
+      }
+    };
+
+    loadPendingCount();
+  }, []);
 
   return (
     <AppShell>
@@ -38,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             isSidebarOpen ? styles['admin-layout__sidebar--open'] : ''
           }`}
         >
-          <AdminPageSidebar />
+          <AdminPageSidebar pendingCount={pendingCount} />
         </aside>
 
         {/* 메인 콘텐츠 */}

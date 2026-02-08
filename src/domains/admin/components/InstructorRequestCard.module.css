@@ -1,4 +1,6 @@
-.card {
+/* InstructorRequestCard.module.css */
+
+.instructor-request-card {
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -12,11 +14,11 @@
   width: 100%;
 }
 
-.card:hover {
+.instructor-request-card:hover {
   border-color: var(--color-brand);
 }
 
-.avatar {
+.instructor-request-card__avatar {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,25 +30,25 @@
   flex-shrink: 0;
 }
 
-.content {
+.instructor-request-card__content {
   flex: 1;
   min-width: 0;
 }
 
-.nickname {
+.instructor-request-card__nickname {
   font-size: var(--text-md);
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: var(--space-1);
 }
 
-.info {
+.instructor-request-card__info {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
 }
 
-.info__item {
+.instructor-request-card__info-item {
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -54,7 +56,7 @@
   color: var(--color-text-muted);
 }
 
-.badge {
+.instructor-request-card__badge {
   flex-shrink: 0;
   padding: var(--space-1) var(--space-3);
   background: var(--color-warning);
@@ -64,27 +66,27 @@
   border-radius: 9999px;
 }
 
-.badge__approved {
+.instructor-request-card__badge--approved {
   background: var(--color-success);
 }
 
-.badge__rejected {
+.instructor-request-card__badge--rejected {
   background: var(--color-text-muted);
 }
 
 /* 반응형 */
 @media (max-width: 640px) {
-  .card {
+  .instructor-request-card {
     flex-wrap: wrap;
     padding: var(--space-3) var(--space-4);
   }
 
-  .info {
+  .instructor-request-card__info {
     flex-direction: column;
     gap: var(--space-1);
   }
 
-  .badge {
+  .instructor-request-card__badge {
     margin-left: auto;
   }
 }

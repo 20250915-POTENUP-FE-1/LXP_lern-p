@@ -5,7 +5,11 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, UserCheck, Settings } from 'lucide-react';
 import styles from '@/domains/admin/components/AdminPageSidebar.module.css';
 
-export function AdminPageSidebar() {
+type AdminPageSidebarProps = {
+  pendingCount?: number;
+};
+
+export function AdminPageSidebar({ pendingCount = 0 }: AdminPageSidebarProps) {
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
 
@@ -37,6 +41,9 @@ export function AdminPageSidebar() {
         >
           <UserCheck size={18} />
           <span className={styles['admin-layout__nav-text']}>강사 승인</span>
+          {pendingCount > 0 && (
+            <span className={styles['admin-layout__nav-badge']}>{pendingCount}</span>
+          )}
         </Link>
       </nav>
     </>
