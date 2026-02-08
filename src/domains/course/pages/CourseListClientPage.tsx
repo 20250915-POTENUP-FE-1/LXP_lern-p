@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
 import { MOCK_GET_ALL_COURSE } from '@/mocks/course.mock';
+import { USE_MOCK } from '@/shared/constants/config';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
 import type { CourseCardType, GetAllCourseResponse } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import { SortSelect, sortCourses } from '../components/SortSelect';
 import { LEVEL_LABEL } from '../constants/level';
-import { USE_MOCK } from '@/shared/constants/config';
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
