@@ -32,3 +32,10 @@ export type UpdateStudentToInstructorResponse = {
   id: string;
   roles: Role[];
 };
+
+export type ApplyInstructorResponse = {
+  id: string;
+  userId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  appliedAt: string;
+};
