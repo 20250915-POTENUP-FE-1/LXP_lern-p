@@ -176,20 +176,6 @@ export default function CourseListClientPage() {
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>
-
-            {totalPages > 1 && (
-              <div className={styles['course-list__pagination']}>
-                <button type="button" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                  이전
-                </button>
-                <span>
-                  {page + 1} / {totalPages}
-                </span>
-                <button type="button" disabled={!hasNext} onClick={() => setPage(page + 1)}>
-                  다음
-                </button>
-              </div>
-            )}
           </>
         )}
       </section>
