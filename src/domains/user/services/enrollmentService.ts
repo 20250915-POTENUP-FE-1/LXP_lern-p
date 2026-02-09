@@ -25,7 +25,7 @@ export const getEnrollmentByCourseId = async (
 // 수강 정보 조회 (수강 ID 기준)
 export async function getEnrollmentByEnrollmentId(
   enrollmentId: string,
-): Promise<EnrollmentDetailResponse> {
+): Promise<GetEnrollmentResponse> {
   return getApi(`/api/enrollments/${enrollmentId}`, { cache: 'no-store' });
 }
 
