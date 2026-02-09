@@ -32,13 +32,12 @@ export type CategoryMapEntry = {
   categoryId: number;
   children: { categoryId: number; name: string }[];
 };
-export type CategoryMap = Record<string, CategoryMapEntry>;
 
-interface FilterNavProps {
-  categoryMap: CategoryMap;
+type FilterNavProps = {
+  categoryMap: Record<string, CategoryMapEntry>;
   selectedCategoryId: number | null;
   onSelectCategory: (categoryId: number | null) => void;
-}
+};
 
 export function FilterNav({ categoryMap, selectedCategoryId, onSelectCategory }: FilterNavProps) {
   const [expandedFirst, setExpandedFirst] = useState<string | null>('전체');

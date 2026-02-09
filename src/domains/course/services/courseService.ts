@@ -8,17 +8,13 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-import type { CourseLevel, GetAllCourseResponse, GetCourseDetailResponse } from '../types/course';
+import type {
+  CourseListParams,
+  GetAllCourseResponse,
+  GetCourseDetailResponse,
+} from '../types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-export type CourseListParams = {
-  page?: number;
-  size?: number;
-  categoryId?: number;
-  level?: CourseLevel;
-  title?: string;
-  sort?: string;
-};
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
@@ -32,7 +28,7 @@ export const getAllCourses = async (params?: CourseListParams): Promise<GetAllCo
   if (params?.sort) query.set('sort', params.sort);
 
   const qs = query.toString();
-  const response = await fetch(`${BASE_URL}/api/courses${qs ? `?${qs}` : ''}`, {
+  const response = await fetch(`${BASE_URL}/api/courses${query.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

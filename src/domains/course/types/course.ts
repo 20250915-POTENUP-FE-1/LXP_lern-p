@@ -358,3 +358,12 @@ export type LectureResourceResponse = {
   fileUrl: string;
   isDownloadable: boolean;
 };
+
+export type CourseListParams = {
+  page?: number;
+  size?: number;
+  categoryId?: number;
+  level?: CourseLevel;
+  title?: string;
+  sort?: string;
+};

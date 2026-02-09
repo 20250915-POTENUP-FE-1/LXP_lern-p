@@ -12,38 +12,16 @@ import type { CourseCardType, GetAllCourseResponse, Category } from '../types/co
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import { LEVEL_LABEL } from '../constants/level';
 import { FilterNav } from '../components/FilterNav';
-import type { CategoryMap } from '../components/FilterNav';
+import type { CategoryMapEntry } from '../components/FilterNav';
 import { SearchBar } from '../components/SearchBar';
 import { sortCourses, SortSelect } from '../components/SortSelect';
 import { LevelSelect } from '../components/LevelSelect';
 
 /** API 응답 Category[] → FilterNav용 Record<string, string[]> 변환 */
-function toCategoryMap(categories: Category[]): CategoryMap {
-  const map: CategoryMap = {};
-  for (const cat of categories) {
-    if (cat.name === '전체') continue;
-    map[cat.name] = {
-      categoryId: cat.categoryId,
-      children: cat.children.map((c) => ({ categoryId: c.categoryId, name: c.name })),
-    };
-  }
-  return map;
-}
-
-function toCategoryIdMap(categories: Category[]): Record<number, string> {
-  const map: Record<number, string> = {};
-  for (const cat of categories) {
-    map[cat.categoryId] = cat.name;
-    for (const child of cat.children) {
-      map[child.categoryId] = child.name;
-    }
-  }
-  return map;
-}
 
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
-  const [categoryMap, setCategoryMap] = useState<CategoryMap>({});
+  const [categoryMap, setCategoryMap] = useState<Record<string, CategoryMapEntry>>({});
   const [categoryIdToName, setCategoryIdToName] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [totalPages, setTotalPages] = useState(0);
@@ -58,11 +36,11 @@ export default function CourseListClientPage() {
     title,
     setPage,
     setCategoryId,
-    setCategoryAndTitle,
+    setCategoryLevelAndTitle,
   } = useCourseListQuery();
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
-    setCategoryAndTitle(nextCategoryId, null); // 카테고리 선택 시 항상 title 제거
+    setCategoryLevelAndTitle(nextCategoryId, null, null);
   };
 
   // 카테고리 데이터는 마운트 시 1회만
@@ -171,7 +149,19 @@ export default function CourseListClientPage() {
         onSelectCategory={handleSelectCategory}
       />
 
+      {/* <div className={styles['bannerContainer']}>
+        <div className={styles['bannerContent']}>
+          <div className={styles['mainText']}>
+            강사, 학생 둘 다 되는 게 <span className={styles['highlightText']}>런닉스</span>
+          </div>
+          <div className={styles['subText']}>한 번의 클릭으로 배움과 가르침을 모두 경험하세요</div>
+        </div>
+      </div> */}
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
+        <div className={styles['course-list__toolbar']}>
+          <LevelSelect />
+          <SortSelect />
+        </div>
         {loading ? (
           <p className={styles['course-list__loading']}>불러오는 중...</p>
         ) : courses.length === 0 ? (
@@ -180,10 +170,6 @@ export default function CourseListClientPage() {
           </p>
         ) : (
           <>
-            <div className={styles['course-list__toolbar']}>
-              <LevelSelect />
-              <SortSelect />
-            </div>
             <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
               {courses.map((course) => (
                 <CourseCard key={course.id} course={course} />
@@ -208,4 +194,27 @@ export default function CourseListClientPage() {
       </section>
     </main>
   );
+}
+
+function toCategoryMap(categories: Category[]): Record<string, CategoryMapEntry> {
+  const map: Record<string, CategoryMapEntry> = {};
+  for (const cat of categories) {
+    if (cat.name === '전체') continue;
+    map[cat.name] = {
+      categoryId: cat.categoryId,
+      children: cat.children.map((c) => ({ categoryId: c.categoryId, name: c.name })),
+    };
+  }
+  return map;
+}
+
+function toCategoryIdMap(categories: Category[]): Record<number, string> {
+  const map: Record<number, string> = {};
+  for (const cat of categories) {
+    map[cat.categoryId] = cat.name;
+    for (const child of cat.children) {
+      map[child.categoryId] = child.name;
+    }
+  }
+  return map;
 }
