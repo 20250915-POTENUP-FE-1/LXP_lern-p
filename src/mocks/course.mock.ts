@@ -14,7 +14,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '2001',
       title: '스프링 부트 완벽 가이드1',
-      categories: ['백엔드'],
+      categories: ['프로그래밍', '백엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
       status: 'PUBLISHED',
       price: 55000,
@@ -32,7 +32,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '2002',
       title: '스프링 부트 완벽 가이드2',
-      categories: ['백엔드', 'Spring'],
+      categories: ['프로그래밍', '백엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
       status: 'PUBLISHED',
       price: 99000,
@@ -50,7 +50,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '2003',
       title: 'React & Next.js 완전 정복',
-      categories: ['프론트엔드', 'React'],
+      categories: ['프로그래밍', '프론트엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2003.png',
       status: 'PUBLISHED',
       price: 89000,
@@ -68,7 +68,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '2004',
       title: '데이터베이스 기초',
-      categories: ['데이터베이스'],
+      categories: ['데이터사이언스', '데이터 분석'],
       thumbnailUrl: 'https://example.com/thumbnails/course_2004.png',
       status: 'PUBLISHED',
       price: 59000,
@@ -86,7 +86,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '3001',
       title: 'Node.js 백엔드 실전',
-      categories: ['백엔드', 'Node.js'],
+      categories: ['프로그래밍', '백엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_3001.png',
       status: 'PUBLISHED',
       price: 99000,
@@ -104,7 +104,7 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
     {
       courseId: '3002',
       title: '프론트엔드 테스트 전략',
-      categories: ['프론트엔드', '테스트'],
+      categories: ['프로그래밍', '프론트엔드'],
       thumbnailUrl: 'https://example.com/thumbnails/course_3002.png',
       status: 'PUBLISHED',
       price: 69000,

@@ -14,8 +14,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 16px;
-  margin: 50px auto;
-  margin-bottom: 0px;
+  margin: 16px auto 0; /* 50px → 16px (위에 FilterNav 있으니 줄임) */
   padding: 60px 40px;
   gap: 30px;
 }
@@ -48,7 +47,6 @@
   display: flex;
   justify-content: flex-end;
   padding-right: 4px;
-
   margin-bottom: 32px;
   width: 100%;
   align-self: stretch;
@@ -59,12 +57,10 @@
   gap: var(--space-4);
 }
 
-/* 사이드바: 기본 비활성 상태지만 구조만 유지 */
 .course-list__sidebar {
   display: block;
 }
 
-/* 콘텐츠 */
 .course-list__content {
   min-width: 0;
 }
@@ -72,7 +68,7 @@
 .course-grid {
   display: grid;
   gap: var(--space-4);
-  grid-template-columns: 1fr; /* 기본: 1열 */
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 768px) {
@@ -86,7 +82,7 @@
   }
 
   .course-grid {
-    grid-template-columns: repeat(2, 1fr); /* 태블릿: 2열 */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -101,7 +97,7 @@
   }
 
   .course-grid {
-    grid-template-columns: repeat(4, 1fr); /* 데스크탑: 4열 */
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

@@ -37,7 +37,7 @@
   border: 1px solid transparent;
   padding: var(--space-2) var(--space-4);
   background: var(--color-brand);
-  color: var(--color-text);
+  color: #fff;
   font-weight: 600;
   cursor: pointer;
   transition:

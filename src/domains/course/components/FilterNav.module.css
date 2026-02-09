@@ -1,0 +1,159 @@
+.filter-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ── 공통 행 래퍼 ── */
+.filter-nav__row {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+}
+
+.filter-nav__list {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0 36px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.filter-nav__list::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── 1차 카테고리 행 ── */
+.filter-nav__row--primary {
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 0;
+}
+
+.filter-nav__row--primary .filter-nav__list {
+  gap: 0;
+}
+
+/* 1차 아이템: 아이콘 + 텍스트 세로 배치 */
+.filter-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-nav__item:hover {
+  color: var(--color-brand);
+}
+
+.filter-nav__item--active {
+  color: var(--color-brand);
+  border-bottom-color: var(--color-brand);
+  font-weight: 700;
+}
+
+.filter-nav__label {
+  line-height: 1;
+}
+
+/* ── 2차 카테고리 행 ── */
+.filter-nav__row--secondary {
+  background: var(--color-elevated, #f9fafb);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filter-nav__row--secondary .filter-nav__list {
+  gap: 8px;
+}
+
+/* 2차 칩 */
+.filter-nav__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-bg, #fff);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-nav__chip:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.filter-nav__chip--active {
+  background: var(--color-brand);
+  color: #fff;
+  border-color: var(--color-brand);
+}
+
+.filter-nav__chip--active:hover {
+  color: #fff;
+}
+
+/* ── 좌우 화살표 ── */
+.filter-nav__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.filter-nav__arrow:hover {
+  background: #fff;
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.filter-nav__arrow--left {
+  left: 0;
+}
+
+.filter-nav__arrow--right {
+  right: 0;
+}
