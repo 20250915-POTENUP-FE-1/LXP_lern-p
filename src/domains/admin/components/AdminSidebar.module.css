@@ -1,5 +1,5 @@
 /* 사이드바 헤더 */
-.admin-layout__sidebar-header {
+.admin-sidebar__header {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -11,14 +11,14 @@
 }
 
 /* Navigation */
-.admin-layout__nav {
+.admin-sidebar__nav {
   display: flex;
   flex-direction: column;
   padding: var(--space-3);
   gap: var(--space-1);
 }
 
-.admin-layout__nav-item {
+.admin-sidebar__nav-item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -38,25 +38,25 @@
   text-decoration: none;
 }
 
-.admin-layout__nav-item:hover {
+.admin-sidebar__nav-item:hover {
   background: var(--color-elevated);
   color: var(--color-text);
 }
 
-.admin-layout__nav-item--active {
+.admin-sidebar__nav-item--active {
   background: rgba(239, 104, 23, 0.1);
   color: var(--color-brand);
 }
 
-.admin-layout__nav-item--active:hover {
+.admin-sidebar__nav-item--active:hover {
   background: rgba(239, 104, 23, 0.15);
 }
 
-.admin-layout__nav-text {
+.admin-sidebar__nav-text {
   flex: 1;
 }
 
-.admin-layout__nav-badge {
+.admin-sidebar__nav-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
