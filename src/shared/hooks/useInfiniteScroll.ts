@@ -1,13 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-export type PageResponse<T> = {
-  content: T[];
-  currentPage: number;
-  totalPages: number;
-  hasNext: boolean;
-};
+import { PageResponse } from '@/shared/types/page';
 
 export type UseInfiniteScrollProps<T> = {
   loadPage: (page: number) => Promise<PageResponse<T>>;
@@ -101,19 +95,19 @@ export function useInfiniteScroll<T>({
     };
   }, [enabled]);
 
-const setTarget = useCallback((node: HTMLElement | null) => {
-  const observer = observerRef.current;
+  const setTarget = useCallback((node: HTMLElement | null) => {
+    const observer = observerRef.current;
 
-  if (observer && targetRef.current) {
-    observer.unobserve(targetRef.current);
-  }
+    if (observer && targetRef.current) {
+      observer.unobserve(targetRef.current);
+    }
 
-  targetRef.current = node;
+    targetRef.current = node;
 
-  if (observer && node) {
-    observer.observe(node);
-  }
-}, []);
+    if (observer && node) {
+      observer.observe(node);
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
