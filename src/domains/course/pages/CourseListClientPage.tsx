@@ -14,7 +14,8 @@ import { LEVEL_LABEL } from '../constants/level';
 import { FilterNav } from '../components/FilterNav';
 import type { CategoryMap } from '../components/FilterNav';
 import { SearchBar } from '../components/SearchBar';
-import { SortSelect } from '../components/SortSelect';
+import { sortCourses, SortSelect } from '../components/SortSelect';
+import { LevelSelect } from '../components/LevelSelect';
 
 /** API 응답 Category[] → FilterNav용 Record<string, string[]> 변환 */
 function toCategoryMap(categories: Category[]): CategoryMap {
@@ -29,14 +30,27 @@ function toCategoryMap(categories: Category[]): CategoryMap {
   return map;
 }
 
+function toCategoryIdMap(categories: Category[]): Record<number, string> {
+  const map: Record<number, string> = {};
+  for (const cat of categories) {
+    map[cat.categoryId] = cat.name;
+    for (const child of cat.children) {
+      map[child.categoryId] = child.name;
+    }
+  }
+  return map;
+}
+
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
   const [categoryMap, setCategoryMap] = useState<CategoryMap>({});
+  const [categoryIdToName, setCategoryIdToName] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [totalPages, setTotalPages] = useState(0);
   const [hasNext, setHasNext] = useState(false);
 
-  const { sort, page, categoryId, level, title, setPage, setCategoryId } = useCourseListQuery();
+  const { sort, page, size, categoryId, level, title, setPage, setCategoryId } =
+    useCourseListQuery();
 
   // 카테고리 데이터는 마운트 시 1회만
   useEffect(() => {
@@ -44,6 +58,7 @@ export default function CourseListClientPage() {
       try {
         const categoryData = USE_MOCK ? MOCK_GET_CATEGORIES : await getCategories();
         setCategoryMap(toCategoryMap(categoryData));
+        setCategoryIdToName(toCategoryIdMap(categoryData));
       } catch (error) {
         console.error('카테고리 불러오기 실패:', error);
       }
@@ -57,10 +72,51 @@ export default function CourseListClientPage() {
       setLoading(true);
       try {
         const data: GetAllCourseResponse = USE_MOCK
-          ? MOCK_GET_ALL_COURSE
+          ? (() => {
+              const titleKeyword = title.trim().toLowerCase();
+              const categoryName = categoryId != null ? categoryIdToName[categoryId] : undefined;
+              let filtered = MOCK_GET_ALL_COURSE.content;
+
+              if (categoryName) {
+                filtered = filtered.filter((item) => item.categories.includes(categoryName));
+              }
+
+              if (level) {
+                filtered = filtered.filter((item) => item.level === level);
+              }
+
+              if (titleKeyword) {
+                filtered = filtered.filter((item) =>
+                  item.title.toLowerCase().includes(titleKeyword),
+                );
+              }
+
+              const sorted = sortCourses(
+                filtered.map((item) => ({
+                  ...item,
+                  createdAt: item.lastModifiedAt,
+                })),
+                sort,
+              );
+
+              const totalElements = sorted.length;
+              const totalPagesValue = totalElements === 0 ? 0 : Math.ceil(totalElements / size);
+              const start = page * size;
+              const end = start + size;
+              return {
+                ...MOCK_GET_ALL_COURSE,
+                content: sorted.slice(start, end),
+                currentPage: page,
+                size,
+                totalElements,
+                totalPages: totalPagesValue,
+                hasNext: totalPagesValue > 0 && page + 1 < totalPagesValue,
+              };
+            })()
           : await getAllCourses({
               page,
-              size: 10,
+              size,
+              sort,
               categoryId: categoryId ?? undefined,
               level: level ?? undefined,
               title: title || undefined,
@@ -91,7 +147,7 @@ export default function CourseListClientPage() {
     };
 
     void fetchCourses();
-  }, [page, categoryId, level, title, sort]);
+  }, [page, size, categoryId, level, title, sort, categoryIdToName]);
 
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
@@ -106,10 +162,13 @@ export default function CourseListClientPage() {
         {loading ? (
           <p className={styles['course-list__loading']}>불러오는 중...</p>
         ) : courses.length === 0 ? (
-          <p className={styles['course-list__empty']}>등록된 강좌가 없습니다.</p>
+          <p className={styles['course-list__empty']}>
+            {title.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
+          </p>
         ) : (
           <>
             <div className={styles['course-list__toolbar']}>
+              <LevelSelect />
               <SortSelect />
             </div>
             <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>

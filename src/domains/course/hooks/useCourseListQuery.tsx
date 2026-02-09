@@ -9,6 +9,7 @@ export type SortValue = 'newest' | 'oldest' | 'price-asc' | 'price-desc';
 interface CourseListQueryState {
   sort: SortValue;
   page: number;
+  size: number;
   categoryId: number | null;
   level: CourseLevel | null;
   title: string;
@@ -17,6 +18,7 @@ interface CourseListQueryState {
 interface UseCourseListQueryReturn extends CourseListQueryState {
   setSort: (value: SortValue) => void;
   setPage: (value: number) => void;
+  setSize: (value: number) => void;
   setCategoryId: (value: number | null) => void;
   setLevel: (value: CourseLevel | null) => void;
   setTitle: (value: string) => void;
@@ -37,6 +39,10 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
 
   const pageParam = searchParams.get('page');
   const page = pageParam ? Math.max(0, Number(pageParam)) : 0;
+
+  const sizeParam = searchParams.get('size');
+  const sizeValue = sizeParam ? Number(sizeParam) : 10;
+  const size = Number.isFinite(sizeValue) && sizeValue > 0 ? sizeValue : 10;
 
   const categoryIdParam = searchParams.get('categoryId');
   const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
@@ -91,14 +97,21 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     [updateParams],
   );
 
+  const setSize = useCallback(
+    (value: number) => updateParams({ size: String(value), page: null }),
+    [updateParams],
+  );
+
   return {
     sort,
     page,
+    size,
     categoryId,
     level,
     title,
     setSort,
     setPage,
+    setSize,
     setCategoryId,
     setLevel,
     setTitle,

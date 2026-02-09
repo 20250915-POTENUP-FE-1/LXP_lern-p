@@ -41,14 +41,20 @@ interface FilterNavProps {
 }
 
 export function FilterNav({ categoryMap, selectedCategoryId, onSelectCategory }: FilterNavProps) {
-  const [expandedFirst, setExpandedFirst] = useState<string | null>(null);
+  const [expandedFirst, setExpandedFirst] = useState<string | null>('전체');
 
-  const firstCategories = Object.keys(categoryMap);
+  const firstCategories = ['전체', ...Object.keys(categoryMap)];
 
   const secondCategories =
     expandedFirst && expandedFirst !== '전체' ? (categoryMap[expandedFirst]?.children ?? []) : [];
 
   const handleFirstClick = (cat: string) => {
+    if (cat === '전체') {
+      setExpandedFirst('전체');
+      onSelectCategory(null);
+      return;
+    }
+
     if (cat === expandedFirst) {
       setExpandedFirst(null);
       onSelectCategory(null);
@@ -70,13 +76,41 @@ export function FilterNav({ categoryMap, selectedCategoryId, onSelectCategory }:
     }
   };
 
+  useEffect(() => {
+    if (selectedCategoryId == null) {
+      setExpandedFirst('전체');
+      return;
+    }
+
+    const parentEntry = Object.entries(categoryMap).find(
+      ([, entry]) => entry.categoryId === selectedCategoryId,
+    );
+    if (parentEntry) {
+      setExpandedFirst(parentEntry[0]);
+      return;
+    }
+
+    const childEntry = Object.entries(categoryMap).find(([, entry]) =>
+      entry.children.some((child) => child.categoryId === selectedCategoryId),
+    );
+    if (childEntry) {
+      setExpandedFirst(childEntry[0]);
+      return;
+    }
+
+    setExpandedFirst(null);
+  }, [categoryMap, selectedCategoryId]);
+
   return (
     <nav className={styles['filter-nav']} aria-label="카테고리 필터">
       <ScrollableRow className={styles['filter-nav__row--primary']}>
         {firstCategories.map((cat) => {
           const Icon = CATEGORY_ICONS[cat] ?? Layers;
           const entry = categoryMap[cat];
-          const isActive = expandedFirst === cat || selectedCategoryId === entry?.categoryId;
+          const isActive =
+            cat === '전체'
+              ? selectedCategoryId == null
+              : expandedFirst === cat || selectedCategoryId === entry?.categoryId;
           return (
             <li key={cat}>
               <button

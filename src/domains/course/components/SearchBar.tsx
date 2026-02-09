@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import styles from './SearchBar.module.css';
@@ -9,9 +9,16 @@ export function SearchBar() {
   const { title, setTitle } = useCourseListQuery();
   const [inputValue, setInputValue] = useState(title);
 
+  useEffect(() => {
+    if (!title) {
+      setInputValue('');
+    }
+  }, [title]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTitle(inputValue.trim());
+    setInputValue('');
   };
 
   return (
