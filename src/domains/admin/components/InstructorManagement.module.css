@@ -1,0 +1,96 @@
+.instructor-management {
+  /* 컨테이너 */
+}
+
+/* 필터 탭 */
+.instructor-management__filter-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.instructor-management__filter-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.instructor-management__filter-tab:hover {
+  background: var(--color-elevated);
+  color: var(--color-text);
+}
+
+.instructor-management__filter-tab--active {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+.instructor-management__filter-tab--active:hover {
+  background: var(--color-brand-600);
+}
+
+.instructor-management__filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-2);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.instructor-management__filter-tab--active .instructor-management__filter-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.instructor-management__filter-count--warning {
+  background: var(--color-warning);
+  color: #fff;
+}
+
+.instructor-management__filter-tab--active .instructor-management__filter-count--warning {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 요청 목록 */
+.instructor-management__request-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* 빈 상태 */
+.instructor-management__empty-state {
+  text-align: center;
+  padding: var(--space-9) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  background: var(--color-elevated);
+  border-radius: var(--radius-md);
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .instructor-management__filter-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .instructor-management__filter-tab {
+    white-space: nowrap;
+    padding: var(--space-2) var(--space-3);
+  }
+}

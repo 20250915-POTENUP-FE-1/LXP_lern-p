@@ -1,0 +1,90 @@
+.instructor-request-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.instructor-request-card:hover {
+  border-color: var(--color-brand);
+}
+
+.instructor-request-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--color-elevated);
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.instructor-request-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.instructor-request-card__nickname {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.instructor-request-card__info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.instructor-request-card__info-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.instructor-request-card__badge {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-warning);
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.instructor-request-card__badge--approved {
+  background: var(--color-success);
+}
+
+.instructor-request-card__badge--rejected {
+  background: var(--color-text-muted);
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .instructor-request-card {
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .instructor-request-card__info {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .instructor-request-card__badge {
+    margin-left: auto;
+  }
+}

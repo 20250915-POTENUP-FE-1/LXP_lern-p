@@ -1,0 +1,161 @@
+.instructor-approval-modal {
+  width: 100%;
+}
+
+.instructor-approval-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-5);
+}
+
+.instructor-approval-modal__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.instructor-approval-modal__close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.instructor-approval-modal__close-button:hover {
+  background: var(--color-elevated);
+  color: var(--color-text);
+}
+
+/* 정보 영역 */
+.instructor-approval-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.instructor-approval-modal__info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.instructor-approval-modal__info-item svg {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.instructor-approval-modal__info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.instructor-approval-modal__info-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.instructor-approval-modal__info-value {
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* 액션 버튼 */
+.instructor-approval-modal__actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.instructor-approval-modal__button-approve,
+.instructor-approval-modal__button-reject {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.instructor-approval-modal__button-approve {
+  background: var(--color-brand);
+  color: #fff;
+  border: none;
+}
+
+.instructor-approval-modal__button-approve:hover:not(:disabled) {
+  background: var(--color-brand-600);
+}
+
+.instructor-approval-modal__button-approve:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.instructor-approval-modal__button-reject {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.instructor-approval-modal__button-reject:hover:not(:disabled) {
+  background: var(--color-elevated);
+}
+
+.instructor-approval-modal__button-reject:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 상태 메시지 */
+.instructor-approval-modal__status-message {
+  padding: var(--space-4);
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+}
+
+.instructor-approval-modal__status--approved {
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.instructor-approval-modal__status--rejected {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* 에러 상태 */
+.instructor-approval-modal__error {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .instructor-approval-modal__actions {
+    flex-direction: column-reverse;
+  }
+}
