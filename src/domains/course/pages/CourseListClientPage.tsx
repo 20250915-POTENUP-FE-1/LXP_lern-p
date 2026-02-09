@@ -117,9 +117,7 @@ export default function CourseListClientPage() {
           <p className={styles['course-list__empty']}>등록된 강좌가 없습니다.</p>
         ) : (
           <>
-            <div className={styles['course-list__toolbar']}>
-              <SortSelect />
-            </div>
+            <div className={styles['course-list__toolbar']}>{/*<SortSelect />*/}</div>
             <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
               {sortedCourses.map((course) => (
                 <CourseCard key={course.id} course={course} />
