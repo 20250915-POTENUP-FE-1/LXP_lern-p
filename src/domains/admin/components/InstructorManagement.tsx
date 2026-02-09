@@ -9,7 +9,7 @@ import styles from './InstructorManagement.module.css';
 type InstructorManagementProps = {
   requests: InstructorApplication[];
   onProcess: (requestId: number, action: 'approve' | 'reject') => Promise<void>;
-  onRefresh: () => void;
+  onRefresh?: () => void;
 };
 
 export const InstructorManagement = ({
@@ -49,9 +49,9 @@ export const InstructorManagement = ({
 
       setIsProcessing(true);
       try {
-        await onProcess(selectedRequest.applicationId, action); //onProcess 에 선택된 아이디-액션 비동기로 저장
+        await onProcess(selectedRequest.applicationId, action);
         handleCloseModal();
-        onRefresh(); //선택시 Void(빈값) 출력??
+        onRefresh?.();
       } catch (error) {
         console.error('처리 실패:', error);
         alert('처리에 실패했습니다. 다시 시도해주세요.');
