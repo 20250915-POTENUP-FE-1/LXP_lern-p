@@ -1,12 +1,8 @@
-// 강사승인 모달
-
-'use client';
-
 import { X, User, Mail, Calendar } from 'lucide-react';
 import { Modal } from '@/shared/ui/Modal';
+import { formatDate } from '@/shared/util/formatDate';
 import type { InstructorRequest } from '../types/admin';
 import styles from './InstructorApprovalModal.module.css';
-import { formatDate } from '@/shared/util/formatDate';
 
 type InstructorApprovalModalProps = {
   isOpen: boolean;
