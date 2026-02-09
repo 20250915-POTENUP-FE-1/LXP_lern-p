@@ -6,15 +6,11 @@ import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {
   value?: string; // 부모에서 내려오는 썸네일(서버 url이든 base64든)
-  onUploadComplete?: (url: string) => void; // 부모 폼 값 갱신
   onFileSelect?: (multiFile: File | null) => void; // 실제 파일 전달(업로드용)
+  disabled?: boolean;
 };
 
-export function ThumbnailUploader({
-  value,
-  onUploadComplete,
-  onFileSelect,
-}: ThumbnailUploaderProps) {
+export function ThumbnailUploader({ value, onFileSelect, disabled }: ThumbnailUploaderProps) {
   // 로컬에서 "사용자가 방금 선택한" 미리보기만 관리 (props를 복사하지 않음)
   const [localPreview, setLocalPreview] = useState<string>('');
 
@@ -24,13 +20,17 @@ export function ThumbnailUploader({
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
 
-    // 부모에게 파일 전달(업로드 준비)
-    onFileSelect?.(file);
-
     // 파일 선택 취소/제거
     if (!file) {
       setLocalPreview('');
-      onUploadComplete?.(''); // 부모 값도 비움(원하는 정책에 따라 제거 가능)
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있어요.');
+      e.currentTarget.value = '';
+      setLocalPreview('');
+      onFileSelect?.(null);
       return;
     }
 
@@ -41,15 +41,16 @@ export function ThumbnailUploader({
       e.currentTarget.value = '';
       setLocalPreview('');
       onFileSelect?.(null);
-      onUploadComplete?.(''); // 부모의 썸네일 상태도 비움
       return;
     }
+
+    // 부모에게 파일 전달(업로드 준비)
+    onFileSelect?.(file);
 
     const reader = new FileReader();
     reader.onload = () => {
       const base64Url = String(reader.result ?? '');
       setLocalPreview(base64Url);
-      onUploadComplete?.(base64Url);
     };
     reader.readAsDataURL(file);
   };
@@ -63,11 +64,14 @@ export function ThumbnailUploader({
           accept="image/*"
           onChange={handleFileChange}
           className={styles['form__control']}
+          disabled={disabled}
         />
 
         <p className={styles['upload__hint']}>
           16:11 비율의 JPG 또는 PNG 파일(최대 5MB)을 업로드하세요.
         </p>
+
+        {disabled && <p className={styles['upload__loading']}>썸네일 업로드 중입니다…</p>}
 
         <div className={styles['upload__preview']} data-has-image={previewUrl ? 'true' : 'false'}>
           {previewUrl ? (

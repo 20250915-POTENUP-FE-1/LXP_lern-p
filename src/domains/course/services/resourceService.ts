@@ -1,5 +1,6 @@
 import { postApi } from '@/shared/lib/api/fetchApi';
 
+// Lecture Resource Presign
 export type PresignedUploadUrlRequest = {
   fileName: string;
   contentType: string;
@@ -19,4 +20,25 @@ export async function createPresignedUploadUrl(
   payload: PresignedUploadUrlRequest,
 ): Promise<PresignedUploadUrlResponse> {
   return postApi<PresignedUploadUrlResponse>('/api/instructor/resources', payload);
+}
+
+// Course Thumbnail Presign
+export type CourseThumbnailPresignRequest = {
+  originalFileName: string;
+  contentType: string;
+  size: number;
+};
+
+export type CourseThumbnailPresignResponse = {
+  uploadUrl: string;
+  fileKey: string;
+  fileUrl: string;
+  expiresInSeconds: number;
+};
+
+export async function createCourseThumbnailPresignedUrl(payload: CourseThumbnailPresignRequest) {
+  return postApi<CourseThumbnailPresignResponse>(
+    '/api/uploads/courses/thumbnails/presign',
+    payload,
+  );
 }

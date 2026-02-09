@@ -15,9 +15,9 @@ export function CourseForm() {
     handleFormSubmit,
     handleChange,
     handleCategoryChange,
-    handleThumbnailUpload,
     handleThumbnailFileSelect,
     handleCancel,
+    isThumbnailUploading,
   } = useCourseForm();
 
   return (
@@ -110,8 +110,8 @@ export function CourseForm() {
             </label>
             <ThumbnailUploader
               value={formData.thumbnailUrl}
-              onUploadComplete={handleThumbnailUpload}
               onFileSelect={handleThumbnailFileSelect}
+              disabled={isThumbnailUploading}
             />
           </div>
 
