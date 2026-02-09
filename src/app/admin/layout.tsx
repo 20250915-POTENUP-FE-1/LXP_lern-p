@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AppShell } from '@/shared/ui/AppShell';
-import { AdminPageSidebar } from '@/domains/admin/components/AdminPageSidebar';
 import { Menu, X } from 'lucide-react';
+import { AdminSidebar } from '@/domains/admin/components/AdminSidebar';
 import styles from '@/app/admin/AdminPage.module.css';
 import { USE_MOCK } from '@/shared/constants/config';
 import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
@@ -36,7 +35,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   return (
-    <AppShell>
+    // TODO: 관리자 권한 가드 필요
+    <div className={styles['auth-shell']}>
       <div className={styles['admin-layout']}>
         {/* 모바일 헤더 */}
         <header className={styles['admin-layout__mobile-header']}>
@@ -64,12 +64,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             isSidebarOpen ? styles['admin-layout__sidebar--open'] : ''
           }`}
         >
-          <AdminPageSidebar pendingCount={pendingCount} />
+          <AdminSidebar pendingCount={pendingCount} />
         </aside>
 
         {/* 메인 콘텐츠 */}
         <main className={styles['admin-layout__main']}>{children}</main>
       </div>
-    </AppShell>
+    </div>
   );
 }
