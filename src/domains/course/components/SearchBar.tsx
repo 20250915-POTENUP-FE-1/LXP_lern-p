@@ -2,6 +2,7 @@
 
 import { ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
 import styles from './SearchBar.module.css';
 
 export function SearchBar() {
@@ -12,11 +13,8 @@ export function SearchBar() {
   };
 
   return (
-    <form
-      className={`${styles['search-bar']} ${styles['search-bar--center']}`}
-      role="search"
-      aria-label="강좌 검색"
-    >
+    <form className={styles['search-bar']} role="search" aria-label="강좌 검색">
+      <Search size={18} className={styles['search-bar__icon']} />
       <label htmlFor="course-list-search" className="sr-only">
         검색어
       </label>
@@ -32,7 +30,7 @@ export function SearchBar() {
         엔터 키로 검색
       </span>
       <button type="submit" className={styles['search-bar__button']}>
-        검색
+        <Search size={18} />
       </button>
     </form>
   );
