@@ -1,10 +1,9 @@
 import type { InstructorRequest } from '@/domains/admin/types/admin';
 
-// 초기 seed 데이터 (읽기 전용)
 export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   {
     id: 1,
-    userId: 'userID-1',
+    userId: 'user_001',
     email: 'kim@example.com',
     nickname: '김강사',
     status: 'PENDING',
@@ -12,7 +11,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 2,
-    userId: 'userID-2',
+    userId: 'user_002',
     email: 'lee@example.com',
     nickname: '이강사',
     status: 'PENDING',
@@ -20,7 +19,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 3,
-    userId: 'userID-3',
+    userId: 'user_003',
     email: 'park@example.com',
     nickname: '박강사',
     status: 'PENDING',
@@ -28,7 +27,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 4,
-    userId: 'userID-4',
+    userId: 'user_004',
     email: 'choi@example.com',
     nickname: '최강사',
     status: 'APPROVED',
@@ -37,7 +36,7 @@ export const MOCK_INSTRUCTOR_REQUESTS: InstructorRequest[] = [
   },
   {
     id: 5,
-    userId: 'userID-5',
+    userId: 'user_005',
     email: 'jung@example.com',
     nickname: '정강사',
     status: 'REJECTED',
