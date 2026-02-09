@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { InstructorRequest, RequestFilter } from '../types/admin';
+import type { InstructorApplication, RequestFilter } from '../types/admin';
 import { InstructorRequestCard } from './InstructorRequestCard';
 import { InstructorApprovalModal } from './InstructorApprovalModal';
 import styles from './InstructorManagement.module.css';
 
 type InstructorManagementProps = {
-  requests: InstructorRequest[];
+  requests: InstructorApplication[];
   onProcess: (requestId: number, action: 'approve' | 'reject') => Promise<void>;
   onRefresh: () => void;
 };
@@ -19,7 +19,7 @@ export const InstructorManagement = ({
 }: InstructorManagementProps) => {
   const [filter, setFilter] = useState<RequestFilter>('PENDING');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<InstructorRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<InstructorApplication | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 필터링된 요청 목록
@@ -31,7 +31,7 @@ export const InstructorManagement = ({
   const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
   // 요청 카드 클릭 핸들러
-  const handleRequestClick = useCallback((request: InstructorRequest) => {
+  const handleRequestClick = useCallback((request: InstructorApplication) => {
     setSelectedRequest(request);
     setIsModalOpen(true);
   }, []);
@@ -49,7 +49,7 @@ export const InstructorManagement = ({
 
       setIsProcessing(true);
       try {
-        await onProcess(selectedRequest.id, action); //onProcess 에 선택된 아이디-액션 비동기로 저장
+        await onProcess(selectedRequest.applicationId, action); //onProcess 에 선택된 아이디-액션 비동기로 저장
         handleCloseModal();
         onRefresh(); //선택시 Void(빈값) 출력??
       } catch (error) {
@@ -112,7 +112,7 @@ export const InstructorManagement = ({
         ) : (
           filteredRequests.map((request) => (
             <InstructorRequestCard
-              key={request.id}
+              key={request.applicationId}
               request={request}
               onClick={() => handleRequestClick(request)}
             />
