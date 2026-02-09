@@ -1,4 +1,4 @@
-import { EnrollmentStatus } from '@/domains/user/types/enrollment';
+import { EnrollmentDetail } from '@/domains/user/types/enrollment';
 
 // API: Course / Enrollment
 export type LearnLectureResourceResponse = {
@@ -45,20 +45,10 @@ export type LearnCourseResponse = {
   sections: LearnSectionResponse[];
 };
 
-export type LearnEnrollmentResponse = {
-  enrollmentId: string;
-  courseId: string;
-  studentId: string;
-  status: EnrollmentStatus;
-  progressRate: number;
-  createdAt: string;
-  expiredAt: string;
-};
-
 // Domain: Course + Enrollment
 export type CourseLearn = {
   course: LearnCourseResponse;
-  enrollment: LearnEnrollmentResponse | null;
+  enrollment: EnrollmentDetail | null;
 };
 
 // UI Types (Learn Page)
