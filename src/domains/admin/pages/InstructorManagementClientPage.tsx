@@ -8,8 +8,10 @@ import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
 import styles from '@/app/admin/AdminPage.module.css';
 
 export function InstructorManagementClientPage() {
-  const [requests, setRequests] = useState<InstructorApplication[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [requests, setRequests] = useState<InstructorApplication[]>(() =>
+    USE_MOCK ? [...MOCK_INSTRUCTOR_REQUESTS] : [],
+  );
+  const [isLoading, setIsLoading] = useState(!USE_MOCK);
   const [error, setError] = useState<string | null>(null);
 
   // 데이터 로딩
@@ -17,11 +19,6 @@ export function InstructorManagementClientPage() {
     try {
       setIsLoading(true);
       setError(null);
-
-      if (USE_MOCK) {
-        setRequests(MOCK_INSTRUCTOR_REQUESTS);
-        return;
-      }
 
       // TODO: API 연동
       // const requestsRes = await api('/api/admin/instructor-requests');
@@ -35,36 +32,38 @@ export function InstructorManagementClientPage() {
   }, []);
 
   useEffect(() => {
-    loadData();
+    if (!USE_MOCK) {
+      loadData();
+    } else {
+      const initialPending = MOCK_INSTRUCTOR_REQUESTS.filter((request) => request.status === 'PENDING')
+        .length;
+      dispatchPendingCount(initialPending);
+    }
   }, [loadData]);
 
   // 승인/거절 처리
-  const handleProcess = useCallback(
-    async (requestId: number, action: 'approve' | 'reject') => {
-      if (!requestId) return;
+  const handleProcess = useCallback(async (requestId: number, action: 'approve' | 'reject') => {
+    if (!requestId) return;
 
-      if (USE_MOCK) {
-        const newStatus: ApplicationStatus = action === 'approve' ? 'APPROVED' : 'REJECTED';
-        const processedAt = new Date().toISOString();
-
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.applicationId === requestId ? { ...r, status: newStatus, processedAt } : r,
-          ),
-        );
-        return;
+    if (USE_MOCK) {
+      const newStatus: ApplicationStatus = action === 'approve' ? 'APPROVED' : 'REJECTED';
+      const request = MOCK_INSTRUCTOR_REQUESTS.find((r) => r.applicationId === requestId);
+      if (request) {
+        request.status = newStatus;
       }
+      const updatedRequests = [...MOCK_INSTRUCTOR_REQUESTS];
+      setRequests(updatedRequests);
+      const pending = updatedRequests.filter((req) => req.status === 'PENDING').length;
+      dispatchPendingCount(pending);
+      return;
+    }
 
-      // TODO: API 연동
-      // await api(`/api/admin/instructor-requests/${requestId}`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify({ action }),
-      // });
-
-      await loadData();
-    },
-    [loadData],
-  );
+    // TODO: API 연동
+    // await api(`/api/admin/instructor-requests/${requestId}`, {
+    //   method: 'PATCH',
+    //   body: JSON.stringify({ action }),
+    // });
+  }, []);
 
   // 로딩 상태
   if (isLoading) {
@@ -95,4 +94,9 @@ export function InstructorManagementClientPage() {
       </div>
     </>
   );
+}
+
+function dispatchPendingCount(count: number) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('mock-pending-count', { detail: count }));
 }
