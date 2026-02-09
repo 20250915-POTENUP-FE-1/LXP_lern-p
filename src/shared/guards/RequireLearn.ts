@@ -13,5 +13,9 @@ export async function requireLearn(courseId: string) {
     redirect(`/courses/${courseId}`);
   }
 
+  if (enrollment.status === 'CANCELED' || enrollment.status === 'EXPIRED') {
+    redirect(`/courses/${courseId}?error=not-available`);
+  }
+
   return { enrollment };
 }
