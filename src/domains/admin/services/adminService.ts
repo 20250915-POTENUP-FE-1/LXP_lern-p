@@ -1,4 +1,4 @@
-import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
+import {} from '@/shared/lib/api/fetchApi';
 import type {} from '../types/admin';
 
 /**

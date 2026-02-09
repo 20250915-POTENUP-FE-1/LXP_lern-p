@@ -1,9 +1,9 @@
 'use client';
 
 import { User, Mail, Calendar } from 'lucide-react';
+import { formatDate } from '@/shared/util/formatDate';
 import type { InstructorRequest } from '../types/admin';
 import styles from './InstructorRequestCard.module.css';
-import { formatDate } from '@/shared/util/formatDate';
 
 type InstructorRequestCardProps = {
   request: InstructorRequest;
