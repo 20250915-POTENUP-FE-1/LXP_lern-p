@@ -2,9 +2,9 @@ import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
   EnrollmentListResponse,
   EnrollmentDetailResponse,
+  EnrollmentStatus,
+  GetEnrollmentResponse,
 } from '@/domains/user/types/enrollment';
-import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
-import { GetEnrollmentResponse } from '@/domains/course/types/course';
 
 // 수강 정보 조회 (강좌 ID 기준)
 export const getEnrollmentByCourseId = async (
@@ -25,12 +25,12 @@ export const getEnrollmentByCourseId = async (
 // 수강 정보 조회 (수강 ID 기준)
 export async function getEnrollmentByEnrollmentId(
   enrollmentId: string,
-): Promise<LearnEnrollmentResponse> {
+): Promise<GetEnrollmentResponse> {
   return getApi(`/api/enrollments/${enrollmentId}`, { cache: 'no-store' });
 }
 
 export async function getEnrollmentList(params?: {
-  status?: string;
+  status?: EnrollmentStatus;
   page?: number;
   size?: number;
 }): Promise<EnrollmentListResponse> {
@@ -41,12 +41,6 @@ export async function getEnrollmentList(params?: {
   });
 
   return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
-    cache: 'no-store',
-  });
-}
-
-export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResponse> {
-  return await getApi<EnrollmentDetailResponse>(`/api/enrollments/${enrollmentId}`, {
     cache: 'no-store',
   });
 }

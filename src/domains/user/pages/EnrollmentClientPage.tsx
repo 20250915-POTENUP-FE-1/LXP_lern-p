@@ -11,17 +11,15 @@ import CourseReviewModal from '@/domains/course/components/CourseReviewModal';
 import { MOCK_GET_COURSE_REVIEWS } from '@/mocks/review.mock';
 import { useCourseReviews } from '@/domains/course/hooks/useCourseReview';
 import { USE_MOCK } from '@/shared/constants/config';
-import { getEnrollmentList } from '../services/enrollmentService';
 import { getIsReviewed } from '@/domains/course/services/reviewService';
+import { getEnrollmentList } from '../services/enrollmentService';
+import { getEnrollmentProgressRate } from '../utils/enrollmentProgress';
 
 export default function EnrollmentClientPage() {
   const [items, setItems] = useState<EnrollmentListContent[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [reviewTarget, setReviewTarget] = useState<EnrollmentListContent | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-
-  const [enrolledLoading, setEnrolledLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const selectedCourseId = useMemo(
@@ -82,7 +80,7 @@ export default function EnrollmentClientPage() {
 
   useEffect(() => {
     async function fetchEnrollments() {
-      setEnrolledLoading(true);
+      setLoading(true);
       try {
         // TODO(mock): 개발 중 환경변수로 수강 목록 및 리뷰 상태를 mock 데이터로 구성
         const page = USE_MOCK ? MOCK_ENROLLMENT_LIST : await getEnrollmentList();
@@ -137,6 +135,10 @@ export default function EnrollmentClientPage() {
 
       <div className={styles['enrollment-section__list']}>
         {items.map((item) => {
+          const rate = getEnrollmentProgressRate(item);
+          const canLearn = item.status === 'ENROLLED' || item.status === 'COMPLETED';
+          const canReview = item.status === 'COMPLETED';
+
           return (
             <div key={item.enrollmentId} className={styles['enrollment-card']}>
               <div className={styles['enrollment__link']}>
@@ -153,35 +155,36 @@ export default function EnrollmentClientPage() {
                 </div>
 
                 <div className={styles['enrollment-card__actions']}>
-                  <button
-                    type="button"
-                    className={styles['enrollment__review-btn']}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      openReviewModal(item);
-                    }}
-                  >
-                    {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
-                  </button>
-                  <Link
-                    href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
-                    className={styles['btn-primary']}
-                    aria-label="학습하기"
-                  >
-                    <Play />
-                  </Link>
+                  {canReview && (
+                    <button
+                      type="button"
+                      className={styles['enrollment__review-btn']}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openReviewModal(item);
+                      }}
+                    >
+                      {item.isReviewed ? '리뷰 수정' : '리뷰 작성'}
+                    </button>
+                  )}
+                  {canLearn && (
+                    <Link
+                      href={`/courses/${item.courseId}/learn?enrollmentId=${item.enrollmentId}`}
+                      className={styles['btn-primary']}
+                      aria-label="학습하기"
+                    >
+                      <Play />
+                    </Link>
+                  )}
                 </div>
               </div>
 
               <div className={styles['progress']}>
-                <div
-                  className={styles['progress__bar']}
-                  style={{ width: `${item.progressRate ?? 0}%` }}
-                />
+                <div className={styles['progress__bar']} style={{ width: `${rate}%` }} />
               </div>
 
-              <span className={styles['enrollment-card__percent']}>{item.progressRate ?? 0}%</span>
+              <span className={styles['enrollment-card__percent']}>{rate}%</span>
             </div>
           );
         })}
