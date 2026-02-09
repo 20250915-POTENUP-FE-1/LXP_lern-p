@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { AppShell } from '@/shared/ui/AppShell';
 import { AdminPageSidebar } from '@/domains/admin/components/AdminPageSidebar';
 import { Menu, X } from 'lucide-react';
-import styles from '@/app/admin/AdminLayout.module.css';
+import styles from '@/app/admin/AdminPage.module.css';
 import { USE_MOCK } from '@/shared/constants/config';
 import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
 
