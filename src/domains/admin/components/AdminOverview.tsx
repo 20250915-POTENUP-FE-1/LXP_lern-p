@@ -1,6 +1,3 @@
-// 관리자페이지 대시보드 (페이지 접속시 기본)
-'use client';
-
 import { Users, BookOpen, UserCheck, Clock } from 'lucide-react';
 import styles from './AdminOverview.module.css';
 
@@ -12,8 +9,6 @@ type AdminOverviewProps = {
     pendingRequests: number;
   };
 };
-
-//TODO:  AdminOverviewProps.stats 를 API 로 가져온 값과 연결??
 
 export const AdminOverview = ({ stats }: AdminOverviewProps) => {
   return (
