@@ -9,16 +9,18 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
 import type {
-  CourseListParams,
+  GetAllCoursesParams,
   GetAllCourseResponse,
   GetCourseDetailResponse,
-} from '../types/course';
+} from '@/domains/course/types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
-export const getAllCourses = async (params?: CourseListParams): Promise<GetAllCourseResponse> => {
+export const getAllCourses = async (
+  params?: GetAllCoursesParams,
+): Promise<GetAllCourseResponse> => {
   const query = new URLSearchParams();
   if (params?.page != null) query.set('page', String(params.page));
   if (params?.size != null) query.set('size', String(params.size));

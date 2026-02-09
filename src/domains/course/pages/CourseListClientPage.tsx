@@ -62,6 +62,7 @@ export default function CourseListClientPage() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
+        // TODO: 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
         const data: GetAllCourseResponse = USE_MOCK
           ? (() => {
               const titleKeyword = title.trim().toLowerCase();

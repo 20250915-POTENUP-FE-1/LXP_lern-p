@@ -359,7 +359,7 @@ export type LectureResourceResponse = {
   isDownloadable: boolean;
 };
 
-export type CourseListParams = {
+export type GetAllCoursesParams = {
   page?: number;
   size?: number;
   categoryId?: number;
