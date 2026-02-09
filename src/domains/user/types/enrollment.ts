@@ -6,6 +6,7 @@ export type EnrollmentListContent = {
   courseId: string;
   courseName: string;
   status: EnrollmentStatus;
+  // TODO: 백엔드 전환 완료 후 progressRate 제거하고 overallProgressRate로 통합
   progressRate?: number;
   overallProgressRate?: number;
   expiredAt: string;
@@ -27,6 +28,7 @@ export type EnrollmentDetailResponse = {
   studentId: string;
   courseId: string;
   status: EnrollmentStatus;
+  // TODO: 백엔드 전환 완료 후 progressRate 제거하고 overallProgressRate로 통합
   progressRate?: number;
   overallProgressRate?: number;
   createdAt: string;
