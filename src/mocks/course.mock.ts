@@ -131,7 +131,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2001': {
     courseId: '2001',
     title: '스프링 부트 완벽 가이드1',
-    categories: ['백엔드'],
+    categories: ['프로그래밍', '백엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
     summary: '스프링 부트의 모든 것',
     description: '기초부터 실전까지',
@@ -227,7 +227,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2002': {
     courseId: '2002',
     title: '스프링 부트 완벽 가이드2',
-    categories: ['백엔드', 'Spring'],
+    categories: ['프로그래밍', '백엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
     summary: 'Spring Boot 기반 실무 백엔드 완성 로드맵',
     description: 'Spring Boot 프로젝트 구조, REST API 설계, JPA 연동까지 실무 중심으로 다룹니다.',
@@ -351,7 +351,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2003': {
     courseId: '2003',
     title: 'React & Next.js 완전 정복',
-    categories: ['프론트엔드', 'React'],
+    categories: ['프로그래밍', '프론트엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2003.png',
     summary: 'React와 Next.js App Router를 함께 학습합니다.',
     description: '컴포넌트 설계부터 App Router 렌더링 흐름까지 연결합니다.',
@@ -475,7 +475,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2004': {
     courseId: '2004',
     title: '데이터베이스 기초',
-    categories: ['데이터베이스'],
+    categories: ['데이터사이언스', '데이터 분석'],
     thumbnailUrl: 'https://example.com/thumbnails/course_2004.png',
     summary: '데이터베이스 기본 개념과 SQL 기초',
     description: '테이블, 관계, 정규화 개념과 SQL 기본 문법을 학습합니다.',
@@ -570,7 +570,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '3001': {
     courseId: '3001',
     title: 'Node.js 백엔드 실전',
-    categories: ['백엔드', 'Node.js'],
+    categories: ['프로그래밍', '백엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_3001.png',
     summary: 'Node.js 기반 서버 개발 실전 과정',
     description: 'Express 기반 API 설계, 인증, 에러 처리, 배포까지 다룹니다.',
@@ -666,7 +666,7 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '3002': {
     courseId: '3002',
     title: '프론트엔드 테스트 전략',
-    categories: ['프론트엔드', '테스트'],
+    categories: ['프로그래밍', '프론트엔드'],
     thumbnailUrl: 'https://example.com/thumbnails/course_3002.png',
     summary: '프론트엔드 테스트 입문',
     description: 'Jest, Testing Library를 활용해 안정적인 테스트를 작성합니다.',
