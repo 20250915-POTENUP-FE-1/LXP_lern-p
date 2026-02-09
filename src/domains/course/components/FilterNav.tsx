@@ -27,33 +27,89 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import styles from './FilterNav.module.css';
 
-export function FilterNav({
-  categoryMap,
-  selectedFirst,
-  selectedSecond,
-  onSelectFirst,
-  onSelectSecond,
-}: FilterNavProps) {
-  const firstCategories = Object.keys(categoryMap);
+/** categoryId를 포함한 카테고리 맵 */
+export type CategoryMapEntry = {
+  categoryId: number;
+  children: { categoryId: number; name: string }[];
+};
+
+type FilterNavProps = {
+  categoryMap: Record<string, CategoryMapEntry>;
+  selectedCategoryId: number | null;
+  onSelectCategory: (categoryId: number | null) => void;
+};
+
+export function FilterNav({ categoryMap, selectedCategoryId, onSelectCategory }: FilterNavProps) {
+  const [expandedFirst, setExpandedFirst] = useState<string | null>('전체');
+
+  const firstCategories = ['전체', ...Object.keys(categoryMap)];
 
   const secondCategories =
-    selectedFirst && selectedFirst !== '전체' ? (categoryMap[selectedFirst] ?? []) : [];
+    expandedFirst && expandedFirst !== '전체' ? (categoryMap[expandedFirst]?.children ?? []) : [];
 
   const handleFirstClick = (cat: string) => {
-    if (cat === selectedFirst) {
-      onSelectFirst(null);
+    if (cat === '전체') {
+      setExpandedFirst('전체');
+      onSelectCategory(null);
       return;
     }
-    onSelectFirst(cat);
-    onSelectSecond(null);
+
+    if (cat === expandedFirst) {
+      setExpandedFirst(null);
+      onSelectCategory(null);
+      return;
+    }
+    setExpandedFirst(cat);
+    // 1차 카테고리 클릭 시 해당 categoryId로 필터
+    const entry = categoryMap[cat];
+    onSelectCategory(entry ? entry.categoryId : null);
   };
+
+  const handleSecondClick = (child: { categoryId: number; name: string }) => {
+    if (selectedCategoryId === child.categoryId) {
+      // 이미 선택된 2차 카테고리를 다시 클릭 → 1차로 복귀
+      const entry = expandedFirst ? categoryMap[expandedFirst] : null;
+      onSelectCategory(entry ? entry.categoryId : null);
+    } else {
+      onSelectCategory(child.categoryId);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCategoryId == null) {
+      setExpandedFirst('전체');
+      return;
+    }
+
+    const parentEntry = Object.entries(categoryMap).find(
+      ([, entry]) => entry.categoryId === selectedCategoryId,
+    );
+    if (parentEntry) {
+      setExpandedFirst(parentEntry[0]);
+      return;
+    }
+
+    const childEntry = Object.entries(categoryMap).find(([, entry]) =>
+      entry.children.some((child) => child.categoryId === selectedCategoryId),
+    );
+    if (childEntry) {
+      setExpandedFirst(childEntry[0]);
+      return;
+    }
+
+    setExpandedFirst(null);
+  }, [categoryMap, selectedCategoryId]);
 
   return (
     <nav className={styles['filter-nav']} aria-label="카테고리 필터">
       <ScrollableRow className={styles['filter-nav__row--primary']}>
         {firstCategories.map((cat) => {
           const Icon = CATEGORY_ICONS[cat] ?? Layers;
-          const isActive = selectedFirst === cat;
+          const entry = categoryMap[cat];
+          const isActive =
+            cat === '전체'
+              ? selectedCategoryId == null
+              : expandedFirst === cat || selectedCategoryId === entry?.categoryId;
           return (
             <li key={cat}>
               <button
@@ -74,17 +130,17 @@ export function FilterNav({
 
       {secondCategories.length > 0 && (
         <ScrollableRow className={styles['filter-nav__row--secondary']}>
-          {secondCategories.map((sub) => (
-            <li key={sub}>
+          {secondCategories.map((child) => (
+            <li key={child.categoryId}>
               <button
                 type="button"
                 className={`${styles['filter-nav__chip']} ${
-                  selectedSecond === sub ? styles['filter-nav__chip--active'] : ''
+                  selectedCategoryId === child.categoryId ? styles['filter-nav__chip--active'] : ''
                 }`}
-                onClick={() => onSelectSecond(selectedSecond === sub ? null : sub)}
-                aria-pressed={selectedSecond === sub}
+                onClick={() => handleSecondClick(child)}
+                aria-pressed={selectedCategoryId === child.categoryId}
               >
-                {sub}
+                {child.name}
               </button>
             </li>
           ))}
@@ -92,17 +148,6 @@ export function FilterNav({
       )}
     </nav>
   );
-}
-
-// API 응답을 변환한 공통 포맷: { '프로그래밍': ['웹개발', '프론트엔드', ...] }
-export type CategoryMap = Record<string, readonly string[]>;
-
-interface FilterNavProps {
-  categoryMap: CategoryMap;
-  selectedFirst: string | null;
-  selectedSecond: string | null;
-  onSelectFirst: (cat: string | null) => void;
-  onSelectSecond: (sub: string | null) => void;
 }
 
 function ScrollableRow({ children, className }: { children: React.ReactNode; className?: string }) {
