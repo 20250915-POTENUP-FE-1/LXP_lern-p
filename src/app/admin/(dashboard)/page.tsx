@@ -25,7 +25,7 @@ async function getAdminStats(): Promise<AdminStats> {
 
 export const revalidate = 0;
 
-export default async function AdminPage() {
+export default async function AdminDashboardPage() {
   const stats = await getAdminStats();
 
   return (
