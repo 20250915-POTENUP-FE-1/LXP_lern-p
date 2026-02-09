@@ -1,6 +1,6 @@
 import type { Category } from '@/domains/course/types/course';
 
-export const MOCK_CATEGORIES: Category[] = [
+export const MOCK_GET_CATEGORIES: Category[] = [
   { categoryId: 0, name: '전체', children: [] },
   {
     categoryId: 1,

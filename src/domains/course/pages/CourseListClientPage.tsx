@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
 import { MOCK_GET_ALL_COURSE } from '@/mocks/course.mock';
-import { MOCK_CATEGORIES } from '@/mocks/category.mock';
+import { MOCK_GET_CATEGORIES } from '@/mocks/category.mock';
 import { USE_MOCK } from '@/shared/constants/config';
 import { CourseCard } from '../components/CourseCard';
 import { getAllCourses } from '../services/courseService';
 import { getCategories } from '../services/courseCreateService';
 import type { CourseCardType, GetAllCourseResponse, Category } from '../types/course';
 import { useCourseListQuery } from '../hooks/useCourseListQuery';
-import { SortSelect, sortCourses } from '../components/SortSelect';
+import { sortCourses } from '../components/SortSelect';
 import { LEVEL_LABEL } from '../constants/level';
 import { FilterNav } from '../components/FilterNav';
 import type { CategoryMap } from '../components/FilterNav';
@@ -37,13 +37,16 @@ export default function CourseListClientPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       try {
-        // 카테고리 fetch
-        const categoryData = USE_MOCK ? MOCK_CATEGORIES : await getCategories();
+        const [categoryData, data] = await Promise.all([
+          USE_MOCK ? Promise.resolve(MOCK_GET_CATEGORIES) : getCategories(),
+          USE_MOCK ? Promise.resolve(MOCK_GET_ALL_COURSE) : getAllCourses(),
+        ]);
+
         setCategoryMap(toCategoryMap(categoryData));
 
-        // 강좌 fetch
-        const data: GetAllCourseResponse = USE_MOCK ? MOCK_GET_ALL_COURSE : await getAllCourses();
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
           id: item.courseId,
           title: item.title,
