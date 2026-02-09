@@ -1,5 +1,5 @@
-import { AdminInstructorPage } from '@/domains/admin/pages/AdminInstructorPage';
+import { InstructorManagementClientPage } from '@/domains/admin/pages/InstructorManagementClientPage';
 
-export default function InstructorPage() {
-  return <AdminInstructorPage />;
+export default function InstructorManagementPage() {
+  return <InstructorManagementClientPage />;
 }

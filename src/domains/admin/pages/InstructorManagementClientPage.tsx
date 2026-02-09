@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { InstructorManagement } from '@/domains/admin/components/AdminDashboard';
+import { InstructorManagement } from '@/domains/admin/components/InstructorManagement';
 import type { InstructorRequest, InstructorRequestStatus } from '@/domains/admin/types/admin';
 import { USE_MOCK } from '@/shared/constants/config';
 import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
 import styles from '@/app/admin/AdminPage.module.css';
 
-export function AdminInstructorPage() {
+export function InstructorManagementClientPage() {
   const [requests, setRequests] = useState<InstructorRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,12 +85,9 @@ export function AdminInstructorPage() {
   // 정상 렌더링
   return (
     <>
-      {/* 제목 헤더 (기존 AdminClientPage의 <header> 부분) */}
       <header className={styles['admin-page__header']}>
         <h1 className={styles['admin-page__title']}>강사 승인</h1>
       </header>
-
-      {/* 콘텐츠 영역 (기존 AdminClientPage의 <div className="admin__content"> 부분) */}
       <div className={styles['admin-page__content']}>
         <InstructorManagement requests={requests} onProcess={handleProcess} onRefresh={loadData} />
       </div>
