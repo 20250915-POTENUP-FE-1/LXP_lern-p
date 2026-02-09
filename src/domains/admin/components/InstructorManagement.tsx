@@ -1,12 +1,10 @@
-// 관리자페이지 강사승인
-
 'use client';
 
 import { useState, useCallback } from 'react';
 import type { InstructorRequest, RequestFilter } from '../types/admin';
 import { InstructorRequestCard } from './InstructorRequestCard';
 import { InstructorApprovalModal } from './InstructorApprovalModal';
-import styles from './AdminDashboard.module.css';
+import styles from './InstructorManagement.module.css';
 
 type InstructorManagementProps = {
   requests: InstructorRequest[];
@@ -65,48 +63,48 @@ export const InstructorManagement = ({
   );
 
   return (
-    <div className={styles['admin-dashboard']}>
+    <div className={styles['instructor-management']}>
       {/* 필터 탭 */}
-      <div className={styles['admin-dashboard__filter-tabs']}>
+      <div className={styles['instructor-management__filter-tabs']}>
         <button
-          className={`${styles['admin-dashboard__filter-tab']} ${
-            filter === 'PENDING' ? styles['admin-dashboard__filter-tab--active'] : ''
+          className={`${styles['instructor-management__filter-tab']} ${
+            filter === 'PENDING' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
           onClick={() => setFilter('PENDING')}
         >
           대기중
           <span
-            className={`${styles['admin-dashboard__filter-count']} ${
-              pendingCount > 0 ? styles['admin-dashboard__filter-count--warning'] : ''
+            className={`${styles['instructor-management__filter-count']} ${
+              pendingCount > 0 ? styles['instructor-management__filter-count--warning'] : ''
             }`}
           >
             {pendingCount}
           </span>
         </button>
         <button
-          className={`${styles['admin-dashboard__filter-tab']} ${
-            filter === 'APPROVED' ? styles['admin-dashboard__filter-tab--active'] : ''
+          className={`${styles['instructor-management__filter-tab']} ${
+            filter === 'APPROVED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
           onClick={() => setFilter('APPROVED')}
         >
           승인됨
-          <span className={styles['admin-dashboard__filter-count']}>{approvedCount}</span>
+          <span className={styles['instructor-management__filter-count']}>{approvedCount}</span>
         </button>
         <button
-          className={`${styles['admin-dashboard__filter-tab']} ${
-            filter === 'REJECTED' ? styles['admin-dashboard__filter-tab--active'] : ''
+          className={`${styles['instructor-management__filter-tab']} ${
+            filter === 'REJECTED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
           onClick={() => setFilter('REJECTED')}
         >
           거절됨
-          <span className={styles['admin-dashboard__filter-count']}>{rejectedCount}</span>
+          <span className={styles['instructor-management__filter-count']}>{rejectedCount}</span>
         </button>
       </div>
 
       {/* 탭에 들어가는 내용 */}
-      <div className={styles['admin-dashboard__request-list']}>
+      <div className={styles['instructor-management__request-list']}>
         {filteredRequests.length === 0 ? (
-          <div className={styles['admin-dashboard__empty-state']}>
+          <div className={styles['instructor-management__empty-state']}>
             {filter === 'PENDING' && '대기 중인 요청이 없습니다.'}
             {filter === 'APPROVED' && '승인된 요청이 없습니다.'}
             {filter === 'REJECTED' && '거절된 요청이 없습니다.'}
