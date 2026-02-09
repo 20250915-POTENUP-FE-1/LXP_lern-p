@@ -1,19 +1,24 @@
 .search-bar {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
   width: 100%;
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  max-width: 600px;
+  margin: 40px auto 0;
+  padding: 4px 4px 4px 16px;
+  border-radius: 100px;
+  border: 2px solid var(--color-border);
   background: var(--color-surface);
-  /* box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02); */
+  transition: border-color 0.2s;
 }
 
-.search-bar--center {
-  margin-inline: auto;
-  max-width: min(720px, 100%);
-  justify-content: center;
+.search-bar:focus-within {
+  border-color: var(--color-brand);
+}
+
+.search-bar__icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 
 .search-bar__input {
@@ -21,7 +26,9 @@
   border: none;
   background: transparent;
   color: var(--color-text);
-  padding: var(--space-2) var(--space-2);
+  font-size: 15px;
+  padding: 10px 0;
+  min-width: 0;
 }
 
 .search-bar__input::placeholder {
@@ -32,17 +39,24 @@
   outline: none;
 }
 
+/* 기본 search input 'x' 버튼 제거 */
+.search-bar__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
 .search-bar__button {
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  padding: var(--space-2) var(--space-4);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
   background: var(--color-brand);
-  color: var(--color-text);
-  font-weight: 600;
+  color: #fff;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s;
 }
 
 .search-bar__button:hover,
@@ -52,11 +66,5 @@
 }
 
 .search-bar__button:active {
-  transform: translateY(1px);
-}
-
-@media (min-width: 768px) {
-  .search-bar {
-    max-width: 720px;
-  }
+  transform: scale(0.95);
 }

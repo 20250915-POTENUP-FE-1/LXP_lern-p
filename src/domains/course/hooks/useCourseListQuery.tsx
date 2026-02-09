@@ -18,7 +18,7 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const sortParam = searchParams.get('category');
+  const sortParam = searchParams.get('sort');
   const sort: SortValue =
     sortParam === 'oldest' || sortParam === 'price-asc' || sortParam === 'price-desc'
       ? sortParam
@@ -27,7 +27,7 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
   const setSort = useCallback(
     (value: SortValue) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set('category', value);
+      params.set('sort', value);
 
       const query = params.toString();
       const nextUrl = query ? `${pathname}?${query}` : pathname;
