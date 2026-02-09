@@ -41,6 +41,7 @@ export default function CourseListClientPage() {
 
       try {
         const [categoryData, data] = await Promise.all([
+          // TODO(mock): 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
           USE_MOCK ? Promise.resolve(MOCK_GET_CATEGORIES) : getCategories(),
           USE_MOCK ? Promise.resolve(MOCK_GET_ALL_COURSE) : getAllCourses(),
         ]);
