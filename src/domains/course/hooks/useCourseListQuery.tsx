@@ -22,6 +22,7 @@ interface UseCourseListQueryReturn extends CourseListQueryState {
   setCategoryId: (value: number | null) => void;
   setLevel: (value: CourseLevel | null) => void;
   setTitle: (value: string) => void;
+  setCategoryAndTitle: (categoryId: number | null, title: string | null) => void;
 }
 
 const VALID_LEVELS: CourseLevel[] = ['BEGINNER', 'NOVICE', 'INTERMEDIATE', 'ADVANCED'];
@@ -70,6 +71,15 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     },
     [pathname, router, searchParams],
   );
+  const setCategoryAndTitle = useCallback(
+    (value: number | null, nextTitle: string | null) =>
+      updateParams({
+        categoryId: value != null ? String(value) : null,
+        title: nextTitle || null,
+        page: null,
+      }),
+    [updateParams],
+  );
 
   const setSort = useCallback(
     (value: SortValue) => updateParams({ sort: value, page: null }),
@@ -115,5 +125,6 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     setCategoryId,
     setLevel,
     setTitle,
+    setCategoryAndTitle,
   };
 }

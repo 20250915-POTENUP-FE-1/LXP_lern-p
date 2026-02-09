@@ -49,8 +49,21 @@ export default function CourseListClientPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [hasNext, setHasNext] = useState(false);
 
-  const { sort, page, size, categoryId, level, title, setPage, setCategoryId } =
-    useCourseListQuery();
+  const {
+    sort,
+    page,
+    size,
+    categoryId,
+    level,
+    title,
+    setPage,
+    setCategoryId,
+    setCategoryAndTitle,
+  } = useCourseListQuery();
+
+  const handleSelectCategory = (nextCategoryId: number | null) => {
+    setCategoryAndTitle(nextCategoryId, null); // 카테고리 선택 시 항상 title 제거
+  };
 
   // 카테고리 데이터는 마운트 시 1회만
   useEffect(() => {
@@ -155,7 +168,7 @@ export default function CourseListClientPage() {
       <FilterNav
         categoryMap={categoryMap}
         selectedCategoryId={categoryId}
-        onSelectCategory={setCategoryId}
+        onSelectCategory={handleSelectCategory}
       />
 
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
