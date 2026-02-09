@@ -220,7 +220,6 @@ export type GetAllCourseResponse = {
     status: Status;
     price: number;
     studentCount: number;
-    rating: number;
     lastModifiedAt: string;
     level: CourseLevel;
     summary: string;
