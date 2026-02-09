@@ -262,18 +262,6 @@ export type GetCourseDetailResponse = {
   };
 };
 
-export type EnrollmentStatus = 'ENROLLED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
-
-export type GetEnrollmentResponse = {
-  enrollmentId: string;
-  studentId: string;
-  courseId: string;
-  status: EnrollmentStatus;
-  progressRate: number;
-  createdAt: string;
-  expiredAt: string;
-};
-
 export type SectionDetailResponse = {
   sectionId: string;
   title: string;

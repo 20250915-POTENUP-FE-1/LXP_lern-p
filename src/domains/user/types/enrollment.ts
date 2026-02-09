@@ -22,6 +22,18 @@ export type EnrollmentListResponse = {
   pageSize: number;
 };
 
+export type GetEnrollmentResponse = {
+  enrollmentId: string;
+  studentId: string;
+  courseId: string;
+  status: EnrollmentStatus;
+  // TODO: 백엔드 전환 완료 후 progressRate 제거하고 overallProgressRate로 통합
+  progressRate?: number;
+  overallProgressRate?: number;
+  createdAt: string;
+  expiredAt: string;
+};
+
 // 2) 수강 단건 조회 (GET /api/enrollments/{enrollmentId})
 export type EnrollmentDetailResponse = {
   enrollmentId: string;

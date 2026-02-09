@@ -3,15 +3,15 @@ import type {
   EnrollmentListResponse,
   EnrollmentDetailResponse,
   EnrollmentStatus,
+  GetEnrollmentResponse,
 } from '@/domains/user/types/enrollment';
-import type { GetEnrollmentResponse as EnrollmentByCourseResponse } from '@/domains/course/types/course';
 
 // 수강 정보 조회 (강좌 ID 기준)
 export const getEnrollmentByCourseId = async (
   courseId: string,
-): Promise<EnrollmentByCourseResponse | null> => {
+): Promise<GetEnrollmentResponse | null> => {
   try {
-    return await getApi<EnrollmentByCourseResponse | null>(`/api/enrollments/course/${courseId}`, {
+    return await getApi<GetEnrollmentResponse | null>(`/api/enrollments/course/${courseId}`, {
       cache: 'no-store',
     });
   } catch (err) {
