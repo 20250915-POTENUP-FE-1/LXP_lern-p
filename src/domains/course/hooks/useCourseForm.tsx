@@ -4,6 +4,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
 import { createCourse } from '../services/courseCreateService';
+import { createCourseThumbnailPresignedUrl } from '../services/thumbnailService';
 import type { CourseDraftForm, CreateCourseRequest } from '../types/course';
 
 const COURSE_DRAFT_ID_KEY = 'courseDraftId';
@@ -32,11 +33,44 @@ export function useCourseForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState(false);
+  const [isThumbnailUploading, setIsThumbnailUploading] = useState(false);
 
   const isInvalid = validateForm(formData);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const handleThumbnailFileSelect = (file: File | null) => {
-    setThumbnailFile(file);
+  const handleThumbnailFileSelect = async (file: File | null) => {
+    if (!file || isThumbnailUploading) return;
+
+    try {
+      setIsThumbnailUploading(true);
+      setError('');
+
+      const presign = await createCourseThumbnailPresignedUrl({
+        originalFileName: file.name,
+        contentType: file.type,
+        size: file.size,
+      });
+
+      await fetch(presign.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        thumbnailUrl: presign.fileUrl,
+      }));
+    } catch (err) {
+      console.error(err);
+
+      setFormData((prev) => ({
+        ...prev,
+        thumbnailUrl: '',
+      }));
+
+      setError('썸네일 업로드에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsThumbnailUploading(false);
+    }
   };
 
   const handleChange = (
@@ -54,13 +88,6 @@ export function useCourseForm() {
     setFormData((prev) => ({
       ...prev,
       category,
-    }));
-  };
-
-  const handleThumbnailUpload = (url: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      thumbnailUrl: url,
     }));
   };
 
@@ -180,8 +207,8 @@ export function useCourseForm() {
     handleFormSubmit,
     handleChange,
     handleCategoryChange,
-    handleThumbnailUpload,
     handleThumbnailFileSelect,
     handleCancel,
+    isThumbnailUploading,
   };
 }
