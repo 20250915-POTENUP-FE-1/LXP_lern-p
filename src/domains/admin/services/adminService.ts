@@ -28,8 +28,11 @@ export async function getInstructorApplicaions(
 /**
  * 강사 요청 승인/거절
  */
-export const processInstructorApplication = async (status: ApplicationStatus): Promise<void> => {
-  await patchApi<void>(`/api/users/instructor/applications`, { status });
+export const processInstructorApplication = async (
+  applicationId: number,
+  status: ApplicationStatus,
+): Promise<void> => {
+  await patchApi<void>(`/api/users/instructor/applications/${applicationId}`, { status });
 };
 
 /**
