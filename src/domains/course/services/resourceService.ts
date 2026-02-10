@@ -23,13 +23,13 @@ export async function createPresignedUploadUrl(
 }
 
 // Course Thumbnail Presign
-export type CourseThumbnailPresignRequest = {
+export type CreateCourseThumbnailPresignedUrlRequest = {
   originalFileName: string;
   contentType: string;
   size: number;
 };
 
-export type CourseThumbnailPresignResponse = {
+export type CreateCourseThumbnailPresignedUrlResponse = {
   uploadUrl: string;
   fileKey: string;
   fileUrl: string;
