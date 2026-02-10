@@ -9,9 +9,23 @@ import { MOCK_INSTRUCTOR_REQUESTS } from '@/mocks/admin.mock';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(() =>
+    USE_MOCK
+      ? MOCK_INSTRUCTOR_REQUESTS.filter((request) => request.status === 'PENDING').length
+      : 0,
+  );
 
   useEffect(() => {
+    if (USE_MOCK) {
+      const handlePendingCount = (event: Event) => {
+        const customEvent = event as CustomEvent<number>;
+        setPendingCount(customEvent.detail ?? 0);
+      };
+
+      window.addEventListener('mock-pending-count', handlePendingCount);
+      return () => window.removeEventListener('mock-pending-count', handlePendingCount);
+    }
+
     const loadPendingCount = async () => {
       try {
         if (USE_MOCK) {

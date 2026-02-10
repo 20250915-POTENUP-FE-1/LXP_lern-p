@@ -1,29 +1,33 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { InstructorRequest, RequestFilter } from '../types/admin';
+import type { InstructorApplication, RequestFilter } from '../types/admin';
 import { InstructorRequestCard } from './InstructorRequestCard';
 import { InstructorApprovalModal } from './InstructorApprovalModal';
 import styles from './InstructorManagement.module.css';
 
 type InstructorManagementProps = {
-  requests: InstructorRequest[];
+  requests: InstructorApplication[];
   onProcess: (requestId: number, action: 'approve' | 'reject') => Promise<void>;
-  onRefresh: () => void;
+  onRefresh?: () => void;
+  filter: RequestFilter;
+  onFilterChange: (next: RequestFilter) => void;
 };
 
 export const InstructorManagement = ({
   requests,
   onProcess,
   onRefresh,
+  filter,
+  onFilterChange,
 }: InstructorManagementProps) => {
-  const [filter, setFilter] = useState<RequestFilter>('PENDING');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<InstructorRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<InstructorApplication | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 필터링된 요청 목록
-  const filteredRequests = requests.filter((req) => req.status === filter); //요청 배열에서, filter 항목에 맞는 목록들을 다시 저장
+  const filteredRequests =
+    filter === 'ALL' ? requests : requests.filter((req) => req.status === filter);
 
   // 각 상태별 개수
   const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
@@ -31,7 +35,7 @@ export const InstructorManagement = ({
   const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
   // 요청 카드 클릭 핸들러
-  const handleRequestClick = useCallback((request: InstructorRequest) => {
+  const handleRequestClick = useCallback((request: InstructorApplication) => {
     setSelectedRequest(request);
     setIsModalOpen(true);
   }, []);
@@ -49,9 +53,9 @@ export const InstructorManagement = ({
 
       setIsProcessing(true);
       try {
-        await onProcess(selectedRequest.id, action); //onProcess 에 선택된 아이디-액션 비동기로 저장
+        await onProcess(selectedRequest.applicationId, action);
         handleCloseModal();
-        onRefresh(); //선택시 Void(빈값) 출력??
+        onRefresh?.();
       } catch (error) {
         console.error('처리 실패:', error);
         alert('처리에 실패했습니다. 다시 시도해주세요.');
@@ -62,15 +66,25 @@ export const InstructorManagement = ({
     [selectedRequest, onProcess, handleCloseModal, onRefresh],
   );
 
+  const totalCount = requests.length;
+
   return (
     <div className={styles['instructor-management']}>
-      {/* 필터 탭 */}
       <div className={styles['instructor-management__filter-tabs']}>
+        <button
+          className={`${styles['instructor-management__filter-tab']} ${
+            filter === 'ALL' ? styles['instructor-management__filter-tab--active'] : ''
+          }`}
+          onClick={() => onFilterChange('ALL')}
+        >
+          전체
+          <span className={styles['instructor-management__filter-count']}>{totalCount}</span>
+        </button>
         <button
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'PENDING' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('PENDING')}
+          onClick={() => onFilterChange('PENDING')}
         >
           대기중
           <span
@@ -85,7 +99,7 @@ export const InstructorManagement = ({
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'APPROVED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('APPROVED')}
+          onClick={() => onFilterChange('APPROVED')}
         >
           승인됨
           <span className={styles['instructor-management__filter-count']}>{approvedCount}</span>
@@ -94,7 +108,7 @@ export const InstructorManagement = ({
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'REJECTED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('REJECTED')}
+          onClick={() => onFilterChange('REJECTED')}
         >
           거절됨
           <span className={styles['instructor-management__filter-count']}>{rejectedCount}</span>
@@ -112,7 +126,7 @@ export const InstructorManagement = ({
         ) : (
           filteredRequests.map((request) => (
             <InstructorRequestCard
-              key={request.id}
+              key={request.applicationId}
               request={request}
               onClick={() => handleRequestClick(request)}
             />
