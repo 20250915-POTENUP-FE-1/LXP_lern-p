@@ -9,118 +9,6 @@ import type { GetAllCourseResponse, GetCourseDetailResponse } from '@/domains/co
  * - 2001 코스 정보는 LearnCourseResponse(MOCK_LEARN_COURSE_MAP['2001'])를 기준으로 재구성
  */
 
-export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
-  content: [
-    {
-      courseId: '2001',
-      title: '스프링 부트 완벽 가이드1',
-      categories: ['프로그래밍', '백엔드'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
-      status: 'PUBLISHED',
-      price: 55000,
-      studentCount: 10,
-      lastModifiedAt: '2026-01-07T12:00:00Z',
-      level: 'BEGINNER',
-      summary: '스프링 부트의 모든 것',
-      instructorName: '김영한',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-    {
-      courseId: '2002',
-      title: '스프링 부트 완벽 가이드2',
-      categories: ['프로그래밍', '백엔드'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
-      status: 'PUBLISHED',
-      price: 99000,
-      studentCount: 412,
-      lastModifiedAt: '2026-01-07T14:30:00Z',
-      level: 'INTERMEDIATE',
-      summary: 'Spring Boot로 실무 백엔드 API를 설계하고 구현합니다.',
-      instructorName: '김백엔드',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-    {
-      courseId: '2003',
-      title: 'React & Next.js 완전 정복',
-      categories: ['프로그래밍', '프론트엔드'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_2003.png',
-      status: 'PUBLISHED',
-      price: 89000,
-      studentCount: 356,
-      lastModifiedAt: '2026-01-05T09:12:00Z',
-      level: 'INTERMEDIATE',
-      summary: 'React 핵심부터 Next.js App Router까지 정리합니다.',
-      instructorName: '이프론트',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-    {
-      courseId: '2004',
-      title: '데이터베이스 기초',
-      categories: ['데이터사이언스', '데이터 분석'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_2004.png',
-      status: 'PUBLISHED',
-      price: 59000,
-      studentCount: 215,
-      lastModifiedAt: '2025-12-28T11:00:00Z',
-      level: 'BEGINNER',
-      summary: '관계형 DB 개념과 SQL 기초를 학습합니다.',
-      instructorName: '박디비',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-    {
-      courseId: '3001',
-      title: 'Node.js 백엔드 실전',
-      categories: ['프로그래밍', '백엔드'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_3001.png',
-      status: 'PUBLISHED',
-      price: 99000,
-      studentCount: 182,
-      lastModifiedAt: '2026-01-03T10:00:00Z',
-      level: 'INTERMEDIATE',
-      summary: 'Node.js 기반 서버 개발 실전 과정',
-      instructorName: '정노드',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-    {
-      courseId: '3002',
-      title: '프론트엔드 테스트 전략',
-      categories: ['프로그래밍', '프론트엔드'],
-      thumbnailUrl: 'https://example.com/thumbnails/course_3002.png',
-      status: 'PUBLISHED',
-      price: 69000,
-      studentCount: 96,
-      lastModifiedAt: '2025-12-18T09:30:00Z',
-      level: 'BEGINNER',
-      summary: 'Jest와 Testing Library로 테스트를 시작합니다.',
-      instructorName: '최테스트',
-      reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
-      },
-    },
-  ],
-  currentPage: 0,
-  size: 30,
-  totalElements: 6,
-  totalPages: 1,
-  hasNext: false,
-};
-
 export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
   '2001': {
     courseId: '2001',
@@ -753,3 +641,129 @@ export const MOCK_GET_COURSE_DETAIL: Record<string, GetCourseDetailResponse> = {
     ],
   },
 };
+
+const BASE_COURSES: GetAllCourseResponse['content'] = [
+  {
+    courseId: '2001',
+    title: '스프링 부트 완벽 가이드1',
+    categories: ['프로그래밍', '백엔드'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_2001.png',
+    status: 'PUBLISHED',
+    price: 55000,
+    studentCount: 10,
+    lastModifiedAt: '2026-01-07T12:00:00Z',
+    level: 'BEGINNER',
+    summary: '스프링 부트의 모든 것',
+    instructorName: '김영한',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+  {
+    courseId: '2002',
+    title: '스프링 부트 완벽 가이드2',
+    categories: ['프로그래밍', '백엔드'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_2002.png',
+    status: 'PUBLISHED',
+    price: 99000,
+    studentCount: 412,
+    lastModifiedAt: '2026-01-07T14:30:00Z',
+    level: 'INTERMEDIATE',
+    summary: 'Spring Boot로 실무 백엔드 API를 설계하고 구현합니다.',
+    instructorName: '김백엔드',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+  {
+    courseId: '2003',
+    title: 'React & Next.js 완전 정복',
+    categories: ['프로그래밍', '프론트엔드'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_2003.png',
+    status: 'PUBLISHED',
+    price: 89000,
+    studentCount: 356,
+    lastModifiedAt: '2026-01-05T09:12:00Z',
+    level: 'INTERMEDIATE',
+    summary: 'React 핵심부터 Next.js App Router까지 정리합니다.',
+    instructorName: '이프론트',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+  {
+    courseId: '2004',
+    title: '데이터베이스 기초',
+    categories: ['데이터사이언스', '데이터 분석'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_2004.png',
+    status: 'PUBLISHED',
+    price: 59000,
+    studentCount: 215,
+    lastModifiedAt: '2025-12-28T11:00:00Z',
+    level: 'BEGINNER',
+    summary: '관계형 DB 개념과 SQL 기초를 학습합니다.',
+    instructorName: '박디비',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+  {
+    courseId: '3001',
+    title: 'Node.js 백엔드 실전',
+    categories: ['프로그래밍', '백엔드'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_3001.png',
+    status: 'PUBLISHED',
+    price: 99000,
+    studentCount: 182,
+    lastModifiedAt: '2026-01-03T10:00:00Z',
+    level: 'INTERMEDIATE',
+    summary: 'Node.js 기반 서버 개발 실전 과정',
+    instructorName: '정노드',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+  {
+    courseId: '3002',
+    title: '프론트엔드 테스트 전략',
+    categories: ['프로그래밍', '프론트엔드'],
+    thumbnailUrl: 'https://example.com/thumbnails/course_3002.png',
+    status: 'PUBLISHED',
+    price: 69000,
+    studentCount: 96,
+    lastModifiedAt: '2025-12-18T09:30:00Z',
+    level: 'BEGINNER',
+    summary: 'Jest와 Testing Library로 테스트를 시작합니다.',
+    instructorName: '최테스트',
+    reviewStat: {
+      reviewCount: 1,
+      avgRating: 5.0,
+    },
+  },
+];
+
+export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
+  content: generateMockCourses(BASE_COURSES, 100),
+  currentPage: 0,
+  size: 30,
+  totalElements: 100,
+  totalPages: Math.ceil(100 / 30),
+  hasNext: true,
+};
+
+function generateMockCourses(base: GetAllCourseResponse['content'], totalCount: number) {
+  return Array.from({ length: totalCount }).map((_, index) => {
+    const seed = base[index % base.length];
+
+    return {
+      ...seed,
+      courseId: `${seed.courseId}-${index}`,
+      title: `${seed.title} (${index + 1})`,
+    };
+  });
+}
