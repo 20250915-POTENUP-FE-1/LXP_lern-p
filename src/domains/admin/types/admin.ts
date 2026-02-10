@@ -2,7 +2,7 @@ import { PageResponse } from '@/shared/types/page';
 
 // 요청 상태
 export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-export type RequestFilter = ApplicationStatus | 'ALL';
+export type RequestFilter = ApplicationStatus;
 
 export type InstructorApplication = {
   applicationId: number;
