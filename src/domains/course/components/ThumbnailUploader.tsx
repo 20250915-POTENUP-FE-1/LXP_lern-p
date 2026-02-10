@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
-import { IMAGE_MIME_TYPES } from '@/domains/course/constants/resource';
+import { IMAGE_MIME_TYPES } from '@/domains/course/constants/image';
 import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {

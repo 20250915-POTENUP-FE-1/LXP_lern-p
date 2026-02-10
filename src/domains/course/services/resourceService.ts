@@ -36,8 +36,10 @@ export type CreateCourseThumbnailPresignedUrlResponse = {
   expiresInSeconds: number;
 };
 
-export async function createCourseThumbnailPresignedUrl(payload: CourseThumbnailPresignRequest) {
-  return postApi<CourseThumbnailPresignResponse>(
+export async function createCourseThumbnailPresignedUrl(
+  payload: CreateCourseThumbnailPresignedUrlRequest,
+) {
+  return postApi<CreateCourseThumbnailPresignedUrlResponse>(
     '/api/uploads/courses/thumbnails/presign',
     payload,
   );
