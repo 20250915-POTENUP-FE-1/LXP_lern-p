@@ -24,8 +24,8 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       summary: '스프링 부트의 모든 것',
       instructorName: '김영한',
       reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
+        reviewCount: 0,
+        avgRating: 0,
       },
     },
     {
@@ -41,8 +41,8 @@ export const MOCK_GET_ALL_COURSE: GetAllCourseResponse = {
       summary: 'Spring Boot로 실무 백엔드 API를 설계하고 구현합니다.',
       instructorName: '김백엔드',
       reviewStat: {
-        reviewCount: 1,
-        avgRating: 5.0,
+        reviewCount: 4,
+        avgRating: 4.5,
       },
     },
     {

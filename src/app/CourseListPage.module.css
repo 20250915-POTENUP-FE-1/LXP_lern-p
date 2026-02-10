@@ -38,7 +38,7 @@
 
 .course-list {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-7);
   padding-block: var(--space-6);
   padding-top: 0;
 }
@@ -68,7 +68,7 @@
 
 .course-grid {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-6);
   grid-template-columns: 1fr;
 }
 

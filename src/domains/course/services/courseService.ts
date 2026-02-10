@@ -26,7 +26,7 @@ export const getAllCourses = async (
   if (params?.size != null) query.set('size', String(params.size));
   if (params?.categoryId != null) query.set('categoryId', String(params.categoryId));
   if (params?.level) query.set('level', params.level);
-  if (params?.title) query.set('title', params.title);
+  if (params?.keyword) query.set('keyword', params.keyword);
   if (params?.sort) query.set('sort', params.sort);
 
   const qs = query.toString();

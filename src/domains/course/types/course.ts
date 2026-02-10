@@ -288,7 +288,12 @@ export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
 export type CourseCardType = Omit<
   Course,
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
->;
+> & {
+  reviewStat: {
+    reviewCount: number;
+    avgRating: number;
+  };
+};
 
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
@@ -364,6 +369,6 @@ export type GetAllCoursesParams = {
   size?: number;
   categoryId?: number;
   level?: CourseLevel;
-  title?: string;
+  keyword?: string;
   sort?: string;
 };

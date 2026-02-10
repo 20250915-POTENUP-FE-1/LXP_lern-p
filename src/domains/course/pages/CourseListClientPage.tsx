@@ -33,14 +33,14 @@ export default function CourseListClientPage() {
     size,
     categoryId,
     level,
-    title,
+    keyword,
     setPage,
     setCategoryId,
-    setCategoryLevelAndTitle,
+    setCategoryLevelAndKeyword,
   } = useCourseListQuery();
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
-    setCategoryLevelAndTitle(nextCategoryId, null, null);
+    setCategoryLevelAndKeyword(nextCategoryId, null, null);
   };
 
   // 카테고리 데이터는 마운트 시 1회만
@@ -65,7 +65,7 @@ export default function CourseListClientPage() {
         // TODO: 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
         const data: GetAllCourseResponse = USE_MOCK
           ? (() => {
-              const titleKeyword = title.trim().toLowerCase();
+              const titleKeyword = keyword.trim().toLowerCase();
               const categoryName = categoryId != null ? categoryIdToName[categoryId] : undefined;
               let filtered = MOCK_GET_ALL_COURSE.content;
 
@@ -111,7 +111,7 @@ export default function CourseListClientPage() {
               sort,
               categoryId: categoryId ?? undefined,
               level: level ?? undefined,
-              title: title || undefined,
+              keyword: keyword || undefined,
             });
 
         const courseCardData: CourseCardType[] = data.content.map((item) => ({
@@ -126,6 +126,7 @@ export default function CourseListClientPage() {
           price: item.price,
           isFree: item.price === 0,
           studentCount: item.studentCount,
+          reviewStat: item.reviewStat,
         }));
 
         setCourses(courseCardData);
@@ -139,7 +140,7 @@ export default function CourseListClientPage() {
     };
 
     void fetchCourses();
-  }, [page, size, categoryId, level, title, sort, categoryIdToName]);
+  }, [page, size, categoryId, level, keyword, sort, categoryIdToName]);
 
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
@@ -167,7 +168,7 @@ export default function CourseListClientPage() {
           <p className={styles['course-list__loading']}>불러오는 중...</p>
         ) : courses.length === 0 ? (
           <p className={styles['course-list__empty']}>
-            {title.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
+            {keyword.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
           </p>
         ) : (
           <>
