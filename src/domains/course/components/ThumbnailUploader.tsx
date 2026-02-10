@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
+import { IMAGE_MIME_TYPES } from '@/domains/course/constants/resource';
 import styles from './CourseForm.module.css';
 
 type ThumbnailUploaderProps = {
@@ -26,8 +27,12 @@ export function ThumbnailUploader({ value, onFileSelect, disabled }: ThumbnailUp
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드할 수 있어요.');
+    const isAllowedImageType = IMAGE_MIME_TYPES.includes(
+      file.type as (typeof IMAGE_MIME_TYPES)[number],
+    );
+
+    if (!isAllowedImageType) {
+      alert('강좌 썸네일은 image/jpeg, image/png, image/webp 형식만 업로드할 수 있습니다.');
       e.currentTarget.value = '';
       setLocalPreview('');
       onFileSelect?.(null);
