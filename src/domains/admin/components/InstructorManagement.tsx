@@ -10,20 +10,24 @@ type InstructorManagementProps = {
   requests: InstructorApplication[];
   onProcess: (requestId: number, action: 'approve' | 'reject') => Promise<void>;
   onRefresh?: () => void;
+  filter: RequestFilter;
+  onFilterChange: (next: RequestFilter) => void;
 };
 
 export const InstructorManagement = ({
   requests,
   onProcess,
   onRefresh,
+  filter,
+  onFilterChange,
 }: InstructorManagementProps) => {
-  const [filter, setFilter] = useState<RequestFilter>('PENDING');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<InstructorApplication | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // 필터링된 요청 목록
-  const filteredRequests = requests.filter((req) => req.status === filter); //요청 배열에서, filter 항목에 맞는 목록들을 다시 저장
+  const filteredRequests =
+    filter === 'ALL' ? requests : requests.filter((req) => req.status === filter);
 
   // 각 상태별 개수
   const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
@@ -62,15 +66,25 @@ export const InstructorManagement = ({
     [selectedRequest, onProcess, handleCloseModal, onRefresh],
   );
 
+  const totalCount = requests.length;
+
   return (
     <div className={styles['instructor-management']}>
-      {/* 필터 탭 */}
       <div className={styles['instructor-management__filter-tabs']}>
+        <button
+          className={`${styles['instructor-management__filter-tab']} ${
+            filter === 'ALL' ? styles['instructor-management__filter-tab--active'] : ''
+          }`}
+          onClick={() => onFilterChange('ALL')}
+        >
+          전체
+          <span className={styles['instructor-management__filter-count']}>{totalCount}</span>
+        </button>
         <button
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'PENDING' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('PENDING')}
+          onClick={() => onFilterChange('PENDING')}
         >
           대기중
           <span
@@ -85,7 +99,7 @@ export const InstructorManagement = ({
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'APPROVED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('APPROVED')}
+          onClick={() => onFilterChange('APPROVED')}
         >
           승인됨
           <span className={styles['instructor-management__filter-count']}>{approvedCount}</span>
@@ -94,7 +108,7 @@ export const InstructorManagement = ({
           className={`${styles['instructor-management__filter-tab']} ${
             filter === 'REJECTED' ? styles['instructor-management__filter-tab--active'] : ''
           }`}
-          onClick={() => setFilter('REJECTED')}
+          onClick={() => onFilterChange('REJECTED')}
         >
           거절됨
           <span className={styles['instructor-management__filter-count']}>{rejectedCount}</span>
