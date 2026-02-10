@@ -6,18 +6,18 @@ import { useCourseListQuery } from '../hooks/useCourseListQuery';
 import styles from './SearchBar.module.css';
 
 export function SearchBar() {
-  const { title, setTitle } = useCourseListQuery();
-  const [inputValue, setInputValue] = useState(title);
+  const { keyword, setKeyword } = useCourseListQuery();
+  const [inputValue, setInputValue] = useState(keyword);
 
   useEffect(() => {
-    if (!title) {
+    if (!keyword) {
       setInputValue('');
     }
-  }, [title]);
+  }, [keyword]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setTitle(inputValue.trim());
+    setKeyword(inputValue.trim());
     setInputValue('');
   };
 

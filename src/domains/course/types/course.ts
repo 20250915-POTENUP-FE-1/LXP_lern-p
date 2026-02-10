@@ -369,6 +369,6 @@ export type GetAllCoursesParams = {
   size?: number;
   categoryId?: number;
   level?: CourseLevel;
-  title?: string;
+  keyword?: string;
   sort?: string;
 };
