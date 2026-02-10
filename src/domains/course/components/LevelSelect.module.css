@@ -5,32 +5,36 @@
 }
 
 .level-select__button {
-  border: none;
-  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
   padding: var(--space-2) var(--space-3);
-
-  background: transparent;
-  color: var(--color-text-muted);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: var(--text-sm);
   min-height: 40px;
   cursor: pointer;
   transition:
+    border-color 0.2s,
     color 0.2s,
+    box-shadow 0.2s,
     transform 0.2s;
 }
 
 .level-select__button--active {
-  background: rgba(37, 99, 235, 0.1);
+  border-color: var(--color-brand);
   color: var(--color-brand);
   font-weight: 600;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
 }
 
 .level-select__button:hover:not(.level-select__button--active) {
-  background: rgba(148, 163, 184, 0.12);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
   transform: translateY(-1px);
 }
 
 .level-select__button:focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.3);
-  outline-offset: 3px;
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
