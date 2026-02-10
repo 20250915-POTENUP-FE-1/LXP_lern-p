@@ -195,7 +195,7 @@
 }
 
 .course-card_start {
-  font-size: 16 +2px;
+  font-size: 18px;
   cursor: pointer;
   transition: color 120ms ease;
   color: #f5b301;

@@ -32,6 +32,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <div>
           <h3 className={styles['course-card__title']}>{course.title}</h3>
         </div>
+
         <div className={`${styles['course-card__meta']}`}>
           <div className={` ${styles['course-card__instructor']}`}>{course.instructorName}</div>
           <div className={styles['course-card__rating']}>
