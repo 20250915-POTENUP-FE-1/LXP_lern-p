@@ -42,6 +42,7 @@
 .course-card__title {
   margin: 0;
   font-size: var(--text-lg);
+  font-weight: 700;
   line-height: 1.4;
 }
 
@@ -61,14 +62,13 @@
 .course-card__meta {
   margin: 0;
   display: flex;
-  flex-direction: column; /* 강사명 위, 카테고리 아래 */
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   gap: var(--space-2);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   white-space: normal;
 }
-
 /* 강사명 기본 유지 */
 .course-card__instructor {
   color: var(--color-text-muted);
@@ -97,10 +97,9 @@
 
 .course-card__price {
   font-weight: 700;
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   color: var(--color-text);
 }
-
 .course-card__cta {
   text-decoration: none;
   border-radius: var(--radius-sm);
@@ -162,7 +161,8 @@
   color: var(--color-brand-700);
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
-  border: 1px solid var(--color-brand);
+  border: 1px solid rgba(239, 104, 23, 0.2);
+  background: rgba(239, 104, 23, 0.08);
   font-weight: 500;
   height: 28px;
 }
@@ -172,9 +172,33 @@
   color: var(--color-accent-text);
 }
 
+.course-card__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.course-card__rating-text {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.course-card__review-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
 .course-card__students {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+.course-card_start {
+  font-size: 16 +2px;
+  cursor: pointer;
+  transition: color 120ms ease;
+  color: #f5b301;
 }
 
 @media (min-width: 768px) {
@@ -215,23 +239,22 @@
 .course-list__cards {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-6);
   justify-content: flex-start;
   align-items: stretch;
 }
-
 .course-list__cards .course-card {
   flex: 1 1 100%;
 }
 
 @media (min-width: 768px) {
   .course-list__cards .course-card {
-    flex: 1 1 calc((100% - var(--space-4)) / 2);
+    flex: 1 1 calc((100% - var(--space-6)) / 2);
   }
 }
 
 @media (min-width: 1200px) {
   .course-list__cards .course-card {
-    flex: 1 1 calc((100% - 3 * var(--space-4)) / 4);
+    flex: 1 1 calc((100% - 3 * var(--space-6)) / 4);
   }
 }

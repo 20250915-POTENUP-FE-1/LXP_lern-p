@@ -126,6 +126,7 @@ export default function CourseListClientPage() {
           price: item.price,
           isFree: item.price === 0,
           studentCount: item.studentCount,
+          reviewStat: item.reviewStat,
         }));
 
         setCourses(courseCardData);
