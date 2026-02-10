@@ -29,7 +29,7 @@ export type CreateCourseThumbnailPresignedUrlRequest = {
   size: number;
 };
 
-export type CourseThumbnailPresignResponse = {
+export type CreateCourseThumbnailPresignedUrlResponse = {
   uploadUrl: string;
   fileKey: string;
   fileUrl: string;
