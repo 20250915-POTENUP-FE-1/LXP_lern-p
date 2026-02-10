@@ -4,7 +4,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { validateForm } from '@/shared/util/validateForm';
 import { buildCourseDraft, type CourseFormState } from '../utils/courseDraft';
 import { createCourse } from '../services/courseCreateService';
-import { createCourseThumbnailPresignedUrl } from '../services/resourceService';
+import { createCourseThumbnailPresignedUrl } from '../services/thumbnailService';
 import type { CourseDraftForm, CreateCourseRequest } from '../types/course';
 
 const COURSE_DRAFT_ID_KEY = 'courseDraftId';
