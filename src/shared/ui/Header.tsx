@@ -54,7 +54,7 @@ export function Header() {
 
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
 
-  const { applicationStatus, refresh: refreshApplication } = useInstructorApplicationStatus(
+  const { applicationStatus, markAsPending } = useInstructorApplicationStatus(
     !!user && !isInstructor,
   );
   const isPending = applicationStatus === 'PENDING';
@@ -182,7 +182,7 @@ export function Header() {
         isOpen={roleModal.isOpen}
         onClose={roleModal.close}
         user={user}
-        onApplied={refreshApplication}
+        onApplied={markAsPending}
       />
     </>
   );

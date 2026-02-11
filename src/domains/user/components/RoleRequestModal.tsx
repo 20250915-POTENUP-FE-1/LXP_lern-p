@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { User } from '@/domains/user/types/user';
 import { applyInstructor } from '@/domains/user/services/userService';
 import { Modal } from '@/shared/ui/Modal';
@@ -10,11 +9,10 @@ type RoleRequestModalProps = {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
-  onApplied: () => void;
+  onApplied?: () => void;
 };
 
 export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleRequestModalProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -23,16 +21,16 @@ export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleReque
     try {
       setLoading(true);
       await applyInstructor();
-
-      onClose();
-      // TODO: 강사 승인 대기 안내 메시지
-      onApplied?.();
-      router.refresh();
     } catch (err) {
+      // POST 실패 = 이미 신청한 상태(중복)일 가능성이 높음
       console.error('강사 권한 부여 실패:', err);
     } finally {
       setLoading(false);
     }
+
+    // 성공이든 실패(중복 신청)든 PENDING 상태로 전환
+    onApplied?.();
+    onClose();
   };
 
   return (
