@@ -31,9 +31,7 @@ export const getAllCourses = async (
 
   const response = await fetch(`${BASE_URL}/api/courses?${query.toString()}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { Accept: 'application/json' },
   });
   if (!response.ok) {
     throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
@@ -42,15 +40,14 @@ export const getAllCourses = async (
 
   return resJson.data;
 };
+
 /**
  * 강좌 상세 조회
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
   const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { Accept: 'application/json' },
   });
   if (!response.ok) {
     throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);
