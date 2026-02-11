@@ -40,7 +40,7 @@ export function CourseCard({ course }: CourseCardProps) {
               <>
                 <span className={styles['course-card_start']}>★</span>
                 <span className={styles['course-card__rating-text']}>
-                  {course.reviewStat.avgRating.toFixed(1)}
+                  {(course.reviewStat.avgRating / 2).toFixed(1)}
                 </span>
                 <span className={styles['course-card__review-count']}>
                   ({course.reviewStat.reviewCount.toLocaleString()})
