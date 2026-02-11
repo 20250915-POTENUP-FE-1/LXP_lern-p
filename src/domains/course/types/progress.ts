@@ -13,7 +13,7 @@ export interface GetProgressResponse {
   overallProgressRate: number;
   lastWatchedResourceId: number;
   lastWatchedAt: string;
-  resourceProgresses: LectureProgressResponse[]; // 🔥 여기를 서버 기준으로
+  resourceProgresses: LectureProgressResponse[]; // 여기를 서버 기준으로
 }
 
 export type UpdateProgressRequest = {
