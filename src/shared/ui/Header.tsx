@@ -4,6 +4,7 @@ import { ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
@@ -72,7 +73,9 @@ export function Header() {
           {/* 왼쪽: 로고 */}
           <div className={styles['header__left']}>
             <Link href="/" className={styles['header__logo']} aria-label="홈으로 이동">
-              <span className={styles['header__logo-text']}>Lernix</span>
+              <span className={styles['header__logo-text']}>
+                <Image src={`/lernix_logo.svg`} width={`80`} height={`18`} alt={`Lernix`} />
+              </span>
             </Link>
           </div>
 
