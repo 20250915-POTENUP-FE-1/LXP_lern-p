@@ -2,11 +2,11 @@
 
 import { User, Mail, Calendar } from 'lucide-react';
 import { formatDate } from '@/shared/util/formatDate';
-import type { InstructorRequest } from '../types/admin';
+import type { InstructorApplication } from '../types/admin';
 import styles from './InstructorRequestCard.module.css';
 
 type InstructorRequestCardProps = {
-  request: InstructorRequest;
+  request: InstructorApplication;
   onClick: () => void;
 };
 
@@ -17,7 +17,7 @@ export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCar
         <User size={24} />
       </div>
       <div className={styles['instructor-request-card__content']}>
-        <div className={styles['instructor-request-card__nickname']}>{request.nickname}</div>
+        <div className={styles['instructor-request-card__nickname']}>{request.name}</div>
         <div className={styles['instructor-request-card__info']}>
           <span className={styles['instructor-request-card__info-item']}>
             <Mail size={14} />
@@ -25,7 +25,7 @@ export const InstructorRequestCard = ({ request, onClick }: InstructorRequestCar
           </span>
           <span className={styles['instructor-request-card__info-item']}>
             <Calendar size={14} />
-            신청일: {formatDate(request.requestedAt)}
+            신청일: {formatDate(request.appliedAt)}
           </span>
         </div>
       </div>

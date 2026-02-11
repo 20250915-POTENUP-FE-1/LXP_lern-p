@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/domains/user/types/user';
-import { updateStudentToInstructor } from '@/domains/user/services/userService';
+import { applyInstructor } from '@/domains/user/services/userService';
 import { Modal } from '@/shared/ui/Modal';
 
 type RoleRequestModalProps = {
@@ -21,10 +21,10 @@ export function RoleRequestModal({ isOpen, onClose, user }: RoleRequestModalProp
 
     try {
       setLoading(true);
-      await updateStudentToInstructor();
+      await applyInstructor();
 
       onClose();
-      router.push('/mypage');
+      // TODO: 강사 승인 대기 안내 메시지
       router.refresh();
     } catch (err) {
       console.error('강사 권한 부여 실패:', err);

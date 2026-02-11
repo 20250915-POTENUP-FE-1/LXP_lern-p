@@ -3,6 +3,7 @@ import Link from 'next/link';
 import styles from '@/domains/course/components/CourseCard.module.css';
 import { CourseCardType as Course } from '../types/course';
 import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
+import { StarRating } from './StarRating';
 
 export type CourseCardProps = {
   course: Course;
@@ -32,8 +33,23 @@ export function CourseCard({ course }: CourseCardProps) {
           <h3 className={styles['course-card__title']}>{course.title}</h3>
         </div>
 
-        <div className={`${styles['course-card__meta']} ${styles['course-card__instructor']}`}>
-          {course.instructorName}
+        <div className={`${styles['course-card__meta']}`}>
+          <div className={` ${styles['course-card__instructor']}`}>{course.instructorName}</div>
+          <div className={styles['course-card__rating']}>
+            {course.reviewStat.reviewCount > 0 ? (
+              <>
+                <span className={styles['course-card_start']}>★</span>
+                <span className={styles['course-card__rating-text']}>
+                  {course.reviewStat.avgRating.toFixed(1)}
+                </span>
+                <span className={styles['course-card__review-count']}>
+                  ({course.reviewStat.reviewCount.toLocaleString()})
+                </span>
+              </>
+            ) : (
+              <span className={styles['course-card__rating-empty']}>&nbsp;</span>
+            )}
+          </div>
         </div>
 
         {course.summary && <p className={styles['course-card__summary']}>{course.summary}</p>}

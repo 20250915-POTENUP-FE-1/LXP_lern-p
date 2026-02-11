@@ -220,7 +220,6 @@ export type GetAllCourseResponse = {
     status: Status;
     price: number;
     studentCount: number;
-    rating: number;
     lastModifiedAt: string;
     level: CourseLevel;
     summary: string;
@@ -289,7 +288,12 @@ export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
 export type CourseCardType = Omit<
   Course,
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
->;
+> & {
+  reviewStat: {
+    reviewCount: number;
+    avgRating: number;
+  };
+};
 
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
@@ -358,4 +362,13 @@ export type LectureResourceResponse = {
   resourceType: ResourceType;
   fileUrl: string;
   isDownloadable: boolean;
+};
+
+export type GetAllCoursesParams = {
+  page?: number;
+  size?: number;
+  categoryId?: number;
+  level?: CourseLevel;
+  keyword?: string;
+  sort?: string;
 };

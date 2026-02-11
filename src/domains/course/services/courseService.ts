@@ -8,14 +8,28 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/firestore';
-import type { GetAllCourseResponse, GetCourseDetailResponse } from '../types/course';
+import type {
+  GetAllCoursesParams,
+  GetAllCourseResponse,
+  GetCourseDetailResponse,
+} from '@/domains/course/types/course';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
  * 강좌 목록 조회 (무한 스크롤)
  */
-export const getAllCourses = async (): Promise<GetAllCourseResponse> => {
-  const response = await fetch(`${BASE_URL}/api/courses`, {
+export const getAllCourses = async (
+  params?: GetAllCoursesParams,
+): Promise<GetAllCourseResponse> => {
+  const query = new URLSearchParams();
+  if (params?.page != null) query.set('page', String(params.page));
+  if (params?.size != null) query.set('size', String(params.size));
+  if (params?.categoryId != null) query.set('categoryId', String(params.categoryId));
+  if (params?.level) query.set('level', params.level);
+  if (params?.keyword) query.set('keyword', params.keyword);
+  // if (params?.sort) query.set('sort', params.sort);
+
+  const response = await fetch(`${BASE_URL}/api/courses?${query.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

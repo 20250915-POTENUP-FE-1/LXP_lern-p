@@ -1,13 +1,13 @@
 import { X, User, Mail, Calendar } from 'lucide-react';
 import { Modal } from '@/shared/ui/Modal';
 import { formatDate } from '@/shared/util/formatDate';
-import type { InstructorRequest } from '../types/admin';
+import type { InstructorApplication } from '../types/admin';
 import styles from './InstructorApprovalModal.module.css';
 
 type InstructorApprovalModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  request: InstructorRequest | null;
+  request: InstructorApplication | null;
   onApprove: () => void;
   onReject: () => void;
   isProcessing?: boolean;
@@ -47,9 +47,9 @@ export const InstructorApprovalModal = ({
               <div className={styles['instructor-approval-modal__info-item']}>
                 <User size={18} />
                 <div className={styles['instructor-approval-modal__info-content']}>
-                  <span className={styles['instructor-approval-modal__info-label']}>닉네임</span>
+                  <span className={styles['instructor-approval-modal__info-label']}>이름</span>
                   <span className={styles['instructor-approval-modal__info-value']}>
-                    {request.nickname}
+                    {request.name}
                   </span>
                 </div>
               </div>
@@ -67,21 +67,10 @@ export const InstructorApprovalModal = ({
                 <div className={styles['instructor-approval-modal__info-content']}>
                   <span className={styles['instructor-approval-modal__info-label']}>신청일</span>
                   <span className={styles['instructor-approval-modal__info-value']}>
-                    {formatDate(request.requestedAt)}
+                    {formatDate(request.appliedAt)}
                   </span>
                 </div>
               </div>
-              {request.processedAt && (
-                <div className={styles['instructor-approval-modal__info-item']}>
-                  <Calendar size={18} />
-                  <div className={styles['instructor-approval-modal__info-content']}>
-                    <span className={styles['instructor-approval-modal__info-label']}>처리일</span>
-                    <span className={styles['instructor-approval-modal__info-value']}>
-                      {formatDate(request.processedAt)}
-                    </span>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* 액션 버튼 (대기중일 때만 표시) */}

@@ -1,5 +1,6 @@
 import { postApi } from '@/shared/lib/api/fetchApi';
 
+// Lecture Resource Presign
 export type PresignedUploadUrlRequest = {
   fileName: string;
   contentType: string;
