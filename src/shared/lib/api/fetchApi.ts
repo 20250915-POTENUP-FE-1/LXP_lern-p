@@ -137,7 +137,7 @@ export async function fetchApi<T = unknown>(
 
     // HTTP 에러
     if (!response.ok) {
-      // 🔥 404 + ER005 (리뷰 없음)은 정상 케이스로 처리
+      // 404 + ER005 (리뷰 없음)은 정상 케이스로 처리
       const code = (resJson && resJson.code) || 'NO_CODE';
       const message = (resJson && resJson.message) || response.statusText || 'Unknown';
 
