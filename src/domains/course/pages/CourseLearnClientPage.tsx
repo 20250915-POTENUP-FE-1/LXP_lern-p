@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
-import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
+import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
 
 export default function CourseLearnClient() {
   const router = useRouter();
@@ -97,7 +97,7 @@ export default function CourseLearnClient() {
           <div className={styles['course-learn__player-wrap']}>
             {currentLecture.type === 'VIDEO' &&
             currentLecture.videoUrl &&
-            formatAbsoluteUrl(currentLecture.videoUrl) ? (
+            toPublicAssetUrl(currentLecture.videoUrl) ? (
               <div className={styles['course-learn__player']}>
                 <video
                   className={styles['course-learn__video']}
@@ -126,7 +126,7 @@ export default function CourseLearnClient() {
                     );
                   }}
                 >
-                  <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
+                  <source src={toPublicAssetUrl(currentLecture.videoUrl)} type="video/mp4" />
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
@@ -140,7 +140,7 @@ export default function CourseLearnClient() {
                   {currentLecture.description}
                 </p>
                 {currentLecture.pdfUrl && (
-                  <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
+                  <a href={toPublicAssetUrl(currentLecture.pdfUrl)} download>
                     <button
                       onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId, 0)}
                       className={styles['course-learn__brand-btn']}

@@ -1,9 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from '@/domains/course/components/CourseCard.module.css';
-import { CourseCardType as Course } from '../types/course';
-import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
-import { StarRating } from './StarRating';
+import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
+import { CourseCardType as Course } from '@/domains/course/types/course';
 
 export type CourseCardProps = {
   course: Course;
@@ -21,8 +20,9 @@ export function CourseCard({ course }: CourseCardProps) {
           width={1200} // 혹은 800
           height={675}
           className={styles['course-card__thumb']}
-          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
-          src={course.thumbnailUrl}
+          src={
+            course.thumbnailUrl ? toPublicAssetUrl(course.thumbnailUrl) : '/default-thumbnail.png'
+          }
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
