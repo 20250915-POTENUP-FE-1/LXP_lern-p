@@ -143,6 +143,12 @@
   border: 1px solid var(--color-brand);
 }
 
+.header__action--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .header__profile {
   display: inline-flex;
   align-items: center;

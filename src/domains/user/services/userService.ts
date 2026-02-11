@@ -35,3 +35,10 @@ export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstru
 export const applyInstructor = async (): Promise<ApplyInstructorResponse> => {
   return await postApi<ApplyInstructorResponse>('/api/users/instructor/applications');
 };
+
+/**
+ * 내 강사 신청 상태 조회
+ */
+export const getMyInstructorApplication = async (): Promise<ApplyInstructorResponse> => {
+  return await getApi<ApplyInstructorResponse>('/api/users/instructor/applications/me');
+};
