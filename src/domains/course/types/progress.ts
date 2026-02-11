@@ -48,7 +48,7 @@ export type LectureProgressMapValue = {
 export type CourseLearnProgress = {
   enrollmentId: string;
   overallProgressRate: number;
-  progressInfo: ProgressInfo;
+  progressInfo?: ProgressInfo;
   lectureProgressMap: Map<number, LectureProgressMapValue>;
 };
 

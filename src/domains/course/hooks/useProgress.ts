@@ -31,7 +31,6 @@ export function useProgress(courseId: string) {
         const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
         setProgressData(progress);
-
       } catch (e) {
         setError(e as Error);
       } finally {
@@ -43,7 +42,9 @@ export function useProgress(courseId: string) {
   }, [courseId]);
 
   const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
-    if (!progressData.resourceProgresses.length) return new Map();
+    if (!progressData?.resourceProgresses?.length) {
+      return new Map();
+    }
 
     return new Map(
       progressData.resourceProgresses.map((p) => [
@@ -73,7 +74,9 @@ export function useProgress(courseId: string) {
     };
   }, [progressData]);
 
-  const progress = useMemo<CourseLearnProgress>(() => {
+  const progress = useMemo<CourseLearnProgress | null>(() => {
+    if (!progressData) return null;
+
     return {
       enrollmentId: String(progressData.enrollmentId),
       overallProgressRate: progressData.overallProgressRate,
