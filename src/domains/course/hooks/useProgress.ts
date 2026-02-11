@@ -45,7 +45,6 @@ const [progressData, setProgressData] = useState<GetProgressResponse | null>(nul
       }
     };
 
-    console.log('fetchProgress 실행됨');
     fetchProgress();
   }, [courseId]);
 
