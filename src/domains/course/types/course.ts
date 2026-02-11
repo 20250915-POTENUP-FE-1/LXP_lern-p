@@ -67,6 +67,7 @@ export type CourseDraftForm = {
   level: CourseLevel;
   price: number | string;
   thumbnail?: string;
+  thumbnailResourceKey: string;
   status?: string;
 };
 
@@ -130,7 +131,7 @@ export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
-  //thumbnail?: string; // TODO: 추후에 반영 예정
+  thumbnailResourceKey: string;
   categoryId: number;
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'NOVICE';
@@ -331,7 +332,6 @@ export type PresignedUrlResponse = {
   expireSeconds?: number;
 };
 
-export type DeleteSectionRequest = {};
 export type DeleteSectionResponse = {
   sectionId?: string;
 };
