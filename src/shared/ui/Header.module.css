@@ -213,3 +213,9 @@
     display: inline-flex;
   }
 }
+
+.header__action--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

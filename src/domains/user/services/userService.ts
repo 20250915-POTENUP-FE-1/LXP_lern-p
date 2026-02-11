@@ -6,6 +6,7 @@ import type {
   UserResponse,
 } from '@/domains/user/types/user';
 import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
+import { PageResponse } from '@/shared/types/page';
 
 /**
  * 사용자 프로필 조회
@@ -34,4 +35,14 @@ export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstru
  */
 export const applyInstructor = async (): Promise<ApplyInstructorResponse> => {
   return await postApi<ApplyInstructorResponse>('/api/users/instructor/applications');
+};
+
+/**
+ * 내 강사 신청 상태 조회
+ */
+export const getMyInstructorApplication = async (): Promise<ApplyInstructorResponse | null> => {
+  const result = await getApi<PageResponse<ApplyInstructorResponse>>(
+    '/api/users/instructor/applications?page=0&size=1',
+  );
+  return result.content?.[0] ?? null;
 };

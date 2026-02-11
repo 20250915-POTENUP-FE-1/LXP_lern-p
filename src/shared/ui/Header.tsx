@@ -12,6 +12,7 @@ import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { logoutAction } from '@/domains/auth/actions/logoutAction';
 import { useCourseCreateEntry } from '@/domains/course/hooks/useCourseCreateEntry';
 import styles from './Header.module.css';
+import { useInstructorApplicationStatus } from '@/domains/user/hook/useInstrunctorApplicationStatus';
 
 export function Header() {
   const router = useRouter();
@@ -53,6 +54,10 @@ export function Header() {
 
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
 
+  const { applicationStatus, refresh: refreshApplication } = useInstructorApplicationStatus(
+    !!user && !isInstructor,
+  );
+  const isPending = applicationStatus === 'PENDING';
   const handleLogout = async () => {
     setMenuOpen(false);
 
@@ -101,7 +106,17 @@ export function Header() {
                 </button>
               )}
 
-              {user && !isInstructor && (
+              {user && !isInstructor && isPending && (
+                <button
+                  type="button"
+                  className={`${styles['header__action']} ${styles['header__action--cta']} ${styles['header__action--disabled']}`}
+                  disabled
+                >
+                  강사 승인 대기 중
+                </button>
+              )}
+
+              {user && !isInstructor && !isPending && (
                 <button
                   type="button"
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
@@ -163,7 +178,12 @@ export function Header() {
 
       {/* 모달들 */}
       <LoginModal isOpen={loginModal.isOpen} onClose={loginModal.close} />
-      <RoleRequestModal isOpen={roleModal.isOpen} onClose={roleModal.close} user={user} />
+      <RoleRequestModal
+        isOpen={roleModal.isOpen}
+        onClose={roleModal.close}
+        user={user}
+        onApplied={refreshApplication}
+      />
     </>
   );
 }

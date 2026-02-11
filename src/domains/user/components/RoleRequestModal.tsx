@@ -10,9 +10,10 @@ type RoleRequestModalProps = {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
+  onApplied: () => void;
 };
 
-export function RoleRequestModal({ isOpen, onClose, user }: RoleRequestModalProps) {
+export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleRequestModalProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -25,6 +26,7 @@ export function RoleRequestModal({ isOpen, onClose, user }: RoleRequestModalProp
 
       onClose();
       // TODO: 강사 승인 대기 안내 메시지
+      onApplied?.();
       router.refresh();
     } catch (err) {
       console.error('강사 권한 부여 실패:', err);
