@@ -22,6 +22,7 @@ import CourseReviewModal from '../components/CourseReviewModal';
 import { useCourseReviews } from '../hooks/useCourseReview';
 import { StarRating } from '../components/StarRating';
 import { formatReviewDate } from '../utils/formatReviewDate';
+import { toPublicAssetUrl } from '../utils/toPublicAssetUrl';
 
 type TabKey = 'intro' | 'curriculum' | 'reviews';
 
@@ -153,7 +154,9 @@ export default function CourseDetailClientPage() {
           width={800}
           height={450}
           className={styles['course-detail__hero']}
-          src={course.thumbnailUrl}
+          src={
+            course.thumbnailUrl ? toPublicAssetUrl(course.thumbnailUrl) : '/default-thumbnail.png'
+          }
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />

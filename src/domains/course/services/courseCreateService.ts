@@ -9,13 +9,8 @@ import type {
   PublishCourseResponse,
   UpdateLectureRequest,
   UpdateLectureResponse,
-} from '../types/course';
-
-import {
-  createCourseFormData,
-  mapDraftToCreateRequest,
-  mapResponseToCourseDraft,
-} from '../utils/courseCreate';
+} from '@/domains/course/types/course';
+import { mapResponseToCourseDraft } from '@/domains/course/utils/courseCreate';
 
 // 강좌 발행 API
 export const publishCourse = async (courseId: string): Promise<PublishCourseResponse> => {
