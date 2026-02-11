@@ -51,7 +51,6 @@ export function Header() {
     router.replace(pathname);
   }, [searchParams, user, router, pathname, loginModal, roleModal]);
 
-  const isInstructor = user?.roles?.includes('INSTRUCTOR');
   const instructorAction = (() => {
     if (!user) return null;
     switch (user.instructorApplicationStatus) {
