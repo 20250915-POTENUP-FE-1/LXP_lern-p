@@ -38,7 +38,6 @@ const [progressData, setProgressData] = useState<GetProgressResponse | null>(nul
           lastWatchedAt: progress?.lastWatchedAt ?? null,
         });
 
-        console.log('learn progress raw:', progress);
       } catch (e) {
         setError(e as Error);
       } finally {
