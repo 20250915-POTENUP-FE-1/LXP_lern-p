@@ -20,8 +20,13 @@ export function useCourseLearn() {
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set());
 
-  const { progressInfo, lectureProgressMap, autoSaveProgress, saveFinalProgressOnEnd } =
-    useProgress(courseId);
+  const {
+    progressInfo,
+    lectureProgressMap,
+    autoSaveProgress,
+    saveFinalProgressOnEnd,
+    lastSavedResourceId,
+  } = useProgress(courseId);
 
   const searchParams = useSearchParams();
   const start = searchParams.get('start') === 'first' ? 'first' : undefined;
@@ -50,6 +55,18 @@ export function useCourseLearn() {
 
     fetchAll();
   }, [courseId]);
+
+  useEffect(() => {
+    if (!courseId) return;
+    if (!lastSavedResourceId) return;
+
+    // NOTE:
+    // 영상 종료 후 progress PATCH 결과로
+    // enrollment 상태(COMPLETED 등)가 변경될 수 있어 재조회
+    getEnrollmentByCourseId(courseId).then((enrollment) => {
+      setLearnData((prev) => (prev ? { ...prev, enrollment } : prev));
+    });
+  }, [courseId, lastSavedResourceId]);
 
   // TODO: UI 완료 상태 기준으로 courseData 생성
   const courseData = useMemo<UICourse | null>(() => {

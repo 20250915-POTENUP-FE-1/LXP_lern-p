@@ -16,6 +16,7 @@ import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(courseId: string) {
   const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
+  const [lastSavedResourceId, setLastSavedResourceId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -147,15 +148,8 @@ export function useProgress(courseId: string) {
 
   // 영상 종료 시 최종 진도 저장
   const saveFinalProgressOnEnd = (resourceId: number, watchedDuration: number) => {
-    if (pendingRef.current) return;
-
-    // TODO: 영상 종료 처리
-    console.log('[END] 영상 종료', {
-      resourceId,
-      watchedDuration,
-    });
-
     saveProgress(resourceId, watchedDuration);
+    setLastSavedResourceId(resourceId);
   };
 
   // 프론트에서 진도 상태를 계산/반영
@@ -203,6 +197,7 @@ export function useProgress(courseId: string) {
     saveProgress,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    lastSavedResourceId,
     isLoading,
     error,
   };
