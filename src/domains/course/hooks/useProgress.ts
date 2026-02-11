@@ -42,16 +42,18 @@ export function useProgress(courseId: string) {
   }, [courseId]);
 
   const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
-    if (!progressData) return new Map();
+    if (!progressData?.resourceProgresses?.length) {
+      return new Map();
+    }
 
     return new Map(
-      progressData.lectureProgresses.map((p) => [
+      progressData.resourceProgresses.map((p) => [
         p.resourceId,
         {
           progressRate: p.progressRate,
+          completed: p.completed,
           watchedDuration: p.watchedDuration,
           totalDurationSeconds: p.totalDurationSeconds,
-          completed: p.completed,
         },
       ]),
     );
@@ -63,7 +65,8 @@ export function useProgress(courseId: string) {
     if (!id) return null;
 
     // 마지막 watchedDuration은 강의별 목록에서 찾아오는 방식으로 맞춤
-    const last = progressData.lectureProgresses.find((p) => p.resourceId === id);
+    const list = progressData?.resourceProgresses ?? [];
+    const last = list.find((p) => p.resourceId === id);
 
     return {
       resourceId: id,
@@ -72,12 +75,12 @@ export function useProgress(courseId: string) {
   }, [progressData]);
 
   const progress = useMemo<CourseLearnProgress | null>(() => {
-    if (!progressData || !progressInfo) return null;
+    if (!progressData) return null;
 
     return {
       enrollmentId: String(progressData.enrollmentId),
       overallProgressRate: progressData.overallProgressRate,
-      progressInfo,
+      progressInfo: progressInfo ?? undefined,
       lectureProgressMap,
     };
   }, [progressData, progressInfo, lectureProgressMap]);
@@ -97,11 +100,13 @@ export function useProgress(courseId: string) {
     if (!pending) return;
 
     const delay = RETRY_DELAYS[pending.retryCount];
-    if (!delay) return; // 재시도 포기
+    if (!delay) {
+      pendingRef.current = null; // 포기
+      return;
+    }
 
     setTimeout(async () => {
       try {
-        // TODO(mock): mock 단계에서는 실제 API 호출 없이 UI 상태만 갱신
         if (!USE_MOCK) {
           await updateLearnProgress(courseId, {
             resourceId: pending.resourceId,
@@ -116,7 +121,7 @@ export function useProgress(courseId: string) {
         pendingRef.current = null;
       } catch {
         pending.retryCount += 1;
-        retryPending();
+        retryPending(); // 실패 시만 재귀
       }
     }, delay);
   };
@@ -129,6 +134,8 @@ export function useProgress(courseId: string) {
         watchedDuration,
       });
     }
+
+    lastSavedDurationRef.current = watchedDuration;
 
     setProgressData((prev) =>
       prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
@@ -147,9 +154,12 @@ export function useProgress(courseId: string) {
   };
 
   // 영상 종료 시 최종 진도 저장
-  const saveFinalProgressOnEnd = (resourceId: number, watchedDuration: number) => {
-    saveProgress(resourceId, watchedDuration);
-    setLastSavedResourceId(resourceId);
+  const saveFinalProgressOnEnd = (resourceId: number) => {
+    const target = progressData?.resourceProgresses.find((p) => p.resourceId === resourceId);
+
+    if (!target) return;
+
+    saveProgress(resourceId, target.totalDurationSeconds);
   };
 
   // 프론트에서 진도 상태를 계산/반영
@@ -158,13 +168,13 @@ export function useProgress(courseId: string) {
     resourceId: number,
     watchedDuration: number,
   ): GetProgressResponse {
-    const lectureProgresses = prev.lectureProgresses.map((p) => {
+    const lectureProgresses = (prev.resourceProgresses ?? []).map((p) => {
       if (p.resourceId !== resourceId) return p;
 
-      const progressRate = Math.min(
-        100,
-        Math.round((watchedDuration / p.totalDurationSeconds) * 100),
-      );
+      const progressRate =
+        watchedDuration >= p.totalDurationSeconds - 0.5
+          ? 100
+          : Math.min(100, Math.round((watchedDuration / p.totalDurationSeconds) * 100));
 
       return {
         ...p,
@@ -176,13 +186,17 @@ export function useProgress(courseId: string) {
     });
 
     // 전체 진도율 재계산
-    const overallProgressRate = Math.round(
-      lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) / lectureProgresses.length,
-    );
+    const overallProgressRate =
+      lectureProgresses.length === 0
+        ? 0
+        : Math.round(
+            lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) /
+              lectureProgresses.length,
+          );
 
     return {
       ...prev,
-      lectureProgresses,
+      resourceProgresses: lectureProgresses,
       overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
