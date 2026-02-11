@@ -22,6 +22,7 @@ import { LevelSelect } from '../components/LevelSelect';
 export default function CourseListClientPage() {
   const [courses, setCourses] = useState<CourseCardType[]>([]);
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryMapEntry>>({});
+  const [parentCategoryToNames, setParentCategoryToNames] = useState<Record<number, string[]>>({});
   const [categoryIdToName, setCategoryIdToName] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -39,6 +40,7 @@ export default function CourseListClientPage() {
         const categoryData = USE_MOCK ? MOCK_GET_CATEGORIES : await getCategories();
         setCategoryMap(toCategoryMap(categoryData));
         setCategoryIdToName(toCategoryIdMap(categoryData));
+        setParentCategoryToNames(toParentCategoryToNames(categoryData));
       } catch (error) {
         console.error('카테고리 불러오기 실패:', error);
       }
@@ -51,15 +53,24 @@ export default function CourseListClientPage() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
+        const categoryNames =
+          categoryId != null
+            ? (parentCategoryToNames[categoryId] ??
+              (categoryIdToName[categoryId] ? [categoryIdToName[categoryId]] : []))
+            : [];
+
+        const shouldSendCategoryId = categoryId != null && !(categoryId in parentCategoryToNames);
+
         // TODO: 개발 중 환경변수로 강좌 목록 데이터를 mock으로 조회
         const data: GetAllCourseResponse = USE_MOCK
           ? (() => {
               const titleKeyword = keyword.trim().toLowerCase();
-              const categoryName = categoryId != null ? categoryIdToName[categoryId] : undefined;
               let filtered = MOCK_GET_ALL_COURSE.content;
 
-              if (categoryName) {
-                filtered = filtered.filter((item) => item.categories.includes(categoryName));
+              if (categoryNames.length > 0) {
+                filtered = filtered.filter((item) =>
+                  categoryNames.some((categoryName) => item.categories.includes(categoryName)),
+                );
               }
 
               if (level) {
@@ -98,12 +109,19 @@ export default function CourseListClientPage() {
               page,
               size,
               sort,
-              categoryId: categoryId ?? undefined,
+              categoryId: shouldSendCategoryId ? categoryId : undefined,
               level: level ?? undefined,
               keyword: keyword || undefined,
             });
 
-        const courseCardData: CourseCardType[] = data.content.map((item) => ({
+        const filteredContent =
+          categoryNames.length > 0
+            ? data.content.filter((item) =>
+                categoryNames.some((categoryName) => item.categories.includes(categoryName)),
+              )
+            : data.content;
+
+        const courseCardData: CourseCardType[] = filteredContent.map((item) => ({
           id: item.courseId,
           title: item.title,
           summary: item.summary,
@@ -119,6 +137,10 @@ export default function CourseListClientPage() {
         }));
 
         setCourses(courseCardData);
+        console.log(
+          'courseCardCategory',
+          courseCardData.map((c) => c.category),
+        );
       } catch (error) {
         console.error('강좌 목록 불러오기 실패:', error);
       } finally {
@@ -127,7 +149,7 @@ export default function CourseListClientPage() {
     };
 
     void fetchCourses();
-  }, [page, size, categoryId, level, keyword, sort, categoryIdToName]);
+  }, [page, size, categoryId, level, keyword, sort, categoryIdToName, parentCategoryToNames]);
 
   return (
     <main className={`${styles['course-list']} container`} aria-label="강좌 목록">
@@ -191,6 +213,14 @@ function toCategoryIdMap(categories: Category[]): Record<number, string> {
     for (const child of cat.children) {
       map[child.categoryId] = child.name;
     }
+  }
+  return map;
+}
+
+function toParentCategoryToNames(categories: Category[]): Record<number, string[]> {
+  const map: Record<number, string[]> = {};
+  for (const cat of categories) {
+    map[cat.categoryId] = [cat.name, ...cat.children.map((child) => child.name)];
   }
   return map;
 }
