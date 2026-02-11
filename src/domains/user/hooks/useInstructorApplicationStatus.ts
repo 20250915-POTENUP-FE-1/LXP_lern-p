@@ -29,5 +29,9 @@ export function useInstructorApplicationStatus(enabled: boolean) {
     void refresh();
   }, [refresh]);
 
-  return { applicationStatus: status, loading, refresh };
+  const markAsPending = useCallback(() => {
+    setStatus('PENDING');
+  }, []);
+
+  return { applicationStatus: status, loading, refresh, markAsPending };
 }
