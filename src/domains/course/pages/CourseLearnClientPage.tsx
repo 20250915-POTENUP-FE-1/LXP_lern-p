@@ -9,20 +9,15 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
-import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
 
-type CourseLearnClientProps = {
-  enrollment: LearnEnrollmentResponse;
-};
-
-export default function CourseLearnClient({ enrollment }: CourseLearnClientProps) {
+export default function CourseLearnClient() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);

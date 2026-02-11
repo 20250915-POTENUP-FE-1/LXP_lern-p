@@ -38,14 +38,14 @@ export default function MyPageSidebar() {
               </Link>
             </li>
 
-            <li className={styles['mypage-nav__item']}>
+            {/* <li className={styles['mypage-nav__item']}>
               <Link
                 href="/mypage/cart"
                 className={`${styles['mypage-nav__link']} ${isActive('/mypage/cart')}`}
               >
                 구매 내역
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 

@@ -1,7 +1,6 @@
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
   EnrollmentListResponse,
-  EnrollmentDetailResponse,
   EnrollmentStatus,
   GetEnrollmentResponse,
 } from '@/domains/user/types/enrollment';
