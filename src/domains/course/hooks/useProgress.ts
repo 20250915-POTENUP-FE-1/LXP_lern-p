@@ -45,7 +45,7 @@ export function useProgress(courseId: string) {
     if (!progressData) return new Map();
 
     return new Map(
-      progressData.lectureProgresses.map((p) => [
+      progressData.resourceProgresses.map((p) => [
         p.resourceId,
         {
           progressRate: p.progressRate,
@@ -63,7 +63,7 @@ export function useProgress(courseId: string) {
     if (!id) return null;
 
     // 마지막 watchedDuration은 강의별 목록에서 찾아오는 방식으로 맞춤
-    const last = progressData.lectureProgresses.find((p) => p.resourceId === id);
+    const last = progressData.resourceProgresses.find((p) => p.resourceId === id);
 
     return {
       resourceId: id,
@@ -158,7 +158,7 @@ export function useProgress(courseId: string) {
     resourceId: number,
     watchedDuration: number,
   ): GetProgressResponse {
-    const lectureProgresses = prev.lectureProgresses.map((p) => {
+    const lectureProgresses = prev.resourceProgresses.map((p) => {
       if (p.resourceId !== resourceId) return p;
 
       const progressRate = Math.min(
@@ -182,7 +182,7 @@ export function useProgress(courseId: string) {
 
     return {
       ...prev,
-      lectureProgresses,
+      resourceProgresses: lectureProgresses,
       overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
