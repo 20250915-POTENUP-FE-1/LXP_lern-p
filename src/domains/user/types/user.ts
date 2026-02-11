@@ -11,6 +11,7 @@ export type User = {
   avatarUrl?: string;
   createdAt: Date;
   updatedAt?: Date;
+  instructorApplicationStatus?: 'NOT_APPLIED' | 'PENDING' | 'APPROVED' | 'REJECTED';
 };
 
 export type UserResponse = {
@@ -20,6 +21,7 @@ export type UserResponse = {
   roles: Role[];
   createdAt: string;
   updatedAt: string;
+  instructorApplicationStatus: 'NOT_APPLIED' | 'PENDING' | 'APPROVED' | 'REJECTED';
 };
 
 export type UpdateProfileRequest = {

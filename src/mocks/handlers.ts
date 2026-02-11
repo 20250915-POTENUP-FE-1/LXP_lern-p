@@ -58,6 +58,7 @@ const mockUser: UserResponse = {
   roles: ['STUDENT'],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  instructorApplicationStatus: 'NOT_APPLIED',
 };
 
 export const handlers = [

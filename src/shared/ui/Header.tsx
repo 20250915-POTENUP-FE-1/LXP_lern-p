@@ -52,6 +52,46 @@ export function Header() {
   }, [searchParams, user, router, pathname, loginModal, roleModal]);
 
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
+  const instructorAction = (() => {
+    if (!user) return null;
+    console.log('instructorApplicationStatus:', user.instructorApplicationStatus);
+
+    switch (user.instructorApplicationStatus) {
+      case 'NOT_APPLIED':
+        return {
+          label: '강사 신청하기',
+          onClick: roleModal.open,
+          disabled: false,
+        };
+      case 'PENDING':
+        return {
+          label: '강사 승인 요청 중',
+          onClick: undefined,
+          disabled: true,
+        };
+      case 'REJECTED':
+        return {
+          label: '승인 거절됨',
+          onClick: roleModal.open,
+          disabled: false,
+        };
+      case 'APPROVED':
+        if (isInstructor) {
+          return {
+            label: '강좌 등록하기',
+            onClick: startCreateCourse,
+            disabled: false,
+          };
+        }
+        return {
+          label: '강사 승인됨',
+          onClick: undefined,
+          disabled: true,
+        };
+      default:
+        return null;
+    }
+  })();
 
   const handleLogout = async () => {
     setMenuOpen(false);
@@ -101,22 +141,14 @@ export function Header() {
                 </button>
               )}
 
-              {user && !isInstructor && (
+              {instructorAction && (
                 <button
                   type="button"
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
-                  onClick={roleModal.open}
+                  onClick={instructorAction.onClick}
+                  disabled={instructorAction.disabled}
                 >
-                  강사 권한 요청
-                </button>
-              )}
-
-              {user && isInstructor && (
-                <button
-                  onClick={startCreateCourse}
-                  className={`${styles['header__action']} ${styles['header__action--cta']}`}
-                >
-                  강좌 등록하기
+                  {instructorAction.label}
                 </button>
               )}
             </nav>
