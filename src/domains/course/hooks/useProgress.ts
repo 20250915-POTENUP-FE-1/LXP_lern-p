@@ -185,8 +185,6 @@ export function useProgress(courseId: string) {
       };
     });
 
-    );
-
     // 전체 진도율 재계산
     const overallProgressRate =
       lectureProgresses.length === 0
