@@ -27,7 +27,7 @@ interface UseCourseListQueryReturn extends CourseListQueryState {
     keyword: string | null,
   ) => void;
   setLevel: (value: CourseLevel | null) => void;
-  setKeyword: (value: string) => void;
+  searchByKeyword: (value: string) => void;
 }
 
 const VALID_LEVELS: CourseLevel[] = ['BEGINNER', 'NOVICE', 'INTERMEDIATE', 'ADVANCED'];
@@ -133,8 +133,15 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     [updateParams],
   );
 
-  const setKeyword = useCallback(
-    (value: string) => updateParams({ keyword: value || null, page: null }),
+  const searchByKeyword = useCallback(
+    (value: string) =>
+      updateParams({
+        keyword: value || null,
+        categoryId: null,
+        level: null,
+        sort: null,
+        page: null,
+      }),
     [updateParams],
   );
 
@@ -152,6 +159,6 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     setCategoryAndKeyword,
     setCategoryLevelAndKeyword,
     setLevel,
-    setKeyword,
+    searchByKeyword,
   };
 }
