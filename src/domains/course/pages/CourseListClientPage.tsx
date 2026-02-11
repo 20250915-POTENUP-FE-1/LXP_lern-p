@@ -137,10 +137,6 @@ export default function CourseListClientPage() {
         }));
 
         setCourses(courseCardData);
-        console.log(
-          'courseCardCategory',
-          courseCardData.map((c) => c.category),
-        );
       } catch (error) {
         console.error('강좌 목록 불러오기 실패:', error);
       } finally {

@@ -90,6 +90,8 @@ async function fetchInitialUser(): Promise<User | null> {
       enrolledCourses: [],
       createdCourses: [],
       createdAt: new Date(userProfile.createdAt),
+      updatedAt: new Date(userProfile.updatedAt),
+      instructorApplicationStatus: userProfile.instructorApplicationStatus,
     };
 
     return user;
