@@ -48,6 +48,7 @@ export type CourseFormState = {
   level: CourseLevel;
   price: number | string | ''; // input 제어용
   thumbnailUrl: string;
+  thumbnailResourceKey: string;
 };
 
 export const buildCourseDraft = (form: CourseFormState): CourseDraftForm => ({
@@ -58,4 +59,5 @@ export const buildCourseDraft = (form: CourseFormState): CourseDraftForm => ({
   category: form.category,
   level: form.level,
   price: form.price === '' ? 0 : Number(form.price),
+  thumbnailResourceKey: form.thumbnailResourceKey, // 실제 업로드 후에 설정됨
 });
