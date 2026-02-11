@@ -137,7 +137,7 @@ export default function EnrollmentClientPage() {
         {items.map((item) => {
           const rate = getEnrollmentProgressRate(item);
           const canLearn = item.status === 'ENROLLED' || item.status === 'COMPLETED';
-          const canReview = item.status === 'ENROLLED';
+          const canReview = item.status === 'ENROLLED' || item.status === 'COMPLETED';
 
           return (
             <div key={item.enrollmentId} className={styles['enrollment-card']}>
