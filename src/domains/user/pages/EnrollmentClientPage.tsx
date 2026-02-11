@@ -83,8 +83,16 @@ export default function EnrollmentClientPage() {
       setLoading(true);
       try {
         // TODO(mock): 개발 중 환경변수로 수강 목록 및 리뷰 상태를 mock 데이터로 구성
-        const page = USE_MOCK ? MOCK_ENROLLMENT_LIST : await getEnrollmentList();
-        const content = page.content;
+        let content: EnrollmentListContent[] = [];
+
+        if (USE_MOCK) {
+          content = MOCK_ENROLLMENT_LIST.content;
+        } else {
+          const enrolledPage = await getEnrollmentList({ status: 'ENROLLED' });
+          const completedPage = await getEnrollmentList({ status: 'COMPLETED' });
+
+          content = [...enrolledPage.content, ...completedPage.content];
+        }
 
         if (USE_MOCK) {
           const merged = content.map((it) => {
