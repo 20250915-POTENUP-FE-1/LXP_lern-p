@@ -150,8 +150,7 @@ export function CartClientPage() {
               instructor: detail.instructor?.name ?? '강사',
               price: detail.price,
               originalPrice: detail.price,
-              // thumbnailUrl: formatAbsoluteUrl(detail?.thumbnailUrl),
-              thumbnailUrl: '/default-thumbnail.png',
+              thumbnailUrl: detail?.thumbnailUrl ?? '/default-thumbnail.png',
             };
 
             setItems((prev) => {
