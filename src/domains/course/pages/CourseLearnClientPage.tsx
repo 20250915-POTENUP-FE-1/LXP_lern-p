@@ -116,7 +116,7 @@ export default function CourseLearnClient() {
                       time: t,
                     });
 
-                    saveFinalProgressOnEnd(currentLecture.resourceId, t);
+                    saveFinalProgressOnEnd(currentLecture.resourceId);
                     moveToNextLecture();
                   }}
                   onTimeUpdate={(e) => {
@@ -142,7 +142,7 @@ export default function CourseLearnClient() {
                 {currentLecture.pdfUrl && (
                   <a href={toPublicAssetUrl(currentLecture.pdfUrl)} download>
                     <button
-                      onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId, 0)}
+                      onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId)}
                       className={styles['course-learn__brand-btn']}
                     >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드
