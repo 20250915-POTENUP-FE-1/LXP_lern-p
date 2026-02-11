@@ -15,7 +15,13 @@ import { getLearnProgress, updateLearnProgress } from '@/domains/course/services
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(courseId: string) {
-  const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
+  const [progressData, setProgressData] = useState<GetProgressResponse>({
+    enrollmentId: 0,
+    overallProgressRate: 0,
+    lastWatchedResourceId: 0,
+    lastWatchedAt: '',
+    resourceProgresses: [],
+  });
   const [lastSavedResourceId, setLastSavedResourceId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -30,7 +36,17 @@ export function useProgress(courseId: string) {
         // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
         const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
-        setProgressData(progress);
+        console.log('learn progress raw:', progress);
+
+        setProgressData({
+          enrollmentId: progress?.enrollmentId ?? 0,
+          overallProgressRate: progress?.overallProgressRate ?? 0,
+          resourceProgresses: progress?.resourceProgresses ?? [],
+          lastWatchedResourceId: progress?.lastWatchedResourceId ?? null,
+          lastWatchedAt: progress?.lastWatchedAt ?? null,
+        });
+
+        console.log('learn progress raw:', progress);
       } catch (e) {
         setError(e as Error);
       } finally {
@@ -38,20 +54,22 @@ export function useProgress(courseId: string) {
       }
     };
 
+    console.log('fetchProgress 실행됨');
     fetchProgress();
   }, [courseId]);
 
   const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
-    if (!progressData) return new Map();
+    if (!progressData || !progressData.resourceProgresses) {
+      return new Map();
+    }
 
     return new Map(
-      progressData.lectureProgresses.map((p) => [
+      progressData.resourceProgresses.map((p) => [
         p.resourceId,
         {
           progressRate: p.progressRate,
-          watchedDuration: p.watchedDuration,
-          totalDurationSeconds: p.totalDurationSeconds,
           completed: p.completed,
+          watchedDuration: p.watchedDuration,
         },
       ]),
     );
@@ -63,7 +81,8 @@ export function useProgress(courseId: string) {
     if (!id) return null;
 
     // 마지막 watchedDuration은 강의별 목록에서 찾아오는 방식으로 맞춤
-    const last = progressData.lectureProgresses.find((p) => p.resourceId === id);
+    const list = progressData?.resourceProgresses ?? [];
+    const last = list.find((p) => p.resourceId === id);
 
     return {
       resourceId: id,
@@ -147,9 +166,12 @@ export function useProgress(courseId: string) {
   };
 
   // 영상 종료 시 최종 진도 저장
-  const saveFinalProgressOnEnd = (resourceId: number, watchedDuration: number) => {
-    saveProgress(resourceId, watchedDuration);
-    setLastSavedResourceId(resourceId);
+  const saveFinalProgressOnEnd = (resourceId: number) => {
+    const target = progressData?.resourceProgresses.find((p) => p.resourceId === resourceId);
+
+    if (!target) return;
+
+    saveProgress(resourceId, target.totalDurationSeconds);
   };
 
   // 프론트에서 진도 상태를 계산/반영
@@ -158,13 +180,13 @@ export function useProgress(courseId: string) {
     resourceId: number,
     watchedDuration: number,
   ): GetProgressResponse {
-    const lectureProgresses = prev.lectureProgresses.map((p) => {
+    const lectureProgresses = (prev.resourceProgresses ?? []).map((p) => {
       if (p.resourceId !== resourceId) return p;
 
-      const progressRate = Math.min(
-        100,
-        Math.round((watchedDuration / p.totalDurationSeconds) * 100),
-      );
+      const progressRate =
+        watchedDuration >= p.totalDurationSeconds - 0.5
+          ? 100
+          : Math.min(100, Math.round((watchedDuration / p.totalDurationSeconds) * 100));
 
       return {
         ...p,
@@ -175,14 +197,25 @@ export function useProgress(courseId: string) {
       };
     });
 
-    // 전체 진도율 재계산
-    const overallProgressRate = Math.round(
-      lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) / lectureProgresses.length,
+    console.log(
+      '각 강의 progressRate:',
+      lectureProgresses.map((p) => ({
+        id: p.resourceId,
+        rate: p.progressRate,
+      })),
     );
+
+    // 전체 진도율 재계산
+    const overallProgressRate =
+      lectureProgresses.length === 0
+        ? 0
+        : Math.round(
+            lectureProgresses.reduce((acc, p) => acc + p.progressRate, 0) /
+              lectureProgresses.length,
+          );
 
     return {
       ...prev,
-      lectureProgresses,
       overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
