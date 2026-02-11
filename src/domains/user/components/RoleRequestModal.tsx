@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { User } from '@/domains/user/types/user';
 import { applyInstructor } from '@/domains/user/services/userService';
 import { Modal } from '@/shared/ui/Modal';
@@ -14,7 +13,6 @@ type RoleRequestModalProps = {
 };
 
 export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleRequestModalProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -31,9 +29,8 @@ export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleReque
     }
 
     // 성공이든 실패(중복 신청)든 PENDING 상태로 전환
-    onClose();
     onApplied?.();
-    router.refresh();
+    onClose();
   };
 
   return (
