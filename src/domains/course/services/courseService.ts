@@ -27,10 +27,9 @@ export const getAllCourses = async (
   if (params?.categoryId != null) query.set('categoryId', String(params.categoryId));
   if (params?.level) query.set('level', params.level);
   if (params?.keyword) query.set('keyword', params.keyword);
-  if (params?.sort) query.set('sort', params.sort);
+  // if (params?.sort) query.set('sort', params.sort);
 
-  const qs = query.toString();
-  const response = await fetch(`${BASE_URL}/api/courses${query.toString()}`, {
+  const response = await fetch(`${BASE_URL}/api/courses?${query.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
