@@ -30,8 +30,6 @@ const [progressData, setProgressData] = useState<GetProgressResponse | null>(nul
         // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
         const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
-        console.log('learn progress raw:', progress);
-
         setProgressData({
           enrollmentId: progress?.enrollmentId ?? 0,
           overallProgressRate: progress?.overallProgressRate ?? 0,
