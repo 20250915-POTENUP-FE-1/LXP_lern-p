@@ -15,7 +15,7 @@ import { getLearnProgress, updateLearnProgress } from '@/domains/course/services
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(courseId: string) {
-const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
+  const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
   const [lastSavedResourceId, setLastSavedResourceId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
