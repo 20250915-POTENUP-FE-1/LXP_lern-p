@@ -137,6 +137,14 @@ export async function fetchApi<T = unknown>(
 
     // HTTP 에러
     if (!response.ok) {
+      // 🔥 404 + ER005 (리뷰 없음)은 정상 케이스로 처리
+      const code = (resJson && resJson.code) || 'NO_CODE';
+      const message = (resJson && resJson.message) || response.statusText || 'Unknown';
+
+      if (response.status === 404 && code === 'ER005') {
+        return null as T; // throw하지 않음
+      }
+
       // 만약 응답이 401 (리프레시 토큰 만료)일 경우 -> 재로그인
       if (response.status === 401) {
         cookieStore.delete('accessToken'); // 재로그인
@@ -146,9 +154,6 @@ export async function fetchApi<T = unknown>(
 
       // 요청/응답 전체 로그
       console.error(LOG_LABELS.REQUEST_FAILED, buildLogPayload());
-
-      const code = (resJson && resJson.code) || 'NO_CODE';
-      const message = (resJson && resJson.message) || response.statusText || 'Unknown';
 
       throw new FetchApiError(`[${response.status} (${code}) - ${message}]`, debugInfo);
     }

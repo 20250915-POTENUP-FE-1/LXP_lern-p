@@ -44,8 +44,15 @@ export const getAllReviews = async (courseId: string): Promise<GetAllReviewsResp
 };
 
 // 리뷰 단건 조회 API
-export async function getMyReview(courseId: string | number): Promise<GetReviewResponse> {
-  return getApi<GetReviewResponse>(`/api/courses/${courseId}/review`);
+export async function getMyReview(courseId: string | number): Promise<GetReviewResponse | null> {
+  try {
+    return await getApi<GetReviewResponse>(`/api/courses/${courseId}/review`);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('ER005')) {
+      return null; // 리뷰 없음은 정상 처리
+    }
+    throw err;
+  }
 }
 // 수강중인 강좌 리뷰 여부 확인 API
 export async function getIsReviewed(request: GetIsReviewedRequest): Promise<GetIsReviewedResponse> {
