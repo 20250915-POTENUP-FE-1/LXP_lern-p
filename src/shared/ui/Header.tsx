@@ -54,8 +54,6 @@ export function Header() {
   const isInstructor = user?.roles?.includes('INSTRUCTOR');
   const instructorAction = (() => {
     if (!user) return null;
-    console.log('instructorApplicationStatus:', user.instructorApplicationStatus);
-
     switch (user.instructorApplicationStatus) {
       case 'NOT_APPLIED':
         return {
@@ -65,28 +63,21 @@ export function Header() {
         };
       case 'PENDING':
         return {
-          label: '강사 승인 요청 중',
+          label: '강사 승인 대기 중',
           onClick: undefined,
           disabled: true,
         };
       case 'REJECTED':
         return {
-          label: '승인 거절됨',
-          onClick: roleModal.open,
-          disabled: false,
+          label: '강사 승인 거절',
+          onClick: undefined, // TODO: 나중에 정책 변경에 맞춰서 재요청 가능하도록 모달 열기
+          disabled: true,
         };
       case 'APPROVED':
-        if (isInstructor) {
-          return {
-            label: '강좌 등록하기',
-            onClick: startCreateCourse,
-            disabled: false,
-          };
-        }
         return {
-          label: '강사 승인됨',
-          onClick: undefined,
-          disabled: true,
+          label: '강좌 등록하기',
+          onClick: startCreateCourse,
+          disabled: false,
         };
       default:
         return null;
