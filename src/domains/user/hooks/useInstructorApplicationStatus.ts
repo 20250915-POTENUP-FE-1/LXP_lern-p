@@ -16,7 +16,7 @@ export function useInstructorApplicationStatus(enabled: boolean) {
     setLoading(true);
     try {
       const result = await getMyInstructorApplication();
-      setStatus(result.status);
+      setStatus(result?.status ?? null);
     } catch {
       // 신청 내역이 없으면 null
       setStatus(null);
