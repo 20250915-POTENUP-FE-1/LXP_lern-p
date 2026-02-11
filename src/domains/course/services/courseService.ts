@@ -13,7 +13,6 @@ import type {
   GetAllCourseResponse,
   GetCourseDetailResponse,
 } from '@/domains/course/types/course';
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
  * 강좌 목록 조회 (무한 스크롤)
@@ -29,7 +28,7 @@ export const getAllCourses = async (
   if (params?.keyword) query.set('keyword', params.keyword);
   // if (params?.sort) query.set('sort', params.sort);
 
-  const response = await fetch(`${BASE_URL}/api/courses?${query.toString()}`, {
+  const response = await fetch(`/api/courses?${query.toString()}`, {
     method: 'GET',
     headers: { Accept: 'application/json' },
   });
@@ -45,7 +44,7 @@ export const getAllCourses = async (
  * 강좌 상세 조회
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
-  const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
+  const response = await fetch(`/api/courses/${courseId}`, {
     method: 'GET',
     headers: { Accept: 'application/json' },
   });
