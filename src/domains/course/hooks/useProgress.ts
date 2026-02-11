@@ -59,9 +59,7 @@ export function useProgress(courseId: string) {
   }, [courseId]);
 
   const lectureProgressMap = useMemo<Map<number, LectureProgressMapValue>>(() => {
-    if (!progressData || !progressData.resourceProgresses) {
-      return new Map();
-    }
+    if (!progressData.resourceProgresses.length) return new Map();
 
     return new Map(
       progressData.resourceProgresses.map((p) => [
@@ -70,6 +68,7 @@ export function useProgress(courseId: string) {
           progressRate: p.progressRate,
           completed: p.completed,
           watchedDuration: p.watchedDuration,
+          totalDurationSeconds: p.totalDurationSeconds,
         },
       ]),
     );
@@ -90,13 +89,11 @@ export function useProgress(courseId: string) {
     };
   }, [progressData]);
 
-  const progress = useMemo<CourseLearnProgress | null>(() => {
-    if (!progressData || !progressInfo) return null;
-
+  const progress = useMemo<CourseLearnProgress>(() => {
     return {
       enrollmentId: String(progressData.enrollmentId),
       overallProgressRate: progressData.overallProgressRate,
-      progressInfo,
+      progressInfo: progressInfo ?? undefined,
       lectureProgressMap,
     };
   }, [progressData, progressInfo, lectureProgressMap]);
@@ -116,11 +113,13 @@ export function useProgress(courseId: string) {
     if (!pending) return;
 
     const delay = RETRY_DELAYS[pending.retryCount];
-    if (!delay) return; // 재시도 포기
+    if (!delay) {
+      pendingRef.current = null; // 포기
+      return;
+    }
 
     setTimeout(async () => {
       try {
-        // TODO(mock): mock 단계에서는 실제 API 호출 없이 UI 상태만 갱신
         if (!USE_MOCK) {
           await updateLearnProgress(courseId, {
             resourceId: pending.resourceId,
@@ -135,7 +134,7 @@ export function useProgress(courseId: string) {
         pendingRef.current = null;
       } catch {
         pending.retryCount += 1;
-        retryPending();
+        retryPending(); // 실패 시만 재귀
       }
     }, delay);
   };
@@ -148,6 +147,8 @@ export function useProgress(courseId: string) {
         watchedDuration,
       });
     }
+
+    lastSavedDurationRef.current = watchedDuration;
 
     setProgressData((prev) =>
       prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
@@ -216,6 +217,7 @@ export function useProgress(courseId: string) {
 
     return {
       ...prev,
+      resourceProgresses: lectureProgresses,
       overallProgressRate,
       lastWatchedResourceId: resourceId,
       lastWatchedAt: new Date().toISOString(),
