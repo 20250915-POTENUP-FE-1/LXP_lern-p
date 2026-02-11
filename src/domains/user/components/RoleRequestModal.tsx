@@ -23,15 +23,17 @@ export function RoleRequestModal({ isOpen, onClose, user, onApplied }: RoleReque
     try {
       setLoading(true);
       await applyInstructor();
-
-      onClose();
-      onApplied?.();
-      router.refresh();
     } catch (err) {
+      // POST 실패 = 이미 신청한 상태(중복)일 가능성이 높음
       console.error('강사 권한 부여 실패:', err);
     } finally {
       setLoading(false);
     }
+
+    // 성공이든 실패(중복 신청)든 PENDING 상태로 전환
+    onClose();
+    onApplied?.();
+    router.refresh();
   };
 
   return (
