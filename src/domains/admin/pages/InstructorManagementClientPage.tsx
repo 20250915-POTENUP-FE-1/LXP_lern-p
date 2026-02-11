@@ -50,10 +50,6 @@ export function InstructorManagementClientPage() {
         size: 100,
       };
 
-      if (filter !== 'ALL') {
-        params.status = filter;
-      }
-
       const result = await getInstructorApplicaions(params);
       const content = Array.isArray(result.content) ? result.content : [];
       setRequests(content);
@@ -65,7 +61,7 @@ export function InstructorManagementClientPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [filter]);
+  }, []);
 
   useEffect(() => {
     if (!USE_MOCK) {
