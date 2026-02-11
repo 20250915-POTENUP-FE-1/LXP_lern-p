@@ -162,6 +162,7 @@ export default function CourseListClientPage() {
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
         <div className={styles['course-list__toolbar']}>
           <LevelSelect />
+          {/* TODO: 강좌 목록 조회 API는 정렬 추후에 반영 */}
           <SortSelect />
         </div>
         {loading ? (
