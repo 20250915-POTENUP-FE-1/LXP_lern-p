@@ -15,13 +15,7 @@ import { getLearnProgress, updateLearnProgress } from '@/domains/course/services
 import { MOCK_LEARN_PROGRESS } from '@/mocks/learn.mock';
 
 export function useProgress(courseId: string) {
-  const [progressData, setProgressData] = useState<GetProgressResponse>({
-    enrollmentId: 0,
-    overallProgressRate: 0,
-    lastWatchedResourceId: 0,
-    lastWatchedAt: '',
-    resourceProgresses: [],
-  });
+const [progressData, setProgressData] = useState<GetProgressResponse | null>(null);
   const [lastSavedResourceId, setLastSavedResourceId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -36,8 +30,6 @@ export function useProgress(courseId: string) {
         // TODO(mock): mock 단계에서는 네트워크 호출 없이 학습 진도 데이터 사용
         const progress = USE_MOCK ? MOCK_LEARN_PROGRESS : await getLearnProgress(courseId);
 
-        console.log('learn progress raw:', progress);
-
         setProgressData({
           enrollmentId: progress?.enrollmentId ?? 0,
           overallProgressRate: progress?.overallProgressRate ?? 0,
@@ -46,7 +38,6 @@ export function useProgress(courseId: string) {
           lastWatchedAt: progress?.lastWatchedAt ?? null,
         });
 
-        console.log('learn progress raw:', progress);
       } catch (e) {
         setError(e as Error);
       } finally {
@@ -54,7 +45,6 @@ export function useProgress(courseId: string) {
       }
     };
 
-    console.log('fetchProgress 실행됨');
     fetchProgress();
   }, [courseId]);
 

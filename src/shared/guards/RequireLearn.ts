@@ -11,12 +11,6 @@ export async function requireLearn(courseId: string) {
       : null
     : await getEnrollmentByCourseId(courseId);
 
-  console.log('requireLearn check:', {
-    enrollmentCourseId: enrollment?.courseId,
-    courseId,
-    type1: typeof enrollment?.courseId,
-    type2: typeof courseId,
-  });
 
   if (!enrollment || Number(enrollment.courseId) !== Number(courseId)) {
     redirect(`/courses/${courseId}`);
