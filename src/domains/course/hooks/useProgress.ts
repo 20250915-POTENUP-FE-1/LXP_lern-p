@@ -185,12 +185,6 @@ export function useProgress(courseId: string) {
       };
     });
 
-    console.log(
-      '각 강의 progressRate:',
-      lectureProgresses.map((p) => ({
-        id: p.resourceId,
-        rate: p.progressRate,
-      })),
     );
 
     // 전체 진도율 재계산
