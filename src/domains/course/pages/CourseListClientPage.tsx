@@ -24,20 +24,9 @@ export default function CourseListClientPage() {
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryMapEntry>>({});
   const [categoryIdToName, setCategoryIdToName] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
-  const [totalPages, setTotalPages] = useState(0);
-  const [hasNext, setHasNext] = useState(false);
 
-  const {
-    sort,
-    page,
-    size,
-    categoryId,
-    level,
-    keyword,
-    setPage,
-    setCategoryId,
-    setCategoryLevelAndKeyword,
-  } = useCourseListQuery();
+  const { sort, page, size, categoryId, level, keyword, setCategoryLevelAndKeyword } =
+    useCourseListQuery();
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
     setCategoryLevelAndKeyword(nextCategoryId, null, null);
@@ -130,8 +119,6 @@ export default function CourseListClientPage() {
         }));
 
         setCourses(courseCardData);
-        setTotalPages(data.totalPages);
-        setHasNext(data.hasNext);
       } catch (error) {
         console.error('강좌 목록 불러오기 실패:', error);
       } finally {
