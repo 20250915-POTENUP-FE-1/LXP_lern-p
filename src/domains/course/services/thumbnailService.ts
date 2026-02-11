@@ -18,7 +18,7 @@ export async function createCourseThumbnailPresignedUrl(
   payload: CreateCourseThumbnailPresignedUrlRequest,
 ) {
   return postApi<CreateCourseThumbnailPresignedUrlResponse>(
-    '/api/uploads/courses/thumbnails/presign',
+    '/api/instructor/resource/thumbnail',
     payload,
   );
 }
