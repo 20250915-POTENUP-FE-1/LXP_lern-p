@@ -94,7 +94,7 @@ export default function EnrollmentClientPage() {
             return { ...it, isReviewed: hasMine };
           });
 
-          setItems(merged);
+          setItems([...merged].reverse());
           return;
         }
 
@@ -108,7 +108,7 @@ export default function EnrollmentClientPage() {
           isReviewed: reviewedMap.get(String(it.courseId)) ?? false,
         }));
 
-        setItems(merged);
+        setItems([...merged].reverse());
       } catch (e) {
         console.error('수강 목록 조회 실패:', e);
       } finally {

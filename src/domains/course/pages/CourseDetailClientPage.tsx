@@ -10,7 +10,7 @@ import { CourseApplyModal } from '@/domains/course/components/CourseApplyModal';
 import { FloatingCTA } from '@/domains/course/components/FloatingCTA';
 import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
-import { formatDuration } from '@/domains/course/utils/formatDuration';
+import { formatDuration, formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
 import { addCartItem } from '@/domains/cart/services/cartService';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
@@ -241,7 +241,7 @@ export default function CourseDetailClientPage() {
                                     {lec.title}
                                   </span>
                                   <span className={styles['course-detail__lecture-meta']}>
-                                    {lec.duration}분
+                                    {formatLectureDuration(lec.duration)}
                                   </span>
                                 </div>
                                 {canPreview ? (
