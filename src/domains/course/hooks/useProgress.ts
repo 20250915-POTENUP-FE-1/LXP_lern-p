@@ -128,19 +128,24 @@ export function useProgress(courseId: string) {
 
   // 진도 즉시 저장
   const saveProgress = async (resourceId: number, watchedDuration: number) => {
+    const prevWatched =
+      progressData?.resourceProgresses.find((p) => p.resourceId === resourceId)?.watchedDuration ??
+      0;
+
+    const safeToSend = Math.max(prevWatched, watchedDuration);
+
     if (!USE_MOCK) {
       await updateLearnProgress(courseId, {
         resourceId,
-        watchedDuration,
+        watchedDuration: safeToSend,
       });
     }
 
-    lastSavedDurationRef.current = Math.max(lastSavedDurationRef.current, watchedDuration);
+    lastSavedDurationRef.current = Math.max(lastSavedDurationRef.current, safeToSend);
+
     setLastSavedResourceId(resourceId);
 
-    setProgressData((prev) =>
-      prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
-    );
+    setProgressData((prev) => (prev ? applyProgressUpdate(prev, resourceId, safeToSend) : prev));
   };
 
   // 재생 중 주기적 진도 저장
