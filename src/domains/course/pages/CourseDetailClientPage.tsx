@@ -12,18 +12,17 @@ import { useCourseApply } from '@/domains/course/hooks/useCourseApply';
 import { useCourseDetail } from '@/domains/course/hooks/useCourseDetail';
 import { formatDuration } from '@/domains/course/utils/formatDuration';
 import styles from '@/app/courses/[id]/CourseDetailPage.module.css';
-import { MOCK_GET_CART } from '@/mocks/cart.mock';
 import { addCartItem } from '@/domains/cart/services/cartService';
 import { useAuthState } from '@/domains/auth/hooks/useAuthState';
 import { USE_MOCK } from '@/shared/constants/config';
 import type { Section, Lecture } from '../types/course';
 import { LEVEL_LABEL } from '../constants/level';
-import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
 import CoursePreviewModal from '../components/CoursePreviewModal';
 import CourseReviewModal from '../components/CourseReviewModal';
 import { useCourseReviews } from '../hooks/useCourseReview';
 import { StarRating } from '../components/StarRating';
 import { formatReviewDate } from '../utils/formatReviewDate';
+import { toPublicAssetUrl } from '../utils/toPublicAssetUrl';
 
 type TabKey = 'intro' | 'curriculum' | 'reviews';
 
@@ -155,8 +154,9 @@ export default function CourseDetailClientPage() {
           width={800}
           height={450}
           className={styles['course-detail__hero']}
-          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
-          src={'/default-thumbnail.png'}
+          src={
+            course.thumbnailUrl ? toPublicAssetUrl(course.thumbnailUrl) : '/default-thumbnail.png'
+          }
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />

@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
+import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
 import { CartItem as CartItemType } from '../types/cart';
 import styles from './CartItem.module.css';
 
@@ -43,8 +43,7 @@ export const CartItem: React.FC<Props> = ({ item, checked = false, onSelectChang
       </label>
       <div className={styles['cart-item__thumb']}>
         <Image
-          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
-          src={'/default-thumbnail.png'}
+          src={item.thumbnailUrl ? toPublicAssetUrl(item.thumbnailUrl) : '/default-thumbnail.png'}
           alt={`${item.title} 썸네일`}
           width={160}
           height={90}

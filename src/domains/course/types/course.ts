@@ -67,6 +67,7 @@ export type CourseDraftForm = {
   level: CourseLevel;
   price: number | string;
   thumbnail?: string;
+  thumbnailResourceKey: string;
   status?: string;
 };
 
@@ -130,7 +131,7 @@ export type CreateCourseRequest = {
   title: string;
   summary: string;
   description: string;
-  //thumbnail?: string; // TODO: 추후에 반영 예정
+  thumbnailResourceKey: string;
   categoryId: number;
   price: number | string;
   courseLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'NOVICE';
@@ -288,7 +289,12 @@ export type ResourceType = 'VIDEO' | 'PDF' | 'ZIP' | 'DOC';
 export type CourseCardType = Omit<
   Course,
   'description' | 'sections' | 'duration' | 'status' | 'instructorId'
->;
+> & {
+  reviewStat: {
+    reviewCount: number;
+    avgRating: number;
+  };
+};
 
 export type GetDraftCourseResponse = {
   courseDraft: CourseDraftForm;
@@ -326,7 +332,6 @@ export type PresignedUrlResponse = {
   expireSeconds?: number;
 };
 
-export type DeleteSectionRequest = {};
 export type DeleteSectionResponse = {
   sectionId?: string;
 };
@@ -364,6 +369,6 @@ export type GetAllCoursesParams = {
   size?: number;
   categoryId?: number;
   level?: CourseLevel;
-  title?: string;
+  keyword?: string;
   sort?: string;
 };

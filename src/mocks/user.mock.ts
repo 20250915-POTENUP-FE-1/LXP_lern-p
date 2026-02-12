@@ -9,4 +9,6 @@ export const MOCK_USER: User = {
   enrolledCourses: [],
   createdCourses: [],
   createdAt: new Date('2026-01-01T09:00:00Z'),
+  updatedAt: new Date('2026-01-10T12:00:00Z'),
+  instructorApplicationStatus: 'APPROVED',
 };

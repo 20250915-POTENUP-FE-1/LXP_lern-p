@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from '@/domains/course/components/CourseCard.module.css';
-import { CourseCardType as Course } from '../types/course';
-import { formatAbsoluteUrl } from '../utils/formatAbsoluteUrl';
+import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
+import { CourseCardType as Course } from '@/domains/course/types/course';
 
 export type CourseCardProps = {
   course: Course;
@@ -20,8 +20,9 @@ export function CourseCard({ course }: CourseCardProps) {
           width={1200} // 혹은 800
           height={675}
           className={styles['course-card__thumb']}
-          // TODO: 썸네일 임시 처리 - formatAbsoluteUrl(course.thumbnailUrl)
-          src={'/default-thumbnail.png'}
+          src={
+            course.thumbnailUrl ? toPublicAssetUrl(course.thumbnailUrl) : '/default-thumbnail.png'
+          }
           alt={`${course.title} 썸네일`}
           loading="lazy"
         />
@@ -32,8 +33,23 @@ export function CourseCard({ course }: CourseCardProps) {
           <h3 className={styles['course-card__title']}>{course.title}</h3>
         </div>
 
-        <div className={`${styles['course-card__meta']} ${styles['course-card__instructor']}`}>
-          {course.instructorName}
+        <div className={`${styles['course-card__meta']}`}>
+          <div className={` ${styles['course-card__instructor']}`}>{course.instructorName}</div>
+          <div className={styles['course-card__rating']}>
+            {course.reviewStat.reviewCount > 0 ? (
+              <>
+                <span className={styles['course-card_start']}>★</span>
+                <span className={styles['course-card__rating-text']}>
+                  {(course.reviewStat.avgRating / 2).toFixed(1)}
+                </span>
+                <span className={styles['course-card__review-count']}>
+                  ({course.reviewStat.reviewCount.toLocaleString()})
+                </span>
+              </>
+            ) : (
+              <span className={styles['course-card__rating-empty']}>&nbsp;</span>
+            )}
+          </div>
         </div>
 
         {course.summary && <p className={styles['course-card__summary']}>{course.summary}</p>}

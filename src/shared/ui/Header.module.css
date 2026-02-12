@@ -97,6 +97,17 @@
   color: var(--color-text);
 }
 
+.header__action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.header__action:disabled:hover,
+.header__action:disabled:focus-visible {
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
 .header__action--link {
   padding-inline: var(--space-2);
   display: inline-flex;

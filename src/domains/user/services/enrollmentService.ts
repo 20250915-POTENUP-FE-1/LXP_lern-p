@@ -1,7 +1,6 @@
 import { getApi } from '@/shared/lib/api/fetchApi';
 import type {
   EnrollmentListResponse,
-  EnrollmentDetailResponse,
   EnrollmentStatus,
   GetEnrollmentResponse,
 } from '@/domains/user/types/enrollment';
@@ -35,10 +34,12 @@ export async function getEnrollmentList(params?: {
   size?: number;
 }): Promise<EnrollmentListResponse> {
   const query = new URLSearchParams({
-    status: params?.status ?? 'ENROLLED',
     page: String(params?.page ?? 0),
     size: String(params?.size ?? 10),
   });
+  if (params?.status) {
+    query.set('status', params.status);
+  }
 
   return await getApi<EnrollmentListResponse>(`/api/enrollments?${query.toString()}`, {
     cache: 'no-store',

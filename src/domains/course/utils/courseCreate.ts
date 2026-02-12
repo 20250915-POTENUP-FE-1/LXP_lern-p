@@ -4,11 +4,13 @@ import {
   CourseDraftForm,
   CreateCourseRequest,
   CreateLectureRequest,
+  GetDraftCourseResponse,
   LectureDraftForm,
   SectionDraftForm,
 } from '../types/course';
+import { CourseFormState } from './courseDraft';
 
-export const createCourseFormData = (data: any, file?: File) => {
+export const createCourseFormData = (data: CourseFormState, file?: File) => {
   const formData = new FormData();
 
   formData.append('request', new Blob([JSON.stringify(data)], { type: 'application/json' }));
@@ -28,6 +30,7 @@ export const mapDraftToCreateRequest = (draft: CourseDraftForm): CreateCourseReq
     summary: draft.summary,
     description: draft.description,
     categoryId, // number
+    thumbnailResourceKey: draft.thumbnailResourceKey,
     price: draft.price,
     courseLevel: draft.level,
   };
@@ -86,43 +89,42 @@ export const applySectionDraftsForNewCourse = async (
 };
 
 // 생성된 강좌조회 용 데이터 매핑 함수
-export const mapResponseToCourseDraft = (data: any) => {
-  // categoryIds가 배열로 오면 그대로 string 배열로 저장
-  const category = Array.isArray(data.categoryIds)
-    ? data.categoryIds.map((id: unknown) => String(id))
-    : data.category
-      ? [String(data.category)]
-      : [];
+export const mapResponseToCourseDraft = (data: GetDraftCourseResponse) => {
+  const { courseDraft, sectionDrafts } = data;
 
-  const courseDraft: CourseDraftForm = {
-    title: data.title ?? '',
-    summary: data.summary ?? '',
-    description: data.description ?? '',
-    thumbnail: data.thumbnailUrl ?? '',
-    category,
-    level: data.courseLevel ?? 'BEGINNER',
-    price: data.price ?? 0,
+  const newCourseDraft: CourseDraftForm = {
+    title: courseDraft?.title ?? '',
+    summary: courseDraft?.summary ?? '',
+    description: courseDraft?.description ?? '',
+    thumbnail: courseDraft?.thumbnail ?? '',
+    thumbnailResourceKey: courseDraft?.thumbnailResourceKey ?? '',
+    category: Array.isArray(courseDraft?.category)
+      ? courseDraft.category.map((id) => String(id))
+      : [],
+    level: courseDraft?.level ?? 'BEGINNER',
+    price: courseDraft?.price ?? 0,
+    status: courseDraft?.status,
   };
 
-  // SectionDraftForm / LectureDraftForm 필드에 맞춰 최소 매핑
-  const sectionDrafts: SectionDraftForm[] = (data.sections ?? []).map((sec: any) => ({
-    localId: String(sec.id ?? crypto.randomUUID?.() ?? Date.now()),
+  const newSectionDrafts: SectionDraftForm[] = (sectionDrafts ?? []).map((sec) => ({
+    localId: sec.localId ?? String(sec.id ?? crypto.randomUUID?.() ?? Date.now()),
     id: String(sec.id ?? ''),
     title: sec.title ?? '',
-    _dirty: false,
-    _deleted: false,
-    lectures: (sec.lectures ?? []).map((lec: any) => ({
-      localId: String(lec.id ?? crypto.randomUUID?.() ?? Date.now()),
+    _dirty: !!sec._dirty,
+    _deleted: !!sec._deleted,
+    lectures: (sec.lectures ?? []).map((lec) => ({
+      localId: lec.localId ?? String(lec.id ?? crypto.randomUUID?.() ?? Date.now()),
       id: String(lec.id ?? ''),
       title: lec.title ?? '',
-      duration: lec.totalDurationSeconds ?? 0,
+      duration: lec.duration ?? 0,
       videoUrl: lec.videoUrl ?? '',
       isPreview: !!lec.isPreview,
-      resource: Array.isArray(lec.resource) ? lec.resource : lec.resource ? [lec.resource] : [],
-      _dirty: false,
-      _deleted: false,
+      resource: Array.isArray(lec.resource) ? lec.resource : [],
+      file: lec.file,
+      _dirty: !!lec._dirty,
+      _deleted: !!lec._deleted,
     })),
   }));
 
-  return { courseDraft, sectionDrafts };
+  return { courseDraft: newCourseDraft, sectionDrafts: newSectionDrafts };
 };

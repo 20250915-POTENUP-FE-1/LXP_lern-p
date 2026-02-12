@@ -9,20 +9,15 @@ import {
   ChevronRight,
   CheckCircle,
 } from 'lucide-react';
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
-import { formatAbsoluteUrl } from '@/domains/course/utils/formatAbsoluteUrl';
-import { LearnEnrollmentResponse } from '@/domains/course/types/learn';
+import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
 
-type CourseLearnClientProps = {
-  enrollment: LearnEnrollmentResponse;
-};
-
-export default function CourseLearnClient({ enrollment }: CourseLearnClientProps) {
+export default function CourseLearnClient() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasSeekedRef = useRef(false);
@@ -102,7 +97,7 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
           <div className={styles['course-learn__player-wrap']}>
             {currentLecture.type === 'VIDEO' &&
             currentLecture.videoUrl &&
-            formatAbsoluteUrl(currentLecture.videoUrl) ? (
+            toPublicAssetUrl(currentLecture.videoUrl) ? (
               <div className={styles['course-learn__player']}>
                 <video
                   className={styles['course-learn__video']}
@@ -121,7 +116,7 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                       time: t,
                     });
 
-                    saveFinalProgressOnEnd(currentLecture.resourceId, t);
+                    saveFinalProgressOnEnd(currentLecture.resourceId);
                     moveToNextLecture();
                   }}
                   onTimeUpdate={(e) => {
@@ -131,7 +126,7 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                     );
                   }}
                 >
-                  <source src={formatAbsoluteUrl(currentLecture.videoUrl)} type="video/mp4" />
+                  <source src={toPublicAssetUrl(currentLecture.videoUrl)} type="video/mp4" />
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
@@ -145,9 +140,9 @@ export default function CourseLearnClient({ enrollment }: CourseLearnClientProps
                   {currentLecture.description}
                 </p>
                 {currentLecture.pdfUrl && (
-                  <a href={formatAbsoluteUrl(currentLecture.pdfUrl)} download>
+                  <a href={toPublicAssetUrl(currentLecture.pdfUrl)} download>
                     <button
-                      onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId, 0)}
+                      onClick={() => saveFinalProgressOnEnd(currentLecture.resourceId)}
                       className={styles['course-learn__brand-btn']}
                     >
                       <Download className={styles['course-learn__icon']} /> PDF 다운로드

@@ -8,13 +8,13 @@ export type LectureProgressResponse = {
   lastWatchedAt: string;
 };
 
-export type GetProgressResponse = {
+export interface GetProgressResponse {
   enrollmentId: number;
   overallProgressRate: number; // 해당 수강 내역의 전체 진도율
   lastWatchedResourceId: number; // 마지막으로 재생했던 Video ID
   lastWatchedAt: string; // 마지막 학습 활동 시간
-  lectureProgresses: LectureProgressResponse[]; // 개별 강의별 진도 상세 목록
-};
+  resourceProgresses: LectureProgressResponse[]; // 개별 강의별 진도 상세 목록
+}
 
 export type UpdateProgressRequest = {
   resourceId: number;
@@ -48,7 +48,7 @@ export type LectureProgressMapValue = {
 export type CourseLearnProgress = {
   enrollmentId: string;
   overallProgressRate: number;
-  progressInfo: ProgressInfo;
+  progressInfo?: ProgressInfo;
   lectureProgressMap: Map<number, LectureProgressMapValue>;
 };
 

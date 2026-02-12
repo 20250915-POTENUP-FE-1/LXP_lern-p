@@ -4,6 +4,7 @@ import { ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { RoleRequestModal } from '@/domains/user/components/RoleRequestModal';
 import { useModal } from '@/shared/hooks/useModal';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
@@ -50,7 +51,37 @@ export function Header() {
     router.replace(pathname);
   }, [searchParams, user, router, pathname, loginModal, roleModal]);
 
-  const isInstructor = user?.roles?.includes('INSTRUCTOR');
+  const instructorAction = (() => {
+    if (!user) return null;
+    switch (user.instructorApplicationStatus) {
+      case 'NOT_APPLIED':
+        return {
+          label: '강사 신청하기',
+          onClick: roleModal.open,
+          disabled: false,
+        };
+      case 'PENDING':
+        return {
+          label: '강사 승인 대기 중',
+          onClick: undefined,
+          disabled: true,
+        };
+      case 'REJECTED':
+        return {
+          label: '강사 승인 거절',
+          onClick: undefined, // TODO: 나중에 정책 변경에 맞춰서 재요청 가능하도록 모달 열기
+          disabled: true,
+        };
+      case 'APPROVED':
+        return {
+          label: '강좌 등록하기',
+          onClick: startCreateCourse,
+          disabled: false,
+        };
+      default:
+        return null;
+    }
+  })();
 
   const handleLogout = async () => {
     setMenuOpen(false);
@@ -72,7 +103,9 @@ export function Header() {
           {/* 왼쪽: 로고 */}
           <div className={styles['header__left']}>
             <Link href="/" className={styles['header__logo']} aria-label="홈으로 이동">
-              <span className={styles['header__logo-text']}>Lernix</span>
+              <span className={styles['header__logo-text']}>
+                <Image src={`/lernix_logo.svg`} width={`80`} height={`18`} alt={`Lernix`} />
+              </span>
             </Link>
           </div>
 
@@ -98,22 +131,14 @@ export function Header() {
                 </button>
               )}
 
-              {user && !isInstructor && (
+              {instructorAction && (
                 <button
                   type="button"
                   className={`${styles['header__action']} ${styles['header__action--cta']}`}
-                  onClick={roleModal.open}
+                  onClick={instructorAction.onClick}
+                  disabled={instructorAction.disabled}
                 >
-                  강사 권한 요청
-                </button>
-              )}
-
-              {user && isInstructor && (
-                <button
-                  onClick={startCreateCourse}
-                  className={`${styles['header__action']} ${styles['header__action--cta']}`}
-                >
-                  강좌 등록하기
+                  {instructorAction.label}
                 </button>
               )}
             </nav>

@@ -12,7 +12,7 @@ interface CourseListQueryState {
   size: number;
   categoryId: number | null;
   level: CourseLevel | null;
-  title: string;
+  keyword: string;
 }
 
 interface UseCourseListQueryReturn extends CourseListQueryState {
@@ -20,14 +20,14 @@ interface UseCourseListQueryReturn extends CourseListQueryState {
   setPage: (value: number) => void;
   setSize: (value: number) => void;
   setCategoryId: (value: number | null) => void;
-  setCategoryAndTitle: (categoryId: number | null, title: string | null) => void;
-  setCategoryLevelAndTitle: (
+  setCategoryAndKeyword: (categoryId: number | null, keyword: string | null) => void;
+  setCategoryLevelAndKeyword: (
     categoryId: number | null,
     level: CourseLevel | null,
-    title: string | null,
+    keyword: string | null,
   ) => void;
   setLevel: (value: CourseLevel | null) => void;
-  setTitle: (value: string) => void;
+  searchByKeyword: (value: string) => void;
 }
 
 const VALID_LEVELS: CourseLevel[] = ['BEGINNER', 'NOVICE', 'INTERMEDIATE', 'ADVANCED'];
@@ -59,7 +59,7 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
       ? (levelParam as CourseLevel)
       : null;
 
-  const title = searchParams.get('title') ?? '';
+  const keyword = searchParams.get('keyword') ?? '';
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -72,7 +72,7 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
         }
       }
 
-      const orderedKeys = ['categoryId', 'level', 'title', 'sort', 'page', 'size'];
+      const orderedKeys = ['categoryId', 'level', 'keyword', 'sort', 'page', 'size'];
       const orderedParams = new URLSearchParams();
       for (const key of orderedKeys) {
         const value = params.get(key);
@@ -108,22 +108,22 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     [updateParams],
   );
 
-  const setCategoryAndTitle = useCallback(
-    (value: number | null, nextTitle: string | null) =>
+  const setCategoryAndKeyword = useCallback(
+    (value: number | null, nextKeyword: string | null) =>
       updateParams({
         categoryId: value != null ? String(value) : null,
-        title: nextTitle || null,
+        keyword: nextKeyword || null,
         page: null,
       }),
     [updateParams],
   );
 
-  const setCategoryLevelAndTitle = useCallback(
-    (value: number | null, nextLevel: CourseLevel | null, nextTitle: string | null) =>
+  const setCategoryLevelAndKeyword = useCallback(
+    (value: number | null, nextLevel: CourseLevel | null, nextKeyword: string | null) =>
       updateParams({
         categoryId: value != null ? String(value) : null,
         level: nextLevel ?? null,
-        title: nextTitle || null,
+        keyword: nextKeyword || null,
         page: null,
       }),
     [updateParams],
@@ -133,8 +133,15 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     [updateParams],
   );
 
-  const setTitle = useCallback(
-    (value: string) => updateParams({ title: value || null, page: null }),
+  const searchByKeyword = useCallback(
+    (value: string) =>
+      updateParams({
+        keyword: value || null,
+        categoryId: null,
+        level: null,
+        sort: null,
+        page: null,
+      }),
     [updateParams],
   );
 
@@ -144,14 +151,14 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
     size,
     categoryId,
     level,
-    title,
+    keyword,
     setSort,
     setPage,
     setSize,
     setCategoryId,
-    setCategoryAndTitle,
-    setCategoryLevelAndTitle,
+    setCategoryAndKeyword,
+    setCategoryLevelAndKeyword,
     setLevel,
-    setTitle,
+    searchByKeyword,
   };
 }

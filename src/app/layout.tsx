@@ -15,8 +15,25 @@ import { AuthProvider } from './_providers/AuthProvider';
 // }
 
 export const metadata: Metadata = {
-  title: 'Lernix',
-  description: '역할 전환형 온라인 학습 플랫폼',
+  title: 'Lernix | 역할 전환형 온라인 학습 플랫폼',
+  description:
+    '강사와 학생의 경계를 허무는 역할 전환형 온라인 학습 플랫폼. 한 번의 클릭으로 배움과 가르침을 모두 경험하세요.',
+  openGraph: {
+    title: 'Lernix | 역할 전환형 온라인 학습 플랫폼',
+    description: '배움과 가르침을 하나로. 강사와 학생 모두가 될 수 있는 역할 전환형 학습 플랫폼.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Lernix – Role-Switch Learning Platform',
+      },
+    ],
+    type: 'website',
+  },
+  icons: {
+    icon: '/lernix_favicon.ico',
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -73,6 +90,8 @@ async function fetchInitialUser(): Promise<User | null> {
       enrolledCourses: [],
       createdCourses: [],
       createdAt: new Date(userProfile.createdAt),
+      updatedAt: new Date(userProfile.updatedAt),
+      instructorApplicationStatus: userProfile.instructorApplicationStatus,
     };
 
     return user;

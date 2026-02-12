@@ -13,7 +13,6 @@ import type {
   GetAllCourseResponse,
   GetCourseDetailResponse,
 } from '@/domains/course/types/course';
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 /**
  * 강좌 목록 조회 (무한 스크롤)
@@ -26,15 +25,12 @@ export const getAllCourses = async (
   if (params?.size != null) query.set('size', String(params.size));
   if (params?.categoryId != null) query.set('categoryId', String(params.categoryId));
   if (params?.level) query.set('level', params.level);
-  if (params?.title) query.set('title', params.title);
-  if (params?.sort) query.set('sort', params.sort);
+  if (params?.keyword) query.set('keyword', params.keyword);
+  // if (params?.sort) query.set('sort', params.sort);
 
-  const qs = query.toString();
-  const response = await fetch(`${BASE_URL}/api/courses${query.toString()}`, {
+  const response = await fetch(`/api/courses?${query.toString()}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { Accept: 'application/json' },
   });
   if (!response.ok) {
     throw new Error(`강좌 목록 조회 실패: ${response.statusText}`);
@@ -43,15 +39,14 @@ export const getAllCourses = async (
 
   return resJson.data;
 };
+
 /**
  * 강좌 상세 조회
  */
 export const getCourseDetail = async (courseId: string): Promise<GetCourseDetailResponse> => {
-  const response = await fetch(`${BASE_URL}/api/courses/${courseId}`, {
+  const response = await fetch(`/api/courses/${courseId}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { Accept: 'application/json' },
   });
   if (!response.ok) {
     throw new Error(`강좌 상세 조회 실패: ${response.statusText}`);

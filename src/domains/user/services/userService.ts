@@ -1,10 +1,11 @@
 import type {
+  ApplyInstructorResponse,
   UpdateProfileRequest,
   UpdateProfileResponse,
   UpdateStudentToInstructorResponse,
   UserResponse,
 } from '@/domains/user/types/user';
-import { getApi, patchApi } from '@/shared/lib/api/fetchApi';
+import { getApi, patchApi, postApi } from '@/shared/lib/api/fetchApi';
 
 /**
  * 사용자 프로필 조회
@@ -26,4 +27,11 @@ export const updateProfile = async ({
  */
 export const updateStudentToInstructor = async (): Promise<UpdateStudentToInstructorResponse> => {
   return await patchApi<UpdateStudentToInstructorResponse>(`/api/users/me/roles/instructor`);
+};
+
+/**
+ * 강사 권한 요청
+ */
+export const applyInstructor = async (): Promise<ApplyInstructorResponse> => {
+  return await postApi<ApplyInstructorResponse>('/api/users/instructor/applications');
 };

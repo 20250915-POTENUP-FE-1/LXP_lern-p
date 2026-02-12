@@ -28,6 +28,7 @@ export function useCourseForm() {
     level: 'BEGINNER',
     price: '',
     thumbnailUrl: '',
+    thumbnailResourceKey: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -43,13 +44,13 @@ export function useCourseForm() {
       setIsThumbnailUploading(true);
       setError('');
 
-      const presign = await createCourseThumbnailPresignedUrl({
+      const { uploadUrl, fileUrl, fileKey } = await createCourseThumbnailPresignedUrl({
         originalFileName: file.name,
         contentType: file.type,
         size: file.size,
       });
 
-      await fetch(presign.uploadUrl, {
+      await fetch(uploadUrl, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
@@ -57,14 +58,14 @@ export function useCourseForm() {
 
       setFormData((prev) => ({
         ...prev,
-        thumbnailUrl: presign.fileUrl,
+        thumbnailUrl: fileUrl,
+        thumbnailResourceKey: fileKey,
       }));
     } catch (err) {
       console.error(err);
 
       setFormData((prev) => ({
         ...prev,
-        thumbnailUrl: '',
       }));
 
       setError('썸네일 업로드에 실패했습니다. 다시 시도해주세요.');
@@ -98,8 +99,7 @@ export function useCourseForm() {
       title: draftData.title,
       summary: draftData.summary,
       description: draftData.description,
-      // TODO: thumbnail은 지금 optional이라 일단 draftData.thumbnail로 넘기거나 빈 값 가능
-      // thumbnail: draftData.thumbnail,
+      thumbnailResourceKey: draftData.thumbnailResourceKey,
       categoryId: Number(draftData.category[draftData.category.length - 1]),
       price: draftData.price,
       courseLevel: draftData.level as CreateCourseRequest['courseLevel'],
@@ -184,6 +184,7 @@ export function useCourseForm() {
             level: raw.level ?? 'BEGINNER',
             price: raw.price == null ? '' : String(raw.price),
             thumbnailUrl: raw.thumbnail ?? '',
+            thumbnailResourceKey: raw.thumbnailResourceKey ?? '',
           };
 
           setFormData(nextForm);

@@ -1,13 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-export type PageResponse<T> = {
-  content: T[];
-  currentPage: number;
-  totalPages: number;
-  hasNext: boolean;
-};
+import { PageResponse } from '@/shared/types/page';
 
 export type UseInfiniteScrollProps<T> = {
   loadPage: (page: number) => Promise<PageResponse<T>>;

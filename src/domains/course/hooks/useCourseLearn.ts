@@ -20,8 +20,13 @@ export function useCourseLearn() {
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set());
 
-  const { progressInfo, lectureProgressMap, autoSaveProgress, saveFinalProgressOnEnd } =
-    useProgress(courseId);
+  const {
+    progressInfo,
+    lectureProgressMap,
+    autoSaveProgress,
+    saveFinalProgressOnEnd,
+    lastSavedResourceId,
+  } = useProgress(courseId);
 
   const searchParams = useSearchParams();
   const start = searchParams.get('start') === 'first' ? 'first' : undefined;
@@ -51,19 +56,20 @@ export function useCourseLearn() {
     fetchAll();
   }, [courseId]);
 
-  // TODO: UI 완료 상태 기준으로 courseData 생성
+  useEffect(() => {
+    if (!courseId) return;
+    if (!lastSavedResourceId) return;
+
+    // NOTE:
+    // 영상 종료 후 progress PATCH 결과로
+    // enrollment 상태(COMPLETED 등)가 변경될 수 있어 재조회
+    getEnrollmentByCourseId(courseId).then((enrollment) => {
+      setLearnData((prev) => (prev ? { ...prev, enrollment } : prev));
+    });
+  }, [courseId, lastSavedResourceId]);
+
   const courseData = useMemo<UICourse | null>(() => {
     if (!learnData) return null;
-
-    /**
-     * TODO: 서버 기준 원본 코드
-     *
-     * const completedIds = new Set(
-     *   learnData.progress?.completedLectureIds ?? [],
-     * );
-     *
-     * return mapCourse(learnData.course, lectureProgressMap);
-     */
     return mapCourse(learnData.course, lectureProgressMap);
   }, [learnData, lectureProgressMap]);
 
@@ -77,12 +83,6 @@ export function useCourseLearn() {
     lectureProgressMap: Map<number, LectureProgressMapValue>,
   ): UILecture {
     if (!progressInfo) return lectures[0];
-
-    // TODO: 초기 자동 선택 (이어보기), 다음 강의 상태
-    console.log('[AUTO SELECT]', {
-      lastWatched: progressInfo?.resourceId,
-      completed: lectureProgressMap.get(progressInfo?.resourceId)?.completed,
-    });
 
     const idx = lectures.findIndex((l) => l.resourceId === progressInfo.resourceId);
 
@@ -110,12 +110,6 @@ export function useCourseLearn() {
 
   const currentLecture = useMemo<UILecture | null>(() => {
     if (!flatLectures.length) return null;
-
-    // TODO: 다음 강의 자동 이동
-    console.log('[CURRENT LECTURE DECIDE]', {
-      selectedLectureId,
-      autoLecture: autoLecture?.id,
-    });
 
     if (selectedLectureId) {
       const found = flatLectures.find((l) => l.id === selectedLectureId);

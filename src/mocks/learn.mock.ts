@@ -98,7 +98,7 @@ export const MOCK_LEARN_PROGRESS: GetProgressResponse = {
   overallProgressRate: 25,
   lastWatchedResourceId: 3001,
   lastWatchedAt: '2025-12-02T09:30:00',
-  lectureProgresses: [
+  resourceProgresses: [
     {
       resourceId: 3001,
       title: 'JPA란?',

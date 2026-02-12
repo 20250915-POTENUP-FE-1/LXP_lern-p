@@ -1,5 +1,6 @@
 'use client';
 
+import { title } from 'process';
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
 import { MOCK_GET_CATEGORIES } from '@/mocks/category.mock';
@@ -19,7 +20,8 @@ import { useInfiniteCourseList } from '../hooks/useInfiniteCourseList';
 
 export default function CourseListClientPage() {
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryMapEntry>>({});
-  const { sort, size, categoryId, level, title, setCategoryLevelAndTitle } = useCourseListQuery();
+  const { sort, size, categoryId, level, keyword, setCategoryLevelAndKeyword } =
+    useCourseListQuery();
 
   const {
     items: courses,
@@ -35,7 +37,7 @@ export default function CourseListClientPage() {
   });
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
-    setCategoryLevelAndTitle(nextCategoryId, null, null);
+    setCategoryLevelAndKeyword(nextCategoryId, null, null);
   };
 
   // 카테고리 데이터는 마운트 시 1회만
@@ -71,13 +73,14 @@ export default function CourseListClientPage() {
       <section className={styles['course-list__content']} aria-label="강좌 카드 목록">
         <div className={styles['course-list__toolbar']}>
           <LevelSelect />
+          {/* TODO: 강좌 목록 조회 API는 정렬 추후에 반영 */}
           <SortSelect />
         </div>
         {isLoading ? (
           <p className={styles['course-list__loading']}>불러오는 중...</p>
         ) : courses.length === 0 ? (
           <p className={styles['course-list__empty']}>
-            {title.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
+            {keyword.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
           </p>
         ) : (
           <>
