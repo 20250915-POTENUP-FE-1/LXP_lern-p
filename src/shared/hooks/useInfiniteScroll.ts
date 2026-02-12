@@ -16,6 +16,7 @@ export type UseInfiniteScrollResult<T> = {
   error: Error | null;
   setTarget: (node: HTMLElement | null) => void;
   reset: () => void;
+  reload: () => void;
 };
 
 export function useInfiniteScroll<T>({
@@ -24,7 +25,6 @@ export function useInfiniteScroll<T>({
   enabled = true,
 }: UseInfiniteScrollProps<T>): UseInfiniteScrollResult<T> {
   const [items, setItems] = useState<T[]>([]);
-  const [page, setPage] = useState(initialPage);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -32,43 +32,52 @@ export function useInfiniteScroll<T>({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const targetRef = useRef<HTMLElement | null>(null);
 
-  const loadMoreRef = useRef<() => void>(() => {}); // observe 고정, 로딩 로직만 최신 유지
-  const requestIdRef = useRef(0); // 유효 요청 식별 토큰
-  const didInitLoadRef = useRef(false); // 초기 로드 체크 플래그
+  const loadMoreRef = useRef<() => void>(() => {});
+  const requestIdRef = useRef(0);
+
+  const pageRef = useRef(initialPage);
+  const didInitLoadRef = useRef(false);
+  const isLoadingRef = useRef(false); // state 반영 타이밍 문제 방지
 
   const loadMore = useCallback(async () => {
-    if (!enabled || isLoading || !hasNext) return;
+    if (!enabled || isLoadingRef.current || !hasNext) return;
 
     const requestId = ++requestIdRef.current;
+    const page = pageRef.current;
+
+    // 요청 즉시 page 증가 → 중복 요청 방지
+    pageRef.current += 1;
+    isLoadingRef.current = true;
 
     setIsLoading(true);
+    setError(null);
+
     try {
-      setError(null);
       const res = await loadPage(page);
 
-      // 늦게 온 응답 무시
       if (requestId !== requestIdRef.current) return;
 
       setItems((prev) => [...prev, ...res.content]);
       setHasNext(res.hasNext);
-      setPage((prev) => prev + 1);
     } catch (e) {
+      // 실패 시 page 되돌림 (다시 시도 가능)
+      pageRef.current -= 1;
+
       if (requestId === requestIdRef.current) {
         setError(e as Error);
       }
     } finally {
       if (requestId === requestIdRef.current) {
+        isLoadingRef.current = false;
         setIsLoading(false);
       }
     }
-  }, [enabled, isLoading, hasNext, loadPage, page]);
+  }, [enabled, hasNext, loadPage]);
 
-  // 최신 loadMore를 observer에서 참조
   useEffect(() => {
     loadMoreRef.current = loadMore;
   }, [loadMore]);
 
-  // observer는 1회만 생성
   useEffect(() => {
     if (!enabled) return;
 
@@ -79,12 +88,12 @@ export function useInfiniteScroll<T>({
         }
       },
       {
-        rootMargin: '0px', // 미리 로딩
-        threshold: 0, // 0~1
+        root: null,
+        rootMargin: '0px',
+        threshold: 0,
       },
     );
 
-    // observer 생성 시 이미 target이 있으면 바로 observe
     if (targetRef.current) {
       observerRef.current.observe(targetRef.current);
     }
@@ -119,19 +128,28 @@ export function useInfiniteScroll<T>({
 
   const reset = useCallback(() => {
     requestIdRef.current++;
+
     setItems([]);
-    setPage(initialPage);
     setHasNext(true);
     setIsLoading(false);
     setError(null);
+
+    pageRef.current = initialPage;
+    isLoadingRef.current = false;
     didInitLoadRef.current = false;
   }, [initialPage]);
 
+  // enabled off 시 정리
   useEffect(() => {
     if (!enabled) {
       reset();
     }
   }, [enabled, reset]);
+
+  // reload = reset + 초기 로드 다시
+  const reload = useCallback(() => {
+    reset();
+  }, [reset]);
 
   return {
     items,
@@ -140,5 +158,6 @@ export function useInfiniteScroll<T>({
     error,
     setTarget,
     reset,
+    reload,
   };
 }

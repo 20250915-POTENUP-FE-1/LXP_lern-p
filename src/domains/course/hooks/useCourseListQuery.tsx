@@ -8,7 +8,6 @@ export type SortValue = 'newest' | 'oldest' | 'price-asc' | 'price-desc';
 
 interface CourseListQueryState {
   sort: SortValue;
-  page: number;
   size: number;
   categoryId: number | null;
   level: CourseLevel | null;
@@ -17,7 +16,6 @@ interface CourseListQueryState {
 
 interface UseCourseListQueryReturn extends CourseListQueryState {
   setSort: (value: SortValue) => void;
-  setPage: (value: number) => void;
   setSize: (value: number) => void;
   setCategoryId: (value: number | null) => void;
   setCategoryAndKeyword: (categoryId: number | null, keyword: string | null) => void;
@@ -43,12 +41,9 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
       ? sortParam
       : 'newest';
 
-  const pageParam = searchParams.get('page');
-  const page = pageParam ? Math.max(0, Number(pageParam)) : 0;
-
   const sizeParam = searchParams.get('size');
-  const sizeValue = sizeParam ? Number(sizeParam) : 10;
-  const size = Number.isFinite(sizeValue) && sizeValue > 0 ? sizeValue : 10;
+  const sizeValue = sizeParam ? Number(sizeParam) : 12;
+  const size = Number.isFinite(sizeValue) && sizeValue > 0 ? sizeValue : 12;
 
   const categoryIdParam = searchParams.get('categoryId');
   const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
@@ -64,6 +59,7 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString());
+
       for (const [key, value] of Object.entries(updates)) {
         if (value == null || value === '') {
           params.delete(key);
@@ -72,8 +68,9 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
         }
       }
 
-      const orderedKeys = ['categoryId', 'level', 'keyword', 'sort', 'page', 'size'];
+      const orderedKeys = ['categoryId', 'level', 'keyword', 'sort', 'size'];
       const orderedParams = new URLSearchParams();
+
       for (const key of orderedKeys) {
         const value = params.get(key);
         if (value != null) {
@@ -82,29 +79,21 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
       }
 
       const query = orderedParams.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
+
+      router.replace(query ? `${pathname}?${query}` : pathname);
     },
     [pathname, router, searchParams],
   );
 
-  const setSort = useCallback(
-    (value: SortValue) => updateParams({ sort: value, page: null }),
-    [updateParams],
-  );
-
-  const setPage = useCallback(
-    (value: number) => updateParams({ page: String(value) }),
-    [updateParams],
-  );
+  const setSort = useCallback((value: SortValue) => updateParams({ sort: value }), [updateParams]);
 
   const setSize = useCallback(
-    (value: number) => updateParams({ size: String(value), page: null }),
+    (value: number) => updateParams({ size: String(value) }),
     [updateParams],
   );
 
   const setCategoryId = useCallback(
-    (value: number | null) =>
-      updateParams({ categoryId: value != null ? String(value) : null, page: null }),
+    (value: number | null) => updateParams({ categoryId: value != null ? String(value) : null }),
     [updateParams],
   );
 
@@ -113,7 +102,6 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
       updateParams({
         categoryId: value != null ? String(value) : null,
         keyword: nextKeyword || null,
-        page: null,
       }),
     [updateParams],
   );
@@ -124,12 +112,12 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
         categoryId: value != null ? String(value) : null,
         level: nextLevel ?? null,
         keyword: nextKeyword || null,
-        page: null,
       }),
     [updateParams],
   );
+
   const setLevel = useCallback(
-    (value: CourseLevel | null) => updateParams({ level: value, page: null }),
+    (value: CourseLevel | null) => updateParams({ level: value }),
     [updateParams],
   );
 
@@ -140,20 +128,17 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
         categoryId: null,
         level: null,
         sort: null,
-        page: null,
       }),
     [updateParams],
   );
 
   return {
     sort,
-    page,
     size,
     categoryId,
     level,
     keyword,
     setSort,
-    setPage,
     setSize,
     setCategoryId,
     setCategoryAndKeyword,
