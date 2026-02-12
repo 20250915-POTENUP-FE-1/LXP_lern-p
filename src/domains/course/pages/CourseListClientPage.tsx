@@ -1,6 +1,5 @@
 'use client';
 
-import { title } from 'process';
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/app/CourseListPage.module.css';
 import { MOCK_GET_CATEGORIES } from '@/mocks/category.mock';
@@ -33,7 +32,7 @@ export default function CourseListClientPage() {
     sort,
     categoryId: categoryId ?? undefined,
     level: level ?? undefined,
-    title,
+    title: keyword,
   });
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
@@ -76,22 +75,15 @@ export default function CourseListClientPage() {
           {/* TODO: 강좌 목록 조회 API는 정렬 추후에 반영 */}
           <SortSelect />
         </div>
-        {isLoading ? (
-          <p className={styles['course-list__loading']}>불러오는 중...</p>
-        ) : courses.length === 0 ? (
-          <p className={styles['course-list__empty']}>
-            {keyword.trim() ? '검색 결과가 없습니다.' : '등록된 강좌가 없습니다.'}
-          </p>
-        ) : (
-          <>
-            <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
-              {uniqueCourses.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-            {hasNext && <div ref={setTarget} />}
-          </>
-        )}
+        <div className={`${styles['course-list__cards']} ${styles['course-grid']}`}>
+          {uniqueCourses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+
+        {isLoading && <p className={styles['course-list__loading']}>불러오는 중...</p>}
+
+        {hasNext && <div ref={setTarget} />}
       </section>
     </main>
   );
