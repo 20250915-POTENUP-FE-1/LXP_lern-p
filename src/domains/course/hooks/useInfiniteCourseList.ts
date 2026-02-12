@@ -10,19 +10,11 @@ type UseInfiniteCourseListParams = {
   size: number;
   sort?: string;
   categoryId?: number;
-  title?: string;
+  keyword?: string;
   level?: CourseLevel;
 };
 
 export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
-  const CATEGORY_ID_NAME_MAP: Record<number, string> = {
-    1: '프로그래밍',
-    2: '백엔드',
-    3: '프론트엔드',
-    4: '데이터사이언스',
-    5: '데이터 분석',
-  };
-
   const mockAdapter = useCallback(
     async (page: number): Promise<GetAllCourseResponse> => {
       const size = params.size;
@@ -40,8 +32,8 @@ export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
         filtered = filtered.filter((course) => course.level === params.level);
       }
 
-      if (params.title?.trim()) {
-        const keyword = params.title.toLowerCase();
+      if (params.keyword?.trim()) {
+        const keyword = params.keyword.toLowerCase();
         filtered = filtered.filter(
           (course) =>
             course.title.toLowerCase().includes(keyword) ||
@@ -61,7 +53,7 @@ export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
         hasNext: end < filtered.length,
       };
     },
-    [params.size, params.categoryId, params.level, params.title],
+    [params.size, params.categoryId, params.level, params.keyword],
   );
 
   type CourseItem = GetAllCourseResponse['content'][number];
@@ -78,6 +70,7 @@ export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
     price: item.price,
     isFree: item.price === 0,
     studentCount: item.studentCount,
+    reviewStat: item.reviewStat,
   });
 
   const loadPage = async (page: number) => {
@@ -89,13 +82,14 @@ export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
           sort: params.sort,
           categoryId: params.categoryId,
           level: params.level,
-          title: params.title,
+          keyword: params.keyword,
         });
     return {
       content: data.content.map(toCourseCard),
       currentPage: data.currentPage,
       totalPages: data.totalPages,
       hasNext: data.hasNext,
+      totalElements: data.totalElements,
     };
   };
 
@@ -103,7 +97,15 @@ export function useInfiniteCourseList(params: UseInfiniteCourseListParams) {
 
   useEffect(() => {
     infinite.reload();
-  }, [params.categoryId, params.sort, params.level, params.title]);
+  }, [params.categoryId, params.sort, params.level, params.keyword]);
 
   return infinite;
 }
+
+const CATEGORY_ID_NAME_MAP: Record<number, string> = {
+  1: '프로그래밍',
+  2: '백엔드',
+  3: '프론트엔드',
+  4: '데이터사이언스',
+  5: '데이터 분석',
+};

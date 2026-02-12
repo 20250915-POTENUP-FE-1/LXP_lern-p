@@ -15,8 +15,6 @@ import { SortSelect } from '../components/SortSelect';
 import { LevelSelect } from '../components/LevelSelect';
 import { useInfiniteCourseList } from '../hooks/useInfiniteCourseList';
 
-/** API 응답 Category[] → FilterNav용 Record<string, string[]> 변환 */
-
 export default function CourseListClientPage() {
   const [categoryMap, setCategoryMap] = useState<Record<string, CategoryMapEntry>>({});
   const { sort, size, categoryId, level, keyword, setCategoryLevelAndKeyword } =
@@ -32,7 +30,7 @@ export default function CourseListClientPage() {
     sort,
     categoryId: categoryId ?? undefined,
     level: level ?? undefined,
-    title: keyword,
+    keyword: keyword,
   });
 
   const handleSelectCategory = (nextCategoryId: number | null) => {
