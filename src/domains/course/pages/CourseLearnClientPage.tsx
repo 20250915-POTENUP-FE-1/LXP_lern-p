@@ -16,6 +16,7 @@ import { useCourseLearn } from '@/domains/course/hooks/useCourseLearn';
 import styles from '@/app/courses/[id]/learn/CourseLearnPage.module.css';
 import { formatLectureDuration } from '@/domains/course/utils/formatDuration';
 import { toPublicAssetUrl } from '@/domains/course/utils/toPublicAssetUrl';
+import { useProgress } from '../hooks/useProgress';
 
 export default function CourseLearnClient() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function CourseLearnClient() {
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    resetSaveState,
     totalLectures,
     completedLectures,
   } = useCourseLearn();
@@ -39,6 +41,7 @@ export default function CourseLearnClient() {
   useEffect(() => {
     if (!currentLecture) return;
     hasSeekedRef.current = false;
+    resetSaveState();
   }, [currentLecture?.resourceId]);
 
   useEffect(() => {

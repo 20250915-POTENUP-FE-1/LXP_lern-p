@@ -25,6 +25,7 @@ export function useCourseLearn() {
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    resetSaveState,
     lastSavedResourceId,
   } = useProgress(courseId);
 
@@ -195,6 +196,7 @@ export function useCourseLearn() {
     lectureProgressMap,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    resetSaveState,
     totalLectures,
     completedLectures,
   };

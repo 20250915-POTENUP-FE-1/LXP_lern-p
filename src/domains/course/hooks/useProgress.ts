@@ -135,7 +135,8 @@ export function useProgress(courseId: string) {
       });
     }
 
-    lastSavedDurationRef.current = watchedDuration;
+    lastSavedDurationRef.current = Math.max(lastSavedDurationRef.current, watchedDuration);
+    setLastSavedResourceId(resourceId);
 
     setProgressData((prev) =>
       prev ? applyProgressUpdate(prev, resourceId, watchedDuration) : prev,
@@ -147,19 +148,33 @@ export function useProgress(courseId: string) {
     const now = Date.now();
 
     if (now - lastSavedAtRef.current < THROTTLE_INTERVAL) return;
-    if (Math.abs(watchedDuration - lastSavedDurationRef.current) < MIN_SAVE_DELTA) return;
+    if (watchedDuration - lastSavedDurationRef.current < MIN_SAVE_DELTA) return;
 
     lastSavedAtRef.current = now;
     saveProgress(resourceId, watchedDuration);
   };
 
   // 영상 종료 시 최종 진도 저장
-  const saveFinalProgressOnEnd = (resourceId: number) => {
-    const target = progressData?.resourceProgresses.find((p) => p.resourceId === resourceId);
+  const saveFinalProgressOnEnd = async (resourceId: number) => {
+    if (!progressData) return;
 
+    const target = progressData.resourceProgresses.find((p) => p.resourceId === resourceId);
     if (!target) return;
 
-    saveProgress(resourceId, target.totalDurationSeconds);
+    if (!USE_MOCK) {
+      await updateLearnProgress(courseId, {
+        resourceId,
+        watchedDuration: target.totalDurationSeconds,
+      });
+    }
+
+    setProgressData((prev) =>
+      prev
+        ? applyProgressUpdate(prev, resourceId, target.totalDurationSeconds, {
+            updateLastWatched: false,
+          })
+        : prev,
+    );
   };
 
   // 프론트에서 진도 상태를 계산/반영
@@ -167,25 +182,27 @@ export function useProgress(courseId: string) {
     prev: GetProgressResponse,
     resourceId: number,
     watchedDuration: number,
+    options?: { updateLastWatched?: boolean },
   ): GetProgressResponse {
     const lectureProgresses = (prev.resourceProgresses ?? []).map((p) => {
       if (p.resourceId !== resourceId) return p;
 
+      const safeDuration = Math.max(p.watchedDuration, watchedDuration);
+
       const progressRate =
-        watchedDuration >= p.totalDurationSeconds - 0.5
+        safeDuration >= p.totalDurationSeconds - 0.5
           ? 100
-          : Math.min(100, Math.round((watchedDuration / p.totalDurationSeconds) * 100));
+          : Math.min(100, Math.round((safeDuration / p.totalDurationSeconds) * 100));
 
       return {
         ...p,
-        watchedDuration,
+        watchedDuration: safeDuration,
         progressRate,
         completed: progressRate >= 100,
         lastWatchedAt: new Date().toISOString(),
       };
     });
 
-    // 전체 진도율 재계산
     const overallProgressRate =
       lectureProgresses.length === 0
         ? 0
@@ -194,14 +211,23 @@ export function useProgress(courseId: string) {
               lectureProgresses.length,
           );
 
+    const shouldUpdateLastWatched = options?.updateLastWatched !== false;
+
     return {
       ...prev,
       resourceProgresses: lectureProgresses,
       overallProgressRate,
-      lastWatchedResourceId: resourceId,
-      lastWatchedAt: new Date().toISOString(),
+
+      lastWatchedResourceId: shouldUpdateLastWatched ? resourceId : prev.lastWatchedResourceId,
+
+      lastWatchedAt: shouldUpdateLastWatched ? new Date().toISOString() : prev.lastWatchedAt,
     };
   }
+
+  const resetSaveState = () => {
+    lastSavedDurationRef.current = 0;
+    lastSavedAtRef.current = 0;
+  };
 
   return {
     progress,
@@ -211,6 +237,7 @@ export function useProgress(courseId: string) {
     saveProgress,
     autoSaveProgress,
     saveFinalProgressOnEnd,
+    resetSaveState,
     lastSavedResourceId,
     isLoading,
     error,
