@@ -91,7 +91,7 @@ export function useProgress(courseId: string) {
   const pendingRef = useRef<PendingProgress | null>(null); // 저장 실패 시 재시도 대상
 
   const THROTTLE_INTERVAL = 10_000; // 저장 최소 호출 간격 (ms)
-  const MIN_SAVE_DELTA = 5; // 저장할 최소 재생 시간 변화량 (초)
+  const MIN_SAVE_DELTA = 3; // 저장할 최소 재생 시간 변화량 (초)
   const RETRY_DELAYS = [2000, 5000, 15000]; // 저장 실패 시 재시도 간격 (ms)
 
   // 저장 실패한 진도를 재시도
