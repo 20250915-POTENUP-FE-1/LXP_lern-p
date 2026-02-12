@@ -9,6 +9,8 @@ export type CourseCardProps = {
 };
 
 export function CourseCard({ course }: CourseCardProps) {
+  const reviewCount = course.reviewStat?.reviewCount ?? 0;
+  const avgRating = course.reviewStat?.avgRating ?? 0;
   return (
     <Link
       href={`/courses/${course.id}`}
@@ -36,14 +38,14 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className={`${styles['course-card__meta']}`}>
           <div className={` ${styles['course-card__instructor']}`}>{course.instructorName}</div>
           <div className={styles['course-card__rating']}>
-            {course.reviewStat.reviewCount > 0 ? (
+            {reviewCount > 0 ? (
               <>
                 <span className={styles['course-card_start']}>★</span>
                 <span className={styles['course-card__rating-text']}>
-                  {(course.reviewStat.avgRating / 2).toFixed(1)}
+                  {(avgRating / 2).toFixed(1)}
                 </span>
                 <span className={styles['course-card__review-count']}>
-                  ({course.reviewStat.reviewCount.toLocaleString()})
+                  ({reviewCount.toLocaleString()})
                 </span>
               </>
             ) : (

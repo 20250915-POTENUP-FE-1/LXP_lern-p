@@ -80,9 +80,11 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
           orderedParams.set(key, value);
         }
       }
-
+      const shouldScroll = updates.page == null;
       const query = orderedParams.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
+      router.push(query ? `${pathname}?${query}` : pathname, {
+        scroll: shouldScroll,
+      });
     },
     [pathname, router, searchParams],
   );
