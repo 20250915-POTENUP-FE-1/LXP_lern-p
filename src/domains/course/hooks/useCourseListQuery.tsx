@@ -42,8 +42,8 @@ export function useCourseListQuery(): UseCourseListQueryReturn {
       : 'newest';
 
   const sizeParam = searchParams.get('size');
-  const sizeValue = sizeParam ? Number(sizeParam) : 10;
-  const size = Number.isFinite(sizeValue) && sizeValue > 0 ? sizeValue : 10;
+  const sizeValue = sizeParam ? Number(sizeParam) : 12;
+  const size = Number.isFinite(sizeValue) && sizeValue > 0 ? sizeValue : 12;
 
   const categoryIdParam = searchParams.get('categoryId');
   const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
