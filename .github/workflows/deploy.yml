@@ -1,0 +1,20 @@
+name: Mirror to Fork
+
+on:
+  push:
+    branches: ['main', 'develop']
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to fork repository
+        run: |
+          git remote remove fork || true
+          git remote add fork https://x-access-token:${{ secrets.FORK_PAT }}@github.com/${{ secrets.FORK_REPO }}.git
+          git push fork "HEAD:refs/heads/${{ github.ref_name }}" --force-with-lease
